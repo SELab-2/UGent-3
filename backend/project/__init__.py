@@ -3,7 +3,7 @@ This file is the base of the Flask API. It contains the basic structure of the A
 """
 
 from flask import Flask, jsonify
-from endpoints.index import index_bp
+from .endpoints.index import index_bp
 
 def create_app():
     """
