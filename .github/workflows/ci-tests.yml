@@ -16,15 +16,19 @@ jobs:
           path: ~/.npm
           key: npm-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
-
+          
       - name: Install dependencies
+        working-directory: ./frontend
         run: npm ci
       
       - name: Build
+        working-directory: ./frontend
         run: npm run build
       
       - name: Preview Web App
+        working-directory: ./frontend
         run: npm run preview &
 
       - name: Running tests
+        working-directory: ./frontend
         run: npm test
