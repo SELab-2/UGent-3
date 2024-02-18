@@ -17,6 +17,9 @@ jobs:
           key: npm-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
 
+      - name: Go to frontend directory
+        run: cd frontend 
+
       - name: Install dependencies
         run: npm i
       
