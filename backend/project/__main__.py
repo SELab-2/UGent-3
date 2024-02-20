@@ -59,10 +59,3 @@ class Project_Submissions(db.Model):
     student = db.Column(db.Integer,ForeignKey('Students.id'))
     project_task = db.Column(db.Integer,ForeignKey('Project_Tasks.id'))
     path_to_files = db.Column(db.String(100), nullable=False,unique=False)
-
-
-
-
-# Create the database tables
-with app.app_context():
-    db.create_all()
