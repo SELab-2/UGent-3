@@ -1,0 +1,62 @@
+name: UGent-3
+run-name: ${{ github.actor }} is running tests 🚀
+on: [push, pull_request]
+jobs:
+  Frontend-tests:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-
+          
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: Build
+        working-directory: ./frontend
+        run: npm run build
+      
+      - name: Preview Web App
+        working-directory: ./frontend
+        run: npm run preview &
+
+      - name: Running tests
+        working-directory: ./frontend
+        run: npm test
+      
+      - name: Run linting
+        working-directory: ./frontend
+        run: npm run lint
+  Backend-tests:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          cache: 'pip'
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt
+
+      - name: Running tests
+        working-directory: ./backend
+        run: pytest
+
+      - name: Run linting
+        working-directory: ./backend
+        run: pylint ./*/*.py
+
+      
