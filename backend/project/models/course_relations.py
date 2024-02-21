@@ -1,7 +1,7 @@
 """Models for relation between users and courses"""
 # pylint: disable=too-few-public-methods
 
-from sqlalchemy import INTEGER, Column, ForeignKey, PrimaryKeyConstraint, String
+from sqlalchemy import Integer, Column, ForeignKey, PrimaryKeyConstraint, String
 from project import db
 
 class BaseCourseRelation(db.Model):
@@ -9,7 +9,7 @@ class BaseCourseRelation(db.Model):
 
     __abstract__ = True
 
-    course_id = Column(INTEGER, ForeignKey('Courses.course_id'), nullable=False)
+    course_id = Column(Integer, ForeignKey('Courses.course_id'), nullable=False)
     uid = Column(String(255), ForeignKey("Users.uid"), nullable=False)
     __table_args__ = PrimaryKeyConstraint("course_id", "uid")
 
