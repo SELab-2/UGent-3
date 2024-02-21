@@ -1,9 +1,12 @@
 """Main entry point for the application."""
 from sys import path
-from project import create_app
+from os import getenv
+from project import init_db
+from dotenv import load_dotenv
 
 path.append(".")
 
 if __name__ == "__main__":
-    app = create_app()
+    load_dotenv(dotenv_path='environment.env')
+    app = init_db(getenv("DB_HOST"))
     app.run(debug=True)
