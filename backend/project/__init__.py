@@ -8,15 +8,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from .endpoints.index import index_bp
 
-db = SQLAlchemy()
-load_dotenv()
-
 def create_app():
     """
     Create a Flask application instance.
     Returns:
         Flask -- A Flask application instance
     """
+    db = SQLAlchemy()
+    load_dotenv()
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = getenv('DB_HOST')
     app.register_blueprint(index_bp)
