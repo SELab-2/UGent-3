@@ -1,8 +1,8 @@
 """Main entry point for the application."""
 from sys import path
 from os import getenv
-from project import init_db
 from dotenv import load_dotenv
+from project import init_db
 
 path.append(".")
 
