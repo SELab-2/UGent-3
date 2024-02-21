@@ -2,8 +2,9 @@
 This file is the base of the Flask API. It contains the basic structure of the API.    
 """
 
-from flask import Flask, jsonify
+from flask import Flask
 from .endpoints.index import index_bp
+
 
 def create_app():
     """
@@ -14,5 +15,6 @@ def create_app():
     app = Flask(__name__)
 
     app.register_blueprint(index_bp)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+
+    #TODO: connect to db
     return app
