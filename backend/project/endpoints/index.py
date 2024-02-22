@@ -6,10 +6,11 @@ index_bp = Blueprint("index", __name__)
 
 
 class Index(Resource):
-    """Temporary"""
+    """Api endpoint for the / route"""
 
     def get(self):
-        """Hello world"""
+        """Example of an api endpoint function that will respond to get requests made to /
+        return a json data structure with key Message and value Hello World!"""
         return {"Message": "Hello World!"}
 
 

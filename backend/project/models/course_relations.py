@@ -5,7 +5,10 @@ from sqlalchemy import Integer, Column, ForeignKey, PrimaryKeyConstraint, String
 from project import db
 
 class BaseCourseRelation(db.Model):
-    """Base class for course relation models"""
+    """Base class for course relation models,
+    both course relation tables have a 
+    course_id of the course to wich someone is related and
+    an uid of the related person"""
 
     __abstract__ = True
 

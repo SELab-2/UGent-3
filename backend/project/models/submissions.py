@@ -4,7 +4,15 @@ from sqlalchemy import Column,String,ForeignKey,Integer,CheckConstraint,DateTime
 from project import db
 
 class Submissions(db.Model):
-    """Submission model"""
+    """This class describes the submissions table,
+    submissions can be made to a project, a submission has
+    and id, a uid from the user that uploaded it, 
+    the project id of the related project,
+    an optional grading,
+    the submission time,
+    submission path,
+    and finally the submission status
+    so we can easily present in a list which submission succeeded the automated checks"""
 
     __tablename__ = "submissions"
     submission_id = Column(Integer, nullable=False, primary_key=True)

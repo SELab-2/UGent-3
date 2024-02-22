@@ -4,7 +4,14 @@ from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, St
 from project import db
 
 class Projects(db.Model):
-    """Project model"""
+    """This class describes the projects table,
+    a projects has an id, a title, a description, 
+    an optional assignment file that can contain more explanation of the projects,
+    an optional deadline,
+    the course id of the course to which the project belongs,
+    visible for students variable so a teacher can decide if the students can see it yet,
+    archieved var so we can implement the archiving functionality,
+    a test path,script name and regex experssions for automated testing"""
 
     __tablename__ = "projects"
     project_id = Column(Integer, primary_key=True)

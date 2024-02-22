@@ -5,7 +5,8 @@ from project import db
 
 
 class Courses(db.Model):
-    """Course model"""
+    """This class described the courses table, 
+    a course has an id, name, optional ufora id and the teacher that created it"""
 
     __tablename__ = "courses"
     course_id = Column(Integer, primary_key=True)

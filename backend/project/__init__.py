@@ -20,8 +20,15 @@ def create_app():
 
     return app
 
-def init_db(db_uri):
-    """Initialize the database with the given uri"""
+def create_app_with_db(db_uri:str):
+    """
+    Initialize the database with the given uri 
+    and connect it to the app made with create_app.
+    Parameters:
+    db_uri (str): The URI of the database to initialize.
+    Returns:
+        Flask -- A Flask application instance
+    """
     app = create_app()
     app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     db.init_app(app)
