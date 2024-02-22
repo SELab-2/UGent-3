@@ -2,6 +2,7 @@
 # pylint: disable=too-few-public-methods
 from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from project import db
+from project.models.courses import Courses
 
 class Projects(db.Model):
     """This class describes the projects table,
@@ -19,7 +20,7 @@ class Projects(db.Model):
     descriptions = Column(Text, nullable=False)
     assignment_file = Column(String(50))
     deadline = Column(DateTime(timezone=True))
-    course_id = Column(Integer, ForeignKey("Courses.course_id"), nullable=False)
+    course_id = Column(Integer, ForeignKey("courses.course_id"), nullable=False)
     visible_for_students = Column(Boolean, nullable=False)
     archieved = Column(Boolean, nullable=False)
     test_path = Column(String(50))

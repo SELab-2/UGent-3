@@ -3,6 +3,8 @@
 
 from sqlalchemy import Integer, Column, ForeignKey, PrimaryKeyConstraint, String
 from project import db
+from project.models.users import Users
+from project.models.courses import Courses
 
 class BaseCourseRelation(db.Model):
     """Base class for course relation models,
@@ -12,9 +14,11 @@ class BaseCourseRelation(db.Model):
 
     __abstract__ = True
 
-    course_id = Column(Integer, ForeignKey('Courses.course_id'), nullable=False)
-    uid = Column(String(255), ForeignKey("Users.uid"), nullable=False)
-    __table_args__ = PrimaryKeyConstraint("course_id", "uid")
+    course_id = Column(Integer, ForeignKey('courses.course_id'), nullable=False)
+    uid = Column(String(255), ForeignKey("users.uid"), nullable=False)
+    __table_args__ = (
+        PrimaryKeyConstraint("course_id", "uid"),
+    )
 
 class CourseAdmins(BaseCourseRelation):
     """Admin to course relation model"""
