@@ -38,6 +38,8 @@ class TestCoursesModel:
 
         db_session.add(course)
         db_session.commit()
+        for s in course_students_relation:
+            s.course_id = course.course_id
 
         with pytest.raises(
             IntegrityError
