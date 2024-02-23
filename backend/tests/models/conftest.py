@@ -98,7 +98,6 @@ def valid_project(course):
         title="Project",
         descriptions="Test project",
         deadline=deadline,
-        course_id=course.course_id,
         visible_for_students=True,
         archieved=False,
     )

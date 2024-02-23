@@ -1,5 +1,6 @@
 import pytest
 from sqlalchemy.exc import IntegrityError
+from psycopg2.errors import ForeignKeyViolation
 from project.models.courses import Courses
 from project.models.users import Users
 from project.models.course_relations import CourseAdmins, CourseStudents
@@ -11,8 +12,7 @@ class TestCoursesModel:
     def test_foreignkey_courses_teacher(self, db_session, course: Courses):
         """Tests the foreign key relation between courses and the teacher uid"""
         with pytest.raises(
-            IntegrityError,
-            match="Courses should throw a foreign key error on the teacher uid",
+            IntegrityError
         ):
             db_session.add(course)
             db_session.commit()
@@ -40,8 +40,7 @@ class TestCoursesModel:
         db_session.commit()
 
         with pytest.raises(
-            IntegrityError,
-            match="Course_relations should throw a foreign key error on the student uid",
+            IntegrityError
         ):
             db_session.add_all(course_students_relation)
             db_session.commit()
@@ -66,6 +65,8 @@ class TestCoursesModel:
         db_session.add_all(course_students)
         db_session.commit()
 
+        for s in course_students_relation:
+            s.course_id = course.course_id
         db_session.add_all(course_students_relation)
         db_session.commit()
 
@@ -80,7 +81,7 @@ class TestCoursesModel:
 
         db_session.add(assistent)
         db_session.commit()
-
+        course_admin.course_id = course.course_id
         db_session.add(course_admin)
         db_session.commit()
 

@@ -13,6 +13,7 @@ class TestProjectsAndSubmissionsModel:
         db_session.commit()
         db_session.add(course)
         db_session.commit()
+        valid_project.course_id = course.course_id
         db_session.add(valid_project)
         db_session.commit()
         check_project = (
@@ -40,8 +41,7 @@ class TestProjectsAndSubmissionsModel:
         assert submission_check.uid == valid_user.uid
 
         with pytest.raises(
-            IntegrityError,
-            match="Submissions model should throw an error on grades out of [0,20] range",
+            IntegrityError
         ):
             submission_check.grading = 100
             db_session.commit()
