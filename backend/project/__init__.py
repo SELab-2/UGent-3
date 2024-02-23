@@ -2,8 +2,8 @@
 This file is the base of the Flask API. It contains the basic structure of the API.    
 """
 
-from flask import Flask, jsonify
-from .endpoints.index import index_bp
+from flask import Flask
+from .endpoints.index.index import index_bp
 
 def create_app():
     """
