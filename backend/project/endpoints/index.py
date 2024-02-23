@@ -7,6 +7,7 @@ from flask_restful import Resource
 
 index_bp = Blueprint("index", __name__)
 
+
 class Index(Resource):
     """
     Subclass of restfull Resource, used to define the index endpoint of the API.
