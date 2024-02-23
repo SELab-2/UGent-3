@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: test_database
+
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      - postgres
+    environment:
+      POSTGRES_HOST: postgres  # Use the service name defined in Docker Compose
+    volumes:
+      - .:/app
+    command: ["pytest"]
