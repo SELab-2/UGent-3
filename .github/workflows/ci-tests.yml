@@ -37,7 +37,7 @@ jobs:
         working-directory: ./frontend
         run: npm run lint
   Backend-tests:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -50,10 +50,10 @@ jobs:
       - name: Install dependencies
         working-directory: ./backend
         run: pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt
-
+      
       - name: Running tests
         working-directory: ./backend
-        run: pytest
+        run: bash ./run_tests.sh
 
       - name: Run linting
         working-directory: ./backend
