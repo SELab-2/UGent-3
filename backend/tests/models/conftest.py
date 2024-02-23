@@ -4,7 +4,12 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from datetime import datetime
 from project import db
+from project.models.courses import Courses
+from project.models.course_relations import CourseAdmins, CourseStudents
+from project.models.projects import Projects
+from project.models.submissions import Submissions
 from project.models.users import Users
 from sqlalchemy.engine.url import URL
 from dotenv import load_dotenv
@@ -39,4 +44,50 @@ def db_session():
 @pytest.fixture
 def valid_user():
     user = Users(uid="student", is_teacher=False, is_admin=False)
+    return user 
+
+@pytest.fixture
+def teachers():
+    users = [Users(uid=str(i), is_teacher=True, is_admin=False) for i in range(10)]
+    return users
+
+@pytest.fixture
+def course_teacher():
+    sel2_teacher = Users(uid="Bart", is_teacher=True, is_admin=False)
+    return sel2_teacher
+        
+@pytest.fixture
+def course(course_teacher):
+    sel2 = Courses(name="Sel2", teacher=course_teacher.uid)
+    return sel2
+
+@pytest.fixture
+def course_students():
+    students = [
+        Users(uid="student_sel2_" + str(i), is_teacher=False, is_admin=False)
+            for i in range(5)
+    ]
+    return students
+
+@pytest.fixture
+def course_students_relation(course,course_students):
+    course_relations = [
+        CourseStudents(course_id=course.course_id, uid=course_students[i].uid)
+            for i in range(5)
+    ]
+    return course_relations
+
+@pytest.fixture
+def assistent():
+    assist = Users(uid="assistent_sel2")
+    return assist
+
+@pytest.fixture()
+def course_admin(course,assistent):
+    admin_relation = CourseAdmins(uid=assistent.uid, course_id=course.course_id)
+    return admin_relation
+
+@pytest.fixture()
+def teacher():
+    user = Users(uid="teacher", is_teacher=True)
     return user
