@@ -7,15 +7,25 @@ services:
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
       POSTGRES_DB: test_database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d test_database"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
 
   test-runner:
     build:
       context: .
       dockerfile: Dockerfile.test
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       POSTGRES_HOST: postgres  # Use the service name defined in Docker Compose
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: test_database
     volumes:
       - .:/app
     command: ["pytest"]
