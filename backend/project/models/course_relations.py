@@ -1,5 +1,4 @@
 """Models for relation between users and courses"""
-# pylint: disable=too-few-public-methods
 
 from sqlalchemy import Integer, Column, ForeignKey, PrimaryKeyConstraint, String
 from project import db

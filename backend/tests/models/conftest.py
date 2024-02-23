@@ -66,7 +66,7 @@ def course_teacher():
     return sel2_teacher
 
 @pytest.fixture
-def course(course_teacher): # pylint: disable=redefined-outer-name ; fixture testing requires the same name to be used
+def course(course_teacher):
     """A course for testing, with the course teacher as the teacher."""
     sel2 = Courses(name="Sel2", teacher=course_teacher.uid)
     return sel2
@@ -81,7 +81,7 @@ def course_students():
     return students
 
 @pytest.fixture
-def course_students_relation(course,course_students): # pylint: disable=redefined-outer-name
+def course_students_relation(course,course_students):
     """A list of 5 course relations for testing."""
     course_relations = [
         CourseStudents(course_id=course.course_id, uid=course_students[i].uid)
@@ -96,7 +96,7 @@ def assistent():
     return assist
 
 @pytest.fixture()
-def course_admin(course,assistent): # pylint: disable=redefined-outer-name ; fixture testing requires the same name to be used
+def course_admin(course,assistent):
     """A course admin for testing."""
     admin_relation = CourseAdmins(uid=assistent.uid, course_id=course.course_id)
     return admin_relation

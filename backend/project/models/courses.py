@@ -1,5 +1,5 @@
 """The Courses model"""
-# pylint: disable=too-few-public-methods
+
 from sqlalchemy import Integer, Column, ForeignKey, String
 from project import db
 

@@ -1,5 +1,5 @@
 """Model for projects"""
-# pylint: disable=too-few-public-methods
+
 from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from project import db
 
