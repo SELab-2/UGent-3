@@ -53,7 +53,7 @@ jobs:
 
       - name: Running tests
         working-directory: ./backend
-        run: sudo bash ./run_tests.sh
+        run: bash ./run_tests.sh
 
       - name: Run linting
         working-directory: ./backend
