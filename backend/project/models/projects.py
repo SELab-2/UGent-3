@@ -2,7 +2,6 @@
 # pylint: disable=too-few-public-methods
 from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from project import db
-from project.models.courses import Courses
 
 class Projects(db.Model):
     """This class describes the projects table,

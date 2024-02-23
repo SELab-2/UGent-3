@@ -3,8 +3,6 @@
 
 from sqlalchemy import Integer, Column, ForeignKey, PrimaryKeyConstraint, String
 from project import db
-from project.models.users import Users
-from project.models.courses import Courses
 
 class BaseCourseRelation(db.Model):
     """Base class for course relation models,
