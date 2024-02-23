@@ -1,3 +1,6 @@
+from datetime import datetime
+import pytest
+from sqlalchemy.exc import IntegrityError
 from project.models.courses import Courses
 from project.models.course_relations import CourseAdmins, CourseStudents
 from project.models.projects import Projects
@@ -5,43 +8,22 @@ from project.models.submissions import Submissions
 from project.models.users import Users
 
 class TestProjectsAndSubmissionsModel:
-    def test_projects_and_submissions(self,db_session):
-        """
-        In this test function i will test the
-        creation of projects and submissions
-        """
-
-        teacher = Users(uid="teacher", is_teacher=True)
-        db_session.add(teacher)
+    def test_deadline(self,db_session,course,course_teacher,valid_project,valid_user):
+        db_session.add(course_teacher)
         db_session.commit()
-        course = Courses(name="course", teacher=teacher.uid)
         db_session.add(course)
         db_session.commit()
-        deadline = datetime(2024, 2, 25, 12, 0, 0)  # February 25, 2024, 12:00 PM
-        project = Projects(
-            title="Project",
-            descriptions="Test project",
-            deadline=deadline,
-            course_id=course.course_id,
-            visible_for_students=True,
-            archieved=False,
-        )
-
-        db_session.add(project)
+        db_session.add(valid_project)
         db_session.commit()
-
         check_project = (
-            db_session.query(Projects).filter_by(title=project.title).first()
+            db_session.query(Projects).filter_by(title=valid_project.title).first()
         )
-        self.assertEqual(check_project.deadline, project.deadline)
+        assert check_project.deadline == valid_project.deadline
 
-        submittor = Users(uid="student")
-        self.assertFalse(submittor.is_teacher)
-        db_session.add(submittor)
+        db_session.add(valid_user)
         db_session.commit()
-
         submission = Submissions(
-            uid=submittor.uid,
+            uid=valid_user.uid,
             project_id=check_project.project_id,
             submission_time=datetime.now(),
             submission_path="/test/submission/",
@@ -55,24 +37,22 @@ class TestProjectsAndSubmissionsModel:
             .filter_by(project_id=check_project.project_id)
             .first()
         )
-        self.assertEqual(submission_check.uid, submittor.uid)
-        with self.assertRaises(
+        assert submission_check.uid == valid_user.uid
+
+        with pytest.raises(
             IntegrityError,
-            msg="Submissions model should throw an error on grades out of [0,20] range",
+            match="Submissions model should throw an error on grades out of [0,20] range",
         ):
             submission_check.grading = 100
             db_session.commit()
         db_session.rollback()
-
         submission_check.grading = 15
         db_session.commit()
-
         submission_check = (
             db_session.query(Submissions)
             .filter_by(project_id=check_project.project_id)
             .first()
         )
-        self.assertEqual(submission_check.grading, 15)
-        self.assertEqual(
-            submission.grading, 15
-        )  # Interesting! all the model objects are connected
+        assert submission_check.grading == 15
+        assert submission.grading == 15
+        # Interesting! all the model objects are connected

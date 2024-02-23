@@ -5,7 +5,7 @@ from project.models.users import Users
 from project.models.course_relations import CourseAdmins, CourseStudents
 
 
-class TestUserModel:
+class TestCoursesModel:
     """Test class for the database models"""
 
     def test_foreignkey_courses_teacher(self, db_session, course: Courses):

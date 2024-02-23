@@ -40,6 +40,10 @@ def db_session():
     yield session
     session.rollback()
     session.close()
+    # Truncate all tables
+    for table in reversed(db.metadata.sorted_tables):
+        session.execute(table.delete())
+    session.commit()
 
 @pytest.fixture
 def valid_user():
@@ -88,6 +92,14 @@ def course_admin(course,assistent):
     return admin_relation
 
 @pytest.fixture()
-def teacher():
-    user = Users(uid="teacher", is_teacher=True)
-    return user
+def valid_project(course):
+    deadline = datetime(2024, 2, 25, 12, 0, 0)  # February 25, 2024, 12:00 PM
+    project = Projects(
+        title="Project",
+        descriptions="Test project",
+        deadline=deadline,
+        course_id=course.course_id,
+        visible_for_students=True,
+        archieved=False,
+    )
+    return project
