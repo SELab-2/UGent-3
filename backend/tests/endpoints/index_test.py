@@ -6,7 +6,7 @@ def test_home(client):
     assert response.status_code == 200
 
 def test_openapi_spec(client):
-    "Test whether the required fields of the openapi spec are present"
+    """Test whether the required fields of the openapi spec are present"""
     response = client.get("/")
     response_json = response.json
     assert response_json["openapi"] is not None
