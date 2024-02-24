@@ -1,14 +1,19 @@
+"""This module tests the Projects and Submissions model"""
 from datetime import datetime
 import pytest
 from sqlalchemy.exc import IntegrityError
-from project.models.courses import Courses
-from project.models.course_relations import CourseAdmins, CourseStudents
 from project.models.projects import Projects
 from project.models.submissions import Submissions
-from project.models.users import Users
 
-class TestProjectsAndSubmissionsModel:
-    def test_deadline(self,db_session,course,course_teacher,valid_project,valid_user):
+class TestProjectsAndSubmissionsModel: # pylint: disable=too-few-public-methods
+    """Test class for the database models of projects and submissions"""
+    def test_deadline(self,db_session, # pylint: disable=too-many-arguments ; all arguments are needed for the test
+                      course,
+                      course_teacher,
+                      valid_project,
+                      valid_user):
+        """Tests if the deadline is correctly set
+        and if the submission is correctly connected to the project"""
         db_session.add(course_teacher)
         db_session.commit()
         db_session.add(course)

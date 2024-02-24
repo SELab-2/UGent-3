@@ -1,8 +1,7 @@
 """Model for submissions"""
-# pylint: disable=too-few-public-methods
+
 from sqlalchemy import Column,String,ForeignKey,Integer,CheckConstraint,DateTime,Boolean
 from project import db
-from project.models.users import Users
 
 class Submissions(db.Model):
     """This class describes the submissions table,
