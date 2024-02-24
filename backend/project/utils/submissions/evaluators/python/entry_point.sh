@@ -1,3 +1,4 @@
+#!/bin/bash
 
 submission_requirements_file="/submission/requirements.txt"
 
