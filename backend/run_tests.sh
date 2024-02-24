@@ -7,7 +7,7 @@ docker-compose -f tests.yaml up --build --exit-code-from test-runner
 exit_code=$?
 
 if [ $exit_code -eq 0 ]; then
-    pylint tests/utils
+    pytest tests/utils
     exit_code=$?
 fi
 
