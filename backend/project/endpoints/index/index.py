@@ -1,7 +1,7 @@
 """Index api point"""
+import os
 from flask import Blueprint, send_from_directory
 from flask_restful import Resource, Api
-import os
 
 index_bp = Blueprint("index", __name__)
 index_endpoint = Api(index_bp)
