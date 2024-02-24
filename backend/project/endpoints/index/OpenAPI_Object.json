@@ -1,0 +1,45 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Pigeonhole API",
+    "summary": "A project submission and grading API for University Ghent students and professors.",
+    "description": "The API built for the Pigeonhole application. It serves as an interface for student of University Ghent. They can submit solutions to projects created by their professors. Professors and their assistents can then review these submitions, grade them and define custom tests that automatically run on every submition. The API is built using the OpenAPI 3.1.0 specification.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Project discussion forum",
+      "url": "https://github.com/SELab-2/UGent-opgave/discussions",
+      "email": "Bart.Coppens@UGent.be"
+    },
+    "x-authors": [
+      {
+        "name": "Aron Buzogany",
+        "github": "https://github.com/AronBuzogany"
+      },
+      {
+        "name": "Gerwoud Van den Eynden",
+        "github": "https://github.com/Gerwoud"
+      },
+      {
+        "name": "Jarne Clauw",
+        "github": "https://github.com/JarneClauw"
+      },
+      {
+        "name": "Siebe Vlietinck",
+        "github": "https://github.com/Vucis"
+      },
+      {
+        "name": "Warre Provoost",
+        "github": "https://github.com/warreprovoost"
+      },
+      {
+        "name": "Cedric Mekeirle",
+        "github": "https://github.com/JibrilExe"
+      },
+      {
+        "name": "Matisse Sulzer",
+        "github": "https://github.com/Matisse-Sulzer"
+      }
+    ]
+  },
+  "paths": []
+}
