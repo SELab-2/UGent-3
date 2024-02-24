@@ -4,7 +4,7 @@ This file is the base of the Flask API. It contains the basic structure of the A
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from .endpoints.index import index_bp
+from .endpoints.index.index import index_bp
 from .endpoints.submissions import submissions_bp
 
 db = SQLAlchemy()

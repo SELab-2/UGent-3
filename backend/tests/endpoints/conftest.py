@@ -8,11 +8,11 @@ def app():
     Returns:
         Flask -- A Flask application instance
     """
-    app = create_app() # pylint: disable=redefined-outer-name ; fixture testing requires the same name to be used
+    app = create_app()
     yield app
 
 @pytest.fixture
-def client(app): # pylint: disable=redefined-outer-name ; fixture testing requires the same name to be used
+def client(app):
     """A fixture that creates a test client for the app.
     Arguments:
         app {Flask} -- A Flask application instance
