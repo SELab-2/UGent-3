@@ -2,15 +2,18 @@
 This file contains tests for the python submission evaluator.
 """
 
+from os import path
+import pytest
 from project.utils.submissions.evaluator import evaluate
 from project.utils.submissions.file_handling import create_submission_folder
 from project.models.submissions import Submissions
 from project.models.projects import Projects
-import pytest
-from os import path
 
 @pytest.fixture
 def project_path_succes():
+    """
+    Return the path to a project with a succesful test case.
+    """
     return path.join(path.dirname(__file__), "resources", "python", "tc_1")
 
 @pytest.fixture
@@ -40,5 +43,7 @@ def test_makes_log_file(evaluate_python):
 def test_logs_output(evaluate_python):
     """Test whether the evaluator logs the output of the script."""
     _, submission_path = evaluate_python
-    with open(path.join(submission_path, "output", "test_output.log"), "r") as output_file:
+    with open(path.join(submission_path, "output", "test_output.log",),
+              "r", 
+              encoding="utf-8") as output_file:
         assert "Hello, World!" in output_file.read()
