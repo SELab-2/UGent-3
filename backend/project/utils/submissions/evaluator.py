@@ -1,7 +1,7 @@
 from project.models.projects import Projects
-from os import path, makedirs
-from os import getenv
+from os import path
 from project.models.submissions import Submissions
+from project.utils.submissions.file_handling import create_submission_subfolders
 import docker
 
 DOCKER_IMAGE_MAPPER = {
@@ -37,7 +37,7 @@ def evaluate(submission: Submissions, project: Projects, evaluator: str):
 def create_and_run_evaluator(docker_image: str, submission_id: int, project_path: str, submission_solution_path: str):
     client = docker.from_env()
     image, build_logs = client.images.build(path=docker_image, tag=f"submission_{submission_id}")
-      
+
     container = client.containers.run(
         image.id,
         detach=True,
@@ -51,27 +51,3 @@ def create_and_run_evaluator(docker_image: str, submission_id: int, project_path
         pids_limit=256
     )
     return container
-
-def create_submission_subfolders(submission_path: str):
-    submission_output_path = path.join(submission_path, "output")
-    artifacts_path = path.join(submission_output_path, "artifacts")
-
-    if not path.exists(submission_output_path):
-        makedirs(submission_output_path)
-
-    if not path.exists(artifacts_path):
-        makedirs(artifacts_path)
-
-    return submission_output_path
-
-def create_submission_folder(submission_id, project_id):
-    submission_path = path.join(getenv("SUBMISSIONS_ROOT_PATH"), str(project_id), str(submission_id))
-    submission_solution_path = path.join(submission_path, "submission")
-
-    if not path.exists(submission_path):
-        makedirs(submission_path)
-
-    if not path.exists(submission_solution_path):
-        makedirs(submission_solution_path)
-
-    return submission_path
