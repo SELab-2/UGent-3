@@ -1,5 +1,5 @@
 """Model for users"""
-# pylint: disable=too-few-public-methods
+
 from sqlalchemy import Boolean, Column, String
 from project import db
 

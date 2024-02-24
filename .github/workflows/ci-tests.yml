@@ -57,6 +57,6 @@ jobs:
 
       - name: Run linting
         working-directory: ./backend
-        run: pylint ./*/*.py
+        run: find . -type f -name "*.py" | xargs pylint 
 
       
