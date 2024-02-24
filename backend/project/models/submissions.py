@@ -1,7 +1,7 @@
 """Model for submissions"""
 
 from sqlalchemy import Column,String,ForeignKey,Integer,CheckConstraint,DateTime,Boolean
-from project import db
+from project.database import db
 
 class Submissions(db.Model):
     """This class describes the submissions table,

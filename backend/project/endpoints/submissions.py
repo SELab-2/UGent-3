@@ -2,13 +2,14 @@
 
 from flask import Blueprint
 from flask_restful import Resource
+from project.models.submissions import Submissions as m_submissions
 
 submissions_bp = Blueprint("submissions", __name__)
 
 class Submissions(Resource):
     """API endpoint for the submissions"""
 
-    def get(self, uid: int, pid: int) -> dict[str, int]:
+    def get(self, uid: str, pid: int) -> dict[str, any]:
         """Get all the submissions from a user for a project
 
         Args:
@@ -18,7 +19,10 @@ class Submissions(Resource):
         Returns:
             dict[str, int]: The list of submission URLs
         """
-        return {"uid": uid, "pid": pid}
+
+        a = m_submissions.query.filter_by(uid=uid, project_id=pid).count()
+
+        return {"uid": uid, "pid": pid, "test": a}
 
     def post(self, uid: int, pid: int) -> dict[str, int]:
         """Post a new submission to a project
@@ -33,7 +37,7 @@ class Submissions(Resource):
         return {"uid": uid, "pid": pid}
 
 submissions_bp.add_url_rule(
-    "/submissions/<int:uid>/<int:pid>",
+    "/submissions/<string:uid>/<int:pid>",
     view_func=Submissions.as_view("submissions"))
 
 class Submission(Resource):

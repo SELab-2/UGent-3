@@ -2,12 +2,13 @@
 This file is the base of the Flask API. It contains the basic structure of the API.    
 """
 
+from os import getenv
+from dotenv import load_dotenv
+from sqlalchemy import URL
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from .database import db
 from .endpoints.index.index import index_bp
 from .endpoints.submissions import submissions_bp
-
-db = SQLAlchemy()
 
 def create_app():
     """
@@ -22,7 +23,7 @@ def create_app():
 
     return app
 
-def create_app_with_db(db_uri:str):
+def create_app_with_db(db_uri: str = None):
     """
     Initialize the database with the given uri 
     and connect it to the app made with create_app.
@@ -31,6 +32,19 @@ def create_app_with_db(db_uri:str):
     Returns:
         Flask -- A Flask application instance
     """
+
+    #$ flask --app project:create_app_with_db run
+    if db_uri is None:
+        load_dotenv()
+        db_uri = URL.create(
+            drivername=getenv("DB_DRIVER"),
+            username=getenv("DB_USER"),
+            password=getenv("DB_PASSWORD"),
+            host=getenv("DB_HOST"),
+            port=int(getenv("DB_PORT")),
+            database=getenv("DB_NAME")
+        )
+
     app = create_app()
     app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     db.init_app(app)
