@@ -1,5 +1,5 @@
-from project.utils.submissions.evaluator import create_submission_folder
-from os import environ, path
+from project.utils.submissions.file_handling import create_submission_folder
+from os import path
 from shutil import rmtree
 
 def test_create_submission_folder_creates(submission_root):
