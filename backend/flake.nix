@@ -15,6 +15,9 @@
 	targetPkgs = pkgs: with pkgs; [
           python311Full
 	  python311Packages.pip
+
+	  postgresql
+	  dbeaver
 	];
 	runScript = "zsh || bash";
       }).env;
