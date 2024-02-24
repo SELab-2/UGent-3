@@ -1,4 +1,8 @@
 """Main entry point for the application."""
+# TODO: remove is for dev purposes
+from sys import path
+path.append(".")
+
 from sys import path
 from os import getenv
 from dotenv import load_dotenv
