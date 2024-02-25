@@ -36,7 +36,9 @@ class Submissions(Resource):
                 # if operator is None:
                 #     return {"message": f"User {uid_operator} not found"}, 404
                 # if not (operator.is_admin or operator.is_teacher or uid_operator == uid):
-                #     return {"message": f"User {uid_operator} does not have the correct rights"}, 403
+                #     return {
+                #         "message": f"User {uid_operator} does not have the correct rights"
+                #     }, 403
 
                 # Check user
                 user = session.get(m_users, uid)
@@ -53,7 +55,8 @@ class Submissions(Resource):
                 submissions_urls = [f"/submissions/{s.submission_id}" for s in submissions]
                 return {"submissions": submissions_urls}
         except Exception:
-            return {"message": f"An error occurred while fetching the submissions from user {uid} for project {pid}"}, 500
+            return {"message": f"An error occurred while fetching the submissions "
+                f"from user {uid} for project {pid}"}, 500
 
     def post(self, uid: str, pid: int) -> dict[str, any]:
         """Post a new submission to a project
@@ -78,7 +81,9 @@ class Submissions(Resource):
                 # if operator is None:
                 #     return {"message": f"User {uid_operator} not found"}, 404
                 # if uid_operator != uid:
-                #     return {"message": f"User {uid_operator} does not have the correct rights"}, 403
+                #     return {
+                #         "message": f"User {uid_operator} does not have the correct rights"
+                #     }, 403
 
                 submission = m_submissions()
 
@@ -98,7 +103,9 @@ class Submissions(Resource):
                 if "grading" in request.form:
                     grading = request.form["grading"]
                     if grading < 0 or grading > 20:
-                        return {"message": "The submission must have a 'grading' in between 0 and 20"}, 400
+                        return {
+                            "message": "The submission must have a 'grading' in between 0-20"
+                        }, 400
                     submission.grading = grading
 
                 # Submission time
@@ -116,7 +123,8 @@ class Submissions(Resource):
                 return {"submission": f"/submissions/{submission.submission_id}"}, 201
         except Exception:
             session.rollback()
-            return {"message": f"An error occurred while creating a new submission for user {uid} in project {pid}"}, 500
+            return {"message": f"An error occurred while creating a new submission "
+                f"for user {uid} in project {pid}"}, 500
 
 submissions_bp.add_url_rule(
     "/submissions/<string:uid>/<int:pid>",
@@ -147,7 +155,9 @@ class Submission(Resource):
                 # if operator is None:
                 #     return {"message": f"User {uid_operator} not found"}, 404
                 # if not (operator.is_admin or operator.is_teacher or uid_operator == uid):
-                #     return {"message": f"User {uid_operator} does not have the correct rights"}, 403
+                #     return {
+                #         "message": f"User {uid_operator} does not have the correct rights"
+                #     }, 403
 
                 # Get the submission
                 submission = session.get(m_submissions, sid)
@@ -188,7 +198,9 @@ class Submission(Resource):
                 # if operator is None:
                 #     return {"message": f"User {uid_operator} not found"}, 404
                 # if not operator.is_teacher:
-                #     return {"message": f"User {uid_operator} does not have the correct rights"}, 403
+                #     return {
+                #         "message": f"User {uid_operator} does not have the correct rights"
+                #     }, 403
 
                 # Get the submission
                 submission = session.get(m_submissions, sid)
@@ -199,7 +211,9 @@ class Submission(Resource):
                 if "grading" in request.form:
                     grading = request.form["grading"]
                     if grading < 0 or grading > 20:
-                        return {"message": "The submission must have a 'grading' in between 0 and 20"}, 400
+                        return {
+                            "message": "The submission must have a 'grading' in between 0-20"
+                        }, 400
                     submission.grading = grading
 
                 # Save the submission
@@ -231,7 +245,9 @@ class Submission(Resource):
                 # if operator is None:
                 #     return {"message": f"User {uid_operator} not found"}, 404
                 # if not operator.is_admin:
-                #     return {"message": f"User {uid_operator} does not have the correct rights"}, 403
+                #     return {
+                #         "message": f"User {uid_operator} does not have the correct rights"
+                #     }, 403
 
                 # Check if the submission exists
                 submission = session.get(m_submissions, sid)
