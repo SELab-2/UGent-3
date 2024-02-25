@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from flask_restful import Resource, Api
+from flask_restful import Resource, Api, abort
 
 from project import db
 from project.models.projects import Projects
@@ -10,6 +10,10 @@ project_detail_endpoint = Api(project_detail_bp)
 
 
 class ProjectDetail(Resource):
+
+    def is_existing_project(self, project):
+        if project is None:
+            abort(404)
     def get(self, **kwargs):
         """
         Get method for listing a specific project
@@ -20,9 +24,7 @@ class ProjectDetail(Resource):
 
         project = Projects.query.filter_by(project_id=id).first()
 
-        if project is None:
-            # project doesn't exist so return a 404 error
-            return {'message': 'Project doesn\'t exist'}, 404
+        self.is_existing_project(project)
 
         print(project)
         project_dict = {field: value for field, value in project.__dict__.items() if
@@ -39,6 +41,8 @@ class ProjectDetail(Resource):
         remove_id = kwargs['project_id']
 
         deleted_project = Projects.query.filter_by(project_id=remove_id).first()
+
+        self.is_existing_project(deleted_project)
 
         db.session.delete(deleted_project)
         db.session.commit()

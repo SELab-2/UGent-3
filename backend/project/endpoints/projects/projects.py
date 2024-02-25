@@ -41,8 +41,6 @@ class Projects_endpoint(Resource):
 
             display_data.append(project_dict)
 
-        # display_data = [{field, value} for field, value in zip(project_fields, )]
-        print(display_data)
         return display_data, 200
 
     def post(self):
