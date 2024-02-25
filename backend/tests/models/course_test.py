@@ -1,6 +1,6 @@
+"""Test module for the Courses model"""
 import pytest
 from sqlalchemy.exc import IntegrityError
-from psycopg2.errors import ForeignKeyViolation
 from project.models.courses import Courses
 from project.models.users import Users
 from project.models.course_relations import CourseAdmins, CourseStudents
@@ -47,7 +47,7 @@ class TestCoursesModel:
             db_session.add_all(course_students_relation)
             db_session.commit()
 
-    def test_correct_courserelations(
+    def test_correct_courserelations( # pylint: disable=too-many-arguments ; all arguments are needed for the test
         self,
         db_session,
         course,
@@ -57,7 +57,9 @@ class TestCoursesModel:
         assistent,
         course_admin,
     ):
-        """Tests if we get the expected results for correct usage of CourseStudents and CourseAdmins"""
+        """Tests if we get the expected results for
+        correct usage of CourseStudents and CourseAdmins"""
+
         db_session.add(course_teacher)
         db_session.commit()
 
