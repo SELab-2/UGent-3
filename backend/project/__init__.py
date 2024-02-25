@@ -15,10 +15,12 @@ def create_app():
     """
     from .endpoints.index.index import index_bp
     from .endpoints.projects.projects import projects_bp
+    from .endpoints.projects.project_detail import project_detail_bp
 
     app = Flask(__name__)
     app.register_blueprint(index_bp)
     app.register_blueprint(projects_bp)
+    app.register_blueprint(project_detail_bp)
 
     return app
 

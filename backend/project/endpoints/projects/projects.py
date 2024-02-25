@@ -1,6 +1,5 @@
 from flask import Blueprint
 from flask_restful import Resource, Api
-from sqlalchemy.orm import sessionmaker
 
 from project import db
 from project.models.projects import Projects
@@ -13,7 +12,6 @@ class Projects_endpoint(Resource):
         Get method for listing all available projects
         that are currently in the API
         """
-        # TODO: fetch data from database using sqlalchemy
         display_data = []
         projects = Projects.query.all()
 
