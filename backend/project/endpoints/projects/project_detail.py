@@ -25,6 +25,10 @@ parser.add_argument("regex_expressions", type=str, help='Projects regex expressi
 class ProjectDetail(Resource):
 
     def is_existing_project(self, project):
+        """
+        Check if the project exists in the database
+        and if not abort the request and give back a 404 not found
+        """
         if project is None:
             abort(404)
 
@@ -32,29 +36,40 @@ class ProjectDetail(Resource):
         """
         Get method for listing a specific project
         filtered by id of that specific project
+        the id fetched from the url with the reaparse
         """
-        id: int = kwargs['project_id']
 
+        # fetch the project with the id that is specified in the url
+        id: int = kwargs['project_id']
         project = Projects.query.filter_by(project_id=id).first()
 
         self.is_existing_project(project)
 
+        # remove the invalid alchemysql field
         project_dict = {field: value for field, value in project.__dict__.items() if
                         not field.startswith('_')}
 
+        # return the fetched project and return 200 OK status
         return project_dict, 200
 
     def put(self, **kwargs):
+        """
+        Update method for updating a specific project
+        filtered by id of that specific project
+        """
         id: int = kwargs['project_id']
 
         args = parser.parse_args()
-
+        # get the project that need to be edited
         project = Projects.query.filter_by(project_id=id).first()  # .update(values=values)
 
+        # check which values are not None is the dict
+        # if it is not None is needs to be modified in the database
         for key, value in args.items():
             if value is not None:
                 setattr(project, key, value)
 
+        # commit the changes and return the 200 OK code
         db.session.commit()
         return {"Message": f"Project {id} updated succesfully"}, 200
 
@@ -66,13 +81,17 @@ class ProjectDetail(Resource):
 
         remove_id = kwargs['project_id']
 
+        # fetch the project that needs to be removed
         deleted_project = Projects.query.filter_by(project_id=remove_id).first()
 
+        # check if its an existing one
         self.is_existing_project(deleted_project)
 
+        # if it exists delete it and commit the changes in the database
         db.session.delete(deleted_project)
         db.session.commit()
 
+        # return 204 content delted succesfully
         return {"Message": f"Project with id:{remove_id} deleted successfully!"}, 204
 
 

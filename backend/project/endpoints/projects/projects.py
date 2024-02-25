@@ -22,9 +22,7 @@ parser.add_argument("regex_expressions", type=str, help='Projects regex expressi
 projects_bp = Blueprint('projects', __name__)
 projects_endpoint = Api(projects_bp)
 
-project_fields = ['project_id', 'title', 'descriptions', 'assignment_file',
-                  'deadline', 'course_id', 'visible_for_students',
-                  'archieved', 'test_path', 'script_name', 'regex_expressions']
+
 class Projects_endpoint(Resource):
     def get(self):
         """
@@ -34,12 +32,14 @@ class Projects_endpoint(Resource):
         display_data = []
         projects = Projects.query.all()
 
+        # remove field from alchemysql that has no value for the API itself
         for project in projects:
             project_dict = {field: value for field, value in project.__dict__.items() if
                             not field.startswith('_')}
 
             display_data.append(project_dict)
 
+        # return all valid entries for a project and return a 200 OK code
         return display_data, 200
 
     def post(self):
@@ -50,6 +50,7 @@ class Projects_endpoint(Resource):
         args = parser.parse_args()
         print(args)
 
+        # create a new project object to add in the API later
         new_project = Projects(
             title=args['title'],
             descriptions=args['descriptions'],
@@ -63,10 +64,12 @@ class Projects_endpoint(Resource):
             regex_expressions=args['regex_expressions']
         )
 
+        # add the new project to the database and commit the changes
         db.session.add(new_project)
         db.session.commit()
 
-        return args, 201
+        # 201 content added succesfully
+        return {"Message": "New project added succesfully"}, 201
 
 
 projects_bp.add_url_rule('/projects', view_func=Projects_endpoint.as_view('projects'))

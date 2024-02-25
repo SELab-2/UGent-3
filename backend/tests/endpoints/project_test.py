@@ -47,6 +47,11 @@ def test_post_remove_project(client):
     assert response.status_code == 404
 
 def test_update_project(client):
+    """
+    Test functionality of the PUT method for projects
+    """
+
+    # dummy data for testing
     data = {
         "title": "YourProject for testing purposes 123451",
         "descriptions": ["YourProjectDescription"],
@@ -60,19 +65,24 @@ def test_update_project(client):
         "regex_expressions": "Y"
     }
 
+    # post it so it can be edited later on
     response = client.post("/projects", json=data)
 
+    # get the newly added project is no other is present
     response = client.get("/projects")
     assert response.status_code == 200
     json_data = response.json[0]
 
+    # set a new title and flit the archieved boolean
     new_archieved = not json_data["archieved"]
     new_title = "just patched title"
 
+    # edit the project
     response = client.put(f"/projects/{json_data['project_id']}", json={"title": new_title, "archieved": new_archieved})
 
     assert response.status_code == 200
 
+    # fetch the project again and check if the values are the newly edited values
     response = client.get(f"/projects/{json_data['project_id']}")
     data = response.json
     assert response.status_code == 200
