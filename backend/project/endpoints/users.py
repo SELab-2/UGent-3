@@ -10,6 +10,15 @@ users_api = Api(users_bp)
 
 class Users(Resource):
     """Api endpoint for the /users route"""
+    
+    def get(self):
+        """
+        This function will respond to get requests made to /users.
+        It should return all users from the database.
+        """
+        users = UserModel.query.all()
+        users_list = [{"uid": user.uid, "is_teacher": user.is_teacher, "is_admin": user.is_admin} for user in users]
+        return users_list
 
     def post(self):
         """
@@ -38,24 +47,30 @@ class Users(Resource):
         return {"Message": "User created successfully!"}
 
     def update(self):
-        uid = request.json.get('uid')
-        is_teacher = request.json.get('is_teacher')
-        is_admin = request.json.get('is_admin')
-        if uid is None:
-            return {"Message": "User ID is required!"}, 400
+            """
+            Update the user's information.
 
-        user = UserModel.query.get(uid)
-        if user is None:
-            return {"Message": "User not found!"}, 404
+            Returns:
+                dict: A dictionary containing the message indicating the success or failure of the update.
+            """
+            uid = request.json.get('uid')
+            is_teacher = request.json.get('is_teacher')
+            is_admin = request.json.get('is_admin')
+            if uid is None:
+                return {"Message": "User ID is required!"}, 400
 
-        if is_teacher is not None:
-            user.is_teacher = is_teacher
-        if is_admin is not None:
-            user.is_admin = is_admin
+            user = UserModel.query.get(uid)
+            if user is None:
+                return {"Message": "User not found!"}, 404
 
-        # Save the changes to the database
-        db.session.commit()
-        return {"Message": "User updated successfully!"}
+            if is_teacher is not None:
+                user.is_teacher = is_teacher
+            if is_admin is not None:
+                user.is_admin = is_admin
+
+            # Save the changes to the database
+            db.session.commit()
+            return {"Message": "User updated successfully!"}
 
 
 users_api.add_resource(Users, "/users")
