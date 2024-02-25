@@ -2,7 +2,7 @@
 
 from sys import path
 from project import create_app_with_db
-from project.database import get_database_uri
+from .database import get_database_uri
 
 path.append(".")
 
