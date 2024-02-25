@@ -14,7 +14,7 @@ class Projects_endpoint(Resource):
         that are currently in the API
         """
         # TODO: fetch data from database using sqlalchemy
-        display_data = {}
+        display_data = []
         projects = Projects.query.all()
 
         for project in projects:
@@ -31,9 +31,9 @@ class Projects_endpoint(Resource):
                 "script_name": project.script_name,
                 "regex_expressions": project.regex_expressions
             }
-            print(project_dict)
+            display_data.append(project_dict)
 
-        return {'hello': 'world'}
+        return display_data
 
 
 projects_bp.add_url_rule('/projects/', view_func=Projects_endpoint.as_view('projects'))
