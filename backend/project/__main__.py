@@ -1,6 +1,9 @@
 """Main entry point for the application."""
 # TODO: remove is for dev purposes
 from sys import path
+
+from sqlalchemy import URL
+
 path.append(".")
 
 from sys import path
@@ -12,5 +15,13 @@ path.append(".")
 
 if __name__ == "__main__":
     load_dotenv()
-    app = create_app_with_db(getenv("DB_HOST"))
+
+    url = URL.create(
+        drivername="postgresql",
+        username=getenv("POSTGRES_USER"),
+        password=getenv("POSTGRES_PASSWORD"),
+        host=getenv("POSTGRES_HOST"),
+        database=getenv("POSTGRES_DB")
+    )
+    app = create_app_with_db(url)
     app.run(debug=True)

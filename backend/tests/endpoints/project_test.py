@@ -47,6 +47,21 @@ def test_post_remove_project(client):
     assert response.status_code == 404
 
 def test_update_project(client):
+    data = {
+        "title": "YourProject for testing purposes 123451",
+        "descriptions": ["YourProjectDescription"],
+        "assignment_file": "@/path/to/your/file.txt",
+        "deadline": "2024-02-25T12:00:00+00:00",
+        "course_id": 1,
+        "visible_for_students": 'true',
+        "archieved": 'false',
+        "test_path": "YourTestPath",
+        "script_name": "YourTestScriptName",
+        "regex_expressions": "Y"
+    }
+
+    response = client.post("/projects", json=data)
+
     response = client.get("/projects")
     assert response.status_code == 200
     json_data = response.json[0]
