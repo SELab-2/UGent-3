@@ -10,6 +10,10 @@ project_detail_endpoint = Api(project_detail_bp)
 
 class ProjectDetail(Resource):
     def get(self, **kwargs):
+        """
+        Get method for listing a specific project
+        filtered by id of that specific project
+        """
         id: int = kwargs['project_id']
         print(id)
 
