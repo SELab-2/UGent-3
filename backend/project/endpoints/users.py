@@ -10,7 +10,7 @@ users_api = Api(users_bp)
 
 class Users(Resource):
     """Api endpoint for the /users route"""
-    
+
     def get(self):
         """
         This function will respond to get requests made to /users.
@@ -46,7 +46,7 @@ class Users(Resource):
         db.session.commit()
         return {"Message": "User created successfully!"}
 
-    def update(self):
+    def patch(self):
             """
             Update the user's information.
 
@@ -71,6 +71,24 @@ class Users(Resource):
             # Save the changes to the database
             db.session.commit()
             return {"Message": "User updated successfully!"}
+    
+    def delete(self):
+        """
+        This function will respond to DELETE requests made to /users.
+        It should delete a user and return a success message.
+        """
+        uid = request.json.get('uid')
+
+        if uid is None:
+            return {"Message": "User ID is required!"}, 400
+
+        user = UserModel.query.get(uid)
+        if user is None:
+            return {"Message": "User not found!"}, 404
+
+        db.session.delete(user)
+        db.session.commit()
+        return {"Message": "User deleted successfully!"}
 
 
 users_api.add_resource(Users, "/users")
