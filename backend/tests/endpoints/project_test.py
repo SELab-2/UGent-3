@@ -6,7 +6,13 @@ def test_projects_home(client):
     response = client.get("/projects")
     assert response.status_code == 200
 
-def test_post_project(client):
+def test_getting_all_projects(client):
+    """Test getting all projects"""
+    response = client.get("/projects")
+    assert response.status_code == 200
+    assert isinstance(response.json, list)
+
+def test_post_remove_project(client):
     """Test adding a user to the datab and fetching it"""
     response = client.get("/projects/1")
     assert response.status_code == 404

@@ -68,5 +68,9 @@ class Projects_endpoint(Resource):
 
         return args, 201
 
+    def patch(self):
+        # TODO
+        pass
+
 
 projects_bp.add_url_rule('/projects', view_func=Projects_endpoint.as_view('projects'))
