@@ -48,7 +48,7 @@ class ProjectDetail(Resource):
         db.session.delete(deleted_project)
         db.session.commit()
 
-        return {}, 200
+        return {"Message": f"Project with id:{remove_id} deleted successfully!"}, 204
 
 
 project_detail_bp.add_url_rule('/projects/<int:project_id>', view_func=ProjectDetail.as_view('project_detail'))

@@ -21,6 +21,10 @@ parser.add_argument("regex_expressions", type=str, help='Projects regex expressi
 
 projects_bp = Blueprint('projects', __name__)
 projects_endpoint = Api(projects_bp)
+
+project_fields = ['project_id', 'title', 'descriptions', 'assignment_file',
+                  'deadline', 'course_id', 'visible_for_students',
+                  'archieved', 'test_path', 'script_name', 'regex_expressions']
 class Projects_endpoint(Resource):
     def get(self):
         """
@@ -29,23 +33,16 @@ class Projects_endpoint(Resource):
         """
         display_data = []
         projects = Projects.query.all()
+        print(projects)
 
         for project in projects:
-            project_dict = {
-                "id": project.project_id,
-                "title": project.title,
-                "descriptions": project.descriptions,
-                "assignment_file": project.assignment_file,
-                "deadline": project.deadline,
-                "course_id": project.course_id,
-                "visible_for_students": project.visible_for_students,
-                "archieved": project.archieved,
-                "test_path": project.test_path,
-                "script_name": project.script_name,
-                "regex_expressions": project.regex_expressions
-            }
+            project_dict = {field: value for field, value in project.__dict__.items() if
+                            not field.startswith('_')}
+
             display_data.append(project_dict)
 
+        # display_data = [{field, value} for field, value in zip(project_fields, )]
+        print(display_data)
         return display_data, 200
 
     def post(self):
