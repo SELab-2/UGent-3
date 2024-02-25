@@ -33,19 +33,18 @@ class ProjectDetail(Resource):
             "regex_expressions": project.regex_expressions
         }
 
-        return project_dict
+        return project_dict, 200
 
     def delete(self, **kwargs):
-        # TODO
-        # id = request.args
+        """
+        Detele a project and all of its submissions in cascade
+        done by project id
+        """
+
         remove_id = kwargs['project_id']
 
-        submissions = Submissions.query.all()
-        print(submissions)
-
         deleted_project = Projects.query.filter_by(project_id=remove_id).first()
-        # deleted_project = {}
-        print(deleted_project)
+
         db.session.delete(deleted_project)
         db.session.commit()
 

@@ -46,7 +46,7 @@ class Projects_endpoint(Resource):
             }
             display_data.append(project_dict)
 
-        return display_data
+        return display_data, 200
 
     def post(self):
         """
@@ -74,8 +74,5 @@ class Projects_endpoint(Resource):
 
         return args, 201
 
-
-    def get_successor_id(self):
-        pass
 
 projects_bp.add_url_rule('/projects', view_func=Projects_endpoint.as_view('projects'))
