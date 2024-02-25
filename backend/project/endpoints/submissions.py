@@ -98,7 +98,7 @@ class Submissions(Resource):
                 if "grading" in request.form:
                     grading = request.form["grading"]
                     if grading < 0 or grading > 20:
-                        return {}
+                        return {"message": "The submission must have a 'grading' in between 0 and 20"}, 400
                     submission.grading = grading
 
                 # Submission time
@@ -166,6 +166,49 @@ class Submission(Resource):
         except Exception:
             return {"message": f"An error occurred while fetching submission {sid}"}, 500
 
+    def patch(self, sid:int) -> dict[str, any]:
+        """Update some fields of a submission given a submission ID
+
+        Args:
+            sid (int): Submission ID
+
+        Returns:
+            dict[str, any]: A message
+        """
+
+        # Authentication
+        # uid_operator = 0
+        # if uid_operator is None:
+        #     return {"message": "Not logged in"}, 401
+
+        try:
+            with db.session() as session:
+                # Authorization
+                # operator = session.get(m_users, uid_operator)
+                # if operator is None:
+                #     return {"message": f"User {uid_operator} not found"}, 404
+                # if not operator.is_teacher:
+                #     return {"message": f"User {uid_operator} does not have the correct rights"}, 403
+
+                # Get the submission
+                submission = session.get(m_submissions, sid)
+                if submission is None:
+                    return {"message": f"Submission {sid} not found"}, 404
+
+                # Update the grading field (its the only field that a teacher can update)
+                if "grading" in request.form:
+                    grading = request.form["grading"]
+                    if grading < 0 or grading > 20:
+                        return {"message": "The submission must have a 'grading' in between 0 and 20"}, 400
+                    submission.grading = grading
+
+                # Save the submission
+                session.commit()
+                return {"message": "Submission {sid} updated"}
+        except Exception:
+            session.rollback()
+            return {"message": f"An error occurred while patching submission {sid}"}, 500
+
     def delete(self, sid: int) -> dict[str, any]:
         """Delete a submission given an submission ID
 
@@ -173,7 +216,7 @@ class Submission(Resource):
             sid (int): Submission ID
 
         Returns:
-            dict[str, any]: Empty
+            dict[str, any]: A message
         """
 
         # Authentication
