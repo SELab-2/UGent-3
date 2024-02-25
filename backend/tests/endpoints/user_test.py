@@ -9,7 +9,7 @@ def test_post_delete_user(client):
     # Delete the user
     response = client.delete("/users", json={'uid': 'del'})
     assert response.status_code == 200
-    assert response.json == {"Message": "User deleted successfully!"}
+    assert response.json == {"Message": f"User with id: del deleted successfully!"}
 
     # Try to delete the user again
     response = client.delete("/users", json={'uid': 'del'})

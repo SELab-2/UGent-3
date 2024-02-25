@@ -88,7 +88,7 @@ class Users(Resource):
 
         db.session.delete(user)
         db.session.commit()
-        return {"Message": "User deleted successfully!"}
+        return {"Message": f"User with id: {uid} deleted successfully!"}, 200
 
 
 users_api.add_resource(Users, "/users")
