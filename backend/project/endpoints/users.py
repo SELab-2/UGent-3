@@ -17,7 +17,8 @@ class Users(Resource):
         It should return all users from the database.
         """
         users = UserModel.query.all()
-        users_list = [{"uid": user.uid, "is_teacher": user.is_teacher, "is_admin": user.is_admin} for user in users]
+        users_list = [{"uid": user.uid, "is_teacher": user.is_teacher, "is_admin": user.is_admin}
+                      for user in users]
         return users_list
 
     def post(self):
@@ -47,31 +48,33 @@ class Users(Resource):
         return {"Message": "User created successfully!"}
 
     def patch(self):
-            """
-            Update the user's information.
+        """
+        Update the user's information.
 
-            Returns:
-                dict: A dictionary containing the message indicating the success or failure of the update.
-            """
-            uid = request.json.get('uid')
-            is_teacher = request.json.get('is_teacher')
-            is_admin = request.json.get('is_admin')
-            if uid is None:
-                return {"Message": "User ID is required!"}, 400
+        Returns:
+            dict: A dictionary containing the message indicating the success
+             or failure of the update.
+        """
+        uid = request.json.get('uid')
+        is_teacher = request.json.get('is_teacher')
+        is_admin = request.json.get('is_admin')
+        if uid is None:
+            return {"Message": "User ID is required!"}, 400
 
-            user = UserModel.query.get(uid)
-            if user is None:
-                return {"Message": "User not found!"}, 404
 
-            if is_teacher is not None:
-                user.is_teacher = is_teacher
-            if is_admin is not None:
-                user.is_admin = is_admin
+        user = db.session.get(UserModel,uid)
+        if user is None:
+            return {"Message": "User not found!"}, 404
 
-            # Save the changes to the database
-            db.session.commit()
-            return {"Message": "User updated successfully!"}
-    
+        if is_teacher is not None:
+            user.is_teacher = is_teacher
+        if is_admin is not None:
+            user.is_admin = is_admin
+
+        # Save the changes to the database
+        db.session.commit()
+        return {"Message": "User updated successfully!"}
+
     def delete(self):
         """
         This function will respond to DELETE requests made to /users.
@@ -82,7 +85,7 @@ class Users(Resource):
         if uid is None:
             return {"Message": "User ID is required!"}, 400
 
-        user = UserModel.query.get(uid)
+        user = db.session.get(UserModel, uid)
         if user is None:
             return {"Message": "User not found!"}, 404
 

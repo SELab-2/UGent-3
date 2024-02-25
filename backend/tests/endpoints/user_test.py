@@ -1,3 +1,12 @@
+"""
+This module tests user management endpoints.
+
+- test_post_delete_user: Tests user creation, deletion, and error handling for deletion
+    of non-existent user.
+- test_get_users: Tests retrieval of all users, ensuring the response is a list.
+- test_patch_user: Tests user update functionality and error handling for updating
+    non-existent user.
+"""
 def test_post_delete_user(client):
     """Test whether the users page is accessible"""
     response = client.post("/users", json={
@@ -9,7 +18,7 @@ def test_post_delete_user(client):
     # Delete the user
     response = client.delete("/users", json={'uid': 'del'})
     assert response.status_code == 200
-    assert response.json == {"Message": f"User with id: del deleted successfully!"}
+    assert response.json == {"Message": "User with id: del deleted successfully!"}
 
     # Try to delete the user again
     response = client.delete("/users", json={'uid': 'del'})

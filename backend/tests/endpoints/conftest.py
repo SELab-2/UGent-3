@@ -1,7 +1,7 @@
 """ Configuration for pytest, Flask, and the test client."""
 import pytest
-from project import create_app_with_db
 from sqlalchemy import create_engine
+from project import create_app_with_db
 from project import db
 from tests import db_url
 
