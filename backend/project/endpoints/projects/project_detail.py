@@ -1,8 +1,9 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from flask_restful import Resource, Api
 
 from project import db
 from project.models.projects import Projects
+from project.models.submissions import Submissions
 
 project_detail_bp = Blueprint('project_detail', __name__)
 project_detail_endpoint = Api(project_detail_bp)
@@ -33,6 +34,22 @@ class ProjectDetail(Resource):
         }
 
         return project_dict
+
+    def delete(self, **kwargs):
+        # TODO
+        # id = request.args
+        remove_id = kwargs['project_id']
+
+        submissions = Submissions.query.all()
+        print(submissions)
+
+        deleted_project = Projects.query.filter_by(project_id=remove_id).first()
+        # deleted_project = {}
+        print(deleted_project)
+        db.session.delete(deleted_project)
+        db.session.commit()
+
+        return {}, 200
 
 
 project_detail_bp.add_url_rule('/projects/<int:project_id>', view_func=ProjectDetail.as_view('project_detail'))

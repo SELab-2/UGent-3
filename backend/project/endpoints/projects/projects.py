@@ -1,6 +1,6 @@
 from flask import Blueprint
 from flask_restful import Resource, Api, reqparse
-from sqlalchemy import insert
+from sqlalchemy import insert, delete
 
 from project import db
 from project.models.projects import Projects
@@ -49,6 +49,10 @@ class Projects_endpoint(Resource):
         return display_data
 
     def post(self):
+        """
+        Post functionality for project
+        using flask_restfull parse lib
+        """
         args = parser.parse_args()
         print(args)
 
@@ -70,9 +74,6 @@ class Projects_endpoint(Resource):
 
         return args, 201
 
-    def delete(self):
-        # TODO
-        pass
 
     def get_successor_id(self):
         pass
