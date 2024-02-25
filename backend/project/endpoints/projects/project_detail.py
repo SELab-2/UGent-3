@@ -28,7 +28,7 @@ class ProjectDetail(Resource):
 
         print(project)
         project_dict = {field: value for field, value in project.__dict__.items() if
-                            not field.startswith('_')}
+                        not field.startswith('_')}
 
         return project_dict, 200
 

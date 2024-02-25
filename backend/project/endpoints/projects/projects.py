@@ -33,7 +33,6 @@ class Projects_endpoint(Resource):
         """
         display_data = []
         projects = Projects.query.all()
-        print(projects)
 
         for project in projects:
             project_dict = {field: value for field, value in project.__dict__.items() if

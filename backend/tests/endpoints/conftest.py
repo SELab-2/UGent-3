@@ -1,6 +1,9 @@
 """ Configuration for pytest, Flask, and the test client."""
+from os import getenv
+
 import pytest
-from project import create_app
+from project import create_app, create_app_with_db
+from dotenv import load_dotenv
 
 @pytest.fixture
 def app():
@@ -8,7 +11,8 @@ def app():
     Returns:
         Flask -- A Flask application instance
     """
-    app = create_app()
+    load_dotenv()
+    app = create_app_with_db(getenv("DB_HOST"))
     yield app
 
 @pytest.fixture
