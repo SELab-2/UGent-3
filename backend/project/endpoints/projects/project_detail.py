@@ -48,9 +48,6 @@ class ProjectDetail(Resource):
         id: int = kwargs['project_id']
 
         args = parser.parse_args()
-        print(args)
-
-        values = {key: value for key, value in args.items() if value is not None}
 
         project = Projects.query.filter_by(project_id=id).first()  # .update(values=values)
 

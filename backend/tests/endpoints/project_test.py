@@ -14,8 +14,6 @@ def test_getting_all_projects(client):
 
 def test_post_remove_project(client):
     """Test adding a user to the datab and fetching it"""
-    response = client.get("/projects/1")
-    assert response.status_code == 404
 
     data = {
         "title": "YourProject for testing purposes 123451",
@@ -45,3 +43,23 @@ def test_post_remove_project(client):
     response = client.delete(f"/projects/{to_rem['project_id']}")
 
     assert response.status_code == 204
+    response = client.delete(f"/projects/{to_rem['project_id']}")
+    assert response.status_code == 404
+
+def test_update_project(client):
+    response = client.get("/projects")
+    assert response.status_code == 200
+    json_data = response.json[0]
+
+    new_archieved = not json_data["archieved"]
+    new_title = "just patched title"
+
+    response = client.put(f"/projects/{json_data['project_id']}", json={"title": new_title, "archieved": new_archieved})
+
+    assert response.status_code == 200
+
+    response = client.get(f"/projects/{json_data['project_id']}")
+    data = response.json
+    assert response.status_code == 200
+    assert data['title'] == new_title
+    assert data['archieved'] == new_archieved
