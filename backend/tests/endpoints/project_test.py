@@ -60,12 +60,6 @@ def test_update_project(db_session, client, course, course_teacher):
     db_session.add(course)
     db_session.commit()
 
-    print("course")
-    print(course)
-
-    course_id = course.course_id
-    print(f"course_id: {course_id}")
-
     # dummy data for testing
     data = {
         "title": "YourProject for testing purposes 123451",
