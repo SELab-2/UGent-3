@@ -1,16 +1,13 @@
 """Main entry point for the application."""
 # TODO: remove is for dev purposes
 from sys import path
-from os import getenv
-from dotenv import load_dotenv
-from project import create_app_with_db
-
-
-from sqlalchemy import URL
-
 path.append(".")
+from os import getenv # pylint: disable=wrong-import-position
+from sqlalchemy import URL # pylint: disable=wrong-import-position
+from project import create_app_with_db # pylint: disable=wrong-import-position
+from dotenv import load_dotenv # pylint: disable=wrong-import-position
 
-path.append(".")
+
 
 if __name__ == "__main__":
     load_dotenv()
