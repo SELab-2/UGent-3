@@ -9,6 +9,7 @@ from flask_restful import Resource, Api, abort, reqparse
 
 from project import db
 from project.models.projects import Projects
+from sqlalchemy import exc
 
 project_detail_bp = Blueprint('project_detail', __name__)
 project_detail_endpoint = Api(project_detail_bp)
@@ -57,16 +58,15 @@ class ProjectDetail(Resource):
         # return the fetched project and return 200 OK status
         return jsonify(project)
 
-    def put(self, **kwargs):
+    def put(self, project_id):
         """
         Update method for updating a specific project
         filtered by id of that specific project
         """
-        proj_id: int = kwargs['project_id']
 
         args = parser.parse_args()
         # get the project that need to be edited
-        project = Projects.query.filter_by(project_id=proj_id).first()  # .update(values=values)
+        project = Projects.query.filter_by(project_id=project_id).first()  # .update(values=values)
 
         # check which values are not None is the dict
         # if it is not None is needs to be modified in the database
@@ -75,16 +75,19 @@ class ProjectDetail(Resource):
                 setattr(project, key, value)
 
         # commit the changes and return the 200 OK code
-        db.session.commit()
-        return {"Message": f"Project {id} updated succesfully"}, 200
+        try:
+            db.session.commit()
+            return {"message": f"Project {id} updated succesfully"}, 200
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            return {"message": f"Something unexpected happenend when trying to edit project {id}"}, 500
 
-    def delete(self, **kwargs):
+
+    def delete(self, remove_id):
         """
         Detele a project and all of its submissions in cascade
         done by project id
         """
-
-        remove_id = kwargs['project_id']
 
         # fetch the project that needs to be removed
         deleted_project = Projects.query.filter_by(project_id=remove_id).first()
@@ -93,11 +96,14 @@ class ProjectDetail(Resource):
         self.abort_if_not_present(deleted_project)
 
         # if it exists delete it and commit the changes in the database
-        db.session.delete(deleted_project)
-        db.session.commit()
+        try:
+            db.session.delete(deleted_project)
+            db.session.commit()
 
-        # return 204 content delted succesfully
-        return {"Message": f"Project with id:{remove_id} deleted successfully!"}, 204
+            # return 204 content delted succesfully
+            return {"message": f"Project with id:{remove_id} deleted successfully!"}, 204
+        except exc.SQLAlchemyError:
+            return {"message": f"Something unexpected happened when removing project {remove_id}"}, 500
 
 
 project_detail_bp.add_url_rule(
