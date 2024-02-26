@@ -46,7 +46,7 @@ def test_post_remove_project(client):
     response = client.delete(f"/projects/{to_rem['project_id']}")
     assert response.status_code == 404
 
-def test_update_project(client):
+def test_update_project(client, course_teacher, course):
     """
     Test functionality of the PUT method for projects
     """
@@ -57,7 +57,7 @@ def test_update_project(client):
         "descriptions": ["YourProjectDescription"],
         "assignment_file": "@/path/to/your/file.txt",
         "deadline": "2024-02-25T12:00:00+00:00",
-        "course_id": 1,
+        "course_id": course.course_id,
         "visible_for_students": 'true',
         "archieved": 'false',
         "test_path": "YourTestPath",

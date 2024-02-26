@@ -8,6 +8,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from project import db
 
+from project.models.users import Users
+from project.models.courses import Courses
+
 load_dotenv()
 
 url = URL.create(
@@ -17,6 +20,20 @@ url = URL.create(
     host=getenv("POSTGRES_HOST"),
     database=getenv("POSTGRES_DB")
 )
+
+
+@pytest.fixture
+def course_teacher():
+    """A user that's a teacher for for testing"""
+    ad_teacher = Users(uid="Gunnar", is_teacher=True, is_admin=True)
+    return ad_teacher
+
+
+@pytest.fixture
+def course(course_teacher):
+    """A course for testing, with the course teacher as the teacher."""
+    ad2 = Courses(name="Ad2", teacher=course_teacher.uid)
+    return ad2
 
 @pytest.fixture
 def app():
