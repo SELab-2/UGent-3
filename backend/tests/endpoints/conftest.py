@@ -26,7 +26,6 @@ def user_db_session():
     yield session
     session.rollback()
     session.close()
-    # Truncate all tables
     for table in reversed(db.metadata.sorted_tables):
         session.execute(table.delete())
     session.commit()
