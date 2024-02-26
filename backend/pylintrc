@@ -2,8 +2,7 @@
 init-hook='import sys; sys.path.append(".")'
 
 [MESSAGES CONTROL]
-disable=W0621, # Redefining name %r from outer scope (line %s)
-        C0415 # Import outside toplevel (needed to prevent circular imports in project/__init__.py)
+disable=W0621 # Redefining name %r from outer scope (line %s)
 
 
 [test-files:*_test.py]
@@ -12,5 +11,4 @@ disable=
 
 [modules:project/modules/*]
 disable=
-    R0903, # Too few public methods (modules don't require us to have public methods)
-    C0415 # Import outside toplevel
+    R0903 # Too few public methods (modules don't require us to have public methods)

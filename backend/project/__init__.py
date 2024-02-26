@@ -14,8 +14,8 @@ def create_app():
     Returns:
         Flask -- A Flask application instance
     """
-    from .endpoints.index.index import index_bp
-    from .endpoints.users import users_bp
+    from .endpoints.index.index import index_bp # pylint: disable=import-outside-toplevel
+    from .endpoints.users import users_bp # pylint: disable=import-outside-toplevel
 
     app = Flask(__name__)
     app.register_blueprint(index_bp)
