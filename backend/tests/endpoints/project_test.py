@@ -12,15 +12,20 @@ def test_getting_all_projects(client):
     assert response.status_code == 200
     assert isinstance(response.json, list)
 
-def test_post_remove_project(client):
+def test_post_remove_project(db_session, client, course, course_teacher):
     """Test adding a user to the datab and fetching it"""
+
+    db_session.add(course_teacher)
+    db_session.commit()
+    db_session.add(course)
+    db_session.commit()
 
     data = {
         "title": "YourProject for testing purposes 123451",
         "descriptions": ["YourProjectDescription"],
         "assignment_file": "@/path/to/your/file.txt",
         "deadline": "2024-02-25T12:00:00+00:00",
-        "course_id": 1,
+        "course_id": course.course_id,
         "visible_for_students": 'true',
         "archieved": 'false',
         "test_path": "YourTestPath",
@@ -46,10 +51,21 @@ def test_post_remove_project(client):
     response = client.delete(f"/projects/{to_rem['project_id']}")
     assert response.status_code == 404
 
-def test_update_project(client, course_teacher, course):
+def test_update_project(db_session, client, course, course_teacher):
     """
     Test functionality of the PUT method for projects
     """
+
+    db_session.add(course_teacher)
+    db_session.commit()
+    db_session.add(course)
+    db_session.commit()
+
+    print("course")
+    print(course)
+
+    course_id = course.course_id
+    print(f"course_id: {course_id}")
 
     # dummy data for testing
     data = {
