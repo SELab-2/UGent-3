@@ -7,7 +7,7 @@ from flask_restful import Resource, Api, reqparse
 
 from project import db
 from project.models.projects import Projects
-
+from sqlalchemy import exc
 
 parser = reqparse.RequestParser()
 # parser.add_argument('id', type=int, help='Unique to charge for this resource')
@@ -65,11 +65,12 @@ class ProjectsEndpoint(Resource):
         )
 
         # add the new project to the database and commit the changes
-        db.session.add(new_project)
-        db.session.commit()
-
-        # 201 content added succesfully
-        return {"Message": "New project added succesfully"}, 201
+        try:
+            db.session.add(new_project)
+            db.session.commit()
+            return {"message": "New project added succesfully"}, 201
+        except exc.SQLAlchemyError:
+            return {"message": f"Something unexpected happenend when trying to add a new project"}, 500
 
 
 projects_bp.add_url_rule('/projects', view_func=ProjectsEndpoint.as_view('projects'))

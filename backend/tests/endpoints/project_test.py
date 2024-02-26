@@ -15,7 +15,6 @@ def test_post_remove_project(db_session, client, course, course_teacher):
     """Test adding a user to the datab and fetching it"""
 
     db_session.add(course_teacher)
-    db_session.commit()
     db_session.add(course)
     db_session.commit()
 
