@@ -42,7 +42,7 @@ class ProjectDetail(Resource):
         if project is None:
             abort(404)
 
-    def get(self, **kwargs):
+    def get(self, project_id):
         """
         Get method for listing a specific project
         filtered by id of that specific project
@@ -50,8 +50,7 @@ class ProjectDetail(Resource):
         """
 
         # fetch the project with the id that is specified in the url
-        proj_id: int = kwargs['project_id']
-        project = Projects.query.filter_by(project_id=proj_id).first()
+        project = Projects.query.filter_by(project_id=project_id).first()
 
         self.abort_if_not_present(project)
 
