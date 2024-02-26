@@ -1,11 +1,11 @@
 """ Configuration for pytest, Flask, and the test client."""
 from os import getenv
 from dotenv import load_dotenv
-
-import pytest
-from project import create_app_with_db, db
 from sqlalchemy import create_engine, URL
 from sqlalchemy.orm import sessionmaker
+from project import create_app_with_db, db
+
+import pytest
 
 from project.models.users import Users
 from project.models.courses import Courses

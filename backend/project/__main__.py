@@ -3,13 +3,12 @@
 from sys import path
 from os import getenv
 from dotenv import load_dotenv
+from project import create_app_with_db
+
 
 from sqlalchemy import URL
 
 path.append(".")
-
-from sys import path
-from project import create_app_with_db
 
 path.append(".")
 
