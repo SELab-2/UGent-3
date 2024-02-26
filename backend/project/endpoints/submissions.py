@@ -126,10 +126,6 @@ class Submissions(Resource):
             return {"message": f"An error occurred while creating a new submission "
                 f"for user {uid} in project {pid}"}, 500
 
-submissions_bp.add_url_rule(
-    "/submissions/<string:uid>/<int:pid>",
-    view_func=Submissions.as_view("submissions"))
-
 class Submission(Resource):
     """API endpoint for the submission"""
 
@@ -218,7 +214,7 @@ class Submission(Resource):
 
                 # Save the submission
                 session.commit()
-                return {"message": "Submission {sid} updated"}
+                return {"message": f"Submission {sid} updated"}
         except Exception:
             session.rollback()
             return {"message": f"An error occurred while patching submission {sid}"}, 500
@@ -262,6 +258,9 @@ class Submission(Resource):
             db.session.rollback()
             return {"message": f"An error occurred while deleting submission {sid}"}, 500
 
+submissions_bp.add_url_rule(
+    "/submissions/<string:uid>/<int:pid>",
+    view_func=Submissions.as_view("submissions"))
 submissions_bp.add_url_rule(
     "/submissions/<int:sid>",
     view_func=Submission.as_view("submission"))
