@@ -4,7 +4,7 @@ for example /projects/1 if the project id of
 the corresponding project is 1
 """
 
-from flask import Blueprint
+from flask import Blueprint, jsonify
 from flask_restful import Resource, Api, abort, reqparse
 
 from project import db
@@ -54,12 +54,8 @@ class ProjectDetail(Resource):
 
         self.abort_if_not_present(project)
 
-        # remove the invalid alchemysql field
-        project_dict = {field: value for field, value in project.__dict__.items() if
-                        not field.startswith('_')}
-
         # return the fetched project and return 200 OK status
-        return project_dict, 200
+        return jsonify(project)
 
     def put(self, **kwargs):
         """
