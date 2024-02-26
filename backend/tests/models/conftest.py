@@ -39,6 +39,9 @@ def db_session():
     After the test, all changes are rolled back and the session is closed."""
     db.metadata.create_all(engine)
     session = Session()
+    for table in reversed(db.metadata.sorted_tables):
+        session.execute(table.delete())
+    session.commit()
     yield session
     session.rollback()
     session.close()
