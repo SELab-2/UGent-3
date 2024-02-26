@@ -1,5 +1,5 @@
 """Main entry point for the application."""
-# TODO: remove is for dev purposes
+# TOD: remove is for dev purposes
 from sys import path
 path.append(".")
 from os import getenv # pylint: disable=wrong-import-position

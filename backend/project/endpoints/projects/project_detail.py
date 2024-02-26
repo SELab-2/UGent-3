@@ -34,7 +34,7 @@ class ProjectDetail(Resource):
     for implementing get, delete and put methods
     """
 
-    def is_existing_project(self, project):
+    def abort_if_not_present(self, project):
         """
         Check if the project exists in the database
         and if not abort the request and give back a 404 not found
@@ -53,7 +53,7 @@ class ProjectDetail(Resource):
         proj_id: int = kwargs['project_id']
         project = Projects.query.filter_by(project_id=proj_id).first()
 
-        self.is_existing_project(project)
+        self.abort_if_not_present(project)
 
         # remove the invalid alchemysql field
         project_dict = {field: value for field, value in project.__dict__.items() if
@@ -95,7 +95,7 @@ class ProjectDetail(Resource):
         deleted_project = Projects.query.filter_by(project_id=remove_id).first()
 
         # check if its an existing one
-        self.is_existing_project(deleted_project)
+        self.abort_if_not_present(deleted_project)
 
         # if it exists delete it and commit the changes in the database
         db.session.delete(deleted_project)
