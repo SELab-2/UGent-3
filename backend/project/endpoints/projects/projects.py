@@ -49,7 +49,6 @@ class ProjectsEndpoint(Resource):
         using flask_restfull parse lib
         """
         args = parser.parse_args()
-        print(args)
 
         # create a new project object to add in the API later
         new_project = Projects(
