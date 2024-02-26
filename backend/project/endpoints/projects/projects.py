@@ -2,7 +2,7 @@
 Module that implements the /projects endpoint of the API
 """
 
-from flask import Blueprint
+from flask import Blueprint, jsonify
 from flask_restful import Resource, Api, reqparse
 
 from project import db
@@ -40,15 +40,8 @@ class ProjectsEndpoint(Resource):
         display_data = []
         projects = Projects.query.all()
 
-        # remove field from alchemysql that has no value for the API itself
-        for project in projects:
-            project_dict = {field: value for field, value in project.__dict__.items() if
-                            not field.startswith('_')}
-
-            display_data.append(project_dict)
-
         # return all valid entries for a project and return a 200 OK code
-        return display_data, 200
+        return jsonify(projects)
 
     def post(self):
         """
