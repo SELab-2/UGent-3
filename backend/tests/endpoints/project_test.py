@@ -55,7 +55,6 @@ def test_update_project(db_session, client, course, course_teacher):
     """
 
     db_session.add(course_teacher)
-    db_session.commit()
     db_session.add(course)
     db_session.commit()
 
