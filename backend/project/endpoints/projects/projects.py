@@ -1,10 +1,13 @@
+"""
+Module that implements the /projects endpoint of the API
+"""
+
 from flask import Blueprint
 from flask_restful import Resource, Api, reqparse
-from sqlalchemy import insert, delete
 
 from project import db
 from project.models.projects import Projects
-from project.models.courses import Courses
+
 
 parser = reqparse.RequestParser()
 # parser.add_argument('id', type=int, help='Unique to charge for this resource')
@@ -23,7 +26,12 @@ projects_bp = Blueprint('projects', __name__)
 projects_endpoint = Api(projects_bp)
 
 
-class Projects_endpoint(Resource):
+class ProjectsEndpoint(Resource):
+    """
+    Class for projects endpoints
+    Inherits from flask_restful.Resource class
+    for implementing get method
+    """
     def get(self):
         """
         Get method for listing all available projects
@@ -72,4 +80,4 @@ class Projects_endpoint(Resource):
         return {"Message": "New project added succesfully"}, 201
 
 
-projects_bp.add_url_rule('/projects', view_func=Projects_endpoint.as_view('projects'))
+projects_bp.add_url_rule('/projects', view_func=ProjectsEndpoint.as_view('projects'))

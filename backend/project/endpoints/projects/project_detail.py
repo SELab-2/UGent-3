@@ -1,9 +1,14 @@
-from flask import Blueprint, request
+"""
+Module for project details page
+for example /projects/1 if the project id of
+the corresponding project is 1
+"""
+
+from flask import Blueprint
 from flask_restful import Resource, Api, abort, reqparse
 
 from project import db
 from project.models.projects import Projects
-from project.models.submissions import Submissions
 
 project_detail_bp = Blueprint('project_detail', __name__)
 project_detail_endpoint = Api(project_detail_bp)
@@ -23,6 +28,11 @@ parser.add_argument("regex_expressions", type=str, help='Projects regex expressi
 
 
 class ProjectDetail(Resource):
+    """
+    Class for projects/id endpoints
+    Inherits from flask_restful.Resource class
+    for implementing get, delete and put methods
+    """
 
     def is_existing_project(self, project):
         """
@@ -40,8 +50,8 @@ class ProjectDetail(Resource):
         """
 
         # fetch the project with the id that is specified in the url
-        id: int = kwargs['project_id']
-        project = Projects.query.filter_by(project_id=id).first()
+        proj_id: int = kwargs['project_id']
+        project = Projects.query.filter_by(project_id=proj_id).first()
 
         self.is_existing_project(project)
 
@@ -57,11 +67,11 @@ class ProjectDetail(Resource):
         Update method for updating a specific project
         filtered by id of that specific project
         """
-        id: int = kwargs['project_id']
+        proj_id: int = kwargs['project_id']
 
         args = parser.parse_args()
         # get the project that need to be edited
-        project = Projects.query.filter_by(project_id=id).first()  # .update(values=values)
+        project = Projects.query.filter_by(project_id=proj_id).first()  # .update(values=values)
 
         # check which values are not None is the dict
         # if it is not None is needs to be modified in the database
@@ -95,4 +105,6 @@ class ProjectDetail(Resource):
         return {"Message": f"Project with id:{remove_id} deleted successfully!"}, 204
 
 
-project_detail_bp.add_url_rule('/projects/<int:project_id>', view_func=ProjectDetail.as_view('project_detail'))
+project_detail_bp.add_url_rule(
+    '/projects/<int:project_id>',
+    view_func=ProjectDetail.as_view('project_detail'))

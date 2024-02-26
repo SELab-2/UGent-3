@@ -1,5 +1,4 @@
 """Tests for project endpoints."""
-from project.models.projects import Projects
 
 def test_projects_home(client):
     """Test home project endpoint."""
@@ -94,7 +93,9 @@ def test_update_project(db_session, client, course, course_teacher):
     new_title = "just patched title"
 
     # edit the project
-    response = client.put(f"/projects/{json_data['project_id']}", json={"title": new_title, "archieved": new_archieved})
+    response = client.put(f"/projects/{json_data['project_id']}", json={
+        "title": new_title, "archieved": new_archieved
+    })
 
     assert response.status_code == 200
 
