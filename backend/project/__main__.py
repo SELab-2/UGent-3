@@ -5,8 +5,7 @@ path.append(".")
 from os import getenv # pylint: disable=wrong-import-position
 from sqlalchemy import URL # pylint: disable=wrong-import-position
 from project import create_app_with_db # pylint: disable=wrong-import-position
-from dotenv import load_dotenv # pylint: disable=wrong-import-position
-
+from dotenv import load_dotenv # pylint: disable=wrong-import-position, wrong-import-order
 
 
 if __name__ == "__main__":
