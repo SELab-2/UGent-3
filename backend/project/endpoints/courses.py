@@ -187,49 +187,6 @@ def get_course_abort_if_not_found(course_id):
 class CoursesForUser(Resource):
     """Api endpoint for the /courses link"""
 
-    def get(self):
-        """
-        Get function for /courses
-        returns all the courses of a related users in a json structure,
-        with courses represented as {course_id:...,name:...}
-        {
-            student: [list of courses where user is registered as student]
-            admin: [list of courses where user is registered as admin]
-        }
-        """
-        uid = request.args.get("uid")
-        abort_if_uid_is_none(uid)
-        abort_if_no_user_found_for_uid(uid)
-
-        query = CourseStudents.query.filter_by(uid=uid)
-        student_course_ids = [
-            course_relation.course_id
-            for course_relation in execute_query_abort_if_db_error(query, all=True)
-        ]
-        query = CourseAdmins.query.filter_by(uid=uid)
-        admin_course_ids = [
-            course_relation.course_id
-            for course_relation in execute_query_abort_if_db_error(query, all=True)
-        ]
-
-        query = Courses.query.filter(Courses.course_id.in_(student_course_ids))
-        student_course_data = execute_query_abort_if_db_error(query, all=True)
-        query = Courses.query.filter(Courses.course_id.in_(admin_course_ids))
-        admin_course_data = execute_query_abort_if_db_error(query, all=True)
-
-        courses_data = {
-            "student": [
-                {"course_id": course.course_id, "name": course.name}
-                for course in student_course_data
-            ],
-            "admin": [
-                {"course_id": course.course_id, "name": course.name}
-                for course in admin_course_data
-            ],
-        }
-
-        return jsonify(courses_data)
-
     def post(self):
         """
         This function will create a new course

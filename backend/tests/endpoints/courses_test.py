@@ -112,29 +112,6 @@ class TestCoursesEndpoint:
 
         #Now we have a course with a teacher, students and an assistent lets try to get some info
 
-        admins = [s.uid for s in CourseAdmins.query.filter_by(course_id=course.course_id).all()]
-        for admin in admins:
-            response = client.get("/courses?uid="+admin)
-            response_data_str = response.data.decode("utf-8")
-            response_json = json.loads(response_data_str)
-            expected_json = {
-                "admin": [{"course_id": course.course_id, "name": course.name}],
-                "student": []
-            }
-            assert response_json == expected_json
-
-        students = [s.uid for s in CourseStudents.query.filter_by(course_id=course.course_id).all()]
-        for student in students:
-            response = client.get("/courses?uid="+student)
-            response_data_str = response.data.decode("utf-8")
-            response_json = json.loads(response_data_str)
-            expected_json = {
-                "admin": [],
-                "student": [{"course_id": course.course_id, "name": course.name}]
-            }
-            assert response_json == expected_json
-        
-
         sel2_students = [
             s.uid for s in CourseStudents.query.filter_by(course_id=course.course_id).all()
         ]
