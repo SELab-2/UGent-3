@@ -8,6 +8,8 @@ from flask_restful import Resource, Api, reqparse
 from project import db
 from project.models.projects import Projects
 from sqlalchemy import exc
+from project.endpoints.projects.endpoint_parser import parse_project_params
+
 
 parser = reqparse.RequestParser()
 # parser.add_argument('id', type=int, help='Unique to charge for this resource')
@@ -21,9 +23,6 @@ parser.add_argument("archieved", type=bool, help='Projects')
 parser.add_argument("test_path", type=str, help='Projects test path')
 parser.add_argument("script_name", type=str, help='Projects test script path')
 parser.add_argument("regex_expressions", type=str, help='Projects regex expressions')
-
-projects_bp = Blueprint('projects', __name__)
-projects_endpoint = Api(projects_bp)
 
 
 class ProjectsEndpoint(Resource):
@@ -48,7 +47,8 @@ class ProjectsEndpoint(Resource):
         Post functionality for project
         using flask_restfull parse lib
         """
-        args = parser.parse_args()
+        # args = parser.parse_args()
+        args = parse_project_params()
 
         # create a new project object to add in the API later
         new_project = Projects(
@@ -71,6 +71,3 @@ class ProjectsEndpoint(Resource):
             return jsonify(new_project), 201
         except exc.SQLAlchemyError:
             return {"message": f"Something unexpected happenend when trying to add a new project"}, 500
-
-
-projects_bp.add_url_rule('/projects', view_func=ProjectsEndpoint.as_view('projects'))

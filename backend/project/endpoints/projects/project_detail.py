@@ -4,15 +4,16 @@ for example /projects/1 if the project id of
 the corresponding project is 1
 """
 
-from flask import Blueprint, jsonify
-from flask_restful import Resource, Api, abort, reqparse
+from flask import jsonify
+from flask_restful import Resource, abort, reqparse
 
 from project import db
 from project.models.projects import Projects
 from sqlalchemy import exc
+from project.endpoints.projects.endpoint_parser import parse_project_params
 
-project_detail_bp = Blueprint('project_detail', __name__)
-project_detail_endpoint = Api(project_detail_bp)
+# project_detail_bp = Blueprint('project_detail', __name__)
+# project_detail_endpoint = Api(project_detail_bp)
 
 parser = reqparse.RequestParser()
 # parser.add_argument('id', type=int, help='Unique to charge for this resource')
@@ -64,7 +65,7 @@ class ProjectDetail(Resource):
         filtered by id of that specific project
         """
 
-        args = parser.parse_args()
+        # args = parser.parse_args()
         # get the project that need to be edited
         project = Projects.query.filter_by(project_id=project_id).first()  # .update(values=values)
 
@@ -73,9 +74,13 @@ class ProjectDetail(Resource):
 
         # commit the changes and return the 200 OK code
         try:
-            for key, value in args.items():
-                if value is not None:
-                    setattr(project, key, value)
+            # for key, value in args.items():
+            #     if value is not None:
+            #         setattr(project, key, value)
+            var_dict = parse_project_params()
+            print(var_dict)
+            for key, value in var_dict.items():
+                setattr(project, key, value)
             db.session.commit()
             # get the updated version
             return {"message": f"Succesfully changed project with id: {project.project_id}"}, 200
@@ -103,10 +108,4 @@ class ProjectDetail(Resource):
             # return 204 content delted succesfully
             return {"message": f"Project with id:{project_id} deleted successfully!"}, 204
         except exc.SQLAlchemyError:
-            print("delete didnt work")
-            return {"message": f"Something unexpected happened when removing project {project}"}, 500
-
-
-project_detail_bp.add_url_rule(
-    '/projects/<int:project_id>',
-    view_func=ProjectDetail.as_view('project_detail'))
+            return {"message": f"Something unexpected happened when removing project {project_id}"}, 500
