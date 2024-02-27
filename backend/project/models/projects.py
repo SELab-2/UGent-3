@@ -22,7 +22,7 @@ class Projects(db.Model):
     descriptions: str = Column(Text, nullable=False)
     assignment_file: str = Column(String(50))
     deadline: str = Column(DateTime(timezone=True))
-    course_id: datetime.datetime = Column(Integer, ForeignKey("courses.course_id"), nullable=False)
+    course_id: int = Column(Integer, ForeignKey("courses.course_id"), nullable=False)
     visible_for_students: bool = Column(Boolean, nullable=False)
     archieved: bool = Column(Boolean, nullable=False)
     test_path: str = Column(String(50))

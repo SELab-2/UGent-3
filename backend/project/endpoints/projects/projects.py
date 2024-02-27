@@ -64,11 +64,13 @@ class ProjectsEndpoint(Resource):
             regex_expressions=args['regex_expressions']
         )
 
+        print(new_project)
+
         # add the new project to the database and commit the changes
         try:
             db.session.add(new_project)
             db.session.commit()
-            return {"message": "New project added succesfully"}, 201
+            return jsonify(new_project), 201
         except exc.SQLAlchemyError:
             return {"message": f"Something unexpected happenend when trying to add a new project"}, 500
 

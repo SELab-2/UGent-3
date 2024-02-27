@@ -1,9 +1,11 @@
 """Tests for project endpoints."""
+from project.models.projects import Projects
 
 def test_projects_home(client):
     """Test home project endpoint."""
     response = client.get("/projects")
     assert response.status_code == 200
+
 
 def test_getting_all_projects(client):
     """Test getting all projects"""
@@ -11,91 +13,90 @@ def test_getting_all_projects(client):
     assert response.status_code == 200
     assert isinstance(response.json, list)
 
-def test_post_remove_project(db_session, client, course, course_teacher):
-    """Test adding a user to the datab and fetching it"""
 
+def test_post_project(db_session, client, project, course, course_teacher, project_json):
+    """Test posting a project to the datab and testing if it's present"""
     db_session.add(course_teacher)
     db_session.commit()
+
     db_session.add(course)
     db_session.commit()
 
-    data = {
-        "title": "YourProject for testing purposes 123451",
-        "descriptions": ["YourProjectDescription"],
-        "assignment_file": "@/path/to/your/file.txt",
-        "deadline": "2024-02-25T12:00:00+00:00",
-        "course_id": course.course_id,
-        "visible_for_students": 'true',
-        "archieved": 'false',
-        "test_path": "YourTestPath",
-        "script_name": "YourTestScriptName",
-        "regex_expressions": "Y"
-    }
+    project.course_id = course.course_id
 
-    response = client.post("/projects", json=data)
+    project_json["course_id"] = course.course_id
+
+    # post the project
+    response = client.post("/projects", json=project_json)
     assert response.status_code == 201
 
-    response = client.get("/projects", json={"title": data["title"]})
+    # check if the project with the id is present
+    project_id = response.json["project_id"]
+    response = client.get(f"/projects/{project_id}")
     assert response.status_code == 200
 
-    json_data = response.json
 
-    to_rem = {}
-    for json in json_data:
-        if json["title"] == data["title"]:
-            to_rem = json
-    response = client.delete(f"/projects/{to_rem['project_id']}")
+def test_remove_project(db_session, client, project, course, course_teacher, project_json):
+    """Test removing a project to the datab and fetching it, testing if its not present anymore"""
 
+    db_session.add(course_teacher)
+    db_session.commit()
+
+    db_session.add(course)
+    db_session.commit()
+
+    project.course_id = course.course_id
+
+    project_json["course_id"] = course.course_id
+
+    # post the project
+    response = client.post("/projects", json=project_json)
+    assert response.status_code == 201
+
+    # check if the project with the id is present
+    project_id = response.json["project_id"]
+    response = client.get(f"/projects/{project_id}")
+    assert response.status_code == 200
+
+    # check if the 204 status code is returned
+    response = client.delete(f"/projects/{project_id}")
     assert response.status_code == 204
-    response = client.delete(f"/projects/{to_rem['project_id']}")
+
+    # check if the project isn't present anymore and the delete indeed went through
+    response = client.delete(f"/projects/{project_id}")
     assert response.status_code == 404
 
-def test_update_project(db_session, client, course, course_teacher):
+
+def test_update_project(db_session, client, course, course_teacher, project, project_json):
     """
     Test functionality of the PUT method for projects
     """
 
     db_session.add(course_teacher)
     db_session.commit()
+
     db_session.add(course)
     db_session.commit()
 
-    # dummy data for testing
-    data = {
-        "title": "YourProject for testing purposes 123451",
-        "descriptions": ["YourProjectDescription"],
-        "assignment_file": "@/path/to/your/file.txt",
-        "deadline": "2024-02-25T12:00:00+00:00",
-        "course_id": course.course_id,
-        "visible_for_students": 'true',
-        "archieved": 'false',
-        "test_path": "YourTestPath",
-        "script_name": "YourTestScriptName",
-        "regex_expressions": "Y"
-    }
+    project.course_id = course.course_id
+    project_json["course_id"] = course.course_id
 
-    # post it so it can be edited later on
-    response = client.post("/projects", json=data)
+    # post the project to edit
+    db_session.add(project)
+    db_session.commit()
+    project_id = project.project_id
 
-    # get the newly added project is no other is present
-    response = client.get("/projects")
-    assert response.status_code == 200
-    json_data = response.json[0]
+    new_title = "patched title"
+    new_archieved = not project.archieved
 
-    # set a new title and flit the archieved boolean
-    new_archieved = not json_data["archieved"]
-    new_title = "just patched title"
-
-    # edit the project
-    response = client.put(f"/projects/{json_data['project_id']}", json={
+    response = client.put(f"/projects/{project_id}", json={
         "title": new_title, "archieved": new_archieved
     })
+    db_session.commit()
+    # print(project)
+    print(response)
+    updated_project = db_session.get(Projects, {"project_id": project.project_id})
 
     assert response.status_code == 200
-
-    # fetch the project again and check if the values are the newly edited values
-    response = client.get(f"/projects/{json_data['project_id']}")
-    data = response.json
-    assert response.status_code == 200
-    assert data['title'] == new_title
-    assert data['archieved'] == new_archieved
+    assert updated_project.title == new_title
+    assert updated_project.archieved == new_archieved

@@ -70,27 +70,27 @@ class ProjectDetail(Resource):
 
         # check which values are not None is the dict
         # if it is not None is needs to be modified in the database
-        for key, value in args.items():
-            if value is not None:
-                setattr(project, key, value)
 
         # commit the changes and return the 200 OK code
         try:
+            for key, value in args.items():
+                if value is not None:
+                    setattr(project, key, value)
             db.session.commit()
-            return {"message": f"Project {id} updated succesfully"}, 200
+            # get the updated version
+            return {"message": f"Succesfully changed project with id: {project.project_id}"}, 200
         except exc.SQLAlchemyError:
             db.session.rollback()
             return {"message": f"Something unexpected happenend when trying to edit project {id}"}, 500
 
-
-    def delete(self, remove_id):
+    def delete(self, project_id):
         """
         Detele a project and all of its submissions in cascade
         done by project id
         """
 
         # fetch the project that needs to be removed
-        deleted_project = Projects.query.filter_by(project_id=remove_id).first()
+        deleted_project = Projects.query.filter_by(project_id=project_id).first()
 
         # check if its an existing one
         self.abort_if_not_present(deleted_project)
@@ -101,9 +101,10 @@ class ProjectDetail(Resource):
             db.session.commit()
 
             # return 204 content delted succesfully
-            return {"message": f"Project with id:{remove_id} deleted successfully!"}, 204
+            return {"message": f"Project with id:{project_id} deleted successfully!"}, 204
         except exc.SQLAlchemyError:
-            return {"message": f"Something unexpected happened when removing project {remove_id}"}, 500
+            print("delete didnt work")
+            return {"message": f"Something unexpected happened when removing project {project}"}, 500
 
 
 project_detail_bp.add_url_rule(
