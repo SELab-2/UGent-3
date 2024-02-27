@@ -27,6 +27,8 @@ def test_post_project(db_session, client, project, course, course_teacher, proje
     project_json["course_id"] = course.course_id
 
     # post the project
+    print("project json")
+    print(project_json)
     response = client.post("/projects", json=project_json)
     assert response.status_code == 201
 
