@@ -1,7 +1,4 @@
 """Main entry point for the application."""
-# TOD: remove is for dev purposes
-from sys import path
-path.append(".")
 from os import getenv # pylint: disable=wrong-import-position
 from sqlalchemy import URL # pylint: disable=wrong-import-position
 from project import create_app_with_db # pylint: disable=wrong-import-position

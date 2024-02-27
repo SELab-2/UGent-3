@@ -64,8 +64,6 @@ class ProjectsEndpoint(Resource):
             regex_expressions=args['regex_expressions']
         )
 
-        print(new_project)
-
         # add the new project to the database and commit the changes
         try:
             db.session.add(new_project)
