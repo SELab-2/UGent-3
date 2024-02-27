@@ -14,15 +14,13 @@ def test_getting_all_projects(client):
     assert isinstance(response.json, list)
 
 
-def test_post_project(db_session, client, project, course, course_teacher, project_json):
+def test_post_project(db_session, client, course, course_teacher, project_json):
     """Test posting a project to the datab and testing if it's present"""
     db_session.add(course_teacher)
     db_session.commit()
 
     db_session.add(course)
     db_session.commit()
-
-    project.course_id = course.course_id
 
     project_json["course_id"] = course.course_id
 
@@ -38,7 +36,7 @@ def test_post_project(db_session, client, project, course, course_teacher, proje
     assert response.status_code == 200
 
 
-def test_remove_project(db_session, client, project, course, course_teacher, project_json):
+def test_remove_project(db_session, client, course, course_teacher, project_json):
     """Test removing a project to the datab and fetching it, testing if its not present anymore"""
 
     db_session.add(course_teacher)
@@ -46,8 +44,6 @@ def test_remove_project(db_session, client, project, course, course_teacher, pro
 
     db_session.add(course)
     db_session.commit()
-
-    project.course_id = course.course_id
 
     project_json["course_id"] = course.course_id
 
@@ -69,7 +65,7 @@ def test_remove_project(db_session, client, project, course, course_teacher, pro
     assert response.status_code == 404
 
 
-def test_update_project(db_session, client, course, course_teacher, project, project_json):
+def test_update_project(db_session, client, course, course_teacher, project):
     """
     Test functionality of the PUT method for projects
     """
@@ -81,7 +77,6 @@ def test_update_project(db_session, client, course, course_teacher, project, pro
     db_session.commit()
 
     project.course_id = course.course_id
-    project_json["course_id"] = course.course_id
 
     # post the project to edit
     db_session.add(project)

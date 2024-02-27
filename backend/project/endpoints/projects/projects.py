@@ -3,11 +3,11 @@ Module that implements the /projects endpoint of the API
 """
 
 from flask import jsonify
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
+from sqlalchemy import exc
 
 from project import db
 from project.models.projects import Projects
-from sqlalchemy import exc
 from project.endpoints.projects.endpoint_parser import parse_project_params
 
 
@@ -22,7 +22,6 @@ class ProjectsEndpoint(Resource):
         Get method for listing all available projects
         that are currently in the API
         """
-        display_data = []
         projects = Projects.query.all()
 
         # return all valid entries for a project and return a 200 OK code
@@ -56,4 +55,6 @@ class ProjectsEndpoint(Resource):
             db.session.commit()
             return jsonify(new_project), 201
         except exc.SQLAlchemyError:
-            return {"message": f"Something unexpected happenend when trying to add a new project"}, 500
+            return ({"message":
+                        "Something unexpected happenend when trying to add a new project"},
+                    500)

@@ -1,3 +1,8 @@
+"""
+Module for providing the blueprint to the api
+of both route
+"""
+
 from flask import Blueprint
 from flask_restful import Api
 

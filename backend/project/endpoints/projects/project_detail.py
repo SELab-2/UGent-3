@@ -5,12 +5,12 @@ the corresponding project is 1
 """
 
 from flask import jsonify
-from flask_restful import Resource, abort, reqparse
+from flask_restful import Resource, abort
+from sqlalchemy import exc
+from project.endpoints.projects.endpoint_parser import parse_project_params
 
 from project import db
 from project.models.projects import Projects
-from sqlalchemy import exc
-from project.endpoints.projects.endpoint_parser import parse_project_params
 
 
 class ProjectDetail(Resource):
@@ -70,7 +70,9 @@ class ProjectDetail(Resource):
             return {"message": f"Succesfully changed project with id: {project.project_id}"}, 200
         except exc.SQLAlchemyError:
             db.session.rollback()
-            return {"message": f"Something unexpected happenend when trying to edit project {id}"}, 500
+            return ({"message":
+                        f"Something unexpected happenend when trying to edit project {id}"},
+                    500)
 
     def delete(self, project_id):
         """
@@ -92,4 +94,6 @@ class ProjectDetail(Resource):
             # return 204 content delted succesfully
             return {"message": f"Project with id:{project_id} deleted successfully!"}, 204
         except exc.SQLAlchemyError:
-            return {"message": f"Something unexpected happened when removing project {project_id}"}, 500
+            return ({"message":
+                        f"Something unexpected happened when removing project {project_id}"},
+                    500)
