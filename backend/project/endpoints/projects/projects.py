@@ -2,27 +2,13 @@
 Module that implements the /projects endpoint of the API
 """
 
-from flask import Blueprint, jsonify
-from flask_restful import Resource, Api, reqparse
+from flask import jsonify
+from flask_restful import Resource, reqparse
 
 from project import db
 from project.models.projects import Projects
 from sqlalchemy import exc
 from project.endpoints.projects.endpoint_parser import parse_project_params
-
-
-parser = reqparse.RequestParser()
-# parser.add_argument('id', type=int, help='Unique to charge for this resource')
-parser.add_argument('title', type=str, help='Projects title')
-parser.add_argument('descriptions', type=str, help='Projects description')
-parser.add_argument('assignment_file', type=str, help='Projects assignment file')
-parser.add_argument("deadline", type=str, help='Projects deadline')
-parser.add_argument("course_id", type=str, help='Projects course_id')
-parser.add_argument("visible_for_students", type=bool, help='Projects visibility for students')
-parser.add_argument("archieved", type=bool, help='Projects')
-parser.add_argument("test_path", type=str, help='Projects test path')
-parser.add_argument("script_name", type=str, help='Projects test script path')
-parser.add_argument("regex_expressions", type=str, help='Projects regex expressions')
 
 
 class ProjectsEndpoint(Resource):
