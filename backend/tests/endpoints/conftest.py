@@ -83,13 +83,7 @@ def app():
     """
     load_dotenv()
 
-    db_url = URL.create(
-        drivername="postgresql",
-        username=getenv("POSTGRES_USER"),
-        password=getenv("POSTGRES_PASSWORD"),
-        host=getenv("POSTGRES_HOST"),
-        database=getenv("POSTGRES_DB")
-    )
+    db_url = url
     engine = create_engine(db_url)
     # Session = sessionmaker(bind=engine)
     app = create_app_with_db(db_url)

@@ -5,7 +5,7 @@ from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, St
 from project import db
 
 @dataclasses.dataclass
-class Projects(db.Model):
+class Projects(db.Model): # pylint: disable=too-many-instance-attributes
     """This class describes the projects table,
     a projects has an id, a title, a description, 
     an optional assignment file that can contain more explanation of the projects,
@@ -13,7 +13,11 @@ class Projects(db.Model):
     the course id of the course to which the project belongs,
     visible for students variable so a teacher can decide if the students can see it yet,
     archieved var so we can implement the archiving functionality,
-    a test path,script name and regex experssions for automated testing"""
+    a test path,script name and regex experssions for automated testing
+
+    Pylint disalbe too many intance attributes because we can't reduce the amount
+     of fields of the model
+    """
 
     __tablename__ = "projects"
     project_id: int = Column(Integer, primary_key=True)
