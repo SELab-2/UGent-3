@@ -22,11 +22,10 @@ class ProjectsEndpoint(Resource):
         Get method for listing all available projects
         that are currently in the API
         """
-        projects = Projects.query.all()
-
+        projects = Projects.query.with_entities(Projects.project_id, Projects.title, Projects.descriptions).all()
+        results = [tuple(row) for row in projects]
         # return all valid entries for a project and return a 200 OK code
-        return jsonify(projects)
-
+        return results
     def post(self):
         """
         Post functionality for project
