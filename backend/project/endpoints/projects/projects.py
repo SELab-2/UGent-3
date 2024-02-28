@@ -5,11 +5,12 @@ Module that implements the /projects endpoint of the API
 from flask import jsonify
 from flask_restful import Resource
 from sqlalchemy import exc
+from sqlalchemy.orm import load_only
+
 
 from project import db
 from project.models.projects import Projects
 from project.endpoints.projects.endpoint_parser import parse_project_params
-
 
 class ProjectsEndpoint(Resource):
     """
@@ -26,7 +27,12 @@ class ProjectsEndpoint(Resource):
         try:
             projects = Projects.query.with_entities(Projects.project_id, Projects.title, Projects.descriptions).all()
 
-            results = [tuple(row) for row in projects]
+            results = [{
+                "project_id": row[0],
+                "title": row[1],
+                "descriptions": row[2]
+            } for row in projects]
+
             # return all valid entries for a project and return a 200 OK code
             return results, 200
         except exc.SQLAlchemyError:
