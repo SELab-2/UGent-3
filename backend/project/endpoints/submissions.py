@@ -25,22 +25,8 @@ class Submissions(Resource):
             dict[str, any]: The list of submission URLs
         """
 
-        # Authentication
-        # uid_operator = 0
-        # if uid_operator is None:
-        #     return {"message": "Not logged in"}, 401
-
         try:
             with db.session() as session:
-                # Authorization
-                # operator = session.get(m_users, uid_operator)
-                # if operator is None:
-                #     return {"message": f"User {uid_operator} not found"}, 404
-                # if not (operator.is_admin or operator.is_teacher or uid_operator == uid):
-                #     return {
-                #         "message": f"User {uid_operator} does not have the correct rights"
-                #     }, 403
-
                 # Check user
                 user = session.get(m_users, uid)
                 if user is None:
@@ -70,22 +56,8 @@ class Submissions(Resource):
             dict[str, any]: The URL to the submission
         """
 
-        # Authentication
-        # uid_operator = 0
-        # if uid_operator is None:
-        #     return {"message": "Not logged in"}, 401
-
         try:
             with db.session() as session:
-                # Authorization
-                # operator = session.get(m_users, uid_operator)
-                # if operator is None:
-                #     return {"message": f"User {uid_operator} not found"}, 404
-                # if uid_operator != uid:
-                #     return {
-                #         "message": f"User {uid_operator} does not have the correct rights"
-                #     }, 403
-
                 submission = m_submissions()
 
                 # User
@@ -113,7 +85,7 @@ class Submissions(Resource):
                 submission.submission_time = datetime.now()
 
                 # Submission path
-                # get the files and store them
+                # Get the files, store them, test them ...
                 submission.submission_path = "/tbd"
 
                 # Submission status
@@ -140,22 +112,8 @@ class Submission(Resource):
             dict[str, any]: The submission
         """
 
-        # Authentication
-        # uid_operator = 0
-        # if uid_operator is None:
-        #     return {"message": "Not logged in"}, 401
-
         try:
             with db.session() as session:
-                # Authorization
-                # operator = session.get(m_users, uid_operator)
-                # if operator is None:
-                #     return {"message": f"User {uid_operator} not found"}, 404
-                # if not (operator.is_admin or operator.is_teacher or uid_operator == uid):
-                #     return {
-                #         "message": f"User {uid_operator} does not have the correct rights"
-                #     }, 403
-
                 # Get the submission
                 submission = session.get(m_submissions, sid)
                 if submission is None:
@@ -183,22 +141,8 @@ class Submission(Resource):
             dict[str, any]: A message
         """
 
-        # Authentication
-        # uid_operator = 0
-        # if uid_operator is None:
-        #     return {"message": "Not logged in"}, 401
-
         try:
             with db.session() as session:
-                # Authorization
-                # operator = session.get(m_users, uid_operator)
-                # if operator is None:
-                #     return {"message": f"User {uid_operator} not found"}, 404
-                # if not operator.is_teacher:
-                #     return {
-                #         "message": f"User {uid_operator} does not have the correct rights"
-                #     }, 403
-
                 # Get the submission
                 submission = session.get(m_submissions, sid)
                 if submission is None:
@@ -230,22 +174,8 @@ class Submission(Resource):
             dict[str, any]: A message
         """
 
-        # Authentication
-        # uid_operator = 0
-        # if uid_operator is None:
-        #     return {"message": "Not logged in"}, 401
-
         try:
             with db.session() as session:
-                # Authorization
-                # operator = session.get(m_users, uid_operator)
-                # if operator is None:
-                #     return {"message": f"User {uid_operator} not found"}, 404
-                # if not operator.is_admin:
-                #     return {
-                #         "message": f"User {uid_operator} does not have the correct rights"
-                #     }, 403
-
                 # Check if the submission exists
                 submission = session.get(m_submissions, sid)
                 if submission is None:
