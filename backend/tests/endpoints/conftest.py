@@ -1,6 +1,29 @@
 """ Configuration for pytest, Flask, and the test client."""
 import pytest
-from project import create_app
+from project import create_app_with_db
+from project.database import db, get_database_uri
+
+@pytest.fixture
+def session():
+    """Create a database session for the tests"""
+    # Create all tables
+    db.create_all()
+
+    # Populate the database
+    db.session.commit()
+
+    # Tests can now use a populated database
+    yield db.session
+
+    # Rollback
+    db.session.rollback()
+
+    # Remove all tables
+    for table in reversed(db.metadata.sorted_tables):
+        db.session.execute(table.delete())
+    db.session.commit()
+
+    db.session.close()
 
 @pytest.fixture
 def app():
@@ -8,7 +31,7 @@ def app():
     Returns:
         Flask -- A Flask application instance
     """
-    app = create_app()
+    app = create_app_with_db(get_database_uri())
     yield app
 
 @pytest.fixture
