@@ -50,7 +50,7 @@ class ProjectDetail(Resource):
         """
 
         # get the project that need to be edited
-        project = Projects.query.filter_by(project_id=project_id).first()  # .update(values=values)
+        project = Projects.query.filter_by(project_id=project_id).first()
 
         # check which values are not None is the dict
         # if it is not None is needs to be modified in the database

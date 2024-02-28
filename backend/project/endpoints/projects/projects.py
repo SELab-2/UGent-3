@@ -25,6 +25,7 @@ class ProjectsEndpoint(Resource):
         """
         try:
             projects = Projects.query.with_entities(Projects.project_id, Projects.title, Projects.descriptions).all()
+
             results = [tuple(row) for row in projects]
             # return all valid entries for a project and return a 200 OK code
             return results, 200
