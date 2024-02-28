@@ -17,6 +17,7 @@ class ProjectsEndpoint(Resource):
     Inherits from flask_restful.Resource class
     for implementing get method
     """
+
     def get(self):
         """
         Get method for listing all available projects
@@ -29,9 +30,8 @@ class ProjectsEndpoint(Resource):
             return results, 200
         except exc.SQLAlchemyError:
             return ({"message":
-                        "Something unexpected happenend when trying to get the projects"},
+                         "Something unexpected happenend when trying to get the projects"},
                     500)
-
 
     def post(self):
         """
@@ -57,8 +57,6 @@ class ProjectsEndpoint(Resource):
         # add the new project to the database and commit the changes
 
         try:
-            print("new project")
-            print(new_project)
             db.session.add(new_project)
             db.session.commit()
             new_project_json = jsonify(new_project).json
@@ -66,5 +64,5 @@ class ProjectsEndpoint(Resource):
             return new_project_json, 201
         except exc.SQLAlchemyError:
             return ({"message":
-                        "Something unexpected happenend when trying to add a new project"},
+                         "Something unexpected happenend when trying to add a new project"},
                     500)
