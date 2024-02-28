@@ -5,7 +5,6 @@ Parser for the argument when posting or patching a project
 from flask_restful import reqparse
 
 parser = reqparse.RequestParser()
-# parser.add_argument('id', type=int, help='Unique to charge for this resource')
 parser.add_argument('title', type=str, help='Projects title')
 parser.add_argument('descriptions', type=str, help='Projects description')
 parser.add_argument('assignment_file', type=str, help='Projects assignment file')
