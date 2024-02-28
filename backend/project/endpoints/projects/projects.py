@@ -5,7 +5,6 @@ Module that implements the /projects endpoint of the API
 from flask import jsonify
 from flask_restful import Resource
 from sqlalchemy import exc
-from sqlalchemy.orm import load_only
 
 
 from project import db
@@ -25,7 +24,11 @@ class ProjectsEndpoint(Resource):
         that are currently in the API
         """
         try:
-            projects = Projects.query.with_entities(Projects.project_id, Projects.title, Projects.descriptions).all()
+            projects = Projects.query.with_entities(
+                Projects.project_id,
+                Projects.title,
+                Projects.descriptions
+            ).all()
 
             results = [{
                 "project_id": row[0],
