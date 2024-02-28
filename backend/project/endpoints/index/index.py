@@ -1,7 +1,6 @@
 """Index api point"""
-import json
 import os
-from flask import Blueprint
+from flask import Blueprint, send_from_directory
 from flask_restful import Resource, Api
 
 index_bp = Blueprint("index", __name__)
@@ -16,11 +15,7 @@ class Index(Resource):
         return a json data structure with key Message and value Hello World!
         """
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        json_file_path = os.path.join(dir_path, "OpenAPI_Object.json")
-
-        with open(json_file_path, "r") as json_file:
-            json_data = json.load(json_file)
-            return  json_data
+        return send_from_directory(dir_path, "OpenAPI_Object.json")
 
 
 index_bp.add_url_rule("/", view_func=Index.as_view("index"))
