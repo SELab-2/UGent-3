@@ -223,7 +223,7 @@ class CoursesForUser(Resource):
             "Course with name:"
             + name
             + "and course_id:"
-            + new_course.course_id
+            + str(new_course.course_id)
             + " was succesfully created"
         )
         return json_message(message), 201
@@ -403,7 +403,7 @@ class CoursesToAddStudents(Resource):
                 db.session.rollback()
                 message = "Student with uid " + uid + " is already assigned to the course"
                 return json_message(message), 400
-            add_or_delete_abort_if_error(CourseStudents(uid=uid, course_id=course_id))
+            add_or_delete_abort_if_error(CourseStudents(uid=uid, course_id=course_id))  
         commit_abort_if_error()
 
         return json_message("Users were succesfully added to the course"), 201
