@@ -49,20 +49,15 @@ class ProjectDetail(Resource):
         filtered by id of that specific project
         """
 
-        # args = parser.parse_args()
         # get the project that need to be edited
         project = Projects.query.filter_by(project_id=project_id).first()  # .update(values=values)
 
         # check which values are not None is the dict
         # if it is not None is needs to be modified in the database
 
-        # commit the changes and return the 200 OK code
+        # commit the changes and return the 200 OK code if it succeeds, else 500
         try:
-            # for key, value in args.items():
-            #     if value is not None:
-            #         setattr(project, key, value)
             var_dict = parse_project_params()
-            print(var_dict)
             for key, value in var_dict.items():
                 setattr(project, key, value)
             db.session.commit()
