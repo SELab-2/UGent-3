@@ -14,14 +14,11 @@ def create_app():
         Flask -- A Flask application instance
     """
     from .endpoints.index.index import index_bp # pylint: disable=import-outside-toplevel
-    # from .endpoints.projects.projects import projects_bp # pylint: disable=import-outside-toplevel
-    # from .endpoints.projects.project_detail import project_detail_bp # pylint: disable=import-outside-toplevel
     from .endpoints.projects.project_endpoint import project_bp
 
     app = Flask(__name__)
     app.register_blueprint(index_bp)
     app.register_blueprint(project_bp)
-    # app.register_blueprint(project_detail_bp)
 
     return app
 
