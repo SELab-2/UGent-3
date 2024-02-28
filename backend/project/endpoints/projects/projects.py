@@ -49,10 +49,15 @@ class ProjectsEndpoint(Resource):
         )
 
         # add the new project to the database and commit the changes
+
         try:
+            print("new project")
+            print(new_project)
             db.session.add(new_project)
             db.session.commit()
-            return jsonify(new_project), 201
+            new_project_json = jsonify(new_project).json
+            new_project_json["message"] = "Project posted successfully"
+            return new_project_json, 201
         except exc.SQLAlchemyError:
             return ({"message":
                         "Something unexpected happenend when trying to add a new project"},

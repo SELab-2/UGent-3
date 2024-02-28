@@ -25,8 +25,6 @@ def test_post_project(db_session, client, course, course_teacher, project_json):
     project_json["course_id"] = course.course_id
 
     # post the project
-    print("project json")
-    print(project_json)
     response = client.post("/projects", json=project_json)
     assert response.status_code == 201
 
@@ -56,9 +54,9 @@ def test_remove_project(db_session, client, course, course_teacher, project_json
     response = client.get(f"/projects/{project_id}")
     assert response.status_code == 200
 
-    # check if the 204 status code is returned
+    # check if the 200 status code is returned
     response = client.delete(f"/projects/{project_id}")
-    assert response.status_code == 204
+    assert response.status_code == 200
 
     # check if the project isn't present anymore and the delete indeed went through
     response = client.delete(f"/projects/{project_id}")

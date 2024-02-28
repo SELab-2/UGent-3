@@ -85,7 +85,6 @@ def app():
 
     db_url = url
     engine = create_engine(db_url)
-    # Session = sessionmaker(bind=engine)
     app = create_app_with_db(db_url)
     db.metadata.create_all(engine)
     yield app
