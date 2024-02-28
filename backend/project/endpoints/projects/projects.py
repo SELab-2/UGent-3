@@ -32,7 +32,6 @@ class ProjectsEndpoint(Resource):
         Post functionality for project
         using flask_restfull parse lib
         """
-        # args = parser.parse_args()
         args = parse_project_params()
 
         # create a new project object to add in the API later
