@@ -86,7 +86,7 @@ def test_update_project(db_session, client, course, course_teacher, project):
     new_title = "patched title"
     new_archieved = not project.archieved
 
-    response = client.put(f"/projects/{project_id}", json={
+    response = client.patch(f"/projects/{project_id}", json={
         "title": new_title, "archieved": new_archieved
     })
     db_session.commit()

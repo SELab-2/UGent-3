@@ -43,7 +43,7 @@ class ProjectDetail(Resource):
         # return the fetched project and return 200 OK status
         return jsonify(project)
 
-    def put(self, project_id):
+    def patch(self, project_id):
         """
         Update method for updating a specific project
         filtered by id of that specific project
