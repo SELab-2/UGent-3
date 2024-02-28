@@ -3,6 +3,7 @@
 from datetime import datetime
 from flask import Blueprint, request
 from flask_restful import Resource
+from sqlalchemy import exc
 from project.database import db
 from project.models.submissions import Submissions as m_submissions
 from project.models.projects import Projects as m_projects
@@ -54,7 +55,7 @@ class Submissions(Resource):
                 submissions = session.query(m_submissions).filter_by(uid=uid, project_id=pid).all()
                 submissions_urls = [f"/submissions/{s.submission_id}" for s in submissions]
                 return {"submissions": submissions_urls}
-        except Exception:
+        except exc.SQLAlchemyError:
             return {"message": f"An error occurred while fetching the submissions "
                 f"from user {uid} for project {pid}"}, 500
 
@@ -121,7 +122,7 @@ class Submissions(Resource):
                 session.add(submission)
                 session.commit()
                 return {"submission": f"/submissions/{submission.submission_id}"}, 201
-        except Exception:
+        except exc.SQLAlchemyError:
             session.rollback()
             return {"message": f"An error occurred while creating a new submission "
                 f"for user {uid} in project {pid}"}, 500
@@ -169,7 +170,7 @@ class Submission(Resource):
                     "submission_path": submission.submission_path,
                     "submission_status": submission.submission_status
                 }
-        except Exception:
+        except exc.SQLAlchemyError:
             return {"message": f"An error occurred while fetching submission {sid}"}, 500
 
     def patch(self, sid:int) -> dict[str, any]:
@@ -215,7 +216,7 @@ class Submission(Resource):
                 # Save the submission
                 session.commit()
                 return {"message": f"Submission {sid} updated"}
-        except Exception:
+        except exc.SQLAlchemyError:
             session.rollback()
             return {"message": f"An error occurred while patching submission {sid}"}, 500
 
@@ -254,7 +255,7 @@ class Submission(Resource):
                 session.delete(submission)
                 session.commit()
                 return {"message": f"Submission {sid} deleted"}
-        except Exception:
+        except exc.SQLAlchemyError:
             db.session.rollback()
             return {"message": f"An error occurred while deleting submission {sid}"}, 500
 
