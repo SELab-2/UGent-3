@@ -7,6 +7,34 @@ This module tests user management endpoints.
 - test_patch_user: Tests user update functionality and error handling for updating
     non-existent user.
 """
+import pytest
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from project.models.users import Users
+from project import db
+from tests import db_url
+
+engine = create_engine(db_url)
+Session = sessionmaker(bind=engine)
+@pytest.fixture
+def user_db_session():
+    """Create a new database session for the user tests.
+    After the test, all changes are rolled back and the session is closed."""
+    db.metadata.create_all(engine)
+    session = Session()
+    session.add_all(
+            [Users(uid="del", is_admin=False, is_teacher=True),
+             Users(uid="pat", is_admin=False, is_teacher=True),
+             Users(uid="u_get", is_admin=False, is_teacher=True)
+             ]
+        )
+    session.commit()
+    yield session
+    session.rollback()
+    session.close()
+    for table in reversed(db.metadata.sorted_tables): # pylint: disable=duplicate-code
+        session.execute(table.delete())
+    session.commit()
 class TestUserEndpoint:
     """Class to test user management endpoints."""
 
