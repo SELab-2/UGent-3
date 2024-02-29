@@ -1,40 +1,24 @@
 """ Configuration for pytest, Flask, and the test client."""
 from datetime import datetime
-from os import getenv
 from dotenv import load_dotenv
 import pytest
-from sqlalchemy import create_engine, URL
-from sqlalchemy.orm import sessionmaker
 from project import create_app_with_db, db
 from project.models.users import Users
 from project.models.courses import Courses
 from project.models.projects import Projects
-
-load_dotenv()
-
-url = URL.create(
-    drivername="postgresql",
-    username=getenv("POSTGRES_USER"),
-    password=getenv("POSTGRES_PASSWORD"),
-    host=getenv("POSTGRES_HOST"),
-    database=getenv("POSTGRES_DB")
-)
+from project.sessionmaker import engine, Session, url
 
 
 @pytest.fixture
 def course_teacher():
     """A user that's a teacher for for testing"""
     ad_teacher = Users(uid="Gunnar", is_teacher=True, is_admin=True)
-    print("teacher")
-    print(ad_teacher)
     return ad_teacher
 
 
 @pytest.fixture
 def course(course_teacher: Users):
     """A course for testing, with the course teacher as the teacher."""
-    print("teacher id")
-    print(course_teacher.uid)
     ad2 = Courses(name="Ad2", teacher=course_teacher.uid)
     return ad2
 
@@ -75,6 +59,11 @@ def project_json(project: Projects):
     return data
 
 
+
+# engine = create_engine(url)
+# Session = sessionmaker(bind=engine)
+
+
 @pytest.fixture
 def app():
     """A fixture that creates and configure a new app instance for each test.
@@ -84,14 +73,11 @@ def app():
     load_dotenv()
 
     db_url = url
-    engine = create_engine(db_url)
+    # engine = create_engine(db_url)
     app = create_app_with_db(db_url)
     db.metadata.create_all(engine)
     yield app
 
-
-engine = create_engine(url)
-Session = sessionmaker(bind=engine)
 
 
 @pytest.fixture
