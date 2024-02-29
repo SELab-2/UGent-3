@@ -6,7 +6,7 @@ from project import create_app_with_db, db
 from project.models.users import Users
 from project.models.courses import Courses
 from project.models.projects import Projects
-from project.sessionmaker import engine, Session, url
+from project.sessionmaker import engine, url
 
 
 @pytest.fixture
@@ -41,6 +41,7 @@ def project(course):
     )
     return project
 
+
 @pytest.fixture
 def project_json(project: Projects):
     """A function that return the json data of a project including the PK neede for testing"""
@@ -59,11 +60,6 @@ def project_json(project: Projects):
     return data
 
 
-
-# engine = create_engine(url)
-# Session = sessionmaker(bind=engine)
-
-
 @pytest.fixture
 def app():
     """A fixture that creates and configure a new app instance for each test.
@@ -78,21 +74,6 @@ def app():
     db.metadata.create_all(engine)
     yield app
 
-
-
-@pytest.fixture
-def db_session():
-    """Create a new database session for a test.
-    After the test, all changes are rolled back and the session is closed."""
-    db.metadata.create_all(engine)
-    session = Session()
-    yield session
-    session.rollback()
-    session.close()
-    # Truncate all tables
-    for table in reversed(db.metadata.sorted_tables):
-        session.execute(table.delete())
-    session.commit()
 
 
 @pytest.fixture

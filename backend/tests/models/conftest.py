@@ -4,27 +4,11 @@ Configuration for the models tests. Contains all the fixtures needed for multipl
 
 from datetime import datetime
 import pytest
-from project import db
 from project.models.courses import Courses
 from project.models.course_relations import CourseAdmins, CourseStudents
 from project.models.projects import Projects
 from project.models.users import Users
-from project.sessionmaker import Session, engine
 
-
-@pytest.fixture
-def db_session():
-    """Create a new database session for a test.
-    After the test, all changes are rolled back and the session is closed."""
-    db.metadata.create_all(engine)
-    session = Session()
-    yield session
-    session.rollback()
-    session.close()
-    # Truncate all tables
-    for table in reversed(db.metadata.sorted_tables):
-        session.execute(table.delete())
-    session.commit()
 
 @pytest.fixture
 def valid_user():
