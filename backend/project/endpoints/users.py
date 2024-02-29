@@ -1,8 +1,10 @@
 """Users api endpoint"""
 from flask import Blueprint, request, jsonify
 from flask_restful import Resource, Api
+from sqlalchemy.exc import SQLAlchemyError
+
 from project import db  # pylint: disable=import-error ; there is no error
-from project.models.users import Users as UserModel  # pylint: disable=import-error ; there is no error
+from project.models.users import Users as userModel  # pylint: disable=import-error ; there is no error
 
 users_bp = Blueprint("users", __name__)
 users_api = Api(users_bp)
@@ -16,7 +18,7 @@ class Users(Resource):
         This function will respond to get requests made to /users.
         It should return all users from the database.
         """
-        users = UserModel.query.all()
+        users = userModel.query.all()
 
         return jsonify(users)
 
@@ -39,16 +41,16 @@ class Users(Resource):
                 }
             }, 400
         try:
-            user = db.session.get(UserModel, uid)
+            user = db.session.get(userModel, uid)
             if user is not None:
                 # bad request, error code could be 409 but is rarely used
                 return {"Message": f"User {uid} already exists"}, 400
             # Code to create a new user in the database using the uid, is_teacher, and is_admin
-            new_user = UserModel(uid=uid, is_teacher=is_teacher, is_admin=is_admin)
+            new_user = userModel(uid=uid, is_teacher=is_teacher, is_admin=is_admin)
             db.session.add(new_user)
             db.session.commit()
 
-        except Exception as e:  # pylint: disable=broad-exception-caught ;
+        except SQLAlchemyError as e:
             # every exception should result in a rollback
             db.session.rollback()
             return {"Message": f"An error occurred while creating the user: {str(e)}"}, 500
@@ -64,7 +66,7 @@ class User(Resource):
         This function will respond to GET requests made to /users/<user_id>.
         It should return the user with the given user_id from the database.
         """
-        user = db.session.get(UserModel, user_id)
+        user = db.session.get(userModel, user_id)
         if user is None:
             return {"Message": "User not found!"}, 404
 
@@ -81,7 +83,7 @@ class User(Resource):
         is_teacher = request.json.get('is_teacher')
         is_admin = request.json.get('is_admin')
         try:
-            user = db.session.get(UserModel, user_id)
+            user = db.session.get(userModel, user_id)
             if user is None:
                 return {"Message": "User not found!"}, 404
 
@@ -92,7 +94,7 @@ class User(Resource):
 
             # Save the changes to the database
             db.session.commit()
-        except Exception as e:  # pylint: disable=broad-exception-caught ;
+        except SQLAlchemyError as e:
             # every exception should result in a rollback
             db.session.rollback()
             return {"Message": f"An error occurred while patching the user: {str(e)}"}, 500
@@ -104,13 +106,13 @@ class User(Resource):
         It should delete the user with the given user_id from the database.
         """
         try:
-            user = db.session.get(UserModel, user_id)
+            user = db.session.get(userModel, user_id)
             if user is None:
                 return {"Message": "User not found!"}, 404
 
             db.session.delete(user)
             db.session.commit()
-        except Exception as e:  # pylint: disable=broad-exception-caught ;
+        except SQLAlchemyError as e:
             # every exception should result in a rollback
             db.session.rollback()
             return {"Message": f"An error occurred while deleting the user: {str(e)}"}, 500
