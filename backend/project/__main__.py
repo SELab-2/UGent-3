@@ -1,9 +1,11 @@
 """Main entry point for the application."""
+from sys import path
 from os import getenv
 from dotenv import load_dotenv
 from sqlalchemy import URL
 from project import create_app_with_db
 
+path.append(".")
 
 if __name__ == "__main__":
     load_dotenv()

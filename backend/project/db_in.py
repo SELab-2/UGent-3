@@ -1,5 +1,5 @@
-"""fix for circular import statements"""
 
+"""db initialization"""
 from flask_sqlalchemy import SQLAlchemy
 
 
