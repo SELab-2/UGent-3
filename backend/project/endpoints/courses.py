@@ -288,21 +288,21 @@ class CoursesByCourseId(Resource):
         course = get_course_abort_if_not_found(course_id)
         query = Projects.query.filter_by(course_id=course_id)
         project_uids = [
-            project.project_id
+            "/projects/"+project.project_id
             for project in execute_query_abort_if_db_error(query, all=True)
         ]
         query = CourseAdmins.query.filter_by(course_id=course_id)
         admin_uids = [
-            admin.uid for admin in execute_query_abort_if_db_error(query, all=True)
+            "/users/"+admin.uid for admin in execute_query_abort_if_db_error(query, all=True)
         ]
         query = CourseStudents.query.filter_by(course_id=course_id)
         student_uids = [
-            student.uid for student in execute_query_abort_if_db_error(query, all=True)
+            "/users/"+student.uid for student in execute_query_abort_if_db_error(query, all=True)
         ]
 
         data = {
             "ufora_id": course.ufora_id,
-            "teacher": course.teacher,
+            "teacher": "/users/"+course.teacher,
             "admins": admin_uids,
             "students": student_uids,
             "projects": project_uids,
@@ -346,7 +346,7 @@ class CoursesForAdmins(Resource):
         get_course_abort_if_not_found(course_id)
 
         query = CourseAdmins.query.filter_by(course_id=course_id)
-        admin_uids = [a.uid for a in execute_query_abort_if_db_error(query, all=True)]
+        admin_uids = ["/users/"+a.uid for a in execute_query_abort_if_db_error(query, all=True)]
         return jsonify(admin_uids)
 
     def post(self, course_id):
@@ -418,7 +418,7 @@ class CoursesToAddStudents(Resource):
         get_course_abort_if_not_found(course_id)
 
         query = CourseStudents.query.filter_by(course_id=course_id)
-        student_uids = [s.uid for s in execute_query_abort_if_db_error(query, all=True)]
+        student_uids = ["/users/"+s.uid for s in execute_query_abort_if_db_error(query, all=True)]
 
         return jsonify(student_uids)
 
