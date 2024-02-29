@@ -41,5 +41,194 @@
       }
     ]
   },
-  "paths": []
+  "paths": [
+    {
+      "/projects": {
+        "get": {
+          "description": "Returns all projects from the database that the user has acces to",
+          "responses": {
+            "200": {
+              "description": "A list of projects",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "project_id": {
+                          "type": "int"
+                        },
+                        "descriptions": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "description": "Upload a new proejct",
+          "responses": {
+            "201": {
+              "description": "Uploaded a new project succesfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/projects/{id}": {
+          "get": {
+            "description": "Return a project with corresponding id",
+            "responses": {
+              "200": {
+                "description": "A user with corresponding id",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "archieved": {
+                          "type": "bool"
+                        },
+                        "assignment_file": {
+                          "type": "string"
+                        },
+                        "course_id": {
+                          "type": "int"
+                        },
+                        "deadline": {
+                          "type": "date"
+                        },
+                        "descriptions": {
+                          "type": "array",
+                          "items": {
+                            "description": "string"
+                          }
+                        },
+                        "project_id": {
+                          "type": "int"
+                        },
+                        "regex_expressions": {
+                          "type": "array",
+                          "items": {
+                            "regex": "string"
+                          }
+                        },
+                        "script_name": {
+                          "type": "string"
+                        },
+                        "test_path": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "visible_for_students": {
+                          "type": "bool"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "404": {
+                "description": "An id that doens't correspond to a existing user",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "ojbect",
+                      "properties": {
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "patch": {
+            "description": "Patch certain fields op a project",
+            "responses": {
+              "200": {
+                "description": "Patched a project succesfully",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "message": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "404": {
+                "description": "Tried to patch a user that is not present",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "ojbect",
+                      "properties": {
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+        "delete": {
+          "description": "Delete a project with given id",
+          "responses": {
+            "200": {
+              "description": "Removed a project succesfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Tried to remove a project that is not present",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": "string"
+                    }
+                  }
+               }
+             }
+           }
+         }
+       }
+      }
+    }
+  ]
 }

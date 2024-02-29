@@ -41,7 +41,7 @@ class ProjectDetail(Resource):
         self.abort_if_not_present(project)
 
         # return the fetched project and return 200 OK status
-        return jsonify(project)
+        return jsonify(project), 200
 
     def patch(self, project_id):
         """
