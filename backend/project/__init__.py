@@ -14,7 +14,7 @@ def create_app():
     Returns:
         Flask -- A Flask application instance
     """
-    from .endpoints.index import index_bp  # pylint: disable=import-outside-toplevel
+    from .endpoints.index.index import index_bp  # pylint: disable=import-outside-toplevel
     from .endpoints.courses import courses_bp  # pylint: disable=import-outside-toplevel
 
     app = Flask(__name__)

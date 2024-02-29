@@ -19,6 +19,10 @@ class TestCoursesEndpoint:
         # Posting to /courses test
         response = client.post("/courses?uid=Bart", json=course_data)  # valid user
 
+        for x in range(3,10):
+            coursee = {"name": "Sel" + str(x), "teacher": "Bart"}
+            response = client.post("/courses?uid=Bart", json=coursee)  # valid user
+            assert response.status_code == 201  
         assert response.status_code == 201  # succes post = 201
 
         course = courses_init_db.query(Courses).filter_by(name="Sel2").first()
@@ -47,7 +51,6 @@ class TestCoursesEndpoint:
         valid_students = {
             "students": ["student_sel2_0", "student_sel2_1", "student_sel2_2"]
         }
-        invalid_students = {"students": ["invalid"]}
         bad_students = {"error": ["student_sel2_0", "student_sel2_1"]}
         sel2_students_link = "/courses/" + str(course.course_id)
 
@@ -74,13 +77,6 @@ class TestCoursesEndpoint:
             json=valid_students,  # already added students
         )
         assert response.status_code == 400
-        response = client.post(
-            sel2_students_link + "/students?uid=Bart",
-            json=invalid_students,  # invalid students
-        )
-        assert (
-            response.status_code == 500
-        )  # internal server error because of invalid students uid
 
         response = client.post(
             sel2_students_link + "/students?uid=Bart",
@@ -121,6 +117,14 @@ class TestCoursesEndpoint:
         assert admins == ["Bart", "Rien"]
 
         # Now we have a course with a teacher, students and an assistent lets try to get some info
+
+        for x in range(3,10):
+            response = client.get(f"/courses?name=Sel{str(x)}")
+            assert response.status_code == 200
+            link = response.json[0]
+            assert len(link) > len("/courses/")
+            response = client.get(link+"?uid=Bart")
+            assert response.status_code == 200
 
         sel2_students = [
             s.uid

@@ -32,6 +32,7 @@ def execute_query_abort_if_db_error(query, all=False):
         abort(500, str(e))
     return result
 
+
 def add_or_delete_abort_if_error(to_add_or_delete, delete=False):
     """
     Add a new object to the database and handle any SQLAlchemyError that might occur.
@@ -48,6 +49,7 @@ def add_or_delete_abort_if_error(to_add_or_delete, delete=False):
         db.session.rollback()
         abort(500, str(e))
 
+
 def commit_abort_if_error():
     """
     Commit the current session and handle any SQLAlchemyError that might occur.
@@ -58,6 +60,7 @@ def commit_abort_if_error():
         db.session.rollback()
         abort(500, str(e))
 
+
 def abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant):
     """
     Check if the current user is authorized to appoint new admins to a course.
@@ -66,7 +69,8 @@ def abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant):
         course_id (int): The ID of the course.
 
     Raises:
-        HTTPException: If the current user is not authorized or if the UID of the person to be made an admin is missing in the request body.
+        HTTPException: If the current user is not authorized or 
+        if the UID of the person to be made an admin is missing in the request body.
     """
     abort_if_uid_is_none(teacher)
 
@@ -80,6 +84,7 @@ def abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant):
 
     if not assistant:
         abort(400, "uid of person to make admin is required in the request body")
+
 
 def abort_if_none_uid_student_uids_or_non_existant_course_id(
     course_id, uid, student_uids
@@ -113,6 +118,7 @@ def abort_if_none_uid_student_uids_or_non_existant_course_id(
             you should have a students field with a list of uids in the request body""",
         )
 
+
 def abort_if_uid_is_none(uid):
     """
     Check wether the uid is None if so
@@ -120,6 +126,7 @@ def abort_if_uid_is_none(uid):
     """
     if uid is None:
         abort(400, "There should be an uid in the request query")
+
 
 def abort_if_no_user_found_for_uid(uid):
     """
@@ -138,6 +145,7 @@ def abort_if_no_user_found_for_uid(uid):
         abort(404, "User was not found")
     return user
 
+
 def get_admin_relation(uid, course_id):
     """
     Retrieve the CourseAdmins object for the given uid and course.
@@ -153,6 +161,7 @@ def get_admin_relation(uid, course_id):
         CourseAdmins.query.filter_by(uid=uid, course_id=course_id)
     )
 
+
 def json_message(message):
     """
     Create a json message with the given message.
@@ -164,6 +173,7 @@ def json_message(message):
         dict: The message in a json format.
     """
     return {"message": message}
+
 
 def get_course_abort_if_not_found(course_id):
     """
@@ -187,6 +197,25 @@ def get_course_abort_if_not_found(course_id):
 class CoursesForUser(Resource):
     """Api endpoint for the /courses link"""
 
+    def get(self):
+        """ "
+        Get function for /courses this will be the main endpoint to
+        to get all courses and filter by given query parameter like /courses?parameter=...
+        parameters can be either one of the following: teacher,ufora_id,name.
+        """
+        query = Courses.query
+        if "teacher" in request.args:
+            query = query.filter_by(course_id=request.args.get("teacher"))
+        if "ufora_id" in request.args:
+            query = query.filter_by(ufora_id=request.args.get("ufora_id"))
+        if "name" in request.args:
+            query = query.filter_by(name=request.args.get("name"))
+        results = execute_query_abort_if_db_error(query, all=True)
+        if results == []:
+            return json_message("No courses found with the given parameters"), 404
+        detail_urls = ["/courses/" + str(course.course_id) for course in results]
+        return jsonify(detail_urls)
+
     def post(self):
         """
         This function will create a new course
@@ -198,7 +227,9 @@ class CoursesForUser(Resource):
         user = abort_if_no_user_found_for_uid(uid)
 
         if not user.is_teacher:
-            message = "Only teachers or admins can create new courses, you are unauthorized"
+            message = (
+                "Only teachers or admins can create new courses, you are unauthorized"
+            )
             return json_message(message), 403
 
         data = request.get_json()
@@ -255,7 +286,7 @@ class CoursesByCourseId(Resource):
             return json_message(message), 404
 
         course = get_course_abort_if_not_found(course_id)
-        query = Projects.query.filter_by(course_id=course_id, all=True)
+        query = Projects.query.filter_by(course_id=course_id)
         project_uids = [
             project.project_id
             for project in execute_query_abort_if_db_error(query, all=True)
@@ -330,7 +361,9 @@ class CoursesForAdmins(Resource):
         query = Users.query.filter_by(uid=assistant)
         new_admin = execute_query_abort_if_db_error(query)
         if not new_admin:
-            message = "User to make admin was not found, please request with a valid uid"
+            message = (
+                "User to make admin was not found, please request with a valid uid"
+            )
             return json_message(message), 404
 
         admin_relation = CourseAdmins(uid=assistant, course_id=course_id)
@@ -359,7 +392,12 @@ class CoursesForAdmins(Resource):
         add_or_delete_abort_if_error(admin_relation, delete=True)
         commit_abort_if_error()
 
-        message = "Admin " + assistant + " was succesfully removed from course " + str(course_id)
+        message = (
+            "Admin "
+            + assistant
+            + " was succesfully removed from course "
+            + str(course_id)
+        )
         return json_message(message), 204
 
 
@@ -401,9 +439,11 @@ class CoursesToAddStudents(Resource):
             student_relation = execute_query_abort_if_db_error(query)
             if student_relation:
                 db.session.rollback()
-                message = "Student with uid " + uid + " is already assigned to the course"
+                message = (
+                    "Student with uid " + uid + " is already assigned to the course"
+                )
                 return json_message(message), 400
-            add_or_delete_abort_if_error(CourseStudents(uid=uid, course_id=course_id))  
+            add_or_delete_abort_if_error(CourseStudents(uid=uid, course_id=course_id))
         commit_abort_if_error()
 
         return json_message("Users were succesfully added to the course"), 201
