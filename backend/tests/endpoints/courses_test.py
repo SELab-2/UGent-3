@@ -9,7 +9,7 @@ from project.models.courses import Courses
 class TestCoursesEndpoint:
     """Class for testing the courses endpoint"""
 
-    def test_courses(self, courses_init_db, client):
+    def test_courses(self, courses_init_db, client,api_url):
         """
         First i test posting, then getting then deleting of all the courses related data
         """
@@ -119,15 +119,15 @@ class TestCoursesEndpoint:
         # Now we have a course with a teacher, students and an assistent lets try to get some info
 
         for x in range(3,10):
-            response = client.get(f"/courses?name=Sel{str(x)}")
+            response = client.get(f"{api_url}/courses?name=Sel{str(x)}")
             assert response.status_code == 200
             link = response.json[0]
-            assert len(link) > len("/courses/")
+            assert len(link) > len(f"{api_url}/courses/")
             response = client.get(link+"?uid=Bart")
             assert response.status_code == 200
 
         sel2_students = [
-            "/users/"+s.uid
+            f"{api_url}/users/"+s.uid
             for s in CourseStudents.query.filter_by(course_id=course.course_id).all()
         ]
 

@@ -1,4 +1,6 @@
 """Courses api point"""
+from dotenv import load_dotenv
+from os import getenv
 from flask import Blueprint, jsonify, request
 from flask import abort
 from flask_restful import Api, Resource
@@ -12,6 +14,8 @@ from sqlalchemy.exc import SQLAlchemyError
 courses_bp = Blueprint("courses", __name__)
 courses_api = Api(courses_bp)
 
+load_dotenv()
+api_url = getenv('API_HOST')
 
 def execute_query_abort_if_db_error(query, all=False):
     """
@@ -213,7 +217,7 @@ class CoursesForUser(Resource):
         results = execute_query_abort_if_db_error(query, all=True)
         if results == []:
             return json_message("No courses found with the given parameters"), 404
-        detail_urls = ["/courses/" + str(course.course_id) for course in results]
+        detail_urls = [api_url+"/courses/" + str(course.course_id) for course in results]
         return jsonify(detail_urls)
 
     def post(self):
@@ -288,21 +292,21 @@ class CoursesByCourseId(Resource):
         course = get_course_abort_if_not_found(course_id)
         query = Projects.query.filter_by(course_id=course_id)
         project_uids = [
-            "/projects/"+project.project_id
+            api_url+"/projects/"+project.project_id
             for project in execute_query_abort_if_db_error(query, all=True)
         ]
         query = CourseAdmins.query.filter_by(course_id=course_id)
         admin_uids = [
-            "/users/"+admin.uid for admin in execute_query_abort_if_db_error(query, all=True)
+            api_url+"/users/"+admin.uid for admin in execute_query_abort_if_db_error(query, all=True)
         ]
         query = CourseStudents.query.filter_by(course_id=course_id)
         student_uids = [
-            "/users/"+student.uid for student in execute_query_abort_if_db_error(query, all=True)
+            api_url+"/users/"+student.uid for student in execute_query_abort_if_db_error(query, all=True)
         ]
 
         data = {
             "ufora_id": course.ufora_id,
-            "teacher": "/users/"+course.teacher,
+            "teacher": api_url+"/users/"+course.teacher,
             "admins": admin_uids,
             "students": student_uids,
             "projects": project_uids,
@@ -346,7 +350,7 @@ class CoursesForAdmins(Resource):
         get_course_abort_if_not_found(course_id)
 
         query = CourseAdmins.query.filter_by(course_id=course_id)
-        admin_uids = ["/users/"+a.uid for a in execute_query_abort_if_db_error(query, all=True)]
+        admin_uids = [api_url+"/users/"+a.uid for a in execute_query_abort_if_db_error(query, all=True)]
         return jsonify(admin_uids)
 
     def post(self, course_id):
@@ -418,7 +422,7 @@ class CoursesToAddStudents(Resource):
         get_course_abort_if_not_found(course_id)
 
         query = CourseStudents.query.filter_by(course_id=course_id)
-        student_uids = ["/users/"+s.uid for s in execute_query_abort_if_db_error(query, all=True)]
+        student_uids = [api_url+"/users/"+s.uid for s in execute_query_abort_if_db_error(query, all=True)]
 
         return jsonify(student_uids)
 

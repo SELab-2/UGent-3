@@ -26,6 +26,10 @@ url = URL.create(
 )
 
 @pytest.fixture
+def api_url():
+    return os.getenv('API_HOST')
+
+@pytest.fixture
 def app():
     app = create_app_with_db(url)
     return app
