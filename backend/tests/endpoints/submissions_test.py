@@ -1,20 +1,61 @@
 """Test the submissions API endpoint"""
 
+from os import getenv
+
 class TestSubmissionsEndpoint:
     """Class to test the submissions API endpoint"""
 
     ### GET SUBMISSIONS ###
-    def test_get_submissions_wrong_user(self, client, session):
+    def test_get_submissions_wrong_user(self, client):
         """Test getting submissions for a non-existing user"""
+        response = client.get("/submissions?uid=unknown")
+        data = response.json
+        assert response.status_code == 400
+        assert data["message"] == "Invalid user (uid=unknown)"
 
-    def test_get_submissions_wrong_project(self, client, session):
+    def test_get_submissions_wrong_project(self, client):
         """Test getting submissions for a non-existing project"""
+        response = client.get("/submissions?project_id=-1")
+        data = response.json
+        assert response.status_code == 400
+        assert data["message"] == "Invalid project (project_id=-1)"
 
-    def test_get_submissions_database_issue(self, client, session):
-        """Test getting the submissions with a faulty database"""
-
-    def test_get_submissions_correct(self, client, session):
+    def test_get_submissions_all(self, client):
         """Test getting the submissions"""
+        response = client.get("/submissions")
+        data = response.json
+        assert response.status_code == 200
+        assert data["submissions"] == [
+            f"{getenv('HOSTNAME')}/submissions/1",
+            f"{getenv('HOSTNAME')}/submissions/2"
+        ]
+
+    def test_get_submissions_user(self, client):
+        """Test getting the submissions given a specific user"""
+        response = client.get("/submissions?uid=user4")
+        data = response.json
+        assert response.status_code == 200
+        assert data["submissions"] == [
+            f"{getenv('HOSTNAME')}/submissions/1"
+        ]
+
+    def test_get_submissions_project(self, client):
+        """Test getting the submissions given a specific project"""
+        response = client.get("/submissions?project_id=1")
+        data = response.json
+        assert response.status_code == 200
+        assert data["submissions"] == [
+            f"{getenv('HOSTNAME')}/submissions/1"
+        ]
+
+    def test_get_submissions_user_project(self, client):
+        """Test getting the submissions given a specific user and project"""
+        response = client.get("/submissions?uid=user4&project_id=1")
+        data = response.json
+        assert response.status_code == 200
+        assert data["submissions"] == [
+            f"{getenv('HOSTNAME')}/submissions/1"
+        ]
 
     ### POST SUBMISSIONS ###
     def test_post_submissions_wrong_user(self, client, session):

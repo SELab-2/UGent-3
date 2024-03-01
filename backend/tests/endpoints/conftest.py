@@ -1,29 +1,34 @@
 """ Configuration for pytest, Flask, and the test client."""
 import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from project import create_app_with_db
 from project.database import db, get_database_uri
 
+engine = create_engine(get_database_uri())
+Session = sessionmaker(bind=engine)
 @pytest.fixture
 def session():
     """Create a database session for the tests"""
     # Create all tables
-    db.create_all()
+    db.metadata.create_all(engine)
+
+    session = Session()
 
     # Populate the database
-    db.session.commit()
+    session.commit()
 
     # Tests can now use a populated database
-    yield db.session
+    yield session
 
     # Rollback
-    db.session.rollback()
+    session.rollback()
+    session.close()
 
     # Remove all tables
     for table in reversed(db.metadata.sorted_tables):
-        db.session.execute(table.delete())
-    db.session.commit()
-
-    db.session.close()
+        session.execute(table.delete())
+    session.commit()
 
 @pytest.fixture
 def app():
@@ -31,7 +36,9 @@ def app():
     Returns:
         Flask -- A Flask application instance
     """
+    engine = create_engine(get_database_uri())
     app = create_app_with_db(get_database_uri())
+    db.metadata.create_all(engine)
     yield app
 
 @pytest.fixture

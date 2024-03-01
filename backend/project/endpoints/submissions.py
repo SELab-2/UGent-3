@@ -22,28 +22,39 @@ class Submissions(Resource):
             dict[str, any]: The list of submission URLs
         """
 
+        data = {}
         try:
             with db.session() as session:
                 query = session.query(m_submissions)
 
                 # Filter by uid
                 uid = request.args.get("uid")
-                if (uid is not None) and (session.get(m_users, uid) is not None):
-                    query.filter_by(uid=uid)
+                if uid is not None:
+                    if session.get(m_users, uid) is not None:
+                        query = query.filter_by(uid=uid)
+                    else:
+                        data["message"] = f"Invalid user (uid={uid})"
+                        return data, 400
 
                 # Filter by project_id
                 project_id = request.args.get("project_id")
-                if (project_id is not None) and (session.get(m_projects, project_id) is not None):
-                    query.filter_by(project_id=project_id)
+                if project_id is not None:
+                    if session.get(m_projects, project_id) is not None:
+                        query = query.filter_by(project_id=project_id)
+                    else:
+                        data["message"] = f"Invalid project (project_id={project_id})"
+                        return data, 400
 
                 # Get the submissions
-                submissions = query.all()
-                submissions_urls = [
-                    f"{getenv('HOSTNAME')}/submissions/{s.submission_id}" for s in submissions
+                data["message"] = "Successfully fetched the submissions"
+                data["submissions"] = [
+                    f"{getenv('HOSTNAME')}/submissions/{s.submission_id}" for s in query.all()
                 ]
-                return {"submissions": submissions_urls}
+                return data, 200
+
         except exc.SQLAlchemyError:
-            return {"message": "An error occurred while fetching the submissions"}, 500
+            data["message"] = "An error occurred while fetching the submissions"
+            return data, 500
 
     def post(self) -> dict[str, any]:
         """Post a new submission to a project
