@@ -35,13 +35,18 @@ class ProjectDetail(Resource):
         the id fetched from the url with the reaparse
         """
 
-        # fetch the project with the id that is specified in the url
-        project = Projects.query.filter_by(project_id=project_id).first()
+        try:
+            # fetch the project with the id that is specified in the url
+            project = Projects.query.filter_by(project_id=project_id).first()
 
-        self.abort_if_not_present(project)
+            self.abort_if_not_present(project)
 
-        # return the fetched project and return 200 OK status
-        return jsonify(project), 200
+            # return the fetched project and return 200 OK status
+            return jsonify(project), 200
+        except exc.SQLAlchemyError:
+            return ({"message":
+                         "Internal server error"},
+                    500)
 
     def patch(self, project_id):
         """
