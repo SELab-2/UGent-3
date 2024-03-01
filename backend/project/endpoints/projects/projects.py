@@ -37,7 +37,7 @@ class ProjectsEndpoint(Resource):
             } for row in projects]
 
             # return all valid entries for a project and return a 200 OK code
-            return results, 200
+            return jsonify(results), 200
         except exc.SQLAlchemyError:
             return ({"message":
                          "Something unexpected happenend when trying to get the projects"},
