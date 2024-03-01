@@ -44,7 +44,25 @@
   "paths": {
     "/submissions/{uid}/{pid}": {
       "get": {
-        "summary": "Get all submissions from a user for a project",
+        "summary": "Get the submissions",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "query",
+            "description": "Project ID",
+            "schema": {
+              "type": "int"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "A list of submission URLs",
@@ -58,21 +76,6 @@
                       "items": {
                         "type": "string"
                       }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "A 'not found' message",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
                     }
                   }
                 }
@@ -99,12 +102,18 @@
       "post": {
         "summary": "Post a new submission to a project",
         "requestBody": {
-          "description": "Grading",
+          "description": "Form data",
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
+                  "uid": {
+                    "type": "string"
+                  },
+                  "project_id": {
+                    "type": "int"
+                  },
                   "grading": {
                     "type": "int",
                     "minimum": 0,
@@ -177,27 +186,7 @@
             }
           }
         }
-      },
-      "parameters": [
-        {
-          "name": "uid",
-          "in": "path",
-          "description": "User ID",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        },
-        {
-          "name": "pid",
-          "in": "path",
-          "description": "Project ID",
-          "required": true,
-          "schema": {
-            "type": "int"
-          }
-        }
-      ]
+      }
     },
     "/submissions/{sid}": {
       "get": {
