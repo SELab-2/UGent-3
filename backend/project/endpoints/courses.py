@@ -15,7 +15,9 @@ courses_bp = Blueprint("courses", __name__)
 courses_api = Api(courses_bp)
 
 load_dotenv()
-api_url = getenv('API_HOST')
+#api_url = getenv('API_HOST')
+#temporary:
+api_url = "http://localhost"
 
 def execute_query_abort_if_db_error(query, all=False):
     """
