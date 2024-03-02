@@ -12,7 +12,6 @@ from os import path
 import docker
 from project.models.projects import Projects
 from project.models.submissions import Submissions
-from project.utils.submissions.file_handling import create_submission_subfolders
 
 DOCKER_IMAGE_MAPPER = {
     "python": path.join(path.dirname(__file__), "evaluators", "python"),
