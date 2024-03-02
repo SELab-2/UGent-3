@@ -86,7 +86,7 @@
             }
           },
           "400": {
-            "description": "An invalid data message",
+            "description": "An 'invalid data' message",
             "content": {
               "application/json": {
                 "schema": {
@@ -164,7 +164,7 @@
             }
           },
           "400": {
-            "description": "An invalid data message",
+            "description": "An 'invalid data' message",
             "content": {
               "application/json": {
                 "schema": {
@@ -271,7 +271,7 @@
         }
       },
       "patch": {
-        "summary": "Update the submission",
+        "summary": "Patch the submission",
         "requestBody": {
           "description": "The submission data",
           "content": {
@@ -306,7 +306,7 @@
             }
           },
           "400": {
-            "description": "A 'bad data field' message",
+            "description": "An 'invalid data' message",
             "content": {
               "application/json": {
                 "schema": {

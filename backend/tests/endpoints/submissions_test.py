@@ -110,7 +110,7 @@ class TestSubmissionsEndpoint:
         })
         data = response.json
         assert response.status_code == 400
-        assert data["message"] == "Invalid grading (range=0-20)"
+        assert data["message"] == "Invalid grading (grading=0-20)"
 
     def test_post_submissions_wrong_files(self, client: FlaskClient, session: Session):
         """Test posting a submission with no or wrong files"""
@@ -157,18 +157,27 @@ class TestSubmissionsEndpoint:
     ### PATCH SUBMISSION ###
     def test_patch_submission_wrong_id(self, client: FlaskClient, session: Session):
         """Test patching a submission for a non-existing submission id"""
+        response = client.patch("/submissions/100", data={"grading": 20})
+        data = response.json
+        assert response.status_code == 404
+        assert data["message"] == "Submission (submission_id=100) not found"
 
     def test_patch_submission_wrong_grading(self, client: FlaskClient, session: Session):
         """Test patching a submission with a wrong grading"""
-
-    def test_patch_submission_wrong_form(self, client: FlaskClient, session: Session):
-        """Test patching a submisson with a wrong data form"""
-
-    def test_patch_submission_database_issue(self, client: FlaskClient, session: Session):
-        """Test patching a submission with a faulty database"""
+        response = client.patch("/submissions/2", data={"grading": 100})
+        data = response.json
+        assert response.status_code == 400
+        assert data["message"] == "Invalid grading (grading=0-20)"
 
     def test_patch_submission_correct(self, client: FlaskClient, session: Session):
         """Test patching a submission"""
+        response = client.patch("/submissions/2", data={"grading": 20})
+        data = response.json
+        assert response.status_code == 200
+        assert data["message"] == "Successfully patched submission (submission_id=2)"
+
+        submission = session.get(m_submissions, 2)
+        assert submission.grading == 20
 
     ### DELETE SUBMISSION ###
     def test_delete_submission_wrong_id(self, client: FlaskClient, session: Session):

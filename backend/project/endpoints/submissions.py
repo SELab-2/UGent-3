@@ -92,7 +92,7 @@ class Submissions(Resource):
                 grading = int(request.form.get("grading"))
                 if grading is not None:
                     if not 0 <= grading <= 20:
-                        data["message"] = "Invalid grading (range=0-20)"
+                        data["message"] = "Invalid grading (grading=0-20)"
                         return data, 400
                     submission.grading = grading
 
@@ -165,28 +165,32 @@ class Submission(Resource):
             dict[str, any]: A message
         """
 
+        data = {}
         try:
             with db.session() as session:
                 # Get the submission
                 submission = session.get(m_submissions, submission_id)
                 if submission is None:
-                    return {"message": f"Submission {submission_id} not found"}, 404
+                    data["message"] = f"Submission (submission_id={submission_id}) not found"
+                    return data, 404
 
-                # Update the grading field (its the only field that a teacher can update)
+                # Update the grading field
                 if "grading" in request.form:
-                    grading = request.form["grading"]
-                    if grading < 0 or grading > 20:
-                        return {
-                            "message": "The submission must have a 'grading' in between 0-20"
-                        }, 400
+                    grading = int(request.form["grading"])
+                    if not 0 <= grading <= 20:
+                        data["message"] = "Invalid grading (grading=0-20)"
+                        return data, 400
                     submission.grading = grading
 
                 # Save the submission
                 session.commit()
-                return {"message": f"Submission {submission_id} updated"}
+                data["message"] = f"Successfully patched submission (submission_id={submission_id})"
+                return data, 200
         except exc.SQLAlchemyError:
             session.rollback()
-            return {"message": f"An error occurred while patching submission {submission_id}"}, 500
+            data["message"] = \
+                f"An error occurred while patching submission (submission_id={submission_id})"
+            return data, 500
 
     def delete(self, submission_id: int) -> dict[str, any]:
         """Delete a submission given an submission ID
