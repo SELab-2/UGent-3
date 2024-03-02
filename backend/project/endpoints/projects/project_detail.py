@@ -15,6 +15,7 @@ from project import db
 from project.models.projects import Projects
 
 load_dotenv()
+API_URL = getenv('API_HOST')
 
 class ProjectDetail(Resource):
     """
@@ -71,7 +72,7 @@ class ProjectDetail(Resource):
             db.session.commit()
             # get the updated version
             return {"message": f"Succesfully changed project with id: "
-                               f"{getenv('API_HOST')}/projects/{id}"
+                               f"{API_URL}/projects/{id}"
                     }, 200
         except exc.SQLAlchemyError:
             db.session.rollback()
@@ -98,7 +99,7 @@ class ProjectDetail(Resource):
 
             # return 200 if content is deleted succesfully
             return ({"message": f"Project with id: "
-                               f"{getenv('API_HOST')}/projects/{id} deleted successfully!"},
+                               f"{API_URL}/projects/{id} deleted successfully!"},
                     200)
         except exc.SQLAlchemyError:
             return ({"message":
