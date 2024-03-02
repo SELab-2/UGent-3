@@ -63,6 +63,7 @@ class Submissions(Resource):
             dict[str, any]: The URL to the submission
         """
 
+        data = {}
         try:
             with db.session() as session:
                 submission = m_submissions()
@@ -70,22 +71,29 @@ class Submissions(Resource):
                 # User
                 uid = request.form.get("uid")
                 if (uid is None) or (session.get(m_users, uid) is None):
-                    return {"message": f"User {uid} not found"}, 404
+                    if uid is None:
+                        data["message"] = "The uid data field is required"
+                    else:
+                        data["message"] = f"Invalid user (uid={uid})"
+                    return data, 400
                 submission.uid = uid
 
                 # Project
                 project_id = request.form.get("project_id")
-                if (project_id is None) or (session.get(m_projects, project_id)):
-                    return {"message": f"Project {project_id} not found"}, 404
+                if (project_id is None) or (session.get(m_projects, project_id) is None):
+                    if project_id is None:
+                        data["message"] = "The project_id data field is required"
+                    else:
+                        data["message"] = f"Invalid project (project_id={project_id})"
+                    return data, 400
                 submission.project_id = project_id
 
                 # Grading
-                if "grading" in request.form:
-                    grading = request.form["grading"]
-                    if grading < 0 or grading > 20:
-                        return {
-                            "message": "The submission must have a 'grading' in between 0-20"
-                        }, 400
+                grading = int(request.form.get("grading"))
+                if grading is not None:
+                    if not 0 <= grading <= 20:
+                        data["message"] = "Invalid grading (range=0-20)"
+                        return data, 400
                     submission.grading = grading
 
                 # Submission time
@@ -100,12 +108,15 @@ class Submissions(Resource):
 
                 session.add(submission)
                 session.commit()
-                return {
-                    "submission": f"{getenv('HOSTNAME')}/submissions/{submission.submission_id}"
-                }, 201
+
+                data["message"] = "Successfully fetched the submissions"
+                data["submission"] = f"{getenv('HOSTNAME')}/submissions/{submission.submission_id}"
+                return data, 201
+
         except exc.SQLAlchemyError:
             session.rollback()
-            return {"message": "An error occurred while creating a new submission "}, 500
+            data["message"] = "An error occurred while creating a new submission"
+            return data, 500
 
 class Submission(Resource):
     """API endpoint for the submission"""

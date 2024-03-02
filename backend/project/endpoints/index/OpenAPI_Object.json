@@ -127,10 +127,12 @@
                 "type": "object",
                 "properties": {
                   "uid": {
-                    "type": "string"
+                    "type": "string",
+                    "required": true
                   },
                   "project_id": {
-                    "type": "int"
+                    "type": "int",
+                    "required": true
                   },
                   "grading": {
                     "type": "int",
@@ -150,6 +152,9 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "message": {
+                      "type": "string"
+                    },
                     "submission": {
                       "type": "string"
                     }
@@ -159,22 +164,7 @@
             }
           },
           "400": {
-            "description": "A 'bad data field' message",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "A 'not found' message",
+            "description": "An invalid data message",
             "content": {
               "application/json": {
                 "schema": {

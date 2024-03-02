@@ -3,6 +3,7 @@ init-hook='import sys; sys.path.append(".")'
 
 [test-files:*_test.py]
 disable=
+    W0613, # Unused argument (pytest uses it)
     W0621, # Redefining name %r from outer scope (line %s)
     R0904, # Too many public methods (too many unit tests essentially)
 
