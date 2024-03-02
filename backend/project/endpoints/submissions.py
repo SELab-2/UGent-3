@@ -184,7 +184,7 @@ class Submission(Resource):
 
                 # Save the submission
                 session.commit()
-                data["message"] = f"Successfully patched submission (submission_id={submission_id})"
+                data["message"] = f"Submission (submission_id={submission_id}) patched"
                 return data, 200
         except exc.SQLAlchemyError:
             session.rollback()
@@ -202,20 +202,24 @@ class Submission(Resource):
             dict[str, any]: A message
         """
 
+        data = {}
         try:
             with db.session() as session:
-                # Check if the submission exists
                 submission = session.get(m_submissions, submission_id)
                 if submission is None:
-                    return {"message": f"Submission {submission_id} not found"}, 404
+                    data["message"] = f"Submission (submission_id={submission_id}) not found"
+                    return data, 404
 
                 # Delete the submission
                 session.delete(submission)
                 session.commit()
-                return {"message": f"Submission {submission_id} deleted"}
+                data["message"] = f"Submission (submission_id={submission_id}) deleted"
+                return data, 200
         except exc.SQLAlchemyError:
             db.session.rollback()
-            return {"message": f"An error occurred while deleting submission {submission_id}"}, 500
+            data["message"] = \
+                f"An error occurred while deleting submission (submission_id={submission_id})"
+            return data, 500
 
 submissions_bp.add_url_rule("/submissions", view_func=Submissions.as_view("submissions"))
 submissions_bp.add_url_rule(

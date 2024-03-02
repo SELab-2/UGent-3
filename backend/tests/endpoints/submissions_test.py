@@ -174,7 +174,7 @@ class TestSubmissionsEndpoint:
         response = client.patch("/submissions/2", data={"grading": 20})
         data = response.json
         assert response.status_code == 200
-        assert data["message"] == "Successfully patched submission (submission_id=2)"
+        assert data["message"] == "Submission (submission_id=2) patched"
 
         submission = session.get(m_submissions, 2)
         assert submission.grading == 20
@@ -182,9 +182,17 @@ class TestSubmissionsEndpoint:
     ### DELETE SUBMISSION ###
     def test_delete_submission_wrong_id(self, client: FlaskClient, session: Session):
         """Test deleting a submission for a non-existing submission id"""
-
-    def test_delete_submission_database_issue(self, client: FlaskClient, session: Session):
-        """Test deleting a submission with a faulty database"""
+        response = client.delete("submissions/100")
+        data = response.json
+        assert response.status_code == 404
+        assert data["message"] == "Submission (submission_id=100) not found"
 
     def test_delete_submission_correct(self, client: FlaskClient, session: Session):
         """Test deleting a submission"""
+        response = client.delete("submissions/1")
+        data = response.json
+        assert response.status_code == 200
+        assert data["message"] == "Submission (submission_id=1) deleted"
+
+        submission = session.get(m_submissions, 1)
+        assert submission is None
