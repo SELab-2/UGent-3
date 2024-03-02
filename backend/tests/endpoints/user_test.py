@@ -31,7 +31,7 @@ def user_db_session():
     session.commit()
     yield session
     session.rollback()
-    session.close()
+    session.close() # pylint: disable=duplicate-code;
     for table in reversed(db.metadata.sorted_tables):
         session.execute(table.delete())
     session.commit()
