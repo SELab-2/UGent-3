@@ -53,7 +53,7 @@ class Users(Resource):
         except SQLAlchemyError as e:
             # every exception should result in a rollback
             db.session.rollback()
-            return {"Message": f"An error occurred while creating the user: {str(e)}"}, 500
+            return {"Message": f"An error occurred while creating the user"}, 500
 
         return {"Message": "User created successfully!"}, 201
 
@@ -97,7 +97,7 @@ class User(Resource):
         except SQLAlchemyError as e:
             # every exception should result in a rollback
             db.session.rollback()
-            return {"Message": f"An error occurred while patching the user: {str(e)}"}, 500
+            return {"Message": f"An error occurred while patching the user"}, 500
         return {"Message": "User updated successfully!"}
 
     def delete(self, user_id):
@@ -115,7 +115,7 @@ class User(Resource):
         except SQLAlchemyError as e:
             # every exception should result in a rollback
             db.session.rollback()
-            return {"Message": f"An error occurred while deleting the user: {str(e)}"}, 500
+            return {"Message": f"An error occurred while deleting the user"}, 500
         return {"Message": "User deleted successfully!"}
 
 
