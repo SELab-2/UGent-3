@@ -68,7 +68,7 @@ class TestUserEndpoint:
         })
         assert response.status_code == 415
 
-    def test_get_all_users(self, client,user_db_session): # pylint:  disable=unused-argument ; pytest uses it
+    def test_get_all_users(self, client,user_db_session):
         """Test getting all users."""
         response = client.get("/users")
         assert response.status_code == 200
