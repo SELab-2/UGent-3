@@ -3,6 +3,8 @@ Module for project details page
 for example /projects/1 if the project id of
 the corresponding project is 1
 """
+from os import getenv
+from dotenv import load_dotenv
 
 from flask import jsonify
 from flask_restful import Resource, abort
@@ -12,6 +14,7 @@ from project.endpoints.projects.endpoint_parser import parse_project_params
 from project import db
 from project.models.projects import Projects
 
+load_dotenv()
 
 class ProjectDetail(Resource):
     """
@@ -67,7 +70,7 @@ class ProjectDetail(Resource):
                 setattr(project, key, value)
             db.session.commit()
             # get the updated version
-            return {"message": f"Succesfully changed project with id: {project.project_id}"}, 200
+            return {"message": f"Succesfully changed project with id: {getenv('API_HOST')}/projects/{id}"}, 200
         except exc.SQLAlchemyError:
             db.session.rollback()
             return ({"message":
@@ -92,7 +95,7 @@ class ProjectDetail(Resource):
             db.session.commit()
 
             # return 200 if content is deleted succesfully
-            return {"message": f"Project with id:{project_id} deleted successfully!"}, 200
+            return {"message": f"Project with id: {getenv('API_HOST')}/projects/{id} deleted successfully!"}, 200
         except exc.SQLAlchemyError:
             return ({"message":
                         f"Something unexpected happened when removing project {project_id}"},
