@@ -14,7 +14,7 @@ def create_submission_subfolders(submission_path: str):
 
     if not path.exists(submission_solution_path):
         makedirs(submission_solution_path)
-    
+
     if not path.exists(submission_output_path):
         makedirs(submission_output_path)
 
