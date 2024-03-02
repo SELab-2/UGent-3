@@ -27,6 +27,8 @@ url = URL.create(
 
 @pytest.fixture
 def api_url():
+    #temporary
+    return "http://localhost"
     return os.getenv('API_HOST')
 
 @pytest.fixture
