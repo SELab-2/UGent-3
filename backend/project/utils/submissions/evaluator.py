@@ -52,12 +52,12 @@ def evaluate(submission: Submissions, project: Projects, evaluator: str) -> int:
                                          project_path,
                                          submission_solution_path)
 
-    submission_output_path = create_submission_subfolders(submission_path)
+    submission_output_path = path.join(submission_path, "output")
     test_output_path = path.join(submission_output_path, "test_output.log")
 
     exit_code = container.wait()
 
-    with open(path.join(test_output_path, ), "w", encoding='utf-8') as output_file:
+    with open(path.join(test_output_path), "w", encoding='utf-8') as output_file:
         output_file.write(container.logs().decode('utf-8'))
 
     container.remove()

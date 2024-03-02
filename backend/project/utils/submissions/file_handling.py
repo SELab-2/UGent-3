@@ -10,7 +10,11 @@ def create_submission_subfolders(submission_path: str):
     """
     submission_output_path = path.join(submission_path, "output")
     artifacts_path = path.join(submission_output_path, "artifacts")
+    submission_solution_path = path.join(submission_path, "submission")
 
+    if not path.exists(submission_solution_path):
+        makedirs(submission_solution_path)
+    
     if not path.exists(submission_output_path):
         makedirs(submission_output_path)
 
@@ -34,12 +38,10 @@ def create_submission_folder(submission_id: int, project_id: int):
     submission_path = path.join(getenv("SUBMISSIONS_ROOT_PATH"),
                                 str(project_id),
                                 str(submission_id))
-    submission_solution_path = path.join(submission_path, "submission")
 
     if not path.exists(submission_path):
         makedirs(submission_path)
 
-    if not path.exists(submission_solution_path):
-        makedirs(submission_solution_path)
+    create_submission_subfolders(submission_path)
 
     return submission_path
