@@ -119,7 +119,7 @@ class TestCoursesEndpoint:
         # Now we have a course with a teacher, students and an assistent lets try to get some info
 
         for x in range(3,10):
-            response = client.get(f"{api_url}/courses?name=Sel{str(x)}")
+            response = client.get(f"/courses?name=Sel{str(x)}")
             assert response.status_code == 200
             link = response.json[0]
             assert len(link) > len(f"{api_url}/courses/")
