@@ -32,25 +32,25 @@ def user_db_session():
     yield session
     session.rollback()
     session.close()
-    for table in reversed(db.metadata.sorted_tables): # pylint: disable=duplicate-code
+    for table in reversed(db.metadata.sorted_tables):
         session.execute(table.delete())
     session.commit()
 class TestUserEndpoint:
     """Class to test user management endpoints."""
 
-    def test_delete_user(self, client,user_db_session):  # pylint:  disable=unused-argument ; pytest uses it
+    def test_delete_user(self, client,user_db_session):
         """Test deleting a user."""
         # Delete the user
         response = client.delete("/users/del")
         assert response.status_code == 200
         assert response.json == {"Message": "User deleted successfully!"}
 
-    def test_delete_not_present(self, client,user_db_session): # pylint:  disable=unused-argument ; pytest uses it
+    def test_delete_not_present(self, client,user_db_session):
         """Test deleting a user that does not exist."""
         response = client.delete("/users/non")
         assert response.status_code == 404
 
-    def test_wrong_form_post(self, client,user_db_session): # pylint:  disable=unused-argument ; pytest uses it
+    def test_wrong_form_post(self, client,user_db_session):
         """Test posting with a wrong form."""
         response = client.post("/users", json={
             'uid': '12',
@@ -59,7 +59,7 @@ class TestUserEndpoint:
         })
         assert response.status_code == 400
 
-    def test_wrong_datatype_post(self, client,user_db_session): # pylint:  disable=unused-argument ; pytest uses it
+    def test_wrong_datatype_post(self, client,user_db_session):
         """Test posting with a wrong data type."""
         response = client.post("/users", data={
             'uid': '12',
@@ -75,7 +75,7 @@ class TestUserEndpoint:
         # Check that the response is a list (even if it's empty)
         assert isinstance(response.json, list)
 
-    def test_get_one_user(self, client,user_db_session): # pylint:  disable=unused-argument ; pytest uses it
+    def test_get_one_user(self, client,user_db_session):
         """Test getting a single user."""
         response = client.get("users/u_get")
         assert response.status_code == 200
@@ -85,7 +85,7 @@ class TestUserEndpoint:
             'is_admin': False
         }
 
-    def test_patch_user(self, client, user_db_session): # pylint:  disable=unused-argument ; pytest uses it
+    def test_patch_user(self, client, user_db_session):
         """Test updating a user."""
         response = client.patch("/users/pat", json={
             'is_teacher': False,
@@ -94,7 +94,7 @@ class TestUserEndpoint:
         assert response.status_code == 200
         assert response.json == {"Message": "User updated successfully!"}
 
-    def test_patch_non_existent(self, client,user_db_session): # pylint:  disable=unused-argument ; pytest uses it
+    def test_patch_non_existent(self, client,user_db_session):
         """Test updating a non-existent user."""
         response = client.patch("/users/non", json={
             'is_teacher': False,
@@ -102,7 +102,7 @@ class TestUserEndpoint:
         })
         assert response.status_code == 404
 
-    def test_patch_non_json(self, client,user_db_session): # pylint:  disable=unused-argument ; pytest uses it
+    def test_patch_non_json(self, client,user_db_session):
         """Test sending a non-JSON patch request."""
         response = client.post("/users", data={
             'uid': '12',
