@@ -121,24 +121,26 @@ class Submissions(Resource):
 class Submission(Resource):
     """API endpoint for the submission"""
 
-    def get(self, sid: int) -> dict[str, any]:
+    def get(self, submission_id: int) -> dict[str, any]:
         """Get the submission given an submission ID
 
         Args:
-            sid (int): Submission ID
+            submission_id (int): Submission ID
 
         Returns:
             dict[str, any]: The submission
         """
 
+        data = {}
         try:
             with db.session() as session:
-                # Get the submission
-                submission = session.get(m_submissions, sid)
+                submission = session.get(m_submissions, submission_id)
                 if submission is None:
-                    return {"message": f"Submission {sid} not found"}, 404
+                    data["message"] = f"Submission (submission_id={submission_id}) not found"
+                    return data, 404
 
-                return {
+                data["message"] = "Successfully fetched the submission"
+                data["submission"] = {
                     "submission_id": submission.submission_id,
                     "uid": submission.uid,
                     "project_id": submission.project_id,
@@ -147,14 +149,17 @@ class Submission(Resource):
                     "submission_path": submission.submission_path,
                     "submission_status": submission.submission_status
                 }
+                return data, 200
         except exc.SQLAlchemyError:
-            return {"message": f"An error occurred while fetching submission {sid}"}, 500
+            data["message"] = \
+                f"An error occurred while fetching the submission (submission_id={submission_id})"
+            return data, 500
 
-    def patch(self, sid:int) -> dict[str, any]:
+    def patch(self, submission_id:int) -> dict[str, any]:
         """Update some fields of a submission given a submission ID
 
         Args:
-            sid (int): Submission ID
+            submission_id (int): Submission ID
 
         Returns:
             dict[str, any]: A message
@@ -163,9 +168,9 @@ class Submission(Resource):
         try:
             with db.session() as session:
                 # Get the submission
-                submission = session.get(m_submissions, sid)
+                submission = session.get(m_submissions, submission_id)
                 if submission is None:
-                    return {"message": f"Submission {sid} not found"}, 404
+                    return {"message": f"Submission {submission_id} not found"}, 404
 
                 # Update the grading field (its the only field that a teacher can update)
                 if "grading" in request.form:
@@ -178,16 +183,16 @@ class Submission(Resource):
 
                 # Save the submission
                 session.commit()
-                return {"message": f"Submission {sid} updated"}
+                return {"message": f"Submission {submission_id} updated"}
         except exc.SQLAlchemyError:
             session.rollback()
-            return {"message": f"An error occurred while patching submission {sid}"}, 500
+            return {"message": f"An error occurred while patching submission {submission_id}"}, 500
 
-    def delete(self, sid: int) -> dict[str, any]:
+    def delete(self, submission_id: int) -> dict[str, any]:
         """Delete a submission given an submission ID
 
         Args:
-            sid (int): Submission ID
+            submission_id (int): Submission ID
 
         Returns:
             dict[str, any]: A message
@@ -196,17 +201,20 @@ class Submission(Resource):
         try:
             with db.session() as session:
                 # Check if the submission exists
-                submission = session.get(m_submissions, sid)
+                submission = session.get(m_submissions, submission_id)
                 if submission is None:
-                    return {"message": f"Submission {sid} not found"}, 404
+                    return {"message": f"Submission {submission_id} not found"}, 404
 
                 # Delete the submission
                 session.delete(submission)
                 session.commit()
-                return {"message": f"Submission {sid} deleted"}
+                return {"message": f"Submission {submission_id} deleted"}
         except exc.SQLAlchemyError:
             db.session.rollback()
-            return {"message": f"An error occurred while deleting submission {sid}"}, 500
+            return {"message": f"An error occurred while deleting submission {submission_id}"}, 500
 
 submissions_bp.add_url_rule("/submissions", view_func=Submissions.as_view("submissions"))
-submissions_bp.add_url_rule("/submissions/<int:sid>", view_func=Submission.as_view("submission"))
+submissions_bp.add_url_rule(
+    "/submissions/<int:submission_id>",
+    view_func=Submission.as_view("submission")
+)

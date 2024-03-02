@@ -134,12 +134,25 @@ class TestSubmissionsEndpoint:
     ### GET SUBMISSION ###
     def test_get_submission_wrong_id(self, client: FlaskClient, session: Session):
         """Test getting a submission for a non-existing submission id"""
-
-    def test_get_submission_database_issue(self, client: FlaskClient, session: Session):
-        """Test getting a submission with a faulty database"""
+        response = client.get("/submissions/100")
+        data = response.json
+        assert response.status_code == 404
+        assert data["message"] == "Submission (submission_id=100) not found"
 
     def test_get_submission_correct(self, client: FlaskClient, session: Session):
         """Test getting a submission"""
+        response = client.get("/submissions/1")
+        data = response.json
+        assert response.status_code == 200
+        assert data["submission"] == {
+            "submission_id": 1,
+            "uid": "student01",
+            "project_id": 1,
+            "grading": 16,
+            "submission_time": "Thu, 14 Mar 2024 11:00:00 GMT",
+            "submission_path": "/submissions/1",
+            "submission_status": True
+        }
 
     ### PATCH SUBMISSION ###
     def test_patch_submission_wrong_id(self, client: FlaskClient, session: Session):

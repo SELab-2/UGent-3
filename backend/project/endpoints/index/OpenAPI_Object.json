@@ -196,7 +196,7 @@
         }
       }
     },
-    "/submissions/{sid}": {
+    "/submissions/{submission_id}": {
       "get": {
         "summary": "Get the submission",
         "responses": {
@@ -207,26 +207,31 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "submission_id": {
-                      "type": "int"
-                    },
-                    "uid": {
+                    "message": {
                       "type": "string"
                     },
-                    "project_id": {
-                      "type": "int"
-                    },
-                    "grading": {
-                      "type": "int"
-                    },
-                    "submission_time": {
-                      "type": "string"
-                    },
-                    "submission_path": {
-                      "type": "string"
-                    },
-                    "submission_status": {
-                      "type": "int"
+                    "submission": {
+                      "submission_id": {
+                        "type": "int"
+                      },
+                      "uid": {
+                        "type": "string"
+                      },
+                      "project_id": {
+                        "type": "int"
+                      },
+                      "grading": {
+                        "type": "int"
+                      },
+                      "submission_time": {
+                        "type": "string"
+                      },
+                      "submission_path": {
+                        "type": "string"
+                      },
+                      "submission_status": {
+                        "type": "int"
+                      }
                     }
                   }
                 }
@@ -399,7 +404,7 @@
       },
       "parameters": [
         {
-          "name": "sid",
+          "name": "submission_id",
           "in": "path",
           "description": "Submission ID",
           "required": true,
