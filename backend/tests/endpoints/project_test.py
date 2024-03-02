@@ -84,8 +84,6 @@ def test_update_project(db_session, client, course, course_teacher, project):
         "title": new_title, "archieved": new_archieved
     })
     db_session.commit()
-    # print(project)
-    print(response)
     updated_project = db_session.get(Projects, {"project_id": project.project_id})
 
     assert response.status_code == 200
