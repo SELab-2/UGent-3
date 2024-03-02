@@ -5,6 +5,8 @@ from flask.testing import FlaskClient
 from sqlalchemy.orm import Session
 from project.models.submissions import Submissions as m_submissions
 
+API_HOST = getenv("API_HOST")
+
 class TestSubmissionsEndpoint:
     """Class to test the submissions API endpoint"""
 
@@ -36,9 +38,9 @@ class TestSubmissionsEndpoint:
         data = response.json
         assert response.status_code == 200
         assert data["submissions"] == [
-            f"{getenv('HOSTNAME')}/submissions/1",
-            f"{getenv('HOSTNAME')}/submissions/2",
-            f"{getenv('HOSTNAME')}/submissions/3"
+            f"{API_HOST}/submissions/1",
+            f"{API_HOST}/submissions/2",
+            f"{API_HOST}/submissions/3"
         ]
 
     def test_get_submissions_user(self, client: FlaskClient, session: Session):
@@ -47,7 +49,7 @@ class TestSubmissionsEndpoint:
         data = response.json
         assert response.status_code == 200
         assert data["submissions"] == [
-            f"{getenv('HOSTNAME')}/submissions/1"
+            f"{API_HOST}/submissions/1"
         ]
 
     def test_get_submissions_project(self, client: FlaskClient, session: Session):
@@ -56,8 +58,8 @@ class TestSubmissionsEndpoint:
         data = response.json
         assert response.status_code == 200
         assert data["submissions"] == [
-            f"{getenv('HOSTNAME')}/submissions/1",
-            f"{getenv('HOSTNAME')}/submissions/2"
+            f"{API_HOST}/submissions/1",
+            f"{API_HOST}/submissions/2"
         ]
 
     def test_get_submissions_user_project(self, client: FlaskClient, session: Session):
@@ -66,7 +68,7 @@ class TestSubmissionsEndpoint:
         data = response.json
         assert response.status_code == 200
         assert data["submissions"] == [
-            f"{getenv('HOSTNAME')}/submissions/1"
+            f"{API_HOST}/submissions/1"
         ]
 
     ### POST SUBMISSIONS ###

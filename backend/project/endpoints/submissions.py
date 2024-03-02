@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from os import getenv
+from dotenv import load_dotenv
 from flask import Blueprint, request
 from flask_restful import Resource
 from sqlalchemy import exc
@@ -9,6 +10,9 @@ from project.database import db
 from project.models.submissions import Submissions as m_submissions
 from project.models.projects import Projects as m_projects
 from project.models.users import Users as m_users
+
+load_dotenv()
+API_HOST = getenv("API_HOST")
 
 submissions_bp = Blueprint("submissions", __name__)
 
@@ -47,7 +51,7 @@ class Submissions(Resource):
                 # Get the submissions
                 data["message"] = "Successfully fetched the submissions"
                 data["submissions"] = [
-                    f"{getenv('HOSTNAME')}/submissions/{s.submission_id}" for s in query.all()
+                    f"{API_HOST}/submissions/{s.submission_id}" for s in query.all()
                 ]
                 return data, 200
 
@@ -109,7 +113,7 @@ class Submissions(Resource):
                 session.commit()
 
                 data["message"] = "Successfully fetched the submissions"
-                data["submission"] = f"{getenv('HOSTNAME')}/submissions/{submission.submission_id}"
+                data["submission"] = f"{API_HOST}/submissions/{submission.submission_id}"
                 return data, 201
 
         except exc.SQLAlchemyError:

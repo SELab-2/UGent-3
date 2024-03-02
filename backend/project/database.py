@@ -15,11 +15,10 @@ def get_database_uri() -> str:
     """
     load_dotenv()
     uri = URL.create(
-        drivername=getenv("DB_DRIVER"),
-        username=getenv("DB_USER"),
-        password=getenv("DB_PASSWORD"),
-        host=getenv("DB_HOST"),
-        port=int(getenv("DB_PORT")),
-        database=getenv("DB_NAME")
+        drivername="postgresql",
+        username=getenv("POSTGRES_USER"),
+        password=getenv("POSTGRES_PASSWORD"),
+        host=getenv("POSTGRES_HOST"),
+        database=getenv("POSTGRES_NAME")
     )
     return uri
