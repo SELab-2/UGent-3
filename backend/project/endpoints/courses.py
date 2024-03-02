@@ -15,9 +15,7 @@ courses_bp = Blueprint("courses", __name__)
 courses_api = Api(courses_bp)
 
 load_dotenv()
-#API_URL = getenv('API_HOST')
-#temporary:
-API_URL = "http://localhost"
+API_URL = getenv('API_HOST')
 
 def execute_query_abort_if_db_error(query, all=False):
     """
@@ -219,7 +217,7 @@ class CoursesForUser(Resource):
         results = execute_query_abort_if_db_error(query, all=True)
         if results == []:
             return json_message("No courses found with the given parameters"), 404
-        detail_urls = [API_URL+"/courses/" + str(course.course_id) for course in results]
+        detail_urls = [f"{API_URL}/courses/{str(course.course_id)}" for course in results]
         return jsonify(detail_urls)
 
     def post(self):

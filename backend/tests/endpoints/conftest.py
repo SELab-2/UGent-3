@@ -1,29 +1,12 @@
 """ Configuration for pytest, Flask, and the test client."""
 import os
-from dotenv import load_dotenv
 import flask
 import pytest
-from sqlalchemy import URL, create_engine
-from sqlalchemy.orm import sessionmaker
 from project.models.course_relations import CourseAdmins, CourseStudents
 from project.models.courses import Courses
 from project.models.users import Users
 from project import create_app_with_db, db
-
-load_dotenv()
-
-DATABSE_NAME = os.getenv('POSTGRES_DB')
-DATABASE_USER = os.getenv('POSTGRES_USER')
-DATABASE_PASSWORD = os.getenv('POSTGRES_PASSWORD')
-DATABASE_HOST = os.getenv('POSTGRES_HOST')
-
-url = URL.create(
-    drivername="postgresql",
-    username=DATABASE_USER,
-    host=DATABASE_HOST,
-    database=DATABSE_NAME,
-    password=DATABASE_PASSWORD
-)
+from project.db_in import url
 
 @pytest.fixture
 def api_url():

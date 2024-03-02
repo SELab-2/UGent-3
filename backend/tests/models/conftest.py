@@ -14,21 +14,7 @@ from project.models.courses import Courses
 from project.models.course_relations import CourseAdmins, CourseStudents
 from project.models.projects import Projects
 from project.models.users import Users
-
-load_dotenv()
-
-DATABSE_NAME = os.getenv('POSTGRES_DB')
-DATABASE_USER = os.getenv('POSTGRES_USER')
-DATABASE_PASSWORD = os.getenv('POSTGRES_PASSWORD')
-DATABASE_HOST = os.getenv('POSTGRES_HOST')
-
-url = URL.create(
-    drivername="postgresql",
-    username=DATABASE_USER,
-    host=DATABASE_HOST,
-    database=DATABSE_NAME,
-    password=DATABASE_PASSWORD
-)
+from project.db_in import url
 
 engine = create_engine(url)
 Session = sessionmaker(bind=engine)
