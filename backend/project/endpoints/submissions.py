@@ -39,11 +39,10 @@ class Submissions(Resource):
                 # Filter by project_id
                 project_id = request.args.get("project_id")
                 if project_id is not None:
-                    if session.get(m_projects, project_id) is not None:
-                        query = query.filter_by(project_id=project_id)
-                    else:
+                    if not project_id.isdigit() or session.get(m_projects, int(project_id)) is None:
                         data["message"] = f"Invalid project (project_id={project_id})"
                         return data, 400
+                    query = query.filter_by(project_id=int(project_id))
 
                 # Get the submissions
                 data["message"] = "Successfully fetched the submissions"
@@ -80,21 +79,21 @@ class Submissions(Resource):
 
                 # Project
                 project_id = request.form.get("project_id")
-                if (project_id is None) or (session.get(m_projects, project_id) is None):
-                    if project_id is None:
-                        data["message"] = "The project_id data field is required"
-                    else:
-                        data["message"] = f"Invalid project (project_id={project_id})"
+                if project_id is None:
+                    data["message"] = "The project_id data field is required"
                     return data, 400
-                submission.project_id = project_id
+                if not project_id.isdigit() or session.get(m_projects, int(project_id)) is None:
+                    data["message"] = f"Invalid project (project_id={project_id})"
+                    return data, 400
+                submission.project_id = int(project_id)
 
                 # Grading
-                grading = int(request.form.get("grading"))
+                grading = request.form.get("grading")
                 if grading is not None:
-                    if not 0 <= grading <= 20:
+                    if not (grading.isdigit() and 0 <= int(grading) <= 20):
                         data["message"] = "Invalid grading (grading=0-20)"
                         return data, 400
-                    submission.grading = grading
+                    submission.grading = int(grading)
 
                 # Submission time
                 submission.submission_time = datetime.now()
@@ -150,6 +149,7 @@ class Submission(Resource):
                     "submission_status": submission.submission_status
                 }
                 return data, 200
+
         except exc.SQLAlchemyError:
             data["message"] = \
                 f"An error occurred while fetching the submission (submission_id={submission_id})"
@@ -175,17 +175,19 @@ class Submission(Resource):
                     return data, 404
 
                 # Update the grading field
-                if "grading" in request.form:
-                    grading = int(request.form["grading"])
-                    if not 0 <= grading <= 20:
+                grading = request.form.get("grading")
+                if grading is not None:
+                    if not (grading.isdigit() and 0 <= int(grading) <= 20):
                         data["message"] = "Invalid grading (grading=0-20)"
                         return data, 400
-                    submission.grading = grading
+                    submission.grading = int(grading)
 
                 # Save the submission
                 session.commit()
+
                 data["message"] = f"Submission (submission_id={submission_id}) patched"
                 return data, 200
+
         except exc.SQLAlchemyError:
             session.rollback()
             data["message"] = \
@@ -213,8 +215,10 @@ class Submission(Resource):
                 # Delete the submission
                 session.delete(submission)
                 session.commit()
+
                 data["message"] = f"Submission (submission_id={submission_id}) deleted"
                 return data, 200
+
         except exc.SQLAlchemyError:
             db.session.rollback()
             data["message"] = \

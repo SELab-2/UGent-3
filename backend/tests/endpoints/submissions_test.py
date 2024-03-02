@@ -23,6 +23,13 @@ class TestSubmissionsEndpoint:
         assert response.status_code == 400
         assert data["message"] == "Invalid project (project_id=-1)"
 
+    def test_get_submissions_wrong_project_type(self, client: FlaskClient, session: Session):
+        """Test getting submissions for a non-existing project of the wrong type"""
+        response = client.get("/submissions?project_id=zero")
+        data = response.json
+        assert response.status_code == 400
+        assert data["message"] == "Invalid project (project_id=zero)"
+
     def test_get_submissions_all(self, client: FlaskClient, session: Session):
         """Test getting the submissions"""
         response = client.get("/submissions")
@@ -101,12 +108,33 @@ class TestSubmissionsEndpoint:
         assert response.status_code == 400
         assert data["message"] == "Invalid project (project_id=-1)"
 
+    def test_post_submissions_wrong_project_type(self, client: FlaskClient, session: Session):
+        """Test posting a submission for a non-existing project of the wrong type"""
+        response = client.post("/submissions", data={
+            "uid": "student01",
+            "project_id": "zero"
+        })
+        data  = response.json
+        assert response.status_code == 400
+        assert data["message"] == "Invalid project (project_id=zero)"
+
     def test_post_submissions_wrong_grading(self, client: FlaskClient, session: Session):
         """Test posting a submission with a wrong grading"""
         response = client.post("/submissions", data={
             "uid": "student01",
             "project_id": 1,
             "grading": 80
+        })
+        data = response.json
+        assert response.status_code == 400
+        assert data["message"] == "Invalid grading (grading=0-20)"
+
+    def test_post_submissions_wrong_grading_type(self, client: FlaskClient, session: Session):
+        """Test posting a submission with a wrong grading type"""
+        response = client.post("/submissions", data={
+            "uid": "student01",
+            "project_id": 1,
+            "grading": "zero"
         })
         data = response.json
         assert response.status_code == 400
@@ -165,6 +193,13 @@ class TestSubmissionsEndpoint:
     def test_patch_submission_wrong_grading(self, client: FlaskClient, session: Session):
         """Test patching a submission with a wrong grading"""
         response = client.patch("/submissions/2", data={"grading": 100})
+        data = response.json
+        assert response.status_code == 400
+        assert data["message"] == "Invalid grading (grading=0-20)"
+
+    def test_patch_submission_wrong_grading_type(self, client: FlaskClient, session: Session):
+        """Test patching a submission with a wrong grading type"""
+        response = client.patch("/submissions/2", data={"grading": "zero"})
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "Invalid grading (grading=0-20)"
