@@ -16,4 +16,5 @@ url = URL.create(
     username=DATABASE_USER,
     host=DATABASE_HOST,
     database=DATABSE_NAME,
+    password=DATABASE_PASSWORD
 )
