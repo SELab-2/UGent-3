@@ -9,13 +9,13 @@ from project.models.courses import Courses
 class TestCoursesEndpoint:
     """Class for testing the courses endpoint"""
 
-    def test_post_courses(self,courses_init_db,client,course_data,invalid_course):
+    def test_post_courses(self, courses_init_db, client, course_data, invalid_course):
         """
         Test posting a course to the /courses endpoint
         """
         response = client.post("/courses?uid=Bart", json=course_data)  # valid user
 
-        for x in range(3,10):
+        for x in range(3, 10):
             coursee = {"name": "Sel" + str(x), "teacher": "Bart"}
             response = client.post("/courses?uid=Bart", json=coursee)  # valid user
             assert response.status_code == 201
@@ -43,7 +43,7 @@ class TestCoursesEndpoint:
         )  # invalid course
         assert response.status_code == 400
 
-    def test_post_courses_course_id_students_and_admins(self,db_with_course,client):
+    def test_post_courses_course_id_students_and_admins(self, db_with_course, client):
         """
         Test posting to courses/course_id/students and admins
         """
@@ -115,23 +115,23 @@ class TestCoursesEndpoint:
         ]
         assert admins == ["Bart", "Rien"]
 
-    def test_get_courses(self,courses_get_db,client,api_url):
+    def test_get_courses(self, courses_get_db, client, api_url):
         """
         Test all the getters for the courses endpoint
         """
         course = courses_get_db.query(Courses).filter_by(name="Sel2").first()
         sel2_students_link = "/courses/" + str(course.course_id)
 
-        for x in range(3,10):
+        for x in range(3, 10):
             response = client.get(f"/courses?name=Sel{str(x)}")
             assert response.status_code == 200
             link = response.json[0]
             assert len(link) > len(f"{api_url}/courses/")
-            response = client.get(link+"?uid=Bart")
+            response = client.get(link + "?uid=Bart")
             assert response.status_code == 200
 
         sel2_students = [
-            f"{api_url}/users/"+s.uid
+            f"{api_url}/users/" + s.uid
             for s in CourseStudents.query.filter_by(course_id=course.course_id).all()
         ]
 
@@ -140,7 +140,7 @@ class TestCoursesEndpoint:
         response_json = response.json  # the students ids are in the json without a key
         assert response_json == sel2_students
 
-    def test_course_delete(self,courses_get_db,client):
+    def test_course_delete(self, courses_get_db, client):
         """
         Test the deleting of all course endpoint related delete functionality
         """
@@ -214,4 +214,3 @@ class TestCoursesEndpoint:
 
         course = courses_get_db.query(Courses).filter_by(name="Sel2").first()
         assert course is None
- 
