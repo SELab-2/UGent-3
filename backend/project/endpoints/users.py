@@ -3,8 +3,8 @@ from flask import Blueprint, request, jsonify
 from flask_restful import Resource, Api
 from sqlalchemy.exc import SQLAlchemyError
 
-from project import db  # pylint: disable=import-error ; there is no error
-from project.models.users import Users as userModel  # pylint: disable=import-error ; there is no error
+from project import db
+from project.models.users import Users as userModel
 
 users_bp = Blueprint("users", __name__)
 users_api = Api(users_bp)
