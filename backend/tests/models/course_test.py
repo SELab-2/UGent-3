@@ -54,7 +54,7 @@ class TestCoursesModel:
         course_teacher,
         course_students,
         course_students_relation,
-        assistent,
+            assistant,
         course_admin,
     ):
         """Tests if we get the expected results for
@@ -83,16 +83,16 @@ class TestCoursesModel:
         student_uids = [s.uid for s in course_students]
         assert student_check == student_uids
 
-        db_session.add(assistent)
+        db_session.add(assistant)
         db_session.commit()
         course_admin.course_id = course.course_id
         db_session.add(course_admin)
         db_session.commit()
 
         assert (
-            db_session.query(CourseAdmins)
-            .filter_by(course_id=course.course_id)
-            .first()
-            .uid
-            == assistent.uid
+                db_session.query(CourseAdmins)
+                .filter_by(course_id=course.course_id)
+                .first()
+                .uid
+                == assistant.uid
         )

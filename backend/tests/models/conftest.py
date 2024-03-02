@@ -81,16 +81,16 @@ def course_students_relation(course, course_students):
 
 
 @pytest.fixture
-def assistent():
-    """An assistent for testing."""
-    assist = Users(uid="assistent_sel2")
+def assistant():
+    """An assistant for testing."""
+    assist = Users(uid="assistant_sel2")
     return assist
 
 
 @pytest.fixture()
-def course_admin(course, assistent):
+def course_admin(course, assistant):
     """A course admin for testing."""
-    admin_relation = CourseAdmins(uid=assistent.uid, course_id=course.course_id)
+    admin_relation = CourseAdmins(uid=assistant.uid, course_id=course.course_id)
     return admin_relation
 
 
