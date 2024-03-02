@@ -1,4 +1,5 @@
 """Courses api point"""
+
 from os import getenv
 from dotenv import load_dotenv
 from flask import Blueprint, jsonify, request
@@ -15,7 +16,8 @@ courses_bp = Blueprint("courses", __name__)
 courses_api = Api(courses_bp)
 
 load_dotenv()
-API_URL = getenv('API_HOST')
+API_URL = getenv("API_HOST")
+
 
 def execute_query_abort_if_db_error(query, query_all=False):
     """
@@ -38,18 +40,31 @@ def execute_query_abort_if_db_error(query, query_all=False):
     return result
 
 
-def add_or_delete_abort_if_error(to_add_or_delete, delete=False):
+def add_abort_if_error(to_add):
     """
-    Add a new object to the database and handle any SQLAlchemyError that might occur.
+    Add a new object to the database
+    and handle any SQLAlchemyError that might occur.
 
     Args:
         to_add (object): The object to add to the database.
     """
     try:
-        if delete:
-            db.session.delete(to_add_or_delete)
-        else:
-            db.session.add(to_add_or_delete)
+        db.session.add(to_add)
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        abort(500, str(e))
+
+
+def delete_abort_if_error(to_delete):
+    """
+    Deletes the given object from the database 
+    and aborts the request with a 500 error if an SQLAlchemyError occurs.
+
+    args:
+    - to_delete: The object to be deleted from the database.
+    """
+    try:
+        db.session.delete(to_delete)
     except SQLAlchemyError as e:
         db.session.rollback()
         abort(500, str(e))
@@ -74,7 +89,7 @@ def abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant):
         course_id (int): The ID of the course.
 
     Raises:
-        HTTPException: If the current user is not authorized or 
+        HTTPException: If the current user is not authorized or
         if the UID of the person to be made an admin is missing in the request body.
     """
     abort_if_uid_is_none(teacher)
@@ -216,10 +231,14 @@ class CoursesForUser(Resource):
         if "name" in request.args:
             query = query.filter_by(name=request.args.get("name"))
         results = execute_query_abort_if_db_error(query, query_all=True)
-        if results == []:
-            return json_message("No courses found with the given parameters"), 404
-        detail_urls = [f"{API_URL}/courses/{str(course.course_id)}" for course in results]
-        return jsonify(detail_urls)
+        detail_urls = [
+            f"{API_URL}/courses/{str(course.course_id)}" for course in results
+        ]
+        message = "Succesfully retrieved all courses with given parameters"
+        response = json_message(message)
+        response["data"] = detail_urls
+        response["url"] = API_URL + "/courses"
+        return response
 
     def post(self):
         """
@@ -248,11 +267,11 @@ class CoursesForUser(Resource):
         if "ufora_id" in data:
             new_course.ufora_id = data["ufora_id"]
 
-        add_or_delete_abort_if_error(new_course)
+        add_abort_if_error(new_course)
         commit_abort_if_error()
 
         admin_course = CourseAdmins(uid=uid, course_id=new_course.course_id)
-        add_or_delete_abort_if_error(admin_course)
+        add_abort_if_error(admin_course)
         commit_abort_if_error()
 
         message = (
@@ -262,7 +281,9 @@ class CoursesForUser(Resource):
             + str(new_course.course_id)
             + " was succesfully created"
         )
-        return json_message(message), 201
+        response = json_message(message)
+        response["url"] = API_URL + "/courses/" + str(new_course.course_id)
+        return response, 201
 
 
 class CoursesByCourseId(Resource):
@@ -293,29 +314,31 @@ class CoursesByCourseId(Resource):
         course = get_course_abort_if_not_found(course_id)
         query = Projects.query.filter_by(course_id=course_id)
         project_uids = [
-            API_URL+"/projects/"+project.project_id
+            API_URL + "/projects/" + project.project_id
             for project in execute_query_abort_if_db_error(query, query_all=True)
         ]
         query = CourseAdmins.query.filter_by(course_id=course_id)
         admin_uids = [
-            API_URL+"/users/"+admin.uid
+            API_URL + "/users/" + admin.uid
             for admin in execute_query_abort_if_db_error(query, query_all=True)
         ]
         query = CourseStudents.query.filter_by(course_id=course_id)
         student_uids = [
-            API_URL+"/users/"+student.uid
+            API_URL + "/users/" + student.uid
             for student in execute_query_abort_if_db_error(query, query_all=True)
         ]
 
         data = {
             "ufora_id": course.ufora_id,
-            "teacher": API_URL+"/users/"+course.teacher,
+            "teacher": API_URL + "/users/" + course.teacher,
             "admins": admin_uids,
             "students": student_uids,
-            "projects": project_uids,
+            "projects": project_uids
         }
-
-        return jsonify(data)
+        response = json_message("Succesfully retrieved course with course_id: " + str(course_id))
+        response["data"] = data
+        response["url"] = API_URL + "/courses/" + str(course_id)
+        return response
 
     def delete(self, course_id):
         """
@@ -331,13 +354,14 @@ class CoursesByCourseId(Resource):
             return json_message(message), 403
 
         course = get_course_abort_if_not_found(course_id)
-        add_or_delete_abort_if_error(course, delete=True)
+        delete_abort_if_error(course)
         commit_abort_if_error()
 
         response = {
-            "message": "Succesfully deleted course with course_id: " + str(course_id)
+            "message": "Succesfully deleted course with course_id: " + str(course_id),
+            "url": API_URL + "/courses"
         }
-        return jsonify(response)
+        return response
 
 
 class CoursesForAdmins(Resource):
@@ -353,8 +377,13 @@ class CoursesForAdmins(Resource):
         get_course_abort_if_not_found(course_id)
 
         query = CourseAdmins.query.filter_by(course_id=course_id)
-        admin_uids = [API_URL+"/users/"+a.uid
-                      for a in execute_query_abort_if_db_error(query, query_all=True)]
+        admin_uids = [
+            API_URL + "/users/" + a.uid
+            for a in execute_query_abort_if_db_error(query, query_all=True)
+        ]
+        response = json_message("Succesfully retrieved all admins of course " + str(course_id))
+        response["data"] = admin_uids
+        response["url"] = API_URL + "/courses/" + str(course_id) + "/admins"
         return jsonify(admin_uids)
 
     def post(self, course_id):
@@ -375,12 +404,13 @@ class CoursesForAdmins(Resource):
             return json_message(message), 404
 
         admin_relation = CourseAdmins(uid=assistant, course_id=course_id)
-        add_or_delete_abort_if_error(admin_relation)
+        add_abort_if_error(admin_relation)
         commit_abort_if_error()
-
-        return json_message(
+        response = json_message(
             "Admin " + assistant + " added to course " + str(course_id)
-        ), 201
+        )
+        response["url"] = API_URL + "/courses/" + str(course_id) + "/admins"
+        return response, 201
 
     def delete(self, course_id):
         """
@@ -397,7 +427,7 @@ class CoursesForAdmins(Resource):
             message = "Course with given admin not found"
             return json_message(message), 404
 
-        add_or_delete_abort_if_error(admin_relation, delete=True)
+        delete_abort_if_error(admin_relation)
         commit_abort_if_error()
 
         message = (
@@ -406,7 +436,9 @@ class CoursesForAdmins(Resource):
             + " was succesfully removed from course "
             + str(course_id)
         )
-        return json_message(message), 204
+        response = json_message(message)
+        response["url"] = API_URL + "/courses/" + str(course_id) + "/admins"
+        return response, 204
 
 
 class CoursesToAddStudents(Resource):
@@ -426,10 +458,14 @@ class CoursesToAddStudents(Resource):
         get_course_abort_if_not_found(course_id)
 
         query = CourseStudents.query.filter_by(course_id=course_id)
-        student_uids = [API_URL+"/users/"+s.uid
-                        for s in execute_query_abort_if_db_error(query, query_all=True)]
-
-        return jsonify(student_uids)
+        student_uids = [
+            API_URL + "/users/" + s.uid
+            for s in execute_query_abort_if_db_error(query, query_all=True)
+        ]
+        response = json_message("Succesfully retrieved all students of course " + str(course_id))
+        response["data"] = student_uids
+        response["url"] = API_URL + "/courses/" + str(course_id) + "/students"
+        return response
 
     def post(self, course_id):
         """
@@ -452,10 +488,11 @@ class CoursesToAddStudents(Resource):
                     "Student with uid " + uid + " is already assigned to the course"
                 )
                 return json_message(message), 400
-            add_or_delete_abort_if_error(CourseStudents(uid=uid, course_id=course_id))
+            add_abort_if_error(CourseStudents(uid=uid, course_id=course_id))
         commit_abort_if_error()
-
-        return json_message("Users were succesfully added to the course"), 201
+        response = json_message("Users were succesfully added to the course")
+        response["url"] = API_URL + "/courses/" + str(course_id) + "/students"
+        return response, 201
 
     def delete(self, course_id):
         """
@@ -474,11 +511,12 @@ class CoursesToAddStudents(Resource):
             query = CourseStudents.query.filter_by(uid=uid, course_id=course_id)
             student_relation = execute_query_abort_if_db_error(query)
             if student_relation:
-                add_or_delete_abort_if_error(student_relation, delete=True)
+                delete_abort_if_error(student_relation)
         commit_abort_if_error()
 
-        response = {"message": "Users were succesfully removed from the course"}
-        return jsonify(response)
+        response = json_message("Users were succesfully removed from the course")
+        response["url"] = API_URL + "/courses/" + str(course_id) + "/students"
+        return response
 
 
 courses_api.add_resource(CoursesForUser, "/courses")

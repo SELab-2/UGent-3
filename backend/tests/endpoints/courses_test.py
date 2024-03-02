@@ -125,8 +125,8 @@ class TestCoursesEndpoint:
         for x in range(3, 10):
             response = client.get(f"/courses?name=Sel{str(x)}")
             assert response.status_code == 200
-            link = response.json[0]
-            assert len(link) > len(f"{api_url}/courses/")
+            link = response.json["url"]
+            assert len(link) == len(f"{api_url}/courses")
             response = client.get(link + "?uid=Bart")
             assert response.status_code == 200
 
@@ -138,7 +138,7 @@ class TestCoursesEndpoint:
         response = client.get(sel2_students_link + "/students?uid=Bart")
         assert response.status_code == 200
         response_json = response.json  # the students ids are in the json without a key
-        assert response_json == sel2_students
+        assert response_json["data"] == sel2_students
 
     def test_course_delete(self, courses_get_db, client):
         """
