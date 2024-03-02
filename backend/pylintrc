@@ -1,5 +1,6 @@
 [MASTER]
 init-hook='import sys; sys.path.append(".")'
+ignore=tests/utils/submission_evaluators/resources/*
 
 [test-files:*_test.py]
 disable=
@@ -8,6 +9,3 @@ disable=
 [modules:project/modules/*]
 disable=
     R0903 # Too few public methods (modules don't require us to have public methods)
-
-[evaluator_resources:tests/utils/submission_evaluators/resources/*]
-disable=all
