@@ -2,12 +2,9 @@
 Configuration for the models tests. Contains all the fixtures needed for multiple models tests.
 """
 
-import os
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.engine.url import URL
-from dotenv import load_dotenv
 import pytest
 from project import db
 from project.models.courses import Courses

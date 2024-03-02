@@ -1,6 +1,6 @@
 """Courses api point"""
-from dotenv import load_dotenv
 from os import getenv
+from dotenv import load_dotenv
 from flask import Blueprint, jsonify, request
 from flask import abort
 from flask_restful import Api, Resource
@@ -20,7 +20,8 @@ API_URL = getenv('API_HOST')
 def execute_query_abort_if_db_error(query, all=False):
     """
     Execute a SQLAlchemy query and handle any SQLAlchemyError that might occur.
-    If all == True, the query will be executed with the all() method, otherwise with the first() method.
+    If all == True, the query will be executed with the all() method,
+    otherwise with the first() method.
     Args:
         query (Query): The SQLAlchemy query to execute.
 
@@ -297,11 +298,13 @@ class CoursesByCourseId(Resource):
         ]
         query = CourseAdmins.query.filter_by(course_id=course_id)
         admin_uids = [
-            API_URL+"/users/"+admin.uid for admin in execute_query_abort_if_db_error(query, all=True)
+            API_URL+"/users/"+admin.uid 
+            for admin in execute_query_abort_if_db_error(query, all=True)
         ]
         query = CourseStudents.query.filter_by(course_id=course_id)
         student_uids = [
-            API_URL+"/users/"+student.uid for student in execute_query_abort_if_db_error(query, all=True)
+            API_URL+"/users/"+student.uid 
+            for student in execute_query_abort_if_db_error(query, all=True)
         ]
 
         data = {
@@ -350,7 +353,8 @@ class CoursesForAdmins(Resource):
         get_course_abort_if_not_found(course_id)
 
         query = CourseAdmins.query.filter_by(course_id=course_id)
-        admin_uids = [API_URL+"/users/"+a.uid for a in execute_query_abort_if_db_error(query, all=True)]
+        admin_uids = [API_URL+"/users/"+a.uid
+                      for a in execute_query_abort_if_db_error(query, all=True)]
         return jsonify(admin_uids)
 
     def post(self, course_id):
@@ -422,7 +426,8 @@ class CoursesToAddStudents(Resource):
         get_course_abort_if_not_found(course_id)
 
         query = CourseStudents.query.filter_by(course_id=course_id)
-        student_uids = [API_URL+"/users/"+s.uid for s in execute_query_abort_if_db_error(query, all=True)]
+        student_uids = [API_URL+"/users/"+s.uid
+                        for s in execute_query_abort_if_db_error(query, all=True)]
 
         return jsonify(student_uids)
 
