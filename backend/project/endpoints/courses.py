@@ -282,6 +282,13 @@ class CoursesForUser(Resource):
             + " was succesfully created"
         )
         response = json_message(message)
+        data = {
+            "course_id": API_URL + "/courses/" + str(new_course.course_id),
+            "name": new_course.name,
+            "teacher": API_URL + "/users/" + new_course.teacher,
+            "ufora_id": new_course.ufora_id if new_course.ufora_id else "None"
+        }
+        response["data"] = data
         response["url"] = API_URL + "/courses/" + str(new_course.course_id)
         return response, 201
 
@@ -363,6 +370,40 @@ class CoursesByCourseId(Resource):
         }
         return response
 
+    def patch(self,course_id):
+        """
+        This function will update the course with course_id
+        """
+        uid = request.args.get("uid")
+        abort_if_uid_is_none(uid)
+
+        admin = get_admin_relation(uid, course_id)
+
+        if not admin:
+            message = "You are not an admin of this course and so you cannot update it"
+            return json_message(message), 403
+
+        data = request.get_json()
+        course = get_course_abort_if_not_found(course_id)
+
+        if "name" in data:
+            course.name = data["name"]
+        if "teacher" in data:
+            course.teacher = data["teacher"]
+        if "ufora_id" in data:
+            course.ufora_id = data["ufora_id"]
+
+        commit_abort_if_error()
+        response = json_message("Succesfully updated course with course_id: " + str(course_id))
+        response["url"] = API_URL + "/courses/" + str(course_id)
+        data = {
+            "course_id": API_URL + "/courses/" + str(course.course_id),
+            "name": course.name,
+            "teacher": API_URL + "/users/" + course.teacher,
+            "ufora_id": course.ufora_id if course.ufora_id else "None"
+        }
+        response["data"] = data
+        return response, 200
 
 class CoursesForAdmins(Resource):
     """
@@ -410,6 +451,11 @@ class CoursesForAdmins(Resource):
             "Admin " + assistant + " added to course " + str(course_id)
         )
         response["url"] = API_URL + "/courses/" + str(course_id) + "/admins"
+        data = {
+            "course_id": API_URL + "/courses/" + str(course_id),
+            "uid": API_URL + "/users/" + assistant
+        }
+        response["data"] = data
         return response, 201
 
     def delete(self, course_id):
@@ -492,6 +538,10 @@ class CoursesToAddStudents(Resource):
         commit_abort_if_error()
         response = json_message("Users were succesfully added to the course")
         response["url"] = API_URL + "/courses/" + str(course_id) + "/students"
+        data = {
+            "students":[API_URL + "/users/" + uid for uid in student_uids]
+        }
+        response["data"] = data
         return response, 201
 
     def delete(self, course_id):

@@ -214,3 +214,15 @@ class TestCoursesEndpoint:
 
         course = courses_get_db.query(Courses).filter_by(name="Sel2").first()
         assert course is None
+
+    def test_course_patch(self,db_with_course,client):
+        """
+        Test the patching of a course
+        """
+        body = {
+            "name": "AD2"
+        }
+        course = db_with_course.query(Courses).filter_by(name="Sel2").first()
+        response = client.patch(f"/courses/{course.course_id}?uid=Bart",json=body)
+        assert response.status_code == 200
+        assert course.name == "AD2"
