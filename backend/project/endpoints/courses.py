@@ -244,12 +244,12 @@ class CoursesForUser(Resource):
         parameters can be either one of the following: teacher,ufora_id,name.
         """
         query = Courses.query
-        if "teacher" in request.Args:
-            query = query.filter_by(course_id=request.Args.get("teacher"))
-        if "ufora_id" in request.Args:
-            query = query.filter_by(ufora_id=request.Args.get("ufora_id"))
-        if "name" in request.Args:
-            query = query.filter_by(name=request.Args.get("name"))
+        if "teacher" in request.args:
+            query = query.filter_by(course_id=request.args.get("teacher"))
+        if "ufora_id" in request.args:
+            query = query.filter_by(ufora_id=request.args.get("ufora_id"))
+        if "name" in request.args:
+            query = query.filter_by(name=request.args.get("name"))
         results = execute_query_abort_if_db_error(
             query, url=API_URL + "/courses", query_all=True
         )
@@ -268,7 +268,7 @@ class CoursesForUser(Resource):
         if the body of the post contains a name and uid is an admin or teacher
         """
         abort_url = API_URL + "/courses"
-        uid = request.Args.get("uid")
+        uid = request.args.get("uid")
         abort_if_uid_is_none(uid, abort_url)
 
         user = abort_if_no_user_found_for_uid(uid, abort_url)
@@ -327,7 +327,7 @@ class CoursesByCourseId(Resource):
         }
         """
         abort_url = API_URL + "/courses"
-        uid = request.Args.get("uid")
+        uid = request.args.get("uid")
         abort_if_uid_is_none(uid, abort_url)
         admin = get_admin_relation(uid, course_id)
         query = CourseStudents.query.filter_by(uid=uid, course_id=course_id)
@@ -381,7 +381,7 @@ class CoursesByCourseId(Resource):
         This function will delete the course with course_id
         """
         abort_url = API_URL + "/courses/"
-        uid = request.Args.get("uid")
+        uid = request.args.get("uid")
         abort_if_uid_is_none(uid, abort_url)
 
         admin = get_admin_relation(uid, course_id)
@@ -407,7 +407,7 @@ class CoursesByCourseId(Resource):
         This function will update the course with course_id
         """
         abort_url = API_URL + "/courses/"
-        uid = request.Args.get("uid")
+        uid = request.args.get("uid")
         abort_if_uid_is_none(uid, abort_url)
 
         admin = get_admin_relation(uid, course_id)
@@ -471,7 +471,7 @@ class CoursesForAdmins(Resource):
         Api endpoint for adding new admins to a course, can only be done by the teacher
         """
         abort_url = API_URL + "/courses/" + str(course_id) + "/admins"
-        teacher = request.Args.get("uid")
+        teacher = request.args.get("uid")
         data = request.get_json()
         assistant = data.get("admin_uid")
         abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant)
@@ -503,7 +503,7 @@ class CoursesForAdmins(Resource):
         Api endpoint for removing admins of a course, can only be done by the teacher
         """
         abort_url = API_URL + "/courses/" + str(course_id) + "/admins"
-        teacher = request.Args.get("uid")
+        teacher = request.args.get("uid")
         data = request.get_json()
         assistant = data.get("admin_uid")
         abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant)
@@ -560,7 +560,7 @@ class CoursesToAddStudents(Resource):
         /courses/course_id/students with a list of uid in the request body under key "students"
         """
         abort_url = API_URL + "/courses/" + str(course_id) + "/students"
-        uid = request.Args.get("uid")
+        uid = request.args.get("uid")
         data = request.get_json()
         student_uids = data.get("students")
         abort_if_none_uid_student_uids_or_non_existant_course_id(
@@ -591,7 +591,7 @@ class CoursesToAddStudents(Resource):
         a field "students" = [list of uids to unassign]
         """
         abort_url = API_URL + "/courses/" + str(course_id) + "/students"
-        uid = request.Args.get("uid")
+        uid = request.args.get("uid")
         data = request.get_json()
         student_uids = data.get("students")
         abort_if_none_uid_student_uids_or_non_existant_course_id(
