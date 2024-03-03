@@ -26,7 +26,11 @@ class Submissions(Resource):
             dict[str, any]: The list of submission URLs
         """
 
-        data = {}
+        data = {
+            "url": f"{API_HOST}/submissions",
+            "message": "Successfully fetched the submissions",
+            "data": {}
+        }
         try:
             with db.session() as session:
                 query = session.query(m_submissions)
@@ -49,8 +53,7 @@ class Submissions(Resource):
                     query = query.filter_by(project_id=int(project_id))
 
                 # Get the submissions
-                data["message"] = "Successfully fetched the submissions"
-                data["submissions"] = [
+                data["data"]["submissions"] = [
                     f"{API_HOST}/submissions/{s.submission_id}" for s in query.all()
                 ]
                 return data, 200
@@ -66,7 +69,11 @@ class Submissions(Resource):
             dict[str, any]: The URL to the submission
         """
 
-        data = {}
+        data = {
+            "url": f"{API_HOST}/submissions",
+            "message": "Successfully fetched the submissions",
+            "data": {}
+        }
         try:
             with db.session() as session:
                 submission = m_submissions()
@@ -112,8 +119,7 @@ class Submissions(Resource):
                 session.add(submission)
                 session.commit()
 
-                data["message"] = "Successfully fetched the submissions"
-                data["submission"] = f"{API_HOST}/submissions/{submission.submission_id}"
+                data["data"]["submission"] = f"{API_HOST}/submissions/{submission.submission_id}"
                 return data, 201
 
         except exc.SQLAlchemyError:
@@ -134,7 +140,11 @@ class Submission(Resource):
             dict[str, any]: The submission
         """
 
-        data = {}
+        data = {
+            "url": f"{API_HOST}/submissions/{submission_id}",
+            "message": "Successfully fetched the submission",
+            "data": {}
+        }
         try:
             with db.session() as session:
                 submission = session.get(m_submissions, submission_id)
@@ -142,15 +152,14 @@ class Submission(Resource):
                     data["message"] = f"Submission (submission_id={submission_id}) not found"
                     return data, 404
 
-                data["message"] = "Successfully fetched the submission"
-                data["submission"] = {
-                    "submission_id": submission.submission_id,
-                    "uid": submission.uid,
-                    "project_id": submission.project_id,
+                data["data"]["submission"] = {
+                    "id": submission.submission_id,
+                    "user": f"{API_HOST}/users/{submission.uid}",
+                    "project": f"{API_HOST}/projects/{submission.project_id}",
                     "grading": submission.grading,
-                    "submission_time": submission.submission_time,
-                    "submission_path": submission.submission_path,
-                    "submission_status": submission.submission_status
+                    "time": submission.submission_time,
+                    "path": submission.submission_path,
+                    "status": submission.submission_status
                 }
                 return data, 200
 
@@ -169,7 +178,11 @@ class Submission(Resource):
             dict[str, any]: A message
         """
 
-        data = {}
+        data = {
+            "url": f"{API_HOST}/submissions/{submission_id}",
+            "message": f"Submission (submission_id={submission_id}) patched",
+            "data": {}
+        }
         try:
             with db.session() as session:
                 # Get the submission
@@ -189,7 +202,6 @@ class Submission(Resource):
                 # Save the submission
                 session.commit()
 
-                data["message"] = f"Submission (submission_id={submission_id}) patched"
                 return data, 200
 
         except exc.SQLAlchemyError:
@@ -208,7 +220,11 @@ class Submission(Resource):
             dict[str, any]: A message
         """
 
-        data = {}
+        data = {
+            "url": f"{API_HOST}/submissions/{submission_id}",
+            "message": f"Submission (submission_id={submission_id}) deleted",
+            "data": {}
+        }
         try:
             with db.session() as session:
                 submission = session.get(m_submissions, submission_id)
@@ -220,7 +236,6 @@ class Submission(Resource):
                 session.delete(submission)
                 session.commit()
 
-                data["message"] = f"Submission (submission_id={submission_id}) deleted"
                 return data, 200
 
         except exc.SQLAlchemyError:

@@ -42,7 +42,7 @@
     ]
   },
   "paths": {
-    "/submissions/{uid}/{pid}": {
+    "/submissions": {
       "get": {
         "summary": "Get the submissions",
         "parameters": [
@@ -59,7 +59,7 @@
             "in": "query",
             "description": "Project ID",
             "schema": {
-              "type": "int"
+              "type": "integer"
             }
           }
         ],
@@ -71,13 +71,21 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     },
-                    "submissions": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "submissions": "array",
+                        "items": {
+                          "type": "string",
+                          "format": "uri"
+                        }
                       }
                     }
                   }
@@ -92,8 +100,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
                     }
                   }
                 }
@@ -107,8 +123,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
                     }
                   }
                 }
@@ -131,11 +155,11 @@
                     "required": true
                   },
                   "project_id": {
-                    "type": "int",
+                    "type": "integer",
                     "required": true
                   },
                   "grading": {
-                    "type": "int",
+                    "type": "integer",
                     "minimum": 0,
                     "maximum": 20
                   }
@@ -152,11 +176,21 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     },
-                    "submission": {
-                      "type": "string"
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "submission": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      }
                     }
                   }
                 }
@@ -170,8 +204,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
                     }
                   }
                 }
@@ -185,8 +227,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
                     }
                   }
                 }
@@ -207,30 +257,46 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     },
-                    "submission": {
-                      "submission_id": {
-                        "type": "int"
-                      },
-                      "uid": {
-                        "type": "string"
-                      },
-                      "project_id": {
-                        "type": "int"
-                      },
-                      "grading": {
-                        "type": "int"
-                      },
-                      "submission_time": {
-                        "type": "string"
-                      },
-                      "submission_path": {
-                        "type": "string"
-                      },
-                      "submission_status": {
-                        "type": "int"
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "submission": {
+                          "type": "object",
+                          "properties": {
+                            "submission_id": {
+                              "type": "integer"
+                            },
+                            "user": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "project": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "grading": {
+                              "type": "integer",
+                              "nullable": true
+                            },
+                            "time": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "path": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "type": "boolean"
+                            }
+                          }
+                        }
                       }
                     }
                   }
@@ -245,8 +311,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
                     }
                   }
                 }
@@ -260,8 +334,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
                     }
                   }
                 }
@@ -280,7 +362,7 @@
                 "type": "object",
                 "properties": {
                   "grading": {
-                    "type": "int",
+                    "type": "integer",
                     "minimum": 0,
                     "maximum": 20
                   }
@@ -297,8 +379,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
                     }
                   }
                 }
@@ -312,8 +402,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
                     }
                   }
                 }
@@ -327,8 +425,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
                     }
                   }
                 }
@@ -342,8 +448,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
                     }
                   }
                 }
@@ -362,8 +476,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
                     }
                   }
                 }
@@ -377,8 +499,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
                     }
                   }
                 }
@@ -392,8 +522,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
                     }
                   }
                 }
@@ -409,7 +547,7 @@
           "description": "Submission ID",
           "required": true,
           "schema": {
-            "type": "int"
+            "type": "integer"
           }
         }
       ]
