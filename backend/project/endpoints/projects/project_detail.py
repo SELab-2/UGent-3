@@ -71,9 +71,10 @@ class ProjectDetail(Resource):
                 setattr(project, key, value)
             db.session.commit()
             # get the updated version
-            return {"message": f"Succesfully changed project with id: "
-                               f"{API_URL}/projects/{id}"
-                    }, 200
+            return {"message": f"Succesfully changed project with id: {id}",
+                    "url": f"{API_URL}/projects/{id}",
+                    "project"D: project
+                  }, 200
         except exc.SQLAlchemyError:
             db.session.rollback()
             return ({"message":
