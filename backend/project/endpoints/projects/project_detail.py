@@ -73,12 +73,14 @@ class ProjectDetail(Resource):
             # get the updated version
             return {"message": f"Succesfully changed project with id: {id}",
                     "url": f"{API_URL}/projects/{id}",
-                    "project": project
+                    "data": project
                   }, 200
         except exc.SQLAlchemyError:
             db.session.rollback()
             return ({"message":
-                        f"Something unexpected happenend when trying to edit project {id}"},
+                        f"Something unexpected happenend when trying to edit project {id}",
+                    "url": f"{API_URL}/projects/{id}",
+                     "data": project},
                     500)
 
     def delete(self, project_id):
