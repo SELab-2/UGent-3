@@ -65,8 +65,8 @@ class ProjectDetail(Resource):
         # get the project that need to be edited
         project = Projects.query.filter_by(project_id=project_id).first()
 
-        # check which values are not None is the dict
-        # if it is not None is needs to be modified in the database
+        # check which values are not None in the dict
+        # if it is not None it needs to be modified in the database
 
         # commit the changes and return the 200 OK code if it succeeds, else 500
         try:
@@ -89,7 +89,7 @@ class ProjectDetail(Resource):
 
     def delete(self, project_id):
         """
-        Detele a project and all of its submissions in cascade
+        Delete a project and all of its submissions in cascade
         done by project id
         """
 
