@@ -101,10 +101,11 @@ class ProjectDetail(Resource):
             db.session.commit()
 
             # return 200 if content is deleted succesfully
-            return ({"message": f"Project with id: "
-                               f"{API_URL}/projects/{id} deleted successfully!"},
+            return ({"message": f"Project with id: {id} deleted successfully",
+                    "url": f"{API_URL}/projects/{id} deleted successfully!",},
                     200)
         except exc.SQLAlchemyError:
             return ({"message":
-                        f"Something unexpected happened when removing project {project_id}"},
+                        f"Something unexpected happened when removing project {project_id}",
+                     "url": f"{API_URL}/projects/{id}"},
                     500)
