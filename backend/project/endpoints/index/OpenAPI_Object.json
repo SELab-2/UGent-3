@@ -41,5 +41,176 @@
       }
     ]
   },
-  "paths": []
+  "paths": [
+    {"/courses": {
+      "get": {
+        "description": "Get a list of all courses.",
+        "responses": {
+          "200": {
+            "description": "A list of all courses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              }
+            }},
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }  
+            },
+          "parameters": [
+            {
+              "name": "name",
+              "in": "query",
+              "description": "Name of the course",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "ufora_id",
+              "in": "query",
+              "description": "Ufora ID of the course",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "teacher",
+              "in": "query",
+              "description": "Teacher of the course",
+              "schema": {
+                "type": "string"
+              }
+            }  
+          ]
+        },
+      "post": {
+        "description": "Create a new course.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the course"
+                  },
+                  "teacher": {
+                    "type": "string",
+                    "description": "Teacher of the course"
+                  }
+                },
+                "required": ["name", "teacher"]
+              }
+            }
+          }
+        },
+        "parameters":[
+          {
+            "name":"uid",
+            "in":"query",
+            "description":"uid of the user sending the request",
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "400": {
+            "description": "There was no uid in the request query.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Course created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Course"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The user trying to create a course was unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The user trying to create a course was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+          
+      }
+    }
+
+
+  ]
 }
