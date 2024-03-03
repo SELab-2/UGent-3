@@ -1,6 +1,8 @@
 """
 Module that implements the /projects endpoint of the API
 """
+from os import getenv
+from dotenv import load_dotenv
 
 from flask import jsonify
 from flask_restful import Resource
@@ -10,6 +12,9 @@ from sqlalchemy import exc
 from project import db
 from project.models.projects import Projects
 from project.endpoints.projects.endpoint_parser import parse_project_params
+
+load_dotenv()
+API_URL = getenv('API_HOST')
 
 class ProjectsEndpoint(Resource):
     """
@@ -37,11 +42,16 @@ class ProjectsEndpoint(Resource):
             } for row in projects]
 
             # return all valid entries for a project and return a 200 OK code
-            return jsonify(results), 200
+            return {
+                "data": results,
+                "url": f"{API_URL}/projects",
+                "message": "Projects fetched successfully"
+            }, 200
         except exc.SQLAlchemyError:
-            return ({"message":
-                         "Something unexpected happenend when trying to get the projects"},
-                    500)
+            return {
+                "message": "Something unexpected happenend when trying to get the projects",
+                "url": f"{API_URL}/projects"
+            }, 500
 
     def post(self):
         """
@@ -72,10 +82,13 @@ class ProjectsEndpoint(Resource):
             new_project_json = jsonify(new_project).json
 
             return {
-                "project": new_project_json,
-                "message": "Project posted successfully"
+                "url": f"{API_URL}/projects/{new_project_json['project_id']}",
+                "message": "Project posted successfully",
+                "data": new_project_json
             }, 201
         except exc.SQLAlchemyError:
-            return ({"message":
-                         "Something unexpected happenend when trying to add a new project"},
-                    500)
+            return ({
+                "url": f"{API_URL}/projects",
+                "message": "Something unexpected happenend when trying to add a new project",
+                "data": jsonify(new_project).json
+            }, 500)

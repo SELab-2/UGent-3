@@ -42,15 +42,19 @@ class ProjectDetail(Resource):
         try:
             # fetch the project with the id that is specified in the url
             project = Projects.query.filter_by(project_id=project_id).first()
-
             self.abort_if_not_present(project)
 
             # return the fetched project and return 200 OK status
-            return jsonify(project), 200
+            return {
+                "data": jsonify(project).json,
+                "url": f"{API_URL}/projects/{project_id}",
+                "message": "Got project successfully"
+            }, 200
         except exc.SQLAlchemyError:
-            return ({"message":
-                         "Internal server error"},
-                    500)
+            return {
+                "message": "Internal server error",
+                "url": f"{API_URL}/projects/{project_id}"
+            }, 500
 
     def patch(self, project_id):
         """
@@ -71,17 +75,17 @@ class ProjectDetail(Resource):
                 setattr(project, key, value)
             db.session.commit()
             # get the updated version
-            return {"message": f"Succesfully changed project with id: {id}",
-                    "url": f"{API_URL}/projects/{id}",
-                    "data": project
-                  }, 200
+            return {
+                "message": f"Succesfully changed project with id: {id}",
+                "url": f"{API_URL}/projects/{id}",
+                "data": project
+            }, 200
         except exc.SQLAlchemyError:
             db.session.rollback()
-            return ({"message":
-                        f"Something unexpected happenend when trying to edit project {id}",
-                    "url": f"{API_URL}/projects/{id}",
-                     "data": project},
-                    500)
+            return {
+                "message": f"Something unexpected happenend when trying to edit project {id}",
+                "url": f"{API_URL}/projects/{id}"
+            }, 500
 
     def delete(self, project_id):
         """
@@ -101,11 +105,13 @@ class ProjectDetail(Resource):
             db.session.commit()
 
             # return 200 if content is deleted succesfully
-            return ({"message": f"Project with id: {id} deleted successfully",
-                    "url": f"{API_URL}/projects/{id} deleted successfully!",},
-                    200)
+            return {
+                "message": f"Project with id: {id} deleted successfully",
+                "url": f"{API_URL}/projects/{id} deleted successfully!",
+                "data": deleted_project
+            }, 200
         except exc.SQLAlchemyError:
-            return ({"message":
-                        f"Something unexpected happened when removing project {project_id}",
-                     "url": f"{API_URL}/projects/{id}"},
-                    500)
+            return {
+                "message": f"Something unexpected happened when removing project {project_id}",
+                "url": f"{API_URL}/projects/{id}"
+            }, 500
