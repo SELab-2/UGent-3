@@ -13,9 +13,9 @@ class Projects(db.Model): # pylint: disable=too-many-instance-attributes
     the course id of the course to which the project belongs,
     visible for students variable so a teacher can decide if the students can see it yet,
     archieved var so we can implement the archiving functionality,
-    a test path,script name and regex experssions for automated testing
+    a test path,script name and regex expressions for automated testing
 
-    Pylint disalbe too many intance attributes because we can't reduce the amount
+    Pylint disable too many instance attributes because we can't reduce the amount
      of fields of the model
     """
 
