@@ -29,7 +29,7 @@ def test_post_project(db_session, client, course, course_teacher, project_json):
     assert response.status_code == 201
 
     # check if the project with the id is present
-    project_id = response.json["project_id"]
+    project_id = response.json["project"]["project_id"]
     response = client.get(f"/projects/{project_id}")
     assert response.status_code == 200
 
@@ -49,7 +49,7 @@ def test_remove_project(db_session, client, course, course_teacher, project_json
     response = client.post("/projects", json=project_json)
 
     # check if the project with the id is present
-    project_id = response.json["project_id"]
+    project_id = response.json["project"]["project_id"]
 
     response = client.delete(f"/projects/{project_id}")
     assert response.status_code == 200
