@@ -1074,7 +1074,7 @@
         ],
         "responses":{
           "204": {
-            "description": "Users were successfully removed from the course.",
+            "description": "User was successfully removed from the course admins.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1082,7 +1082,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Users were successfully removed from the course"
+                      "example": "User was successfully removed from the course admins."
                     },
                     "url": {
                       "type": "string",

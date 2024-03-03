@@ -16,8 +16,8 @@ class TestCoursesEndpoint:
         response = client.post("/courses?uid=Bart", json=course_data)  # valid user
 
         for x in range(3, 10):
-            coursee = {"name": "Sel" + str(x), "teacher": "Bart"}
-            response = client.post("/courses?uid=Bart", json=coursee)  # valid user
+            course = {"name": "Sel" + str(x), "teacher": "Bart"}
+            response = client.post("/courses?uid=Bart", json=course)  # valid user
             assert response.status_code == 201
         assert response.status_code == 201  # succes post = 201
 
@@ -27,12 +27,12 @@ class TestCoursesEndpoint:
 
         response = client.post(
             "/courses?uid=Jef", json=course_data
-        )  # non existant user
+        )  # non existent user
         assert response.status_code == 404
 
         response = client.post(
             "/courses?uid=student_sel2_0", json=course_data
-        )  # existant user but no rights
+        )  # existent user but no rights
         assert response.status_code == 403
 
         response = client.post("/courses", json=course_data)  # bad link, no uid passed
@@ -101,7 +101,7 @@ class TestCoursesEndpoint:
 
         response = client.post(
             sel2_admins_link + "?uid=Bart",  # authorized user
-            json={"admin_uid": "Rin"},  # non existant user
+            json={"admin_uid": "Rin"},  # non existent user
         )
         assert response.status_code == 404
 
@@ -141,9 +141,8 @@ class TestCoursesEndpoint:
         assert response_json["data"] == sel2_students
 
     def test_course_delete(self, courses_get_db, client):
-        """
-        Test the deleting of all course endpoint related delete functionality
-        """
+        """Test all course endpoint related delete functionality"""
+
         course = courses_get_db.query(Courses).filter_by(name="Sel2").first()
         sel2_students_link = "/courses/" + str(course.course_id)
         response = client.delete(
@@ -215,14 +214,12 @@ class TestCoursesEndpoint:
         course = courses_get_db.query(Courses).filter_by(name="Sel2").first()
         assert course is None
 
-    def test_course_patch(self,db_with_course,client):
+    def test_course_patch(self, db_with_course, client):
         """
         Test the patching of a course
         """
-        body = {
-            "name": "AD2"
-        }
+        body = {"name": "AD2"}
         course = db_with_course.query(Courses).filter_by(name="Sel2").first()
-        response = client.patch(f"/courses/{course.course_id}?uid=Bart",json=body)
+        response = client.patch(f"/courses/{course.course_id}?uid=Bart", json=body)
         assert response.status_code == 200
         assert course.name == "AD2"

@@ -45,7 +45,7 @@ def db_session(app):
 
 @pytest.fixture
 def courses_get_db(db_with_course):
-    """Database equiped for the get tests"""
+    """Database equipped for the get tests"""
     for x in range(3,10):
         course = Courses(teacher="Bart", name="Sel" + str(x))
         db_with_course.add(course)
@@ -107,14 +107,14 @@ def course_students():
 
 @pytest.fixture
 def course_teacher():
-    """A user that's a teacher for for testing"""
+    """A user that's a teacher for testing"""
     sel2_teacher = Users(uid="Bart", is_teacher=True, is_admin=False)
     return sel2_teacher
 
 
 @pytest.fixture
 def course_assistent():
-    """A user that's a teacher for for testing"""
+    """A user that's a teacher for testing"""
     sel2_assistent = Users(uid="Rien", is_teacher=True, is_admin=False)
     return sel2_assistent
 
