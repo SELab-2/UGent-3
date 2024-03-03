@@ -7,7 +7,7 @@ from project import db
 @dataclasses.dataclass
 class Users(db.Model):
     """This class defines the users table,
-    a user has an uid,
+    a user has a uid,
     is_teacher and is_admin booleans because a user 
     can be either a student,admin or teacher"""
 
