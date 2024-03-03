@@ -226,3 +226,4 @@ class TestCoursesEndpoint:
         response = client.patch(f"/courses/{course.course_id}?uid=Bart",json=body)
         assert response.status_code == 200
         assert course.name == "AD2"
+        
