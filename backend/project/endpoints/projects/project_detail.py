@@ -73,7 +73,7 @@ class ProjectDetail(Resource):
             # get the updated version
             return {"message": f"Succesfully changed project with id: {id}",
                     "url": f"{API_URL}/projects/{id}",
-                    "project"D: project
+                    "project": project
                   }, 200
         except exc.SQLAlchemyError:
             db.session.rollback()
