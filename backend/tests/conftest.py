@@ -1,3 +1,4 @@
+"""This file contains fixtures that are needed for most of the tests."""
 import pytest
 from project.db_in import url
 from project import db

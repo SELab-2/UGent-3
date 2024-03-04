@@ -16,7 +16,7 @@ def client(app):
     """Returns client for testing requests to the app."""
     with app.test_client() as client:
         with app.app_context():
-            yield client 
+            yield client
 
 @pytest.fixture
 def courses_get_db(db_with_course):
