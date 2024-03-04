@@ -1,5 +1,4 @@
 """Model for projects"""
-
 from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from project import db
 

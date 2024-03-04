@@ -1,5 +1,4 @@
 """Models for relation between users and courses"""
-
 from sqlalchemy import Integer, Column, ForeignKey, PrimaryKeyConstraint, String
 from project import db
 

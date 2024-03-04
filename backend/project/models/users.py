@@ -1,5 +1,4 @@
 """Model for users"""
-
 from sqlalchemy import Boolean, Column, String
 from project import db
 
