@@ -1,4 +1,4 @@
-"""Courses api point"""
+"""Course api point"""
 
 from os import getenv
 from dotenv import load_dotenv
@@ -6,10 +6,10 @@ from flask import Blueprint, jsonify, request
 from flask import abort
 from flask_restful import Api, Resource
 from sqlalchemy.exc import SQLAlchemyError
-from project.models.course_relations import CourseAdmins, CourseStudents
-from project.models.users import Users
-from project.models.courses import Courses
-from project.models.projects import Projects
+from project.models.course_relations import CourseAdmin, CourseStudent
+from project.models.users import User
+from project.models.courses import Course
+from project.models.projects import Project
 from project import db
 
 courses_bp = Blueprint("courses", __name__)
@@ -134,7 +134,7 @@ def abort_if_none_uid_student_uids_or_non_existant_course_id(
     url = API_URL + "/courses/" + str(course_id) + "/students"
     get_course_abort_if_not_found(course_id)
     abort_if_no_user_found_for_uid(uid, url)
-    query = CourseAdmins.query.filter_by(uid=uid, course_id=course_id)
+    query = CourseAdmin.query.filter_by(uid=uid, course_id=course_id)
     admin_relation = execute_query_abort_if_db_error(query, url)
     if not admin_relation:
         message = "Not authorized to assign new students to course with id " + str(
@@ -173,7 +173,7 @@ def abort_if_no_user_found_for_uid(uid, url):
     Raises:
         NotFound: If the user with the given uid is not found.
     """
-    query = Users.query.filter_by(uid=uid)
+    query = User.query.filter_by(uid=uid)
     user = execute_query_abort_if_db_error(query, url)
 
     if not user:
@@ -185,17 +185,17 @@ def abort_if_no_user_found_for_uid(uid, url):
 
 def get_admin_relation(uid, course_id):
     """
-    Retrieve the CourseAdmins object for the given uid and course.
+    Retrieve the CourseAdmin object for the given uid and course.
 
     Args:
         uid (int): The user ID.
         course_id (int): The course ID.
 
     Returns:
-        CourseAdmins: The CourseAdmins object if the user is an admin, otherwise None.
+        CourseAdmin: The CourseAdmin object if the user is an admin, otherwise None.
     """
     return execute_query_abort_if_db_error(
-        CourseAdmins.query.filter_by(uid=uid, course_id=course_id),
+        CourseAdmin.query.filter_by(uid=uid, course_id=course_id),
         url=API_URL + "/courses/" + str(course_id) + "/admins",
     )
 
@@ -221,9 +221,9 @@ def get_course_abort_if_not_found(course_id):
         course_id (int): The course ID.
 
     Returns:
-        Courses: The course with the given ID.
+        Course: The course with the given ID.
     """
-    query = Courses.query.filter_by(course_id=course_id)
+    query = Course.query.filter_by(course_id=course_id)
     course = execute_query_abort_if_db_error(query, API_URL + "/courses")
 
     if not course:
@@ -234,7 +234,7 @@ def get_course_abort_if_not_found(course_id):
     return course
 
 
-class CoursesForUser(Resource):
+class CourseForUser(Resource):
     """Api endpoint for the /courses link"""
 
     def get(self):
@@ -243,7 +243,7 @@ class CoursesForUser(Resource):
         to get all courses and filter by given query parameter like /courses?parameter=...
         parameters can be either one of the following: teacher,ufora_id,name.
         """
-        query = Courses.query
+        query = Course.query
         if "teacher" in request.args:
             query = query.filter_by(course_id=request.args.get("teacher"))
         if "ufora_id" in request.args:
@@ -286,14 +286,14 @@ class CoursesForUser(Resource):
             return json_message(message), 400
 
         name = data["name"]
-        new_course = Courses(name=name, teacher=uid)
+        new_course = Course(name=name, teacher=uid)
         if "ufora_id" in data:
             new_course.ufora_id = data["ufora_id"]
 
         add_abort_if_error(new_course, abort_url)
         commit_abort_if_error(abort_url)
 
-        admin_course = CourseAdmins(uid=uid, course_id=new_course.course_id)
+        admin_course = CourseAdmin(uid=uid, course_id=new_course.course_id)
         add_abort_if_error(admin_course, abort_url)
         commit_abort_if_error(abort_url)
 
@@ -311,7 +311,7 @@ class CoursesForUser(Resource):
         return response, 201
 
 
-class CoursesByCourseId(Resource):
+class CourseByCourseId(Resource):
     """Api endpoint for the /courses/course_id link"""
 
     def get(self, course_id):
@@ -330,7 +330,7 @@ class CoursesByCourseId(Resource):
         uid = request.args.get("uid")
         abort_if_uid_is_none(uid, abort_url)
         admin = get_admin_relation(uid, course_id)
-        query = CourseStudents.query.filter_by(uid=uid, course_id=course_id)
+        query = CourseStudent.query.filter_by(uid=uid, course_id=course_id)
         student = execute_query_abort_if_db_error(query, abort_url)
 
         if not (admin or student):
@@ -338,7 +338,7 @@ class CoursesByCourseId(Resource):
             return json_message(message), 404
 
         course = get_course_abort_if_not_found(course_id)
-        query = Projects.query.filter_by(course_id=course_id)
+        query = Project.query.filter_by(course_id=course_id)
         abort_url = API_URL + "/courses/" + str(course_id)
         # course does exist so url should be to the id
         project_uids = [
@@ -347,14 +347,14 @@ class CoursesByCourseId(Resource):
                 query, abort_url, query_all=True
             )
         ]
-        query = CourseAdmins.query.filter_by(course_id=course_id)
+        query = CourseAdmin.query.filter_by(course_id=course_id)
         admin_uids = [
             API_URL + "/users/" + admin.uid
             for admin in execute_query_abort_if_db_error(
                 query, abort_url, query_all=True
             )
         ]
-        query = CourseStudents.query.filter_by(course_id=course_id)
+        query = CourseStudent.query.filter_by(course_id=course_id)
         student_uids = [
             API_URL + "/users/" + student.uid
             for student in execute_query_abort_if_db_error(
@@ -441,7 +441,7 @@ class CoursesByCourseId(Resource):
         return response, 200
 
 
-class CoursesForAdmins(Resource):
+class CourseForAdmins(Resource):
     """
     This class will handle post and delete queries to
     the /courses/course_id/admins url, only the teacher of a course can do this
@@ -454,7 +454,7 @@ class CoursesForAdmins(Resource):
         abort_url = API_URL + "/courses/" + str(course_id) + "/admins"
         get_course_abort_if_not_found(course_id)
 
-        query = CourseAdmins.query.filter_by(course_id=course_id)
+        query = CourseAdmin.query.filter_by(course_id=course_id)
         admin_uids = [
             API_URL + "/users/" + a.uid
             for a in execute_query_abort_if_db_error(query, abort_url, query_all=True)
@@ -476,7 +476,7 @@ class CoursesForAdmins(Resource):
         assistant = data.get("admin_uid")
         abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant)
 
-        query = Users.query.filter_by(uid=assistant)
+        query = User.query.filter_by(uid=assistant)
         new_admin = execute_query_abort_if_db_error(query, abort_url)
         if not new_admin:
             message = (
@@ -484,7 +484,7 @@ class CoursesForAdmins(Resource):
             )
             return json_message(message), 404
 
-        admin_relation = CourseAdmins(uid=assistant, course_id=course_id)
+        admin_relation = CourseAdmin(uid=assistant, course_id=course_id)
         add_abort_if_error(admin_relation, abort_url)
         commit_abort_if_error(abort_url)
         response = json_message(
@@ -508,7 +508,7 @@ class CoursesForAdmins(Resource):
         assistant = data.get("admin_uid")
         abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant)
 
-        query = CourseAdmins.query.filter_by(uid=assistant, course_id=course_id)
+        query = CourseAdmin.query.filter_by(uid=assistant, course_id=course_id)
         admin_relation = execute_query_abort_if_db_error(query, abort_url)
         if not admin_relation:
             message = "Course with given admin not found"
@@ -526,7 +526,7 @@ class CoursesForAdmins(Resource):
         return response, 204
 
 
-class CoursesToAddStudents(Resource):
+class CourseToAddStudents(Resource):
     """
     Class that will respond to the /courses/course_id/students link
     teachers should be able to assign and remove students from courses,
@@ -542,7 +542,7 @@ class CoursesToAddStudents(Resource):
         abort_url = API_URL + "/courses/" + str(course_id) + "/students"
         get_course_abort_if_not_found(course_id)
 
-        query = CourseStudents.query.filter_by(course_id=course_id)
+        query = CourseStudent.query.filter_by(course_id=course_id)
         student_uids = [
             API_URL + "/users/" + s.uid
             for s in execute_query_abort_if_db_error(query, abort_url, query_all=True)
@@ -568,7 +568,7 @@ class CoursesToAddStudents(Resource):
         )
 
         for uid in student_uids:
-            query = CourseStudents.query.filter_by(uid=uid, course_id=course_id)
+            query = CourseStudent.query.filter_by(uid=uid, course_id=course_id)
             student_relation = execute_query_abort_if_db_error(query, abort_url)
             if student_relation:
                 db.session.rollback()
@@ -576,9 +576,9 @@ class CoursesToAddStudents(Resource):
                     "Student with uid " + uid + " is already assigned to the course"
                 )
                 return json_message(message), 400
-            add_abort_if_error(CourseStudents(uid=uid, course_id=course_id), abort_url)
+            add_abort_if_error(CourseStudent(uid=uid, course_id=course_id), abort_url)
         commit_abort_if_error(abort_url)
-        response = json_message("Users were succesfully added to the course")
+        response = json_message("User were succesfully added to the course")
         response["url"] = abort_url
         data = {"students": [API_URL + "/users/" + uid for uid in student_uids]}
         response["data"] = data
@@ -599,21 +599,21 @@ class CoursesToAddStudents(Resource):
         )
 
         for uid in student_uids:
-            query = CourseStudents.query.filter_by(uid=uid, course_id=course_id)
+            query = CourseStudent.query.filter_by(uid=uid, course_id=course_id)
             student_relation = execute_query_abort_if_db_error(query, abort_url)
             if student_relation:
                 delete_abort_if_error(student_relation, abort_url)
         commit_abort_if_error(abort_url)
 
-        response = json_message("Users were succesfully removed from the course")
+        response = json_message("User were succesfully removed from the course")
         response["url"] = API_URL + "/courses/" + str(course_id) + "/students"
         return response
 
 
-courses_api.add_resource(CoursesForUser, "/courses")
+courses_api.add_resource(CourseForUser, "/courses")
 
-courses_api.add_resource(CoursesByCourseId, "/courses/<int:course_id>")
+courses_api.add_resource(CourseByCourseId, "/courses/<int:course_id>")
 
-courses_api.add_resource(CoursesForAdmins, "/courses/<int:course_id>/admins")
+courses_api.add_resource(CourseForAdmins, "/courses/<int:course_id>/admins")
 
-courses_api.add_resource(CoursesToAddStudents, "/courses/<int:course_id>/students")
+courses_api.add_resource(CourseToAddStudents, "/courses/<int:course_id>/students")

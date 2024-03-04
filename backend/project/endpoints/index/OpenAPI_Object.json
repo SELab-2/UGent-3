@@ -665,7 +665,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Users were succesfully added to the course"
+                      "example": "User were succesfully added to the course"
                     },
                     "url": {
                       "type": "string",
@@ -775,7 +775,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Users were succesfully removed from the course"
+                      "example": "User were succesfully removed from the course"
                     },
                     "url": {
                       "type": "string",
@@ -964,7 +964,7 @@
             }
           },
           "201": {
-            "description": "Users were successfully added to the course.",
+            "description": "User were successfully added to the course.",
             "content": {
               "application/json": {
                 "schema": {
@@ -972,7 +972,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Users were successfully added to the course."
+                      "example": "User were successfully added to the course."
                     },
                     "url": {
                       "type": "string",

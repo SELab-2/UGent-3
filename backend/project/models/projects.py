@@ -2,7 +2,7 @@
 from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from project import db
 
-class Projects(db.Model):
+class Project(db.Model):
     """This class describes the projects table,
     a projects has an id, a title, a description, 
     an optional assignment file that can contain more explanation of the projects,

@@ -2,9 +2,9 @@
 
 import os
 import pytest
-from project.models.courses import Courses
-from project.models.users import Users
-from project.models.course_relations import CourseStudents,CourseAdmins
+from project.models.courses import Course
+from project.models.users import User
+from project.models.course_relations import CourseStudent,CourseAdmin
 from project import create_app_with_db, db
 from project.db_in import url
 
@@ -47,15 +47,15 @@ def db_session(app):
 def courses_get_db(db_with_course):
     """Database equipped for the get tests"""
     for x in range(3,10):
-        course = Courses(teacher="Bart", name="Sel" + str(x))
+        course = Course(teacher="Bart", name="Sel" + str(x))
         db_with_course.add(course)
         db_with_course.commit()
-        db_with_course.add(CourseAdmins(course_id=course.course_id,uid="Bart"))
+        db_with_course.add(CourseAdmin(course_id=course.course_id,uid="Bart"))
         db_with_course.commit()
-    course = db_with_course.query(Courses).filter_by(name="Sel2").first()
-    db_with_course.add(CourseAdmins(course_id=course.course_id,uid="Rien"))
+    course = db_with_course.query(Course).filter_by(name="Sel2").first()
+    db_with_course.add(CourseAdmin(course_id=course.course_id,uid="Rien"))
     db_with_course.add_all(
-        [CourseStudents(course_id=course.course_id, uid="student_sel2_" + str(i))
+        [CourseStudent(course_id=course.course_id, uid="student_sel2_" + str(i))
          for i in range(3)])
     db_with_course.commit()
     return db_with_course
@@ -63,10 +63,10 @@ def courses_get_db(db_with_course):
 @pytest.fixture
 def db_with_course(courses_init_db):
     """A database with a course."""
-    courses_init_db.add(Courses(name="Sel2", teacher="Bart"))
+    courses_init_db.add(Course(name="Sel2", teacher="Bart"))
     courses_init_db.commit()
-    course = courses_init_db.query(Courses).filter_by(name="Sel2").first()
-    courses_init_db.add(CourseAdmins(course_id=course.course_id,uid="Bart"))
+    course = courses_init_db.query(Course).filter_by(name="Sel2").first()
+    courses_init_db.add(CourseAdmin(course_id=course.course_id,uid="Bart"))
     courses_init_db.commit()
     return courses_init_db
 
@@ -99,7 +99,7 @@ def courses_init_db(db_session, course_students, course_teacher, course_assisten
 def course_students():
     """A list of 5 students for testing."""
     students = [
-        Users(uid="student_sel2_" + str(i), is_teacher=False, is_admin=False)
+        User(uid="student_sel2_" + str(i), is_teacher=False, is_admin=False)
         for i in range(5)
     ]
     return students
@@ -108,19 +108,19 @@ def course_students():
 @pytest.fixture
 def course_teacher():
     """A user that's a teacher for testing"""
-    sel2_teacher = Users(uid="Bart", is_teacher=True, is_admin=False)
+    sel2_teacher = User(uid="Bart", is_teacher=True, is_admin=False)
     return sel2_teacher
 
 
 @pytest.fixture
 def course_assistent():
     """A user that's a teacher for testing"""
-    sel2_assistent = Users(uid="Rien", is_teacher=True, is_admin=False)
+    sel2_assistent = User(uid="Rien", is_teacher=True, is_admin=False)
     return sel2_assistent
 
 
 @pytest.fixture
 def course(course_teacher):
     """A course for testing, with the course teacher as the teacher."""
-    sel2 = Courses(name="Sel2", teacher=course_teacher.uid)
+    sel2 = Course(name="Sel2", teacher=course_teacher.uid)
     return sel2

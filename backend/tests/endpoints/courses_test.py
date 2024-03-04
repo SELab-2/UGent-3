@@ -1,12 +1,12 @@
 """Here we will test all the courses endpoint related functionality"""
 
-from project.models.course_relations import CourseStudents, CourseAdmins
+from project.models.course_relations import CourseStudent, CourseAdmin
 
 
-from project.models.courses import Courses
+from project.models.courses import Course
 
 
-class TestCoursesEndpoint:
+class TestCourseEndpoint:
     """Class for testing the courses endpoint"""
 
     def test_post_courses(self, courses_init_db, client, course_data, invalid_course):
@@ -21,7 +21,7 @@ class TestCoursesEndpoint:
             assert response.status_code == 201
         assert response.status_code == 201  # succes post = 201
 
-        course = courses_init_db.query(Courses).filter_by(name="Sel2").first()
+        course = courses_init_db.query(Course).filter_by(name="Sel2").first()
         assert course is not None
         assert course.teacher == "Bart"
 
@@ -47,7 +47,7 @@ class TestCoursesEndpoint:
         """
         Test posting to courses/course_id/students and admins
         """
-        course = db_with_course.query(Courses).filter_by(name="Sel2").first()
+        course = db_with_course.query(Course).filter_by(name="Sel2").first()
         # Posting to /courses/course_id/students and admins test
         valid_students = {
             "students": ["student_sel2_0", "student_sel2_1", "student_sel2_2"]
@@ -70,7 +70,7 @@ class TestCoursesEndpoint:
         assert response.status_code == 201  # succes post = 201
         users = [
             s.uid
-            for s in CourseStudents.query.filter_by(course_id=course.course_id).all()
+            for s in CourseStudent.query.filter_by(course_id=course.course_id).all()
         ]
         assert users == valid_students["students"]
 
@@ -95,7 +95,7 @@ class TestCoursesEndpoint:
         assert response.status_code == 403
         course_admins = [
             s.uid
-            for s in CourseAdmins.query.filter_by(course_id=course.course_id).all()
+            for s in CourseAdmin.query.filter_by(course_id=course.course_id).all()
         ]
         assert course_admins == ["Bart"]
 
@@ -111,7 +111,7 @@ class TestCoursesEndpoint:
         )
         admins = [
             s.uid
-            for s in CourseAdmins.query.filter_by(course_id=course.course_id).all()
+            for s in CourseAdmin.query.filter_by(course_id=course.course_id).all()
         ]
         assert admins == ["Bart", "Rien"]
 
@@ -119,7 +119,7 @@ class TestCoursesEndpoint:
         """
         Test all the getters for the courses endpoint
         """
-        course = courses_get_db.query(Courses).filter_by(name="Sel2").first()
+        course = courses_get_db.query(Course).filter_by(name="Sel2").first()
         sel2_students_link = "/courses/" + str(course.course_id)
 
         for x in range(3, 10):
@@ -132,7 +132,7 @@ class TestCoursesEndpoint:
 
         sel2_students = [
             f"{api_url}/users/" + s.uid
-            for s in CourseStudents.query.filter_by(course_id=course.course_id).all()
+            for s in CourseStudent.query.filter_by(course_id=course.course_id).all()
         ]
 
         response = client.get(sel2_students_link + "/students?uid=Bart")
@@ -143,7 +143,7 @@ class TestCoursesEndpoint:
     def test_course_delete(self, courses_get_db, client):
         """Test all course endpoint related delete functionality"""
 
-        course = courses_get_db.query(Courses).filter_by(name="Sel2").first()
+        course = courses_get_db.query(Course).filter_by(name="Sel2").first()
         sel2_students_link = "/courses/" + str(course.course_id)
         response = client.delete(
             sel2_students_link + "/students?uid=student_sel2_0",
@@ -159,7 +159,7 @@ class TestCoursesEndpoint:
 
         students = [
             s.uid
-            for s in CourseStudents.query.filter_by(course_id=course.course_id).all()
+            for s in CourseStudent.query.filter_by(course_id=course.course_id).all()
         ]
         assert students == ["student_sel2_1", "student_sel2_2"]
 
@@ -190,7 +190,7 @@ class TestCoursesEndpoint:
 
         admins = [
             s.uid
-            for s in CourseAdmins.query.filter_by(course_id=course.course_id).all()
+            for s in CourseAdmin.query.filter_by(course_id=course.course_id).all()
         ]
         assert admins == ["Bart", "Rien"]
         response = client.delete(
@@ -200,18 +200,18 @@ class TestCoursesEndpoint:
 
         admins = [
             s.uid
-            for s in CourseAdmins.query.filter_by(course_id=course.course_id).all()
+            for s in CourseAdmin.query.filter_by(course_id=course.course_id).all()
         ]
         assert admins == ["Bart"]
 
-        course = Courses.query.filter_by(name="Sel2").first()
+        course = Course.query.filter_by(name="Sel2").first()
         assert course.teacher == "Bart"
         response = client.delete(
             "/courses/" + str(course.course_id) + "?uid=" + course.teacher
         )
         assert response.status_code == 200
 
-        course = courses_get_db.query(Courses).filter_by(name="Sel2").first()
+        course = courses_get_db.query(Course).filter_by(name="Sel2").first()
         assert course is None
 
     def test_course_patch(self, db_with_course, client):
@@ -219,7 +219,7 @@ class TestCoursesEndpoint:
         Test the patching of a course
         """
         body = {"name": "AD2"}
-        course = db_with_course.query(Courses).filter_by(name="Sel2").first()
+        course = db_with_course.query(Course).filter_by(name="Sel2").first()
         response = client.patch(f"/courses/{course.course_id}?uid=Bart", json=body)
         assert response.status_code == 200
         assert course.name == "AD2"
