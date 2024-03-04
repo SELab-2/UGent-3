@@ -1,6 +1,6 @@
 """
 Module for providing the blueprint to the api
-of both route
+of both routes
 """
 
 from flask import Blueprint
