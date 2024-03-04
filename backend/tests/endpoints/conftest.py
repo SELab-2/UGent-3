@@ -5,43 +5,18 @@ import pytest
 from project.models.courses import Course
 from project.models.users import User
 from project.models.course_relations import CourseStudent,CourseAdmin
-from project import create_app_with_db, db
-from project.db_in import url
-
 
 @pytest.fixture
 def api_url():
     """Get the API URL from the environment."""
     return os.getenv("API_HOST")
 
-
-@pytest.fixture
-def app():
-    """Get the app"""
-    app = create_app_with_db(url)
-    return app
-
-
 @pytest.fixture
 def client(app):
     """Returns client for testing requests to the app."""
     with app.test_client() as client:
         with app.app_context():
-            yield client
-
-
-@pytest.fixture
-def db_session(app):
-    """Create a new database session for a test.
-    After the test, all changes are rolled back and the session is closed."""
-    app = create_app_with_db(url)
-    with app.app_context():
-        for table in reversed(db.metadata.sorted_tables):
-            db.session.execute(table.delete())
-        db.session.commit()
-
-        yield db.session
-        db.session.close()
+            yield client 
 
 @pytest.fixture
 def courses_get_db(db_with_course):
