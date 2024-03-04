@@ -15,7 +15,7 @@ def test_getting_all_projects(client):
 
 
 def test_post_project(db_session, client, course, course_teacher, project_json):
-    """Test posting a project to the datab and testing if it's present"""
+    """Test posting a project to the database and testing if it's present"""
     db_session.add(course_teacher)
     db_session.commit()
 
@@ -36,7 +36,7 @@ def test_post_project(db_session, client, course, course_teacher, project_json):
 
 
 def test_remove_project(db_session, client, course, course_teacher, project_json):
-    """Test removing a project to the datab and fetching it, testing if its not present anymore"""
+    """Test removing a project to the datab and fetching it, testing if it's not present anymore"""
 
     db_session.add(course_teacher)
     db_session.commit()
@@ -60,7 +60,7 @@ def test_remove_project(db_session, client, course, course_teacher, project_json
     assert response.status_code == 404
 
 
-def test_update_project(db_session, client, course, course_teacher, project):
+def test_patch_project(db_session, client, course, course_teacher, project):
     """
     Test functionality of the PUT method for projects
     """

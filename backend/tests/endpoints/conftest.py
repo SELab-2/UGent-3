@@ -11,7 +11,7 @@ from project.sessionmaker import engine, url
 
 @pytest.fixture
 def course_teacher():
-    """A user that's a teacher for for testing"""
+    """A user that's a teacher for testing"""
     ad_teacher = Users(uid="Gunnar", is_teacher=True, is_admin=True)
     return ad_teacher
 
