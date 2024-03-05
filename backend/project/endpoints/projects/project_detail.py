@@ -12,7 +12,7 @@ from sqlalchemy import exc
 from project.endpoints.projects.endpoint_parser import parse_project_params
 
 from project import db
-from project.models.projects import Projects
+from project.models.projects import Project
 
 load_dotenv()
 API_URL = getenv('API_HOST')
@@ -41,7 +41,7 @@ class ProjectDetail(Resource):
 
         try:
             # fetch the project with the id that is specified in the url
-            project = Projects.query.filter_by(project_id=project_id).first()
+            project = Project.query.filter_by(project_id=project_id).first()
             self.abort_if_not_present(project)
 
             # return the fetched project and return 200 OK status
@@ -63,7 +63,7 @@ class ProjectDetail(Resource):
         """
 
         # get the project that need to be edited
-        project = Projects.query.filter_by(project_id=project_id).first()
+        project = Project.query.filter_by(project_id=project_id).first()
 
         # check which values are not None in the dict
         # if it is not None it needs to be modified in the database
@@ -94,7 +94,7 @@ class ProjectDetail(Resource):
         """
 
         # fetch the project that needs to be removed
-        deleted_project = Projects.query.filter_by(project_id=project_id).first()
+        deleted_project = Project.query.filter_by(project_id=project_id).first()
 
         # check if its an existing one
         self.abort_if_not_present(deleted_project)

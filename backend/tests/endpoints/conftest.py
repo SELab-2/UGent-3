@@ -3,13 +3,9 @@ from datetime import datetime
 
 import os
 import pytest
-from project import create_app_with_db, db
-from project.models.users import Users
-from project.models.courses import Courses
-from project.models.projects import Projects
-from project.sessionmaker import engine, url
 from project.models.courses import Course
 from project.models.users import User
+from project.models.projects import Project
 from project.models.course_relations import CourseStudent,CourseAdmin
 from project import create_app_with_db, db
 from project.db_in import url
@@ -18,14 +14,14 @@ from project.db_in import url
 @pytest.fixture
 def course_teacher():
     """A user that's a teacher for testing"""
-    ad_teacher = Users(uid="Gunnar", is_teacher=True, is_admin=True)
+    ad_teacher = User(uid="Gunnar", is_teacher=True, is_admin=True)
     return ad_teacher
 
 
 @pytest.fixture
-def course(course_teacher: Users):
+def course(course_teacher: User):
     """A course for testing, with the course teacher as the teacher."""
-    ad2 = Courses(name="Ad2", teacher=course_teacher.uid)
+    ad2 = Course(name="Ad2", teacher=course_teacher.uid)
     return ad2
 
 
@@ -33,7 +29,7 @@ def course(course_teacher: Users):
 def project(course):
     """A project for testing, with the course as the course it belongs to"""
     date = datetime(2024, 2, 25, 12, 0, 0)
-    project = Projects(
+    project = Project(
         title="Project",
         descriptions="Test project",
         course_id=course.course_id,
@@ -49,7 +45,7 @@ def project(course):
 
 
 @pytest.fixture
-def project_json(project: Projects):
+def project_json(project: Project):
     """A function that return the json data of a project including the PK neede for testing"""
     data = {
         "title": project.title,

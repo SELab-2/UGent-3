@@ -32,10 +32,6 @@ def db_session():
     for table in reversed(db.metadata.sorted_tables):
         session.execute(table.delete())
     session.commit()
-from project.models.courses import Courses
-from project.models.course_relations import CourseAdmins, CourseStudents
-from project.models.projects import Projects
-from project.models.users import Users
 
 
 @pytest.fixture

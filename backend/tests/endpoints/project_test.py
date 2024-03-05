@@ -1,5 +1,5 @@
 """Tests for project endpoints."""
-from project.models.projects import Projects
+from project.models.projects import Project
 
 def test_projects_home(client):
     """Test home project endpoint."""
@@ -85,7 +85,7 @@ def test_patch_project(db_session, client, course, course_teacher, project):
         "title": new_title, "archieved": new_archieved
     })
     db_session.commit()
-    updated_project = db_session.get(Projects, {"project_id": project.project_id})
+    updated_project = db_session.get(Project, {"project_id": project.project_id})
 
     assert response.status_code == 200
     assert updated_project.title == new_title

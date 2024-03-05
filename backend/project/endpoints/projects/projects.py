@@ -10,7 +10,7 @@ from sqlalchemy import exc
 
 
 from project import db
-from project.models.projects import Projects
+from project.models.projects import Project
 from project.endpoints.projects.endpoint_parser import parse_project_params
 
 load_dotenv()
@@ -29,10 +29,10 @@ class ProjectsEndpoint(Resource):
         that are currently in the API
         """
         try:
-            projects = Projects.query.with_entities(
-                Projects.project_id,
-                Projects.title,
-                Projects.descriptions
+            projects = Project.query.with_entities(
+                Project.project_id,
+                Project.title,
+                Project.descriptions
             ).all()
 
             results = [{
@@ -61,7 +61,7 @@ class ProjectsEndpoint(Resource):
         args = parse_project_params()
 
         # create a new project object to add in the API later
-        new_project = Projects(
+        new_project = Project(
             title=args['title'],
             descriptions=args['descriptions'],
             assignment_file=args['assignment_file'],
