@@ -12,16 +12,16 @@ from project.db_in import url
 
 
 @pytest.fixture
-def course_teacher():
+def course_teacher_ad():
     """A user that's a teacher for testing"""
     ad_teacher = User(uid="Gunnar", is_teacher=True, is_admin=True)
     return ad_teacher
 
 
 @pytest.fixture
-def course(course_teacher: User):
+def course_ad(course_teacher_ad: User):
     """A course for testing, with the course teacher as the teacher."""
-    ad2 = Course(name="Ad2", teacher=course_teacher.uid)
+    ad2 = Course(name="Ad2", teacher=course_teacher_ad.uid)
     return ad2
 
 

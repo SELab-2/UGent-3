@@ -14,15 +14,15 @@ def test_getting_all_projects(client):
     assert isinstance(response.json['data'], list)
 
 
-def test_post_project(db_session, client, course, course_teacher, project_json):
+def test_post_project(db_session, client, course_ad, course_teacher_ad, project_json):
     """Test posting a project to the database and testing if it's present"""
-    db_session.add(course_teacher)
+    db_session.add(course_teacher_ad)
     db_session.commit()
 
-    db_session.add(course)
+    db_session.add(course_ad)
     db_session.commit()
 
-    project_json["course_id"] = course.course_id
+    project_json["course_id"] = course_ad.course_id
 
     # post the project
     response = client.post("/projects", json=project_json)
@@ -35,16 +35,16 @@ def test_post_project(db_session, client, course, course_teacher, project_json):
     assert response.status_code == 200
 
 
-def test_remove_project(db_session, client, course, course_teacher, project_json):
+def test_remove_project(db_session, client, course_ad, course_teacher_ad, project_json):
     """Test removing a project to the datab and fetching it, testing if it's not present anymore"""
 
-    db_session.add(course_teacher)
+    db_session.add(course_teacher_ad)
     db_session.commit()
 
-    db_session.add(course)
+    db_session.add(course_ad)
     db_session.commit()
 
-    project_json["course_id"] = course.course_id
+    project_json["course_id"] = course_ad.course_id
 
     # post the project
     response = client.post("/projects", json=project_json)
@@ -60,18 +60,18 @@ def test_remove_project(db_session, client, course, course_teacher, project_json
     assert response.status_code == 404
 
 
-def test_patch_project(db_session, client, course, course_teacher, project):
+def test_patch_project(db_session, client, course_ad, course_teacher_ad, project):
     """
     Test functionality of the PUT method for projects
     """
 
-    db_session.add(course_teacher)
+    db_session.add(course_teacher_ad)
     db_session.commit()
 
-    db_session.add(course)
+    db_session.add(course_ad)
     db_session.commit()
 
-    project.course_id = course.course_id
+    project.course_id = course_ad.course_id
 
     # post the project to edit
     db_session.add(project)
