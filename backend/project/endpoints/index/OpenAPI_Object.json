@@ -42,7 +42,192 @@
     ]
   },
   "paths": {
-    
+    "/projects": {
+      "get": {
+        "description": "Returns all projects from the database that the user has access to",
+        "responses": {
+          "200": {
+            "description": "A list of projects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "project_id": {
+                        "type": "int"
+                      },
+                      "descriptions": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Upload a new project",
+        "responses": {
+          "201": {
+            "description": "Uploaded a new project succesfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{id}": {
+      "get": {
+        "description": "Return a project with corresponding id",
+        "responses": {
+          "200": {
+            "description": "A project with corresponding id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "archieved": {
+                      "type": "bool"
+                    },
+                    "assignment_file": {
+                      "type": "string"
+                    },
+                    "course_id": {
+                      "type": "int"
+                    },
+                    "deadline": {
+                      "type": "date"
+                    },
+                    "descriptions": {
+                      "type": "array",
+                      "items": {
+                        "description": "string"
+                      }
+                    },
+                    "project_id": {
+                      "type": "int"
+                    },
+                    "regex_expressions": {
+                      "type": "array",
+                      "items": {
+                        "regex": "string"
+                      }
+                    },
+                    "script_name": {
+                      "type": "string"
+                    },
+                    "test_path": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "visible_for_students": {
+                      "type": "bool"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "An id that doesn't correspond to an existing project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Patch certain fields of a project",
+        "responses": {
+          "200": {
+            "description": "Patched a project succesfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tried to patch a project that is not present",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a project with given id",
+        "responses": {
+          "200": {
+            "description": "Removed a project succesfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tried to remove a project that is not present",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/courses": {
       "get": {
         "description": "Get a list of all courses.",
@@ -85,7 +270,7 @@
                 }
               }
             }
-          }  
+          }
             },
           "parameters": [
             {
@@ -111,7 +296,7 @@
               "schema": {
                 "type": "string"
               }
-            }  
+            }
           ]
         },
       "post": {
@@ -611,7 +796,7 @@
         }
       },
       "post":{
-        "description": "Assign students to a course.", 
+        "description": "Assign students to a course.",
         "parameters": [
           {
             "name": "course_id",
@@ -733,7 +918,7 @@
               }
             }
           }
-        } 
+        }
       },
       "delete":{
         "description": "Remove students from a course.",
@@ -918,7 +1103,7 @@
         }
       },
       "post":{
-        "description": "Assign admins to a course.", 
+        "description": "Assign admins to a course.",
         "parameters": [
           {
             "name": "course_id",
@@ -1040,7 +1225,7 @@
               }
             }
           }
-        } 
+        }
       },
       "delete":{
         "description": "Remove an admin from a course.",
@@ -1156,6 +1341,6 @@
           }
           }
       }
-    
+
   }
 }
