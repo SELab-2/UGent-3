@@ -227,6 +227,1120 @@
           }
         }
       }
-    }
+    },
+    "/courses": {
+      "get": {
+        "description": "Get a list of all courses.",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved all courses with given parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+            },
+          "parameters": [
+            {
+              "name": "name",
+              "in": "query",
+              "description": "Name of the course",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "ufora_id",
+              "in": "query",
+              "description": "Ufora ID of the course",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "teacher",
+              "in": "query",
+              "description": "Teacher of the course",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+      "post": {
+        "description": "Create a new course.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the course"
+                  },
+                  "teacher": {
+                    "type": "string",
+                    "description": "Teacher of the course"
+                  }
+                },
+                "required": ["name", "teacher"]
+              }
+            }
+          }
+        },
+        "parameters":[
+          {
+            "name":"uid",
+            "in":"query",
+            "description":"uid of the user sending the request",
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "400": {
+            "description": "There was no uid in the request query.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Course with name: {name} and course_id: {course_id} was successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "course_id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "teacher": {
+                          "type": "string"
+                        },
+                        "ufora_id": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The user trying to create a course was unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The user trying to create a course was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }},
+    "/courses/{course_id}" : {
+      "get": {
+        "description": "Get a course by its ID.",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "description": "ID of the course",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "ufora_id": {
+                          "type": "string"
+                        },
+                        "teacher": {
+                          "type": "string"
+                        },
+                        "admins": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "students": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "projects": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a course by its ID.",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "description": "ID of the course",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Course deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully deleted course with course_id: {course_id}"
+                    },
+                    "url": {
+                      "type": "string",
+                      "example": "{API_URL}/courses"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403" : {
+            "description": "The user trying to delete the course was unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch":{
+        "description": "Update the course with given ID.",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "description": "ID of the course",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the course",
+                    "required" : false
+                  },
+                  "teacher": {
+                    "type": "string",
+                    "description": "Teacher of the course",
+                    "required" : false
+                  },
+                  "ufora_id": {
+                    "type": "string",
+                    "description": "Ufora ID of the course",
+                    "required" : false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200": {
+            "description": "Course updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "course_id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "teacher": {
+                          "type": "string"
+                        },
+                        "ufora_id": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403" : {
+            "description": "The user trying to update the course was unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{course_id}/students": {
+      "get": {
+        "description": "Get a list of all students in a course.",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "description": "ID of the course",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved all students of course.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post":{
+        "description": "Assign students to a course.",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "description": "ID of the course",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "students",
+            "in": "body",
+            "description": "list of uids of the students to be assigned to the course",
+            "required": true,
+            "schema": {
+              "type": "array"
+            }
+          },
+          {
+            "name":"uid",
+            "in":"query",
+            "description":"uid of the user sending the request",
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "There was no uid in the request query.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Students assigned to course.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User were succesfully added to the course"
+                    },
+                    "url": {
+                      "type": "string",
+                      "example": "http://api.example.com/courses/123/students"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "students": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "example": "http://api.example.com/users/123"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The user trying to assign students to the course was unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete":{
+        "description": "Remove students from a course.",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "description": "ID of the course",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "students",
+            "in": "body",
+            "description": "list of uids of the students to be removed from the course",
+            "required": true,
+            "schema": {
+              "type": "array"
+            }
+          },
+          {
+            "name":"uid",
+            "in":"query",
+            "description":"uid of the user sending the request",
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "204": {
+            "description": "Students removed from course.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User were succesfully removed from the course"
+                    },
+                    "url": {
+                      "type": "string",
+                      "example": "API_URL + '/courses/' + str(course_id) + '/students'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "There was no uid in the request query.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403":{
+            "description": "The user trying to remove students from the course was unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500":{
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404":{
+            "description": "Course not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+          }
+          }
+    },
+    "/courses/{course_id}/admins": {
+      "get": {
+        "description": "Get a list of all admins in a course.",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "description": "ID of the course",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved all admins of course.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post":{
+        "description": "Assign admins to a course.",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "description": "ID of the course",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "admin_uid",
+            "in": "body",
+            "description": "uid of the admin to be assigned to the course",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name":"uid",
+            "in":"query",
+            "description":"uid of the user sending the request",
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "There was no uid in the request query.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "User were successfully added to the course.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User were successfully added to the course."
+                    },
+                    "url": {
+                      "type": "string",
+                      "example": "http://api.example.com/courses/123/students"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "students": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["http://api.example.com/users/1", "http://api.example.com/users/2"]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The user trying to assign admins to the course was unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete":{
+        "description": "Remove an admin from a course.",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "description": "ID of the course",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "admin_uid",
+            "in": "body",
+            "description": "uid of the admin to be removed from the course",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name":"uid",
+            "in":"query",
+            "description":"uid of the user sending the request",
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "204": {
+            "description": "User was successfully removed from the course admins.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User was successfully removed from the course admins."
+                    },
+                    "url": {
+                      "type": "string",
+                      "example": "API_URL + '/courses/' + str(course_id) + '/students'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "There was no uid in the request query.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403":{
+            "description": "The user trying to remove the admin from the course was unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500":{
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404":{
+            "description": "Course not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+          }
+          }
+      }
+
   }
 }

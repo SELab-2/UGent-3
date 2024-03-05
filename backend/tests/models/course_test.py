@@ -1,15 +1,15 @@
-"""Test module for the Courses model"""
+"""Test module for the Course model"""
 import pytest
 from sqlalchemy.exc import IntegrityError
-from project.models.courses import Courses
-from project.models.users import Users
-from project.models.course_relations import CourseAdmins, CourseStudents
+from project.models.courses import Course
+from project.models.users import User
+from project.models.course_relations import CourseAdmin, CourseStudent
 
 
-class TestCoursesModel:
+class TestCourseModel:
     """Test class for the database models"""
 
-    def test_foreignkey_courses_teacher(self, db_session, course: Courses):
+    def test_foreignkey_courses_teacher(self, db_session, course: Course):
         """Tests the foreign key relation between courses and the teacher uid"""
         with pytest.raises(
             IntegrityError
@@ -17,7 +17,7 @@ class TestCoursesModel:
             db_session.add(course)
             db_session.commit()
 
-    def test_correct_course(self, db_session, course: Courses, course_teacher: Users):
+    def test_correct_course(self, db_session, course: Course, course_teacher: User):
         """Tests wether added course and a teacher are correctly connected"""
         db_session.add(course_teacher)
         db_session.commit()
@@ -25,7 +25,7 @@ class TestCoursesModel:
         db_session.add(course)
         db_session.commit()
         assert (
-            db_session.query(Courses).filter_by(name=course.name).first().teacher
+            db_session.query(Course).filter_by(name=course.name).first().teacher
             == course_teacher.uid
         )
 
@@ -58,7 +58,7 @@ class TestCoursesModel:
         course_admin,
     ):
         """Tests if we get the expected results for
-        correct usage of CourseStudents and CourseAdmins"""
+        correct usage of CourseStudent and CourseAdmin"""
 
         db_session.add(course_teacher)
         db_session.commit()
@@ -76,7 +76,7 @@ class TestCoursesModel:
 
         student_check = [
             s.uid
-            for s in db_session.query(CourseStudents)
+            for s in db_session.query(CourseStudent)
             .filter_by(course_id=course.course_id)
             .all()
         ]
@@ -90,7 +90,7 @@ class TestCoursesModel:
         db_session.commit()
 
         assert (
-            db_session.query(CourseAdmins)
+            db_session.query(CourseAdmin)
             .filter_by(course_id=course.course_id)
             .first()
             .uid

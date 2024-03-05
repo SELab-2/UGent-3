@@ -1,10 +1,9 @@
 """Model for users"""
-
 from sqlalchemy import Boolean, Column, String
 from project import db
 
 
-class Users(db.Model):
+class User(db.Model):
     """This class defines the users table,
     a user has an uid,
     is_teacher and is_admin booleans because a user 
