@@ -10,6 +10,7 @@ import {
 import Root from "./routes/root"
 import ErrorPage from './error-pages/error-page';
 import Login_page from './routes/login';
+import All_courses from './routes/courses';
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
     {
       path: "login",
       element: <Login_page/>
+    },
+    {
+      path: "courses",
+      element: <All_courses />
     }
   ]
   }
