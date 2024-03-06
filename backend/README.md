@@ -44,7 +44,7 @@ Setting values for these variables can be done with a method to your own liking.
 | API_HOST          | Location of the API root                                       |
 
 All the variables except the last one are for the database setup,
-these are needed or else you can't make a valid connection.
+these are needed to make a connection with the database.
 The last one is for keeping the API restfull since the location of the recourse should be located.
 
 ## Running the project
