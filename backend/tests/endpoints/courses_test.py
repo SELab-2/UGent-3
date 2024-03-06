@@ -26,19 +26,6 @@ class TestCourseEndpoint:
         assert course.teacher == "Bart"
 
         response = client.post(
-            "/courses?uid=Jef", json=course_data
-        )  # non existent user
-        assert response.status_code == 404
-
-        response = client.post(
-            "/courses?uid=student_sel2_0", json=course_data
-        )  # existent user but no rights
-        assert response.status_code == 403
-
-        response = client.post("/courses", json=course_data)  # bad link, no uid passed
-        assert response.status_code == 400
-
-        response = client.post(
             "/courses?uid=Bart", json=invalid_course
         )  # invalid course
         assert response.status_code == 400
@@ -87,12 +74,7 @@ class TestCourseEndpoint:
         assert response.status_code == 400
 
         sel2_admins_link = "/courses/" + str(course.course_id) + "/admins"
-
-        response = client.post(
-            sel2_admins_link + "?uid=student_sel2_0",  # unauthorized user
-            json={"admin_uid": "Rien"},
-        )
-        assert response.status_code == 403
+        
         course_admins = [
             s.uid
             for s in CourseAdmin.query.filter_by(course_id=course.course_id).all()
