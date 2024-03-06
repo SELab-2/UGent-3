@@ -24,7 +24,7 @@ class ProjectsEndpoint(Resource):
         Get method for listing all available projects
         that are currently in the API
         """
-        
+
         response_url = urljoin(API_URL, "projects")
         return query_selected_from_model(
             Project,
