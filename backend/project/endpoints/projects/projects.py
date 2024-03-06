@@ -24,13 +24,15 @@ class ProjectsEndpoint(Resource):
         Get method for listing all available projects
         that are currently in the API
         """
-        response_url = urljoin(API_URL, "/projects")
-        return query_selected_from_model(Project,
-                                             response_url,
-                                             select_values=["project_id", "title", "descriptions"],
-                                             url_mapper={"project_id": response_url},
-                                             filters=request.args
-                                             )
+        
+        response_url = urljoin(API_URL, "projects")
+        return query_selected_from_model(
+            Project,
+            response_url,
+            select_values=["project_id", "title", "descriptions"],
+            url_mapper={"project_id": response_url},
+            filters=request.args
+        )
 
     def post(self):
         """

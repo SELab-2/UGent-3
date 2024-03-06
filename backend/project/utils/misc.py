@@ -21,7 +21,9 @@ def map_keys_to_url(url_mapper: Dict[str, str], data: Dict[str, str]) -> Dict[st
     """
     for key, value in data.items():
         if key in url_mapper:
-            data[key] = urljoin(url_mapper[key], str(value))
+            data[key] = urljoin(url_mapper[key] + "/", str(value))
+    print(url_mapper)
+    print(data)
     return data
 
 def map_all_keys_to_url(url_mapper: Dict[str, str], data: List[Dict[str, str]]):
@@ -35,7 +37,6 @@ def map_all_keys_to_url(url_mapper: Dict[str, str], data: List[Dict[str, str]]):
     Returns:
         A list of dictionaries with the keys mapped to the urls.
     """
-    print(data)
     return [map_keys_to_url(url_mapper, entry) for entry in data]
 
 def model_to_dict(instance: DeclarativeMeta) -> Dict[str, str]:
