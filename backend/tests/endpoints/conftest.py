@@ -28,32 +28,37 @@ def users():
 def courses():
     """Return a list of courses to populate the database"""
     return [
-        Course(course_id=1, name="AD3", teacher="brinkmann"),
-        Course(course_id=2, name="RAF", teacher="laermans"),
+        Course(name="AD3", teacher="brinkmann", autoincrement=True),
+        Course(name="RAF", teacher="laermans"),
     ]
 
 @pytest.fixture
-def course_relations():
+def course_relations(courses):
     """Returns a list of course relations to populate the database"""
+    course_id_ad3 = courses[0].course_id
+    course_id_raf = courses[1].course_id
+
     return [
-        CourseAdmin(course_id=1, uid="brinkmann"),
-        CourseStudent(course_id=1, uid="student01"),
-        CourseStudent(course_id=1, uid="student02"),
-        CourseAdmin(course_id=2, uid="laermans"),
-        CourseStudent(course_id=2, uid="student02")
+        CourseAdmin(course_id=course_id_ad3, uid="brinkmann"),
+        CourseStudent(course_id=course_id_ad3, uid="student01"),
+        CourseStudent(course_id=course_id_ad3, uid="student02"),
+        CourseAdmin(course_id=course_id_raf, uid="laermans"),
+        CourseStudent(course_id=course_id_raf, uid="student02")
     ]
 
 @pytest.fixture
-def projects():
+def projects(courses):
     """Return  a list of projects to populate the database"""
+    course_id_ad3 = courses[0].course_id
+    course_id_raf = courses[1].course_id
+
     return [
         Project(
-            project_id=1,
             title="B+ Trees",
             descriptions="Implement B+ trees",
             assignment_file="assignement.pdf",
             deadline=datetime(2024,3,15,13,0,0),
-            course_id=1,
+            course_id=course_id_ad3,
             visible_for_students=True,
             archieved=False,
             test_path="/tests",
@@ -61,12 +66,11 @@ def projects():
             regex_expressions=["*"]
         ),
         Project(
-            project_id=2,
             title="Predicaten",
             descriptions="Predicaten project",
             assignment_file="assignment.pdf",
             deadline=datetime(2023,3,15,13,0,0),
-            course_id=2,
+            course_id=course_id_raf,
             visible_for_students=False,
             archieved=True,
             test_path="/tests",
@@ -76,30 +80,30 @@ def projects():
     ]
 
 @pytest.fixture
-def submissions():
+def submissions(projects):
     """Return a list of submissions to populate the database"""
+    project_id_ad3 = projects[0].project_id
+    project_id_raf = projects[1].project_id
+
     return [
         Submission(
-            submission_id=1,
             uid="student01",
-            project_id=1,
+            project_id=project_id_ad3,
             grading=16,
             submission_time=datetime(2024,3,14,12,0,0),
             submission_path="/submissions/1",
             submission_status=True
         ),
         Submission(
-            submission_id=2,
             uid="student02",
-            project_id=1,
+            project_id=project_id_ad3,
             submission_time=datetime(2024,3,14,23,59,59),
             submission_path="/submissions/2",
             submission_status=False
         ),
         Submission(
-            submission_id=3,
             uid="student02",
-            project_id=2,
+            project_id=project_id_raf,
             grading=15,
             submission_time=datetime(2023,3,5,10,0,0),
             submission_path="/submissions/3",
