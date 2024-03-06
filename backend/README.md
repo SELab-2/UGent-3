@@ -53,7 +53,7 @@ navigating to the backend directory and running:
 ```sh
 python project
 ``` 
-The server should now be located at localhost:5000 and you can
+The server should now be located at  `localhost:5000` and you can
 start developping.
 
 ## Maintaining the codebase
