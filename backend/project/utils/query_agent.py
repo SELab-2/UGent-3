@@ -7,12 +7,12 @@ to interact with the database.
 from typing import Dict, List, Union
 from urllib.parse import urljoin
 from flask import jsonify
-from sqlalchemy import and_
+from sqlalchemy import and_, inspect
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm.query import Query
 from sqlalchemy.exc import SQLAlchemyError
 from project.db_in import db
-from project.utils.misc import map_all_keys_to_url, models_to_dict
+from project.utils.misc import map_all_keys_to_url, models_to_dict, filter_model_fields
 
 def delete_by_id_from_model(
         model: DeclarativeMeta,
@@ -53,7 +53,8 @@ def delete_by_id_from_model(
 def insert_into_model(model: DeclarativeMeta,
                       data: Dict[str, Union[str, int]],
                       response_url_base: str,
-                      url_id_field: str):
+                      url_id_field: str,
+                      required_fields: List[str] = []):
     """
     Inserts a new entry into the database giving the model corresponding to a certain table
     and the data to insert.
@@ -68,17 +69,24 @@ def insert_into_model(model: DeclarativeMeta,
         a message indicating that something went wrong while inserting into the database.
     """
     try:
-        new_instance: DeclarativeMeta = model(**data)
-
+        # Check if all non-nullable fields are present in the data
+        missing_fields = [field for field in required_fields if field not in data]
+        
+        if missing_fields:
+            return {"error": f"Missing required fields: {', '.join(missing_fields)}",
+                    "url": response_url_base}, 400
+        
+        filtered_data = filter_model_fields(model, data)
+        new_instance: DeclarativeMeta = model(**filtered_data)
         db.session.add(new_instance)
         db.session.commit()
         return jsonify({
                 "data": new_instance,
                 "message": "Object created succesfully.",
                 "url": urljoin(response_url_base, str(getattr(new_instance, url_id_field)))}), 201
-    except SQLAlchemyError:
-        return {"error": "Something went wrong while inserting into the database.",
-                "url": response_url_base}, 500
+    except SQLAlchemyError as e:
+        return jsonify({"error": "Something went wrong while inserting into the database.",
+                "url": response_url_base}), 500
 
 def query_selected_from_model(model: DeclarativeMeta,
                               response_url: str,
@@ -104,8 +112,9 @@ def query_selected_from_model(model: DeclarativeMeta,
     try:
         query: Query = model.query
         if filters:
+            filtered_filters = filter_model_fields(model, filters)
             conditions: List[bool] = []
-            for key, value in filters.items():
+            for key, value in filtered_filters.items():
                 conditions.append(getattr(model, key) == value)
             query = query.filter(and_(*conditions))
 
