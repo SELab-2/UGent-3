@@ -1,9 +1,9 @@
 # Project pigeonhole backend
 ## Prerequisites
-If you want the development environment run both commands if you only need to deploy only run the Deploment command.
+If you want the development environment run both commands if you only need to deploy only run the Deployment command.
 
-The dev-requirements.txt contains everything for writing tests and linters for maintaining quality code.
-On the other hand the regular requirements.txt install the packages needed for 
+The [dev-requirements.txt](dev-requirements.txt) contains everything for writing tests and linters for maintaining quality code.
+On the other hand the regular [requirements.txt](requirements.txt) install the packages needed for 
 the regular base application.
 
 - Deployment
