@@ -59,9 +59,7 @@ start developping.
 ## Maintaining the codebase
 ### Writing tests
 When writing new code it is important to maintain the right functionality so 
-writing tests is mandatory for this, the test library used in this codebase is pytest.
-
-- pytest documentation: https://docs.pytest.org/en/8.0.x/
+writing tests is mandatory for this, the test library used in this codebase is [pytest](https://docs.pytest.org/en/8.0.x/).
 
 If you want to write tests we highly advise to read the pytest documentation on how
 to write tests, so they are kept conventional.
@@ -74,8 +72,7 @@ sudo ./run_tests.sh
 
 Located in the backend directory.
 ### Running the linter
-This codebase is kept by the pylint linter.
-- pylint docutmentation: https://pypi.org/project/pylint/
+This codebase is kept clean by the [pylint](https://pypi.org/project/pylint/) linter.
 
 If you want to execute the linter on all .py files in the project it can simply be done
 with the command:
