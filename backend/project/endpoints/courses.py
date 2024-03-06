@@ -1,6 +1,10 @@
 """Course api point"""
 
 from os import getenv
+from urllib.parse import urljoin
+
+from dotenv import load_dotenv
+
 from flask import Blueprint, jsonify, request
 from flask import abort
 from flask_restful import Api, Resource
@@ -8,14 +12,17 @@ from sqlalchemy.exc import SQLAlchemyError
 from project.models.course_relations import CourseAdmin, CourseStudent
 from project.models.users import User
 from project.models.courses import Course
-from project.models.projects import Project
+from project.utils.query_agent import query_selected_from_model, \
+    insert_into_model,delete_by_id_from_model, \
+    patch_by_id_from_model
 from project import db
 
 courses_bp = Blueprint("courses", __name__)
 courses_api = Api(courses_bp)
 
+load_dotenv()
 API_URL = getenv("API_HOST")
-
+RESPONSE_URL = urljoin(API_URL + "/", "courses")
 
 def execute_query_abort_if_db_error(query, url, query_all=False):
     """
@@ -231,7 +238,6 @@ def get_course_abort_if_not_found(course_id):
 
     return course
 
-
 class CourseForUser(Resource):
     """Api endpoint for the /courses link"""
 
@@ -241,72 +247,27 @@ class CourseForUser(Resource):
         to get all courses and filter by given query parameter like /courses?parameter=...
         parameters can be either one of the following: teacher,ufora_id,name.
         """
-        query = Course.query
-        if "teacher" in request.args:
-            query = query.filter_by(course_id=request.args.get("teacher"))
-        if "ufora_id" in request.args:
-            query = query.filter_by(ufora_id=request.args.get("ufora_id"))
-        if "name" in request.args:
-            query = query.filter_by(name=request.args.get("name"))
-        results = execute_query_abort_if_db_error(
-            query, url=API_URL + "/courses", query_all=True
+
+        return query_selected_from_model(
+            Course,
+            RESPONSE_URL,
+            url_mapper={"course_id": RESPONSE_URL},
+            filters=request.args
         )
-        detail_urls = [
-            f"{API_URL}/courses/{str(course.course_id)}" for course in results
-        ]
-        message = "Succesfully retrieved all courses with given parameters"
-        response = json_message(message)
-        response["data"] = detail_urls
-        response["url"] = API_URL + "/courses"
-        return response
 
     def post(self):
         """
         This function will create a new course
         if the body of the post contains a name and uid is an admin or teacher
         """
-        abort_url = API_URL + "/courses"
-        uid = request.args.get("uid")
-        abort_if_uid_is_none(uid, abort_url)
 
-        user = abort_if_no_user_found_for_uid(uid, abort_url)
-
-        if not user.is_teacher:
-            message = (
-                "Only teachers or admins can create new courses, you are unauthorized"
-            )
-            return json_message(message), 403
-
-        data = request.get_json()
-
-        if "name" not in data:
-            message = "Missing 'name' in the request body"
-            return json_message(message), 400
-
-        name = data["name"]
-        new_course = Course(name=name, teacher=uid)
-        if "ufora_id" in data:
-            new_course.ufora_id = data["ufora_id"]
-
-        add_abort_if_error(new_course, abort_url)
-        commit_abort_if_error(abort_url)
-
-        admin_course = CourseAdmin(uid=uid, course_id=new_course.course_id)
-        add_abort_if_error(admin_course, abort_url)
-        commit_abort_if_error(abort_url)
-
-        message = (f"Course with name: {name} and"
-                   f"course_id:{new_course.course_id} was succesfully created")
-        response = json_message(message)
-        data = {
-            "course_id": API_URL + "/courses/" + str(new_course.course_id),
-            "name": new_course.name,
-            "teacher": API_URL + "/users/" + new_course.teacher,
-            "ufora_id": new_course.ufora_id if new_course.ufora_id else "None",
-        }
-        response["data"] = data
-        response["url"] = API_URL + "/courses/" + str(new_course.course_id)
-        return response, 201
+        return insert_into_model(
+            Course,
+            request.json,
+            RESPONSE_URL,
+            "course_id",
+            required_fields=["name", "teacher"]
+        )
 
 
 class CourseByCourseId(Resource):
@@ -324,119 +285,76 @@ class CourseByCourseId(Resource):
             ]
         }
         """
-        abort_url = API_URL + "/courses"
-        uid = request.args.get("uid")
-        abort_if_uid_is_none(uid, abort_url)
-        admin = get_admin_relation(uid, course_id)
-        query = CourseStudent.query.filter_by(uid=uid, course_id=course_id)
-        student = execute_query_abort_if_db_error(query, abort_url)
+        try:
+            course_details = db.session.query(
+                Course.course_id,
+                Course.name,
+                Course.ufora_id,
+                Course.teacher
+                ).filter(
+                    Course.course_id == course_id).first()
 
-        if not (admin or student):
-            message = "User is not an admin, nor a student of this course"
-            return json_message(message), 404
+            if not course_details:
+                return {
+                    "message": "Course not found",
+                    "url": RESPONSE_URL
+                }, 404
 
-        course = get_course_abort_if_not_found(course_id)
-        query = Project.query.filter_by(course_id=course_id)
-        abort_url = API_URL + "/courses/" + str(course_id)
-        # course does exist so url should be to the id
-        project_uids = [
-            API_URL + "/projects/" + project.project_id
-            for project in execute_query_abort_if_db_error(
-                query, abort_url, query_all=True
-            )
-        ]
-        query = CourseAdmin.query.filter_by(course_id=course_id)
-        admin_uids = [
-            API_URL + "/users/" + admin.uid
-            for admin in execute_query_abort_if_db_error(
-                query, abort_url, query_all=True
-            )
-        ]
-        query = CourseStudent.query.filter_by(course_id=course_id)
-        student_uids = [
-            API_URL + "/users/" + student.uid
-            for student in execute_query_abort_if_db_error(
-                query, abort_url, query_all=True
-            )
-        ]
+            admins = db.session.query(CourseAdmin.uid).filter(
+                CourseAdmin.course_id == course_id
+            ).all()
 
-        data = {
-            "ufora_id": course.ufora_id,
-            "teacher": API_URL + "/users/" + course.teacher,
-            "admins": admin_uids,
-            "students": student_uids,
-            "projects": project_uids,
-        }
-        response = json_message(
-            "Succesfully retrieved course with course_id: " + str(course_id)
-        )
-        response["data"] = data
-        response["url"] = API_URL + "/courses/" + str(course_id)
-        return response
+            students = db.session.query(CourseStudent.uid).filter(
+                CourseStudent.course_id == course_id
+            ).all()
+
+            user_url = urljoin(API_URL + "/", "users")
+
+            admin_ids = [ urljoin(user_url + "/" , admin[0]) for admin in admins]
+            student_ids = [ urljoin(user_url + "/", student[0])  for student in students]
+
+            result = {
+                'course_id': course_details.course_id,
+                'name': course_details.name,
+                'ufora_id': course_details.ufora_id,
+                'teacher': course_details.teacher,
+                'admins': admin_ids,
+                'students': student_ids
+            }
+
+            return {
+                "message": "Succesfully retrieved course with course_id: " + str(course_id),
+                "data": result,
+                "url": urljoin(RESPONSE_URL + "/", str(course_id))
+            }
+        except SQLAlchemyError:
+            return {
+                "error": "Something went wrong while querying the database.",
+                "url": RESPONSE_URL}, 500
 
     def delete(self, course_id):
         """
         This function will delete the course with course_id
         """
-        abort_url = API_URL + "/courses/"
-        uid = request.args.get("uid")
-        abort_if_uid_is_none(uid, abort_url)
-
-        admin = get_admin_relation(uid, course_id)
-
-        if not admin:
-            message = "You are not an admin of this course and so you cannot delete it"
-            return json_message(message), 403
-
-        course = get_course_abort_if_not_found(course_id)
-        abort_url = API_URL + "/courses/" + str(course_id)
-        # course does exist so url should be to the id
-        delete_abort_if_error(course, abort_url)
-        commit_abort_if_error(abort_url)
-
-        response = {
-            "message": "Succesfully deleted course with course_id: " + str(course_id),
-            "url": API_URL + "/courses",
-        }
-        return response
+        return delete_by_id_from_model(
+            Course,
+            "course_id",
+            course_id,
+            RESPONSE_URL
+        )
 
     def patch(self, course_id):
         """
         This function will update the course with course_id
         """
-        abort_url = API_URL + "/courses/"
-        uid = request.args.get("uid")
-        abort_if_uid_is_none(uid, abort_url)
 
-        admin = get_admin_relation(uid, course_id)
-
-        if not admin:
-            message = "You are not an admin of this course and so you cannot update it"
-            return json_message(message), 403
-
-        data = request.get_json()
-        course = get_course_abort_if_not_found(course_id)
-        abort_url = API_URL + "/courses/" + str(course_id)
-        if "name" in data:
-            course.name = data["name"]
-        if "teacher" in data:
-            course.teacher = data["teacher"]
-        if "ufora_id" in data:
-            course.ufora_id = data["ufora_id"]
-
-        commit_abort_if_error(abort_url)
-        response = json_message(
-            "Succesfully updated course with course_id: " + str(course_id)
+        return patch_by_id_from_model(
+            Course,
+            "course_id",
+            course_id,
+            RESPONSE_URL,
+            request.json
         )
-        response["url"] = API_URL + "/courses/" + str(course_id)
-        data = {
-            "course_id": API_URL + "/courses/" + str(course.course_id),
-            "name": course.name,
-            "teacher": API_URL + "/users/" + course.teacher,
-            "ufora_id": course.ufora_id if course.ufora_id else "None",
-        }
-        response["data"] = data
-        return response, 200
 
 
 class CourseForAdmins(Resource):
@@ -461,7 +379,7 @@ class CourseForAdmins(Resource):
             "Succesfully retrieved all admins of course " + str(course_id)
         )
         response["data"] = admin_uids
-        response["url"] = abort_url  # not actually aborting here tho heheh
+        response["url"] = abort_url
         return jsonify(admin_uids)
 
     def post(self, course_id):
@@ -608,10 +526,14 @@ class CourseToAddStudents(Resource):
         return response
 
 
-courses_api.add_resource(CourseForUser, "/courses")
+courses_bp.add_url_rule("/courses",
+                        view_func=CourseForUser.as_view('course_endpoint'))
 
-courses_api.add_resource(CourseByCourseId, "/courses/<int:course_id>")
+courses_bp.add_url_rule("/courses/<int:course_id>",
+                        view_func=CourseByCourseId.as_view('course_by_course_id'))
 
-courses_api.add_resource(CourseForAdmins, "/courses/<int:course_id>/admins")
+courses_bp.add_url_rule("/courses/<int:course_id>/admins",
+                        view_func=CourseForAdmins.as_view('course_admins'))
 
-courses_api.add_resource(CourseToAddStudents, "/courses/<int:course_id>/students")
+courses_bp.add_url_rule("/courses/<int:course_id>/students",
+                        view_func=CourseToAddStudents.as_view('course_students'))
