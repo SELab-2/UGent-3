@@ -253,12 +253,17 @@ class CourseForUser(Resource):
         results = execute_query_abort_if_db_error(
             query, url=API_URL + "/courses", query_all=True
         )
-        detail_urls = [
-            f"{API_URL}/courses/{str(course.course_id)}" for course in results
+        courses = [{
+                "url": f"{API_URL}/courses/{str(course.course_id)}",
+                "name": course.name,
+                "teacher": course.teacher,
+                "ufora_id" : course.ufora_id if course.ufora_id else "None"
+            }
+             for course in results
         ]
         message = "Succesfully retrieved all courses with given parameters"
         response = json_message(message)
-        response["data"] = detail_urls
+        response["data"] = courses
         response["url"] = API_URL + "/courses"
         return response
 
