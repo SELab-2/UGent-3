@@ -64,7 +64,7 @@ writing tests is mandatory for this, the test library used in this codebase is [
 If you want to write tests we highly advise to read the pytest documentation on how
 to write tests, so they are kept conventional.
 
-For executing the tests and testing you're newly added functionality (and to test if you broke nothing from earlier working code)
+For executing the tests and testing you're newly added functionality
 you can run:
 ```sh
 sudo ./run_tests.sh
