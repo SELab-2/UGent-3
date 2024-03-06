@@ -31,8 +31,8 @@ the regular base application.
    ``` 
 
 ## Setting up the environment variables
-The project requires a couple of environment variables to run,
-these should be located in your own .env file if you want to develop on this codebase.
+The project requires a couple of environment variables to run, if you want to develop on this codebase.
+Setting values for these variables can be done with a method to your own liking, like a .env file or setting them in a Dockerfile.
 
 | Variable          | Description                                                    |
 |-------------------|----------------------------------------------------------------|
