@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Button } from "@mui/material";
+import { useState, useEffect } from 'react';
+import { Container, Typography, Box, Button, Grid, Card, CardContent } from "@mui/material";
 
 export default function All_courses() {
     const [courses, setCourses] = useState<string[]>([]);
@@ -16,15 +16,21 @@ export default function All_courses() {
             <Container>
                 <Typography variant="h1" display="flex" justifyContent="center">Courses</Typography>
                 <Typography variant= "h2" display="flex" justifyContent="center">Please select a course for more details</Typography>
-                <Box textAlign="center">
+                <Grid container spacing={3}>
                     {courses.map((courseUrl, index) => (
-                        <Button key={index} variant="contained" size="large" onClick={() => {
-                            window.location.href = courseUrl; // navigate to the course URL when clicked
-                        }}>
-                            {courseUrl}
-                        </Button>
+                        <Grid item xs={12} sm={6} md={4} key={index}>
+                            <Card>
+                                <CardContent>
+                                    <Button variant="contained" size="large" fullWidth onClick={() => {
+                                        window.location.href = courseUrl; // navigate to the course URL when clicked
+                                    }}>
+                                        {courseUrl}
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        </Grid>
                     ))}
-                </Box>
+                </Grid>
             </Container>
         </div>
     );
