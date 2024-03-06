@@ -257,7 +257,7 @@ class CourseForUser(Resource):
         )
         courses = [
             {**dataclasses.asdict(course),
-             "url":f"{API_URL}/courses/{course.course_id}"} 
+             "url":f"{API_URL}/courses/{course.course_id}"}
              for course in results
         ]
         message = "Succesfully retrieved all courses with given parameters"
