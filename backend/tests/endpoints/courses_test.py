@@ -74,7 +74,7 @@ class TestCourseEndpoint:
         assert response.status_code == 400
 
         sel2_admins_link = "/courses/" + str(course.course_id) + "/admins"
-        
+
         course_admins = [
             s.uid
             for s in CourseAdmin.query.filter_by(course_id=course.course_id).all()
