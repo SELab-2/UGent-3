@@ -10,7 +10,7 @@ import {
 import Root from "./routes/root"
 import ErrorPage from './error-pages/error-page';
 import Login_page from './routes/login';
-import All_courses, {Details_course} from './routes/courses';
+import {All_courses,Details_course} from './routes/courses';
 
 const router = createBrowserRouter([
   {
@@ -29,7 +29,6 @@ const router = createBrowserRouter([
     {
       path: "courses/:courseId",
       element: <Details_course />
-    
     }
   ]
   }

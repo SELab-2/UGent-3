@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Container, Typography, Grid, Card, CardContent } from "@mui/material";
-import { useParams } from 'react-router-dom';
+import { useParams,useNavigate } from 'react-router-dom';
+import { authenticated_fetch } from './authenticated_fetch';
 
 interface Course{
     course_id: number,
@@ -9,10 +10,17 @@ interface Course{
     ufora_id:string,
     url:string
 }
+interface CourseDetails{
+    ufora_id: string,
+    teacher: string,
+    admins: string[],
+    students: string[],
+    projects:string[]
+}
 
-export default function All_courses() {
+export function All_courses() {
     const [courses, setCourses] = useState<Course[]>([]);
-
+    const navigate = useNavigate();
     useEffect(() => {
         fetch("http://127.0.0.1:5000/courses")
             .then(response => response.json())
@@ -29,7 +37,7 @@ export default function All_courses() {
                     {courses.map((course) => (
                         <Grid item xs={12} sm={6} md={4} key={course.course_id}>
                             <Card onClick={() => {
-                                window.location.href += "/"+course.course_id;
+                                return navigate(`/courses/${course.course_id}`);
                             }} style={{cursor: 'pointer', backgroundColor: 'gray'}}>
                                 <CardContent>
                                     <Typography variant="h5">Name: {course.name}</Typography>
@@ -44,21 +52,56 @@ export default function All_courses() {
     );
 }
 
-export function Details_course() {
+interface Project {
+    project_id: number,
+    title: string,
+    descriptions: string,
+    course_id: number,
+    deadline: string,
+    archieved: boolean,
+    assignment_file: string,
+    regex_expressions: string[],
+    script_name: string,
+    test_path: string,
+    visible_for_students: boolean
+}
+
+export function Details_course() {//for student
     const { courseId } = useParams<{ courseId: string }>();
-    const [course, setCourse] = useState<Course>();
+    const [course, setCourse] = useState<CourseDetails>();
+    const [projects, setProjects] = useState<Project[]>([]);
+    //todo: load different page if student or admin
 
     useEffect(() => {
-        fetch("http://127.0.0.1:5000/courses/"+courseId)
+        authenticated_fetch("http://127.0.0.1:5000/courses/"+courseId)
             .then(response => response.json())
-            .then(data => setCourse(data.data))
+            .then(data => {
+                setCourse(data.data);
+            })
             .catch(error => console.error('Error:', error));
     }, []);
+    
+    //fetch the projects
+    useEffect(() => {course?.projects.forEach((projectUrl: string) => {
+        console.log(projectUrl)
+        fetch(projectUrl)
+            .then(response => response.json())
+            .then(projectData => {
+                setProjects(prevProjects => [...prevProjects, projectData.data]);
+            })
+            .catch(error => console.error('Error:', error));
+    })}, [course]);
+
+    //todo: fetch last submission so we can check score
     return (
         <div>
             <Container>
-                <Typography variant="h1" display="flex" justifyContent="center">Course details</Typography>
-                
+                <Typography variant="h3" display="flex" justifyContent="center">Ufora id: {course?.ufora_id}</Typography>
+                {
+                    projects.map((project, index) => (
+                        <Typography key={index} variant="h5" display="flex" justifyContent="center">Project: {project.title}</Typography>
+                    ))
+                }
             </Container>
         </div>
     );
