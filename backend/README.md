@@ -20,7 +20,7 @@ the regular base application.
    ```sh
    git clone git@github.com:SELab-2/UGent-3.git
    ```
-2. If you want to development run both commands, if you want to deploy only run deployment command.
+2. If you want to develop run both commands, if you want to deploy only run deployment command.
    - Deployment
    ```sh
    pip install -r requirments.txt
