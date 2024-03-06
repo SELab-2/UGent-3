@@ -2,6 +2,8 @@
 
 from os import getenv
 from dotenv import load_dotenv
+from typing import List
+import dataclasses
 from flask import Blueprint, jsonify, request
 from flask import abort
 from flask_restful import Api, Resource
@@ -250,22 +252,17 @@ class CourseForUser(Resource):
             query = query.filter_by(ufora_id=request.args.get("ufora_id"))
         if "name" in request.args:
             query = query.filter_by(name=request.args.get("name"))
-        results = execute_query_abort_if_db_error(
+        results:List[Course] = execute_query_abort_if_db_error(
             query, url=API_URL + "/courses", query_all=True
         )
-        courses = [{
-                "url": f"{API_URL}/courses/{str(course.course_id)}",
-                "name": course.name,
-                "teacher": course.teacher,
-                "ufora_id" : course.ufora_id if course.ufora_id else "None"
-            }
-             for course in results
+        courses = [
+            dataclasses.asdict(course) for course in results
         ]
         message = "Succesfully retrieved all courses with given parameters"
         response = json_message(message)
         response["data"] = courses
         response["url"] = API_URL + "/courses"
-        return response
+        return jsonify(response)
 
     def post(self):
         """
