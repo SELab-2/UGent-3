@@ -9,9 +9,9 @@ from urllib.parse import urljoin
 from flask import request
 from flask_restful import Resource
 
-from project import db
 from project.models.projects import Project
-from project.utils.query_agent import query_by_id_from_model, delete_by_id_from_model, patch_by_id_from_model
+from project.utils.query_agent import query_by_id_from_model, delete_by_id_from_model, \
+    patch_by_id_from_model
 
 
 API_URL = getenv('API_HOST')

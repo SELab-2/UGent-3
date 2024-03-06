@@ -14,7 +14,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from project.db_in import db
 from project.utils.misc import map_all_keys_to_url, models_to_dict
 
-def delete_by_id_from_model(model: DeclarativeMeta, column_name: str, column_id: int, base_url: str):
+def delete_by_id_from_model(
+        model: DeclarativeMeta,
+        column_name: str,
+        column_id: int,
+        base_url: str):
     """
     Deletes an entry from the database giving the model corresponding to a certain table,
     a column name and its value.
@@ -65,7 +69,7 @@ def insert_into_model(model: DeclarativeMeta,
     """
     try:
         new_instance: DeclarativeMeta = model(**data)
-        
+
         db.session.add(new_instance)
         db.session.commit()
         return jsonify({
