@@ -28,7 +28,7 @@ def users():
 def courses():
     """Return a list of courses to populate the database"""
     return [
-        Course(name="AD3", teacher="brinkmann", autoincrement=True),
+        Course(name="AD3", teacher="brinkmann"),
         Course(name="RAF", teacher="laermans"),
     ]
 
