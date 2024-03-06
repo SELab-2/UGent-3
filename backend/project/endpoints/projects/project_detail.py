@@ -4,7 +4,6 @@ for example /projects/1 if the project id of
 the corresponding project is 1
 """
 from os import getenv
-from dotenv import load_dotenv
 
 from flask import jsonify
 from flask_restful import Resource, abort
@@ -14,7 +13,6 @@ from project.endpoints.projects.endpoint_parser import parse_project_params
 from project import db
 from project.models.projects import Project
 
-load_dotenv()
 API_URL = getenv('API_HOST')
 
 class ProjectDetail(Resource):

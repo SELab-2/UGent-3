@@ -1,7 +1,6 @@
 """Course api point"""
 
 from os import getenv
-from dotenv import load_dotenv
 from flask import Blueprint, jsonify, request
 from flask import abort
 from flask_restful import Api, Resource
@@ -15,7 +14,6 @@ from project import db
 courses_bp = Blueprint("courses", __name__)
 courses_api = Api(courses_bp)
 
-load_dotenv()
 API_URL = getenv("API_HOST")
 
 
