@@ -62,3 +62,7 @@ def models_to_dict(instances: List[DeclarativeMeta]) -> List[Dict[str, str]]:
         A list of dictionaries with the keys and values of the models.
     """
     return [model_to_dict(instance) for instance in instances]
+
+
+def filter_model_fields(model: DeclarativeMeta, data: Dict[str, str]):
+            return {key: value for key, value in data.items() if hasattr(model, key)}
