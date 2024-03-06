@@ -22,8 +22,6 @@ def map_keys_to_url(url_mapper: Dict[str, str], data: Dict[str, str]) -> Dict[st
     for key, value in data.items():
         if key in url_mapper:
             data[key] = urljoin(url_mapper[key] + "/", str(value))
-    print(url_mapper)
-    print(data)
     return data
 
 def map_all_keys_to_url(url_mapper: Dict[str, str], data: List[Dict[str, str]]):
@@ -65,4 +63,14 @@ def models_to_dict(instances: List[DeclarativeMeta]) -> List[Dict[str, str]]:
 
 
 def filter_model_fields(model: DeclarativeMeta, data: Dict[str, str]):
-            return {key: value for key, value in data.items() if hasattr(model, key)}
+    """
+    Filters the data to only contain the fields of the model.
+
+    Args:
+        model: DeclarativeMeta - The model to filter the data with.
+        data: Dict[str, str] - The data to filter.
+
+    Returns:
+        A dictionary with the fields of the model.
+    """
+    return {key: value for key, value in data.items() if hasattr(model, key)}
