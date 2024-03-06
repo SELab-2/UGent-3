@@ -1,11 +1,11 @@
-"""This module tests the Projects and Submissions model"""
+"""This module tests the Project and Submission model"""
 from datetime import datetime
 import pytest
 from sqlalchemy.exc import IntegrityError
-from project.models.projects import Projects
-from project.models.submissions import Submissions
+from project.models.projects import Project
+from project.models.submissions import Submission
 
-class TestProjectsAndSubmissionsModel: # pylint: disable=too-few-public-methods
+class TestProjectAndSubmissionModel: # pylint: disable=too-few-public-methods
     """Test class for the database models of projects and submissions"""
     def test_deadline(self,db_session, # pylint: disable=too-many-arguments ; all arguments are needed for the test
                       course,
@@ -22,13 +22,13 @@ class TestProjectsAndSubmissionsModel: # pylint: disable=too-few-public-methods
         db_session.add(valid_project)
         db_session.commit()
         check_project = (
-            db_session.query(Projects).filter_by(title=valid_project.title).first()
+            db_session.query(Project).filter_by(title=valid_project.title).first()
         )
         assert check_project.deadline == valid_project.deadline
 
         db_session.add(valid_user)
         db_session.commit()
-        submission = Submissions(
+        submission = Submission(
             uid=valid_user.uid,
             project_id=check_project.project_id,
             submission_time=datetime.now(),
@@ -39,7 +39,7 @@ class TestProjectsAndSubmissionsModel: # pylint: disable=too-few-public-methods
         db_session.commit()
 
         submission_check = (
-            db_session.query(Submissions)
+            db_session.query(Submission)
             .filter_by(project_id=check_project.project_id)
             .first()
         )
@@ -54,7 +54,7 @@ class TestProjectsAndSubmissionsModel: # pylint: disable=too-few-public-methods
         submission_check.grading = 15
         db_session.commit()
         submission_check = (
-            db_session.query(Submissions)
+            db_session.query(Submission)
             .filter_by(project_id=check_project.project_id)
             .first()
         )

@@ -6,17 +6,17 @@ from dotenv import load_dotenv
 from flask import Blueprint, request
 from flask_restful import Resource
 from sqlalchemy import exc
-from project.database import db
-from project.models.submissions import Submissions as m_submissions
-from project.models.projects import Projects as m_projects
-from project.models.users import Users as m_users
+from project.db_in import db
+from project.models.submissions import Submission
+from project.models.projects import Project
+from project.models.users import User
 
 load_dotenv()
 API_HOST = getenv("API_HOST")
 
 submissions_bp = Blueprint("submissions", __name__)
 
-class Submissions(Resource):
+class SubmissionsEndpoint(Resource):
     """API endpoint for the submissions"""
 
     def get(self) -> dict[str, any]:
@@ -33,12 +33,12 @@ class Submissions(Resource):
         }
         try:
             with db.session() as session:
-                query = session.query(m_submissions)
+                query = session.query(Submission)
 
                 # Filter by uid
                 uid = request.args.get("uid")
                 if uid is not None:
-                    if session.get(m_users, uid) is not None:
+                    if session.get(User, uid) is not None:
                         query = query.filter_by(uid=uid)
                     else:
                         data["message"] = f"Invalid user (uid={uid})"
@@ -47,7 +47,7 @@ class Submissions(Resource):
                 # Filter by project_id
                 project_id = request.args.get("project_id")
                 if project_id is not None:
-                    if not project_id.isdigit() or session.get(m_projects, int(project_id)) is None:
+                    if not project_id.isdigit() or session.get(Project, int(project_id)) is None:
                         data["message"] = f"Invalid project (project_id={project_id})"
                         return data, 400
                     query = query.filter_by(project_id=int(project_id))
@@ -76,11 +76,11 @@ class Submissions(Resource):
         }
         try:
             with db.session() as session:
-                submission = m_submissions()
+                submission = Submission()
 
                 # User
                 uid = request.form.get("uid")
-                if (uid is None) or (session.get(m_users, uid) is None):
+                if (uid is None) or (session.get(User, uid) is None):
                     if uid is None:
                         data["message"] = "The uid data field is required"
                     else:
@@ -93,7 +93,7 @@ class Submissions(Resource):
                 if project_id is None:
                     data["message"] = "The project_id data field is required"
                     return data, 400
-                if not project_id.isdigit() or session.get(m_projects, int(project_id)) is None:
+                if not project_id.isdigit() or session.get(Project, int(project_id)) is None:
                     data["message"] = f"Invalid project (project_id={project_id})"
                     return data, 400
                 submission.project_id = int(project_id)
@@ -127,7 +127,7 @@ class Submissions(Resource):
             data["message"] = "An error occurred while creating a new submission"
             return data, 500
 
-class Submission(Resource):
+class SubmissionEndpoint(Resource):
     """API endpoint for the submission"""
 
     def get(self, submission_id: int) -> dict[str, any]:
@@ -147,7 +147,7 @@ class Submission(Resource):
         }
         try:
             with db.session() as session:
-                submission = session.get(m_submissions, submission_id)
+                submission = session.get(Submission, submission_id)
                 if submission is None:
                     data["message"] = f"Submission (submission_id={submission_id}) not found"
                     return data, 404
@@ -186,7 +186,7 @@ class Submission(Resource):
         try:
             with db.session() as session:
                 # Get the submission
-                submission = session.get(m_submissions, submission_id)
+                submission = session.get(Submission, submission_id)
                 if submission is None:
                     data["message"] = f"Submission (submission_id={submission_id}) not found"
                     return data, 404
@@ -227,7 +227,7 @@ class Submission(Resource):
         }
         try:
             with db.session() as session:
-                submission = session.get(m_submissions, submission_id)
+                submission = session.get(Submission, submission_id)
                 if submission is None:
                     data["message"] = f"Submission (submission_id={submission_id}) not found"
                     return data, 404
@@ -244,8 +244,8 @@ class Submission(Resource):
                 f"An error occurred while deleting submission (submission_id={submission_id})"
             return data, 500
 
-submissions_bp.add_url_rule("/submissions", view_func=Submissions.as_view("submissions"))
+submissions_bp.add_url_rule("/submissions", view_func=SubmissionsEndpoint.as_view("submissions"))
 submissions_bp.add_url_rule(
     "/submissions/<int:submission_id>",
-    view_func=Submission.as_view("submission")
+    view_func=SubmissionEndpoint.as_view("submission")
 )

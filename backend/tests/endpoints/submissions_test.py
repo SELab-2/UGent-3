@@ -3,7 +3,7 @@
 from os import getenv
 from flask.testing import FlaskClient
 from sqlalchemy.orm import Session
-from project.models.submissions import Submissions as m_submissions
+from project.models.submissions import Submission
 
 API_HOST = getenv("API_HOST")
 
@@ -183,7 +183,7 @@ class TestSubmissionsEndpoint:
         assert data["message"] == "Successfully fetched the submissions"
 
         submission_id = int(data["data"]["submission"].split("/")[-1])
-        submission = session.get(m_submissions, submission_id)
+        submission = session.get(Submission, submission_id)
         assert submission.uid == "student01" and submission.project_id == 1 \
             and submission.grading == 16
 
@@ -251,7 +251,7 @@ class TestSubmissionsEndpoint:
         assert data["message"] == "Submission (submission_id=2) patched"
         assert data["data"] == {}
 
-        submission = session.get(m_submissions, 2)
+        submission = session.get(Submission, 2)
         assert submission.grading == 20
 
     ### DELETE SUBMISSION ###
@@ -273,5 +273,5 @@ class TestSubmissionsEndpoint:
         assert data["message"] == "Submission (submission_id=1) deleted"
         assert data["data"] == {}
 
-        submission = session.get(m_submissions, 1)
+        submission = session.get(Submission, 1)
         assert submission is None

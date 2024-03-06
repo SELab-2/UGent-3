@@ -2,10 +2,10 @@
 
 from sys import path
 from project import create_app_with_db
-from .database import get_database_uri
+from project.db_in import url
 
 path.append(".")
 
 if __name__ == "__main__":
-    app = create_app_with_db(get_database_uri())
+    app = create_app_with_db(url)
     app.run(debug=True)
