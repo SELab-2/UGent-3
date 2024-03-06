@@ -40,4 +40,7 @@ class ProjectsEndpoint(Resource):
         using flask_restfull parse lib
         """
 
-        return insert_into_model(Project, request.json, urljoin(API_URL, "/projects"))
+        return insert_into_model(
+            Project,request.json,
+            urljoin(API_URL, "/projects"),
+            "project_id")
