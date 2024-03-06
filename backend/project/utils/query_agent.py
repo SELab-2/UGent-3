@@ -14,7 +14,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from project.db_in import db
 from project.utils.misc import map_all_keys_to_url, models_to_dict
 
-def delete_by_id_from_model(model: DeclarativeMeta, column_name: str, column_id: int):
+def delete_by_id_from_model(model: DeclarativeMeta, column_name: str, column_id: int, base_url: str):
     """
     Deletes an entry from the database giving the model corresponding to a certain table,
     a column name and its value.
@@ -35,16 +35,21 @@ def delete_by_id_from_model(model: DeclarativeMeta, column_name: str, column_id:
             ).first()
 
         if not result:
-            return {"message": "Resource not found"}, 404
+            return {
+                "message": "Resource not found",
+                 "url": base_url}, 404
         db.session.delete(result)
         db.session.commit()
-        return {"message": "Resource deleted successfully"}, 200
+        return {"message": "Resource deleted successfully",
+                "url": base_url}, 200
     except SQLAlchemyError:
-        return {"error": "Something went wrong while deleting from the database."}, 500
+        return {"error": "Something went wrong while deleting from the database.",
+                "url": base_url}, 500
 
 def insert_into_model(model: DeclarativeMeta,
                       data: Dict[str, Union[str, int]],
-                      response_url_base: str):
+                      response_url_base: str,
+                      url_id_field: str):
     """
     Inserts a new entry into the database giving the model corresponding to a certain table
     and the data to insert.
@@ -60,11 +65,13 @@ def insert_into_model(model: DeclarativeMeta,
     """
     try:
         new_instance: DeclarativeMeta = model(**data)
+        
         db.session.add(new_instance)
         db.session.commit()
-        return {"data": new_instance,
+        return jsonify({
+                "data": new_instance,
                 "message": "Object created succesfully.",
-                "url": urljoin(response_url_base, str(new_instance.project_id))}, 201
+                "url": urljoin(response_url_base, str(getattr(new_instance, url_id_field)))}), 201
     except SQLAlchemyError:
         return {"error": "Something went wrong while inserting into the database.",
                 "url": response_url_base}, 500
@@ -122,7 +129,7 @@ def query_selected_from_model(model: DeclarativeMeta,
 def query_by_id_from_model(model: DeclarativeMeta,
                            column_name: str,
                            column_id: int,
-                           not_found_message: str="Resource not found"):
+                           base_url: str):
     """
     Query an entry from the database giving the model corresponding to a certain table,
     a column name and its value.
@@ -141,7 +148,47 @@ def query_by_id_from_model(model: DeclarativeMeta,
     try:
         result: Query = model.query.filter(getattr(model, column_name) == column_id).first()
         if not result:
-            return {"message": not_found_message}, 404
-        return jsonify(result), 200
+            return {"message": "Resource not found", "url": base_url}, 404
+        print(column_id)
+        return jsonify({
+            "data": result,
+            "message": "Resource fetched correctly",
+            "url": urljoin(base_url + "/", str(column_id))}), 200
     except SQLAlchemyError:
-        return {"error": "Something went wrong while querying the database."}, 500
+        return {
+            "error": "Something went wrong while querying the database.",
+            "url": base_url}, 500
+
+def patch_by_id_from_model(model: DeclarativeMeta,
+                           column_name: str,
+                           column_id: int,
+                           base_url: str,
+                           data: Dict[str, Union[str, int]]):
+    """
+    Update an entry from the database giving the model corresponding to a certain table,
+    a column name and its value.
+
+    Args:
+        model: DeclarativeMeta - The model corresponding to the table to update.
+        column_name: str - The name of the column to update.
+        id: int - The id of the entry to update.
+        data: Dict[str, Union[str, int]] - The data to update the entry with.
+
+    Returns:
+        The entry updated from the database if the operation was successful, otherwise
+        a message indicating that something went wrong while updating the entry.
+    """
+    try:
+        result: Query = model.query.filter(getattr(model, column_name) == column_id).first()
+        if not result:
+            return {"message": "Resource not found", "url": base_url}, 404
+        for key, value in data.items():
+            setattr(result, key, value)
+        db.session.commit()
+        return jsonify({
+            "data": result,
+            "message": "Resource updated successfully",
+            "url": urljoin(base_url + "/", str(column_id))}), 200
+    except SQLAlchemyError:
+        return {"error": "Something went wrong while updating the database.",
+                "url": base_url}, 500
