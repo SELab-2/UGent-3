@@ -1,9 +1,9 @@
 """Course api point"""
 
 from os import getenv
-from dotenv import load_dotenv
-from typing import List
 import dataclasses
+from typing import List
+from dotenv import load_dotenv
 from flask import Blueprint, jsonify, request
 from flask import abort
 from flask_restful import Api, Resource
@@ -256,7 +256,9 @@ class CourseForUser(Resource):
             query, url=API_URL + "/courses", query_all=True
         )
         courses = [
-            dataclasses.asdict(course) for course in results
+            {**dataclasses.asdict(course),
+             "url":f"{API_URL}/courses/{course.course_id}"} 
+             for course in results
         ]
         message = "Succesfully retrieved all courses with given parameters"
         response = json_message(message)
