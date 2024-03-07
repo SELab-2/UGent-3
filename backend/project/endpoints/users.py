@@ -1,4 +1,7 @@
 """Users api endpoint"""
+from os import getenv
+
+from dotenv import load_dotenv
 from flask import Blueprint, request, jsonify
 from flask_restful import Resource, Api
 from sqlalchemy.exc import SQLAlchemyError
@@ -9,6 +12,8 @@ from project.models.users import User as userModel
 users_bp = Blueprint("users", __name__)
 users_api = Api(users_bp)
 
+load_dotenv()
+API_URL = getenv("API_HOST")
 
 class Users(Resource):
     """Api endpoint for the /users route"""
@@ -20,7 +25,8 @@ class Users(Resource):
         """
         users = userModel.query.all()
 
-        return jsonify(users)
+        result = jsonify({"message": "Queried all users", "data": users, "url":f"{API_URL}/users/"})
+        return result
 
     def post(self):
         """
@@ -54,8 +60,12 @@ class Users(Resource):
             # every exception should result in a rollback
             db.session.rollback()
             return {"message": "An error occurred while creating the user"}, 500
-
-        return {"message": "User created successfully!"}, 201
+        user_js = {
+            'uid': user.uid,
+            'is_teacher': user.is_teacher,
+            'is_admin': user.is_admin
+        }
+        return {"message": "User created successfully!", "data": user_js, "url": f"{API_URL}/users/{user.uid}"}, 201
 
 
 class User(Resource):
@@ -70,7 +80,12 @@ class User(Resource):
         if user is None:
             return {"message": "User not found!"}, 404
 
-        return jsonify(user)
+        user_js = {
+            'uid': user.uid,
+            'is_teacher': user.is_teacher,
+            'is_admin': user.is_admin
+        }
+        return {"message": "User queried","data":user_js, "url": f"{API_URL}/users/{user.uid}"}, 200
 
     def patch(self, user_id):
         """
@@ -98,7 +113,12 @@ class User(Resource):
             # every exception should result in a rollback
             db.session.rollback()
             return {"message": "An error occurred while patching the user"}, 500
-        return {"message": "User updated successfully!"}
+        user_js = {
+            'uid': user.uid,
+            'is_teacher': user.is_teacher,
+            'is_admin': user.is_admin
+        }
+        return {"message": "User updated successfully!", "data": user_js, "url": f"{API_URL}/users/{user.uid}"}
 
     def delete(self, user_id):
         """

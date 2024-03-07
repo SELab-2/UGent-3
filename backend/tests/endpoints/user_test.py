@@ -73,13 +73,13 @@ class TestUserEndpoint:
         response = client.get("/users")
         assert response.status_code == 200
         # Check that the response is a list (even if it's empty)
-        assert isinstance(response.json, list)
+        assert isinstance(response.json["data"], list)
 
     def test_get_one_user(self, client,user_db_session):
         """Test getting a single user."""
         response = client.get("users/u_get")
         assert response.status_code == 200
-        assert response.json == {
+        assert response.json["data"] == {
             'uid': 'u_get',
             'is_teacher': True,
             'is_admin': False
@@ -92,7 +92,7 @@ class TestUserEndpoint:
             'is_admin': True
         })
         assert response.status_code == 200
-        assert response.json == {"message": "User updated successfully!"}
+        assert response.json["message"] == "User updated successfully!"
 
     def test_patch_non_existent(self, client,user_db_session):
         """Test updating a non-existent user."""
