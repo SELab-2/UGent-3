@@ -36,14 +36,14 @@ class CourseForAdmins(Resource):
         """
         This function will return all the admins of a course
         """
-        abort_url = API_URL + "/courses/" + str(course_id) + "/admins"
+        abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
         get_course_abort_if_not_found(course_id)
 
         return query_selected_from_model(
             CourseAdmin,
             abort_url,
             select_values=["uid"],
-            url_mapper={"uid": urljoin(API_URL + "/", "users")},
+            url_mapper={"uid": urljoin(f"{API_URL}/", "users")},
             filters={"course_id": course_id},
         )
 
@@ -51,7 +51,7 @@ class CourseForAdmins(Resource):
         """
         Api endpoint for adding new admins to a course, can only be done by the teacher
         """
-        abort_url = API_URL + "/courses/" + str(course_id) + "/admins"
+        abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
         teacher = request.args.get("uid")
         data = request.get_json()
         assistant = data.get("admin_uid")
@@ -76,7 +76,7 @@ class CourseForAdmins(Resource):
         """
         Api endpoint for removing admins of a course, can only be done by the teacher
         """
-        abort_url = API_URL + "/courses/" + str(course_id) + "/admins"
+        abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
         teacher = request.args.get("uid")
         data = request.get_json()
         assistant = data.get("admin_uid")
