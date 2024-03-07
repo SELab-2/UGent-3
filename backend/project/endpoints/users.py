@@ -4,7 +4,7 @@ from flask_restful import Resource, Api
 from sqlalchemy.exc import SQLAlchemyError
 
 from project import db
-from project.models.users import Users as userModel
+from project.models.users import User as userModel
 
 users_bp = Blueprint("users", __name__)
 users_api = Api(users_bp)
@@ -33,7 +33,7 @@ class Users(Resource):
 
         if is_teacher is None or is_admin is None or uid is None:
             return {
-                "Message": "Invalid request data!",
+                "message": "Invalid request data!",
                 "Correct Format": {
                     "uid": "User ID (string)",
                     "is_teacher": "Teacher status (boolean)",
@@ -44,7 +44,7 @@ class Users(Resource):
             user = db.session.get(userModel, uid)
             if user is not None:
                 # bad request, error code could be 409 but is rarely used
-                return {"Message": f"User {uid} already exists"}, 400
+                return {"message": f"User {uid} already exists"}, 400
             # Code to create a new user in the database using the uid, is_teacher, and is_admin
             new_user = userModel(uid=uid, is_teacher=is_teacher, is_admin=is_admin)
             db.session.add(new_user)
@@ -53,9 +53,9 @@ class Users(Resource):
         except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
-            return {"Message": "An error occurred while creating the user"}, 500
+            return {"message": "An error occurred while creating the user"}, 500
 
-        return {"Message": "User created successfully!"}, 201
+        return {"message": "User created successfully!"}, 201
 
 
 class User(Resource):
@@ -68,7 +68,7 @@ class User(Resource):
         """
         user = db.session.get(userModel, user_id)
         if user is None:
-            return {"Message": "User not found!"}, 404
+            return {"message": "User not found!"}, 404
 
         return jsonify(user)
 
@@ -85,7 +85,7 @@ class User(Resource):
         try:
             user = db.session.get(userModel, user_id)
             if user is None:
-                return {"Message": "User not found!"}, 404
+                return {"message": "User not found!"}, 404
 
             if is_teacher is not None:
                 user.is_teacher = is_teacher
@@ -97,8 +97,8 @@ class User(Resource):
         except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
-            return {"Message": "An error occurred while patching the user"}, 500
-        return {"Message": "User updated successfully!"}
+            return {"message": "An error occurred while patching the user"}, 500
+        return {"message": "User updated successfully!"}
 
     def delete(self, user_id):
         """
@@ -108,15 +108,15 @@ class User(Resource):
         try:
             user = db.session.get(userModel, user_id)
             if user is None:
-                return {"Message": "User not found!"}, 404
+                return {"message": "User not found!"}, 404
 
             db.session.delete(user)
             db.session.commit()
         except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
-            return {"Message": "An error occurred while deleting the user"}, 500
-        return {"Message": "User deleted successfully!"}
+            return {"message": "An error occurred while deleting the user"}, 500
+        return {"message": "User deleted successfully!"}
 
 
 users_api.add_resource(Users, "/users")

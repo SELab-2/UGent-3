@@ -10,7 +10,7 @@ This module tests user management endpoints.
 import pytest
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from project.models.users import Users
+from project.models.users import User
 from project import db
 from tests import db_url
 
@@ -23,9 +23,9 @@ def user_db_session():
     db.metadata.create_all(engine)
     session = Session()
     session.add_all(
-            [Users(uid="del", is_admin=False, is_teacher=True),
-             Users(uid="pat", is_admin=False, is_teacher=True),
-             Users(uid="u_get", is_admin=False, is_teacher=True)
+            [User(uid="del", is_admin=False, is_teacher=True),
+             User(uid="pat", is_admin=False, is_teacher=True),
+             User(uid="u_get", is_admin=False, is_teacher=True)
              ]
         )
     session.commit()
@@ -43,7 +43,7 @@ class TestUserEndpoint:
         # Delete the user
         response = client.delete("/users/del")
         assert response.status_code == 200
-        assert response.json == {"Message": "User deleted successfully!"}
+        assert response.json == {"message": "User deleted successfully!"}
 
     def test_delete_not_present(self, client,user_db_session):
         """Test deleting a user that does not exist."""
@@ -92,7 +92,7 @@ class TestUserEndpoint:
             'is_admin': True
         })
         assert response.status_code == 200
-        assert response.json == {"Message": "User updated successfully!"}
+        assert response.json == {"message": "User updated successfully!"}
 
     def test_patch_non_existent(self, client,user_db_session):
         """Test updating a non-existent user."""
