@@ -86,7 +86,9 @@ def insert_into_model(model: DeclarativeMeta,
                 "data": new_instance,
                 "message": "Object created succesfully.",
                 "url": urljoin(response_url_base, str(getattr(new_instance, url_id_field)))}), 201
-    except SQLAlchemyError:
+    except SQLAlchemyError as e:
+        print("error")
+        print(e)
         return jsonify({"error": "Something went wrong while inserting into the database.",
                 "url": response_url_base}), 500
 

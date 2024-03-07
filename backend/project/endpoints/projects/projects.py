@@ -11,9 +11,23 @@ from flask_restful import Resource
 from project.models.projects import Project
 from project.utils.query_agent import query_selected_from_model, insert_into_model
 
+from project.endpoints.projects.endpoint_parser import parse_project_params
+
 API_URL = getenv('API_HOST')
 UPLOAD_FOLDER = getenv('UPLOAD_URL')
 ALLOWED_EXTENSIONS = {'zip'}
+
+def parse_immutabledict(request):
+    output_json = {}
+    for key, value in request.form.items():
+        if value == "false":
+            print("false")
+            output_json[key] = False
+        if value == "true":
+            output_json[key] = True
+        else:
+            output_json[key] = value
+    return output_json
 
 def allowed_file(filename: str):
     return '.' in filename and \
@@ -48,20 +62,16 @@ class ProjectsEndpoint(Resource):
         """
 
         file = request.files["assignment_file"]
+        project_json = parse_project_params()
+        print("args")
+        print(arg)
 
         # save the file that is given with the request
         if allowed_file(file.filename):
             file.save("."+os.path.join(UPLOAD_FOLDER, file.filename))
         else:
             print("no zip file given")
-        # return insert_into_model(Project, request.json, urljoin(API_URL, "/projects"))
-        print(request.form)
-        project_json = {}
-        for key, value in request.form.items():
-            print("key: {}, value: {}".format(key, value))
-            project_json[key] = value
-        print(project_json)
-        new_project = insert_into_model(Project, project_json, urljoin(API_URL, "/projects"))
-        print(new_project)
+
+        new_project = insert_into_model(Project, project_json, urljoin(API_URL, "/projects"), "project_id", required_fields=["title", "descriptions", "course_id", "visible_for_students", "archieved"])
 
         return new_project
