@@ -12,8 +12,12 @@ from project.models.projects import Project
 from project.utils.query_agent import query_selected_from_model, insert_into_model
 
 API_URL = getenv('API_HOST')
-UPLOAD_FOLDER = '/project/endpoints/uploads/'
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+UPLOAD_FOLDER = getenv('UPLOAD_URL')
+ALLOWED_EXTENSIONS = {'zip'}
+
+def allowed_file(filename: str):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 class ProjectsEndpoint(Resource):
     """
@@ -46,6 +50,18 @@ class ProjectsEndpoint(Resource):
         file = request.files["assignment_file"]
 
         # save the file that is given with the request
-        file.save("."+os.path.join(UPLOAD_FOLDER, file.filename))
+        if allowed_file(file.filename):
+            file.save("."+os.path.join(UPLOAD_FOLDER, file.filename))
+        else:
+            print("no zip file given")
         # return insert_into_model(Project, request.json, urljoin(API_URL, "/projects"))
-        return {}, 200
+        print(request.form)
+        project_json = {}
+        for key, value in request.form.items():
+            print("key: {}, value: {}".format(key, value))
+            project_json[key] = value
+        print(project_json)
+        new_project = insert_into_model(Project, project_json, urljoin(API_URL, "/projects"))
+        print(new_project)
+
+        return new_project
