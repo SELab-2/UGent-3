@@ -93,6 +93,7 @@ export function Details_course() {//for student
     })}, [course]);
 
     //todo: fetch last submission so we can check score
+    const submissions = fetch_fake_submission(projects[0].project_id);
     return (
         <div>
             <Container>
@@ -105,4 +106,14 @@ export function Details_course() {//for student
             </Container>
         </div>
     );
+}
+
+function fetch_fake_submission(project_id){
+    return {
+        "submission_id": 1,
+        "student_id": 1,
+        "project_id": project_id,
+        "submission_date": "2021-10-10",
+        "score": 10
+    }
 }
