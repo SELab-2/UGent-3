@@ -5,6 +5,7 @@ This file is the base of the Flask API. It contains the basic structure of the A
 from flask import Flask
 from .db_in import db
 from .endpoints.index.index import index_bp
+from .endpoints.projects.project_endpoint import project_bp
 from .endpoints.courses import courses_bp
 
 
@@ -18,6 +19,7 @@ def create_app():
 
     app = Flask(__name__)
     app.register_blueprint(index_bp)
+    app.register_blueprint(project_bp)
     app.register_blueprint(courses_bp)
 
     return app

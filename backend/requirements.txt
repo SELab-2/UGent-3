@@ -3,3 +3,4 @@ flask-restful
 flask-sqlalchemy
 python-dotenv
 psycopg2-binary
+docker
