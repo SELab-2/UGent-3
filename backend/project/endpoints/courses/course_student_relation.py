@@ -25,6 +25,8 @@ from project.endpoints.courses.courses_utils import (
     json_message,
 )
 
+from project.utils.query_agent import query_selected_from_model
+
 load_dotenv()
 API_URL = getenv("API_HOST")
 RESPONSE_URL = urljoin(API_URL + "/", "courses")
@@ -45,17 +47,13 @@ class CourseToAddStudents(Resource):
         abort_url = API_URL + "/courses/" + str(course_id) + "/students"
         get_course_abort_if_not_found(course_id)
 
-        query = CourseStudent.query.filter_by(course_id=course_id)
-        student_uids = [
-            API_URL + "/users/" + s.uid
-            for s in execute_query_abort_if_db_error(query, abort_url, query_all=True)
-        ]
-        response = json_message(
-            "Succesfully retrieved all students of course " + str(course_id)
+        return query_selected_from_model(
+            CourseStudent,
+            abort_url,
+            select_values=["uid"],
+            url_mapper={"uid": urljoin(API_URL + "/", "users")},
+            filters={"course_id": course_id}
         )
-        response["data"] = student_uids
-        response["url"] = abort_url
-        return response
 
     def post(self, course_id):
         """
