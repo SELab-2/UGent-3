@@ -28,8 +28,8 @@ def users():
 def courses():
     """Return a list of courses to populate the database"""
     return [
-        Course(name="AD3", teacher="brinkmann"),
-        Course(name="RAF", teacher="laermans"),
+        Course(course_id=1, name="AD3", teacher="brinkmann"),
+        Course(course_id=2, name="RAF", teacher="laermans"),
     ]
 
 @pytest.fixture
@@ -54,6 +54,7 @@ def projects(courses):
 
     return [
         Project(
+            project_id=1,
             title="B+ Trees",
             descriptions="Implement B+ trees",
             assignment_file="assignement.pdf",
@@ -66,6 +67,7 @@ def projects(courses):
             regex_expressions=["*"]
         ),
         Project(
+            project_id=2,
             title="Predicaten",
             descriptions="Predicaten project",
             assignment_file="assignment.pdf",
@@ -87,6 +89,7 @@ def submissions(projects):
 
     return [
         Submission(
+            submission_id=1,
             uid="student01",
             project_id=project_id_ad3,
             grading=16,
@@ -95,6 +98,7 @@ def submissions(projects):
             submission_status=True
         ),
         Submission(
+            submission_id=2,
             uid="student02",
             project_id=project_id_ad3,
             submission_time=datetime(2024,3,14,23,59,59),
@@ -102,6 +106,7 @@ def submissions(projects):
             submission_status=False
         ),
         Submission(
+            submission_id=3,
             uid="student02",
             project_id=project_id_raf,
             grading=15,

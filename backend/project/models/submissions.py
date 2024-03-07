@@ -1,8 +1,10 @@
 """Model for submissions"""
 
-from sqlalchemy import Column,String,ForeignKey,Integer,CheckConstraint,DateTime,Boolean
+from dataclasses import dataclass
+from sqlalchemy import Column, String, ForeignKey, Integer, CheckConstraint, DateTime, Boolean
 from project.db_in import db
 
+@dataclass
 class Submission(db.Model):
     """This class describes the submissions table,
     submissions can be made to a project, a submission has
@@ -15,7 +17,7 @@ class Submission(db.Model):
     so we can easily present in a list which submission succeeded the automated checks"""
 
     __tablename__ = "submissions"
-    submission_id = Column(Integer, nullable=False, primary_key=True)
+    submission_id = Column(Integer, primary_key=True)
     uid = Column(String(255), ForeignKey("users.uid"), nullable=False)
     project_id = Column(Integer, ForeignKey("projects.project_id"), nullable=False)
     grading = Column(Integer, CheckConstraint("grading >= 0 AND grading <= 20"))

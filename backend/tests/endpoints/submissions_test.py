@@ -16,36 +16,29 @@ class TestSubmissionsEndpoint:
         response = client.get("/submissions?uid=unknown")
         data = response.json
         assert response.status_code == 400
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "Invalid user (uid=unknown)"
-        assert data["data"] == {}
 
     def test_get_submissions_wrong_project(self, client: FlaskClient, session: Session):
         """Test getting submissions for a non-existing project"""
         response = client.get("/submissions?project_id=-1")
         data = response.json
         assert response.status_code == 400
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "Invalid project (project_id=-1)"
-        assert data["data"] == {}
 
     def test_get_submissions_wrong_project_type(self, client: FlaskClient, session: Session):
         """Test getting submissions for a non-existing project of the wrong type"""
         response = client.get("/submissions?project_id=zero")
         data = response.json
         assert response.status_code == 400
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "Invalid project (project_id=zero)"
-        assert data["data"] == {}
 
     def test_get_submissions_all(self, client: FlaskClient, session: Session):
         """Test getting the submissions"""
         response = client.get("/submissions")
         data = response.json
         assert response.status_code == 200
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "Successfully fetched the submissions"
-        assert data["data"]["submissions"] == [
+        assert data["data"] == [
             f"{API_HOST}/submissions/1",
             f"{API_HOST}/submissions/2",
             f"{API_HOST}/submissions/3"
@@ -56,9 +49,8 @@ class TestSubmissionsEndpoint:
         response = client.get("/submissions?uid=student01")
         data = response.json
         assert response.status_code == 200
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "Successfully fetched the submissions"
-        assert data["data"]["submissions"] == [
+        assert data["data"] == [
             f"{API_HOST}/submissions/1"
         ]
 
@@ -67,9 +59,8 @@ class TestSubmissionsEndpoint:
         response = client.get("/submissions?project_id=1")
         data = response.json
         assert response.status_code == 200
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "Successfully fetched the submissions"
-        assert data["data"]["submissions"] == [
+        assert data["data"] == [
             f"{API_HOST}/submissions/1",
             f"{API_HOST}/submissions/2"
         ]
@@ -79,9 +70,8 @@ class TestSubmissionsEndpoint:
         response = client.get("/submissions?uid=student01&project_id=1")
         data = response.json
         assert response.status_code == 200
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "Successfully fetched the submissions"
-        assert data["data"]["submissions"] == [
+        assert data["data"] == [
             f"{API_HOST}/submissions/1"
         ]
 
@@ -93,9 +83,7 @@ class TestSubmissionsEndpoint:
         })
         data = response.json
         assert response.status_code == 400
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "The uid data field is required"
-        assert data["data"] == {}
 
     def test_post_submissions_wrong_user(self, client: FlaskClient, session: Session):
         """Test posting a submission for a non-existing user"""
@@ -105,9 +93,7 @@ class TestSubmissionsEndpoint:
         })
         data = response.json
         assert response.status_code == 400
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "Invalid user (uid=unknown)"
-        assert data["data"] == {}
 
     def test_post_submissions_no_project(self, client: FlaskClient, session: Session):
         """Test posting a submission without specifying a project"""
@@ -116,9 +102,7 @@ class TestSubmissionsEndpoint:
         })
         data = response.json
         assert response.status_code == 400
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "The project_id data field is required"
-        assert data["data"] == {}
 
     def test_post_submissions_wrong_project(self, client: FlaskClient, session: Session):
         """Test posting a submission for a non-existing project"""
@@ -128,9 +112,7 @@ class TestSubmissionsEndpoint:
         })
         data  = response.json
         assert response.status_code == 400
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "Invalid project (project_id=-1)"
-        assert data["data"] == {}
 
     def test_post_submissions_wrong_project_type(self, client: FlaskClient, session: Session):
         """Test posting a submission for a non-existing project of the wrong type"""
@@ -140,9 +122,7 @@ class TestSubmissionsEndpoint:
         })
         data  = response.json
         assert response.status_code == 400
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "Invalid project (project_id=zero)"
-        assert data["data"] == {}
 
     def test_post_submissions_wrong_grading(self, client: FlaskClient, session: Session):
         """Test posting a submission with a wrong grading"""
@@ -153,9 +133,7 @@ class TestSubmissionsEndpoint:
         })
         data = response.json
         assert response.status_code == 400
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "Invalid grading (grading=0-20)"
-        assert data["data"] == {}
 
     def test_post_submissions_wrong_grading_type(self, client: FlaskClient, session: Session):
         """Test posting a submission with a wrong grading type"""
@@ -166,9 +144,7 @@ class TestSubmissionsEndpoint:
         })
         data = response.json
         assert response.status_code == 400
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "Invalid grading (grading=0-20)"
-        assert data["data"] == {}
 
     def test_post_submissions_correct(self, client: FlaskClient, session: Session):
         """Test posting a submission"""
@@ -179,13 +155,11 @@ class TestSubmissionsEndpoint:
         })
         data = response.json
         assert response.status_code == 201
-        assert data["url"] == f"{API_HOST}/submissions"
         assert data["message"] == "Successfully fetched the submissions"
-
-        submission_id = int(data["data"]["submission"].split("/")[-1])
-        submission = session.get(Submission, submission_id)
-        assert submission.uid == "student01" and submission.project_id == 1 \
-            and submission.grading == 16
+        assert data["url"] == f"{API_HOST}/submissions/{data['data']['id']}"
+        assert data["data"]["user"] == f"{API_HOST}/users/student01"
+        assert data["data"]["project"] == f"{API_HOST}/projects/1"
+        assert data["data"]["grading"] == 16
 
     ### GET SUBMISSION ###
     def test_get_submission_wrong_id(self, client: FlaskClient, session: Session):
@@ -193,18 +167,15 @@ class TestSubmissionsEndpoint:
         response = client.get("/submissions/100")
         data = response.json
         assert response.status_code == 404
-        assert data["url"] == f"{API_HOST}/submissions/100"
         assert data["message"] == "Submission (submission_id=100) not found"
-        assert data["data"] == {}
 
     def test_get_submission_correct(self, client: FlaskClient, session: Session):
         """Test getting a submission"""
         response = client.get("/submissions/1")
         data = response.json
         assert response.status_code == 200
-        assert data["url"] == f"{API_HOST}/submissions/1"
         assert data["message"] == "Successfully fetched the submission"
-        assert data["data"]["submission"] == {
+        assert data["data"] == {
             "id": 1,
             "user": f"{API_HOST}/users/student01",
             "project": f"{API_HOST}/projects/1",
@@ -220,39 +191,38 @@ class TestSubmissionsEndpoint:
         response = client.patch("/submissions/100", data={"grading": 20})
         data = response.json
         assert response.status_code == 404
-        assert data["url"] == f"{API_HOST}/submissions/100"
         assert data["message"] == "Submission (submission_id=100) not found"
-        assert data["data"] == {}
 
     def test_patch_submission_wrong_grading(self, client: FlaskClient, session: Session):
         """Test patching a submission with a wrong grading"""
         response = client.patch("/submissions/2", data={"grading": 100})
         data = response.json
         assert response.status_code == 400
-        assert data["url"] == f"{API_HOST}/submissions/2"
         assert data["message"] == "Invalid grading (grading=0-20)"
-        assert data["data"] == {}
 
     def test_patch_submission_wrong_grading_type(self, client: FlaskClient, session: Session):
         """Test patching a submission with a wrong grading type"""
         response = client.patch("/submissions/2", data={"grading": "zero"})
         data = response.json
         assert response.status_code == 400
-        assert data["url"] == f"{API_HOST}/submissions/2"
         assert data["message"] == "Invalid grading (grading=0-20)"
-        assert data["data"] == {}
 
     def test_patch_submission_correct(self, client: FlaskClient, session: Session):
         """Test patching a submission"""
         response = client.patch("/submissions/2", data={"grading": 20})
         data = response.json
         assert response.status_code == 200
-        assert data["url"] == f"{API_HOST}/submissions/2"
         assert data["message"] == "Submission (submission_id=2) patched"
-        assert data["data"] == {}
-
-        submission = session.get(Submission, 2)
-        assert submission.grading == 20
+        assert data["url"] == f"{API_HOST}/submissions/2"
+        assert data["data"] == {
+            "id": 2,
+            "user": f"{API_HOST}/users/student02",
+            "project": f"{API_HOST}/projects/1",
+            "grading": 20,
+            "time": 'Thu, 14 Mar 2024 22:59:59 GMT',
+            "path": "/submissions/2",
+            "status": False
+        }
 
     ### DELETE SUBMISSION ###
     def test_delete_submission_wrong_id(self, client: FlaskClient, session: Session):
@@ -260,18 +230,14 @@ class TestSubmissionsEndpoint:
         response = client.delete("submissions/100")
         data = response.json
         assert response.status_code == 404
-        assert data["url"] == f"{API_HOST}/submissions/100"
         assert data["message"] == "Submission (submission_id=100) not found"
-        assert data["data"] == {}
 
     def test_delete_submission_correct(self, client: FlaskClient, session: Session):
         """Test deleting a submission"""
         response = client.delete("submissions/1")
         data = response.json
         assert response.status_code == 200
-        assert data["url"] == f"{API_HOST}/submissions/1"
         assert data["message"] == "Submission (submission_id=1) deleted"
-        assert data["data"] == {}
 
         submission = session.get(Submission, 1)
         assert submission is None

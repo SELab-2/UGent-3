@@ -1370,10 +1370,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    },
                     "message": {
                       "type": "string"
                     },
@@ -1399,16 +1395,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    },
                     "message": {
                       "type": "string"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {}
                     }
                   }
                 }
@@ -1422,16 +1410,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    },
                     "message": {
                       "type": "string"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {}
                     }
                   }
                 }
@@ -1475,19 +1455,39 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "message": {
+                      "type": "string"
+                    },
                     "url": {
                       "type": "string",
                       "format": "uri"
                     },
-                    "message": {
-                      "type": "string"
-                    },
                     "data": {
                       "type": "object",
                       "properties": {
-                        "submission": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "user": {
                           "type": "string",
                           "format": "uri"
+                        },
+                        "project": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "grading": {
+                          "type": "integer"
+                        },
+                        "time": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -1503,16 +1503,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    },
                     "message": {
                       "type": "string"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {}
                     }
                   }
                 }
@@ -1526,16 +1518,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    },
                     "message": {
                       "type": "string"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {}
                     }
                   }
                 }
@@ -1556,10 +1540,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    },
                     "message": {
                       "type": "string"
                     },
@@ -1610,16 +1590,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    },
                     "message": {
                       "type": "string"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {}
                     }
                   }
                 }
@@ -1633,16 +1605,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    },
                     "message": {
                       "type": "string"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {}
                     }
                   }
                 }
@@ -1678,16 +1642,41 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "message": {
+                      "type": "string"
+                    },
                     "url": {
                       "type": "string",
                       "format": "uri"
                     },
-                    "message": {
-                      "type": "string"
-                    },
                     "data": {
                       "type": "object",
-                      "properties": {}
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "user": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "project": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "grading": {
+                          "type": "integer"
+                        },
+                        "time": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "boolean"
+                        }
+                      }
                     }
                   }
                 }
@@ -1701,16 +1690,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    },
                     "message": {
                       "type": "string"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {}
                     }
                   }
                 }
@@ -1724,16 +1705,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    },
                     "message": {
                       "type": "string"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {}
                     }
                   }
                 }
@@ -1747,16 +1720,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    },
                     "message": {
                       "type": "string"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {}
                     }
                   }
                 }
@@ -1775,16 +1740,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    },
                     "message": {
                       "type": "string"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {}
                     }
                   }
                 }
@@ -1798,16 +1755,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    },
                     "message": {
                       "type": "string"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {}
                     }
                   }
                 }
@@ -1821,16 +1770,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    },
                     "message": {
                       "type": "string"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {}
                     }
                   }
                 }
