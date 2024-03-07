@@ -1,15 +1,79 @@
-"""Configuration for pytest, Flask, and the test client."""
+""" Configuration for pytest, Flask, and the test client."""
+from datetime import datetime
 
 import os
 import pytest
 from project.models.courses import Course
 from project.models.users import User
+from project.models.projects import Project
 from project.models.course_relations import CourseStudent,CourseAdmin
+from project import create_app_with_db, db
+from project.db_in import url
+
+
+@pytest.fixture
+def course_teacher_ad():
+    """A user that's a teacher for testing"""
+    ad_teacher = User(uid="Gunnar", is_teacher=True, is_admin=True)
+    return ad_teacher
+
+
+@pytest.fixture
+def course_ad(course_teacher_ad: User):
+    """A course for testing, with the course teacher as the teacher."""
+    ad2 = Course(name="Ad2", teacher=course_teacher_ad.uid)
+    return ad2
+
+
+@pytest.fixture
+def project(course):
+    """A project for testing, with the course as the course it belongs to"""
+    date = datetime(2024, 2, 25, 12, 0, 0)
+    project = Project(
+        title="Project",
+        descriptions="Test project",
+        course_id=course.course_id,
+        assignment_file="testfile",
+        deadline=date,
+        visible_for_students=True,
+        archieved=False,
+        test_path="testpad",
+        script_name="testscript",
+        regex_expressions='r'
+    )
+    return project
+
+
+@pytest.fixture
+def project_json(project: Project):
+    """A function that return the json data of a project including the PK neede for testing"""
+    data = {
+        "title": project.title,
+        "descriptions": project.descriptions,
+        "assignment_file": project.assignment_file,
+        "deadline": project.deadline,
+        "course_id": project.course_id,
+        "visible_for_students": project.visible_for_students,
+        "archieved": project.archieved,
+        "test_path": project.test_path,
+        "script_name": project.script_name,
+        "regex_expressions": project.regex_expressions
+    }
+    return data
+
 
 @pytest.fixture
 def api_url():
     """Get the API URL from the environment."""
     return os.getenv("API_HOST")
+
+
+@pytest.fixture
+def app():
+    """Get the app"""
+    app = create_app_with_db(url)
+    return app
+
 
 @pytest.fixture
 def client(app):
@@ -17,6 +81,20 @@ def client(app):
     with app.test_client() as client:
         with app.app_context():
             yield client
+
+
+@pytest.fixture
+def db_session(app):
+    """Create a new database session for a test.
+    After the test, all changes are rolled back and the session is closed."""
+    app = create_app_with_db(url)
+    with app.app_context():
+        for table in reversed(db.metadata.sorted_tables):
+            db.session.execute(table.delete())
+        db.session.commit()
+
+        yield db.session
+        db.session.close()
 
 @pytest.fixture
 def courses_get_db(db_with_course):

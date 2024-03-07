@@ -3,11 +3,18 @@ Configuration for the models tests. Contains all the fixtures needed for multipl
 """
 
 from datetime import datetime
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 import pytest
 from project.models.courses import Course
 from project.models.course_relations import CourseAdmin, CourseStudent
 from project.models.projects import Project
 from project.models.users import User
+from project.db_in import url
+
+engine = create_engine(url)
+Session = sessionmaker(bind=engine)
+
 
 @pytest.fixture
 def valid_user():

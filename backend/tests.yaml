@@ -31,4 +31,4 @@ services:
       API_HOST: http://api_is_here
     volumes:
       - .:/app
-    command: ["pytest"]
+    command: ["pytest", "--ignore", "tests/utils"]
