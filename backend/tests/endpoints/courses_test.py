@@ -113,7 +113,7 @@ class TestCourseEndpoint:
             assert response.status_code == 200
 
         sel2_students = [
-            f"{api_url}/users/" + s.uid
+            {"uid": f"{api_url}/users/" + s.uid}
             for s in CourseStudent.query.filter_by(course_id=course.course_id).all()
         ]
 
