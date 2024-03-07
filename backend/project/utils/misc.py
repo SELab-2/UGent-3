@@ -1,6 +1,6 @@
 """
-This module contains functions that are not related to anything specific but
-are ought to be used throughout the project. 
+This module contains miscellaneous utility functions.
+These functions apply to a variety of use cases and are not specific to any one module.
 """
 
 from typing import Dict, List
