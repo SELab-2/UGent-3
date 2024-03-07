@@ -1,6 +1,7 @@
 """
 Module that implements the /projects endpoint of the API
 """
+import os
 from os import getenv
 from urllib.parse import urljoin
 
@@ -11,6 +12,8 @@ from project.models.projects import Project
 from project.utils.query_agent import query_selected_from_model, insert_into_model
 
 API_URL = getenv('API_HOST')
+UPLOAD_FOLDER = '/project/endpoints/uploads/'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 class ProjectsEndpoint(Resource):
     """
@@ -40,4 +43,9 @@ class ProjectsEndpoint(Resource):
         using flask_restfull parse lib
         """
 
-        return insert_into_model(Project, request.json, urljoin(API_URL, "/projects"))
+        file = request.files["assignment_file"]
+
+        # save the file that is given with the request
+        file.save("."+os.path.join(UPLOAD_FOLDER, file.filename))
+        # return insert_into_model(Project, request.json, urljoin(API_URL, "/projects"))
+        return {}, 200
