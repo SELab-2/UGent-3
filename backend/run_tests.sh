@@ -6,6 +6,11 @@ docker-compose -f tests.yaml up --build --exit-code-from test-runner
 # Store the exit code in a variable
 exit_code=$?
 
+if [ $exit_code -eq 0 ]; then
+    pytest tests/utils
+    exit_code=$?
+fi
+
 # After the tests are finished, stop and remove the containers
 docker-compose -f tests.yaml down
 
