@@ -1,9 +1,9 @@
 """Here we will test all the courses endpoint related functionality"""
 
-from project.models.course_relations import CourseStudent, CourseAdmin
+from project.models.course_relation import CourseStudent, CourseAdmin
 
 
-from project.models.courses import Course
+from project.models.course import Course
 
 
 class TestCourseEndpoint:

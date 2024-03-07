@@ -6,10 +6,10 @@ from flask import Blueprint, jsonify, request
 from flask import abort
 from flask_restful import Api, Resource
 from sqlalchemy.exc import SQLAlchemyError
-from project.models.course_relations import CourseAdmin, CourseStudent
-from project.models.users import User
-from project.models.courses import Course
-from project.models.projects import Project
+from project.models.course_relation import CourseAdmin, CourseStudent
+from project.models.user import User
+from project.models.course import Course
+from project.models.project import Project
 from project import db
 
 courses_bp = Blueprint("courses", __name__)

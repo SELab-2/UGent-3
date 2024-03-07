@@ -10,7 +10,7 @@ from sqlalchemy import exc
 
 
 from project import db
-from project.models.projects import Project
+from project.models.project import Project
 from project.endpoints.projects.endpoint_parser import parse_project_params
 
 load_dotenv()

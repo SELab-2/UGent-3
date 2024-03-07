@@ -12,7 +12,7 @@ from sqlalchemy import exc
 from project.endpoints.projects.endpoint_parser import parse_project_params
 
 from project import db
-from project.models.projects import Project
+from project.models.project import Project
 
 load_dotenv()
 API_URL = getenv('API_HOST')
