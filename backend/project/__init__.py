@@ -6,8 +6,7 @@ from flask import Flask
 from .db_in import db
 from .endpoints.index.index import index_bp
 from .endpoints.projects.project_endpoint import project_bp
-from .endpoints.courses import courses_bp
-
+from .endpoints.courses.courses_config import courses_bp
 
 
 def create_app():
