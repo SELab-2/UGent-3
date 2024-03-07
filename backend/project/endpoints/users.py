@@ -65,7 +65,8 @@ class Users(Resource):
             'is_teacher': user.is_teacher,
             'is_admin': user.is_admin
         }
-        return {"message": "User created successfully!", "data": user_js, "url": f"{API_URL}/users/{user.uid}"}, 201
+        return {"message": "User created successfully!",
+                "data": user_js, "url": f"{API_URL}/users/{user.uid}"}, 201
 
 
 class User(Resource):
@@ -118,7 +119,8 @@ class User(Resource):
             'is_teacher': user.is_teacher,
             'is_admin': user.is_admin
         }
-        return {"message": "User updated successfully!", "data": user_js, "url": f"{API_URL}/users/{user.uid}"}
+        return {"message": "User updated successfully!",
+                "data": user_js, "url": f"{API_URL}/users/{user.uid}"}
 
     def delete(self, user_id):
         """
