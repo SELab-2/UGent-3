@@ -1,6 +1,5 @@
 [MASTER]
 init-hook='import sys; sys.path.append(".")'
-ignore=tests/utils/submission_evaluators/resources/*
 
 [test-files:*_test.py]
 disable=
