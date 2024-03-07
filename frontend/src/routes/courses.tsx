@@ -21,6 +21,7 @@ interface CourseDetails{
 export function All_courses() {
     const [courses, setCourses] = useState<Course[]>([]);
     const navigate = useNavigate();
+    //todo: check if the user is a teacher
     useEffect(() => {
         fetch("http://127.0.0.1:5000/courses")
             .then(response => response.json())
@@ -52,26 +53,42 @@ export function All_courses() {
     );
 }
 
-interface Project {
+interface ProjectSubmission {
     project_id: number,
+    submission_id: number,
     title: string,
-    descriptions: string,
-    course_id: number,
-    deadline: string,
-    archieved: boolean,
-    assignment_file: string,
-    regex_expressions: string[],
-    script_name: string,
-    test_path: string,
-    visible_for_students: boolean
+    score: number
 }
 
-export function Details_course() {//for student
+export function Student_or_admin() {
+    //send a fetch to courses endpoint to check if uid is admin or student
+    //todo: figure out how to get uid
+    const is_student = true;
+    if (is_student) {
+        return <Details_course_student />;
+    } else {
+        return <Details_course_admin />;
+    }
+}
+
+function Details_course_admin() {//for admin
     const { courseId } = useParams<{ courseId: string }>();
     const [course, setCourse] = useState<CourseDetails>();
-    const [projects, setProjects] = useState<Project[]>([]);
-    //todo: load different page if student or admin
+    const navigate = useNavigate();
+    
+    return (
+        <Typography variant="h3" display="flex" justifyContent="center">Under construction</Typography>
+    )
 
+}
+
+
+function Details_course_student() {//for student
+    const { courseId } = useParams<{ courseId: string }>();
+    const [course, setCourse] = useState<CourseDetails>();
+    const [projectSubmissions, setProjectSubmissions] = useState<ProjectSubmission[]>([]);
+    //todo: load different page if student or admin
+    const navigate = useNavigate();
     useEffect(() => {
         authenticated_fetch("http://127.0.0.1:5000/courses/"+courseId)
             .then(response => response.json())
@@ -81,34 +98,46 @@ export function Details_course() {//for student
             .catch(error => console.error('Error:', error));
     }, []);
     
-    //fetch the projects
+    //fetch the projects and submission scores
     useEffect(() => {course?.projects.forEach((projectUrl: string) => {
-        console.log(projectUrl)
         fetch(projectUrl)
             .then(response => response.json())
             .then(projectData => {
-                setProjects(prevProjects => [...prevProjects, projectData.data]);
+                const submission = fetch_fake_submission(projectData.data.project_id);
+                setProjectSubmissions(prevProjectSubmissions => 
+                    [...prevProjectSubmissions, {project_id:projectData.data.project_id, submission_id:submission.submission_id, title: projectData.data.title, score: submission.score}]);
             })
             .catch(error => console.error('Error:', error));
     })}, [course]);
 
-    //todo: fetch last submission so we can check score
-    const submissions = fetch_fake_submission(projects[0].project_id);
     return (
-        <div>
-            <Container>
-                <Typography variant="h3" display="flex" justifyContent="center">Ufora id: {course?.ufora_id}</Typography>
-                {
-                    projects.map((project, index) => (
-                        <Typography key={index} variant="h5" display="flex" justifyContent="center">Project: {project.title}</Typography>
-                    ))
-                }
-            </Container>
-        </div>
+        <Container>
+            <Typography variant="h3" display="flex" justifyContent="center">Ufora id: {course?.ufora_id}</Typography>
+            <Grid container spacing={3}>
+                {projectSubmissions.map((projectSubmission, index) => (
+                    <Grid item xs={12} key={index}>
+                        <Grid container justifyContent="space-between">
+                        <Card onClick={() => {
+                                return navigate(`/projects/${projectSubmission.project_id}`);
+                            }} style={{backgroundColor: 'gray'}}>
+                            <CardContent>
+                                    <Typography variant="h5">Project: {projectSubmission.title}</Typography>
+                            </CardContent>
+                        </Card>
+                        <Card style={{backgroundColor: 'gray'}}>
+                            <CardContent>
+                                    <Typography variant="h5">Score: {projectSubmission.score}</Typography>
+                            </CardContent>
+                        </Card>
+                        </Grid>
+                    </Grid>
+                ))}
+            </Grid>
+        </Container>
     );
 }
 
-function fetch_fake_submission(project_id){
+function fetch_fake_submission(project_id:number){
     return {
         "submission_id": 1,
         "student_id": 1,
