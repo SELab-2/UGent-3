@@ -1,6 +1,6 @@
 /**
  *
- * @param {string} url - The URL to fetch.
+ * @param url - The URL to fetch.
  * @returns The fetch response.
  */
 export function authenticated_fetch(url:string){

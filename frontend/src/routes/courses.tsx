@@ -146,7 +146,7 @@ function Details_course_student() {//for student
 
 /**
  * Fetches a fake submission.
- * @param {number} project_id - The ID of the project.
+ * @param project_id - The ID of the project.
  * @returns A mock submission object.
  */
 function fetch_fake_submission(project_id:number){
