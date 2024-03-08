@@ -25,7 +25,7 @@ class Users(Resource):
         """
         users = userModel.query.all()
 
-        result = jsonify({"message": "Queried all users", "data": users, "url":f"{API_URL}/users/"})
+        result = jsonify({"message": "Queried all users", "data": users, "url":f"{API_URL}/users/", "status_code": 200})
         return result
 
     def post(self):
@@ -55,18 +55,19 @@ class Users(Resource):
             new_user = userModel(uid=uid, is_teacher=is_teacher, is_admin=is_admin)
             db.session.add(new_user)
             db.session.commit()
+            user_js = {
+                'uid': user.uid,
+                'is_teacher': user.is_teacher,
+                'is_admin': user.is_admin
+            }
+            return {"message": "User created successfully!",
+                    "data": user_js, "url": f"{API_URL}/users/{user.uid}"}, 201
 
         except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
             return {"message": "An error occurred while creating the user"}, 500
-        user_js = {
-            'uid': user.uid,
-            'is_teacher': user.is_teacher,
-            'is_admin': user.is_admin
-        }
-        return {"message": "User created successfully!",
-                "data": user_js, "url": f"{API_URL}/users/{user.uid}"}, 201
+
 
 
 class User(Resource):
@@ -77,16 +78,19 @@ class User(Resource):
         This function will respond to GET requests made to /users/<user_id>.
         It should return the user with the given user_id from the database.
         """
-        user = db.session.get(userModel, user_id)
-        if user is None:
-            return {"message": "User not found!"}, 404
+        try:
+            user = db.session.get(userModel, user_id)
+            if user is None:
+                return {"message": "User not found!"}, 404
 
-        user_js = {
-            'uid': user.uid,
-            'is_teacher': user.is_teacher,
-            'is_admin': user.is_admin
-        }
-        return {"message": "User queried","data":user_js, "url": f"{API_URL}/users/{user.uid}"}, 200
+            user_js = {
+                'uid': user.uid,
+                'is_teacher': user.is_teacher,
+                'is_admin': user.is_admin
+            }
+            return {"message": "User queried","data":user_js, "url": f"{API_URL}/users/{user.uid}"}, 200
+        except SQLAlchemyError:
+            return {"message": "An error occurred while fetching the user"}, 500
 
     def patch(self, user_id):
         """
@@ -110,17 +114,18 @@ class User(Resource):
 
             # Save the changes to the database
             db.session.commit()
+            user_js = {
+                'uid': user.uid,
+                'is_teacher': user.is_teacher,
+                'is_admin': user.is_admin
+            }
+            return {"message": "User updated successfully!",
+                    "data": user_js, "url": f"{API_URL}/users/{user.uid}"}, 200
         except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
             return {"message": "An error occurred while patching the user"}, 500
-        user_js = {
-            'uid': user.uid,
-            'is_teacher': user.is_teacher,
-            'is_admin': user.is_admin
-        }
-        return {"message": "User updated successfully!",
-                "data": user_js, "url": f"{API_URL}/users/{user.uid}"}
+
 
     def delete(self, user_id):
         """
@@ -134,11 +139,11 @@ class User(Resource):
 
             db.session.delete(user)
             db.session.commit()
+            return {"message": "User deleted successfully!"}, 200
         except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
             return {"message": "An error occurred while deleting the user"}, 500
-        return {"message": "User deleted successfully!"}
 
 
 users_api.add_resource(Users, "/users")
