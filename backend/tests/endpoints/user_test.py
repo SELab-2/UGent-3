@@ -114,7 +114,7 @@ class TestUserEndpoint:
 
     def test_get_users_with_query(self, client, user_db_session):
         """Test getting users with a query."""
-        # Send a GET request with query parameters
+        # Send a GET request with query parameters, this is a nonsense entry but good for testing
         response = client.get("/users?is_admin=true&is_teacher=false")
         assert response.status_code == 200
 
