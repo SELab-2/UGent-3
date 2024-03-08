@@ -124,34 +124,11 @@ class TestSubmissionsEndpoint:
         assert response.status_code == 400
         assert data["message"] == "Invalid project (project_id=zero)"
 
-    def test_post_submissions_wrong_grading(self, client: FlaskClient, session: Session):
-        """Test posting a submission with a wrong grading"""
-        response = client.post("/submissions", data={
-            "uid": "student01",
-            "project_id": 1,
-            "grading": 80
-        })
-        data = response.json
-        assert response.status_code == 400
-        assert data["message"] == "Invalid grading (grading=0-20)"
-
-    def test_post_submissions_wrong_grading_type(self, client: FlaskClient, session: Session):
-        """Test posting a submission with a wrong grading type"""
-        response = client.post("/submissions", data={
-            "uid": "student01",
-            "project_id": 1,
-            "grading": "zero"
-        })
-        data = response.json
-        assert response.status_code == 400
-        assert data["message"] == "Invalid grading (grading=0-20)"
-
     def test_post_submissions_correct(self, client: FlaskClient, session: Session):
         """Test posting a submission"""
         response = client.post("/submissions", data={
             "uid": "student01",
-            "project_id": 1,
-            "grading": 16
+            "project_id": 1
         })
         data = response.json
         assert response.status_code == 201
@@ -159,7 +136,6 @@ class TestSubmissionsEndpoint:
         assert data["url"] == f"{API_HOST}/submissions/{data['data']['id']}"
         assert data["data"]["user"] == f"{API_HOST}/users/student01"
         assert data["data"]["project"] == f"{API_HOST}/projects/1"
-        assert data["data"]["grading"] == 16
 
     ### GET SUBMISSION ###
     def test_get_submission_wrong_id(self, client: FlaskClient, session: Session):

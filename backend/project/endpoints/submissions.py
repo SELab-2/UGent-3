@@ -92,14 +92,6 @@ class SubmissionsEndpoint(Resource):
                     return data, 400
                 submission.project_id = int(project_id)
 
-                # Grading
-                grading = request.form.get("grading")
-                if grading is not None:
-                    if not (grading.isdigit() and 0 <= int(grading) <= 20):
-                        data["message"] = "Invalid grading (grading=0-20)"
-                        return data, 400
-                    submission.grading = int(grading)
-
                 # Submission time
                 submission.submission_time = datetime.now()
 
