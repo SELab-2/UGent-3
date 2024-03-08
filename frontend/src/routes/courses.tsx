@@ -72,10 +72,11 @@ export function Student_or_admin() {
 }
 
 function Details_course_admin() {//for admin
+    /**
     const { courseId } = useParams<{ courseId: string }>();
     const [course, setCourse] = useState<CourseDetails>();
     const navigate = useNavigate();
-    
+    */
     return (
         <Typography variant="h3" display="flex" justifyContent="center">Under construction</Typography>
     )
