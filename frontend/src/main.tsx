@@ -10,27 +10,32 @@ import {
 import Root from "./routes/root"
 import ErrorPage from './error-pages/error-page';
 import Login_page from './routes/login';
-import {All_courses,Details_course} from './routes/courses';
+import {All_courses,Student_or_admin} from './routes/courses';
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
     errorElement: <ErrorPage />,
-  children: [
-    {
-      path: "login",
-      element: <Login_page/>
-    },
-    {
-      path: "courses",
-      element: <All_courses />
-    },
-    {
-      path: "courses/:courseId",
-      element: <Details_course />
-    }
-  ]
+    children: [
+      {
+        path: "login",
+        element: <Login_page/>
+      },
+      {
+        path: "courses",
+        children: [
+          {
+            path: "/",
+            element: <All_courses />
+          },
+          {
+            path: ":courseId",
+            element: <Student_or_admin />
+          }
+        ]
+      }
+    ]
   }
 ]);
 
