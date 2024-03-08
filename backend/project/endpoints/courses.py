@@ -346,7 +346,7 @@ class CourseByCourseId(Resource):
         abort_url = API_URL + "/courses/" + str(course_id)
         # course does exist so url should be to the id
         project_uids = [
-            API_URL + "/projects/" + str(project.project_id)
+            f"{API_URL}/projects/{project.project_id}"
             for project in execute_query_abort_if_db_error(
                 query, abort_url, query_all=True
             )
