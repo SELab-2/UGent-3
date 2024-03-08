@@ -122,5 +122,5 @@ class TestUserEndpoint:
         users = response.json["data"]
         assert len(users) == 1
         assert users[0]["uid"] == "query_user"
-        assert users[0]["is_admin"] == True
-        assert users[0]["is_teacher"] == False
+        assert users[0]["is_admin"] is True
+        assert users[0]["is_teacher"] is False
