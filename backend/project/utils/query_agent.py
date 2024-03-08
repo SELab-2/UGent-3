@@ -85,7 +85,7 @@ def insert_into_model(model: DeclarativeMeta,
         return jsonify({
                 "data": new_instance,
                 "message": "Object created succesfully.",
-                "url": urljoin(response_url_base, str(getattr(new_instance, url_id_field)))}), 201
+                "url": urljoin(f"{response_url_base}/", str(getattr(new_instance, url_id_field)))}), 201
     except SQLAlchemyError:
         return jsonify({"error": "Something went wrong while inserting into the database.",
                 "url": response_url_base}), 500
@@ -167,7 +167,7 @@ def query_by_id_from_model(model: DeclarativeMeta,
         return jsonify({
             "data": result,
             "message": "Resource fetched correctly",
-            "url": urljoin(base_url + "/", str(column_id))}), 200
+            "url": urljoin(f"{base_url}/", str(column_id))}), 200
     except SQLAlchemyError:
         return {
             "error": "Something went wrong while querying the database.",
@@ -202,7 +202,7 @@ def patch_by_id_from_model(model: DeclarativeMeta,
         return jsonify({
             "data": result,
             "message": "Resource updated successfully",
-            "url": urljoin(base_url + "/", str(column_id))}), 200
+            "url": urljoin(f"{base_url}/", str(column_id))}), 200
     except SQLAlchemyError:
         return {"error": "Something went wrong while updating the database.",
                 "url": base_url}, 500
