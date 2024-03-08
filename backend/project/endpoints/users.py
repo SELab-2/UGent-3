@@ -25,7 +25,8 @@ class Users(Resource):
         """
         users = userModel.query.all()
 
-        result = jsonify({"message": "Queried all users", "data": users, "url":f"{API_URL}/users/", "status_code": 200})
+        result = jsonify({"message": "Queried all users", "data": users,
+                          "url":f"{API_URL}/users/", "status_code": 200})
         return result
 
     def post(self):
@@ -88,7 +89,8 @@ class User(Resource):
                 'is_teacher': user.is_teacher,
                 'is_admin': user.is_admin
             }
-            return {"message": "User queried","data":user_js, "url": f"{API_URL}/users/{user.uid}"}, 200
+            return {"message": "User queried","data":user_js,
+                    "url": f"{API_URL}/users/{user.uid}"}, 200
         except SQLAlchemyError:
             return {"message": "An error occurred while fetching the user"}, 500
 
