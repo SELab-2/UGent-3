@@ -1343,7 +1343,7 @@
     },
     "/submissions": {
       "get": {
-        "summary": "Get the submissions",
+        "summary": "Gets the submissions",
         "parameters": [
           {
             "name": "uid",
@@ -1364,7 +1364,7 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of submission URLs",
+            "description": "Successfully retrieved a list of submission URLs",
             "content": {
               "application/json": {
                 "schema": {
@@ -1389,7 +1389,7 @@
             }
           },
           "400": {
-            "description": "An 'invalid data' message",
+            "description": "An invalid user or project is given",
             "content": {
               "application/json": {
                 "schema": {
@@ -1404,7 +1404,7 @@
             }
           },
           "500": {
-            "description": "An error message",
+            "description": "An internal server error occurred",
             "content": {
               "application/json": {
                 "schema": {
@@ -1421,7 +1421,7 @@
         }
       },
       "post": {
-        "summary": "Post a new submission to a project",
+        "summary": "Posts a new submission to a project",
         "requestBody": {
           "description": "Form data",
           "content": {
@@ -1449,7 +1449,7 @@
         },
         "responses": {
           "201": {
-            "description": "The newly created submission URL",
+            "description": "Successfully posts the submission and retrieves its data",
             "content": {
               "application/json": {
                 "schema": {
@@ -1497,7 +1497,7 @@
             }
           },
           "400": {
-            "description": "An 'invalid data' message",
+            "description": "An invalid user or project is given",
             "content": {
               "application/json": {
                 "schema": {
@@ -1512,7 +1512,7 @@
             }
           },
           "500": {
-            "description": "An error message",
+            "description": "An internal server error occurred",
             "content": {
               "application/json": {
                 "schema": {
@@ -1531,10 +1531,10 @@
     },
     "/submissions/{submission_id}": {
       "get": {
-        "summary": "Get the submission",
+        "summary": "Gets the submission",
         "responses": {
           "200": {
-            "description": "The submission",
+            "description": "Successfully retrieved the submission",
             "content": {
               "application/json": {
                 "schema": {
@@ -1584,7 +1584,7 @@
             }
           },
           "404": {
-            "description": "A 'not found' message",
+            "description": "An invalid submission id is given",
             "content": {
               "application/json": {
                 "schema": {
@@ -1599,7 +1599,7 @@
             }
           },
           "500": {
-            "description": "An error message",
+            "description": "An internal server error occurred",
             "content": {
               "application/json": {
                 "schema": {
@@ -1616,7 +1616,7 @@
         }
       },
       "patch": {
-        "summary": "Patch the submission",
+        "summary": "Patches the submission",
         "requestBody": {
           "description": "The submission data",
           "content": {
@@ -1636,7 +1636,7 @@
         },
         "responses": {
           "200": {
-            "description": "A 'submission updated' message",
+            "description": "Successfully patches the submission and retrieves its data",
             "content": {
               "application/json": {
                 "schema": {
@@ -1684,7 +1684,7 @@
             }
           },
           "400": {
-            "description": "An 'invalid data' message",
+            "description": "An invalid submission grading is given",
             "content": {
               "application/json": {
                 "schema": {
@@ -1699,7 +1699,7 @@
             }
           },
           "404": {
-            "description": "A 'not found' message",
+            "description": "An invalid submission id is given",
             "content": {
               "application/json": {
                 "schema": {
@@ -1714,7 +1714,7 @@
             }
           },
           "500": {
-            "description": "An error message",
+            "description": "An internal server error occurred",
             "content": {
               "application/json": {
                 "schema": {
@@ -1731,10 +1731,10 @@
         }
       },
       "delete": {
-        "summary": "Delete the submission",
+        "summary": "Deletes the submission",
         "responses": {
           "200": {
-            "description": "A 'submission deleted' message",
+            "description": "Successfully deletes the submission",
             "content": {
               "application/json": {
                 "schema": {
@@ -1749,7 +1749,7 @@
             }
           },
           "404": {
-            "description": "A 'not found' message",
+            "description": "An invalid submission id is given",
             "content": {
               "application/json": {
                 "schema": {
@@ -1764,7 +1764,7 @@
             }
           },
           "500": {
-            "description": "An error message",
+            "description": "An internal server error occurred",
             "content": {
               "application/json": {
                 "schema": {
