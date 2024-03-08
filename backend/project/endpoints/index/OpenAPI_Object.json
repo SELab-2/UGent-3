@@ -245,7 +245,24 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "type": "string"
+                        "type": "object",
+                        "properties": {
+                          "course_id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "ufora_id": {
+                            "type": "string"
+                          },
+                          "teacher": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          }
+                        }
                       }
                     },
                     "url": {
