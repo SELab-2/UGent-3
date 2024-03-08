@@ -1,34 +1,25 @@
 # Project pigeonhole backend
 ## Prerequisites
-If you want the development environment run both commands if you only need to deploy only run the Deployment command.
-
-The [dev-requirements.txt](dev-requirements.txt) contains everything for writing tests and linters for maintaining quality code.
-On the other hand the regular [requirements.txt](requirements.txt) install the packages needed for 
-the regular base application.
-
-- Deployment
-```sh
-  pip install -r requirments.txt
-```
-- Development
-```sh
-  pip install -r dev-requirments.txt
-```
-
-## Installation
-1. Clone the repo
+**1. Clone the repo**
    ```sh
    git clone git@github.com:SELab-2/UGent-3.git
    ```
-2. If you want to develop run both commands, if you want to deploy only run deployment command.
+**2. Installing required packages**
+
+   If you want the development environment: run both commands. If you only need to deploy, run the deployment command.
+
+   The [dev-requirements.txt](dev-requirements.txt) contains everything for writing tests and linters for maintaining quality code.
+On the other hand the regular [requirements.txt](requirements.txt) installs the packages needed for 
+the regular base application.
+
    - Deployment
    ```sh
-   pip install -r requirments.txt
+   pip install -r requirements.txt
    ```
    - Development
    ```sh
-   pip install -r dev-requirments.txt
-   ``` 
+   pip install -r dev-requirements.txt
+   ```
 
 ## Setting up the environment variables
 The project requires a couple of environment variables to run, if you want to develop on this codebase.
@@ -45,7 +36,7 @@ Setting values for these variables can be done with a method to your own liking.
 
 All the variables except the last one are for the database setup,
 these are needed to make a connection with the database.
-The last one is for keeping the API restfull since the location of the recourse should be located.
+The last one is for keeping the API restful since the location of the resource should be located.
 
 ## Running the project
 Once all the setup is done you can start the development server by
@@ -53,8 +44,8 @@ navigating to the backend directory and running:
 ```sh
 python project
 ``` 
-The server should now be located at  `localhost:5000` and you can
-start developping.
+The server should now be located at `localhost:5000` and you can
+start developing.
 
 ## Maintaining the codebase
 ### Writing tests
@@ -64,7 +55,7 @@ writing tests is mandatory for this, the test library used in this codebase is [
 If you want to write tests we highly advise to read the pytest documentation on how
 to write tests, so they are kept conventional.
 
-For executing the tests and testing you're newly added functionality
+For executing the tests and testing your newly added functionality
 you can run:
 ```sh
 sudo ./run_tests.sh
