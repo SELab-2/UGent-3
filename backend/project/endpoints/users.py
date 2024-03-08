@@ -23,11 +23,24 @@ class Users(Resource):
         This function will respond to get requests made to /users.
         It should return all users from the database.
         """
-        users = userModel.query.all()
+        try:
+            query = userModel.query
+            is_teacher = request.args.get('is_teacher')
+            is_admin = request.args.get('is_admin')
 
-        result = jsonify({"message": "Queried all users", "data": users,
-                          "url":f"{API_URL}/users/", "status_code": 200})
-        return result
+            if is_teacher is not None:
+                query = query.filter(userModel.is_teacher == (is_teacher.lower() == 'true'))
+
+            if is_admin is not None:
+                query = query.filter(userModel.is_admin == (is_admin.lower() == 'true'))
+
+            users = query.all()
+
+            result = jsonify({"message": "Queried all users", "data": users,
+                              "url":f"{API_URL}/users/", "status_code": 200})
+            return result
+        except SQLAlchemyError:
+            return {"message": "An error occurred while fetching the users"}, 500
 
     def post(self):
         """

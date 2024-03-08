@@ -25,7 +25,8 @@ def user_db_session():
     session.add_all(
             [User(uid="del", is_admin=False, is_teacher=True),
              User(uid="pat", is_admin=False, is_teacher=True),
-             User(uid="u_get", is_admin=False, is_teacher=True)
+             User(uid="u_get", is_admin=False, is_teacher=True),
+             User(uid="query_user", is_admin=True, is_teacher=False)
              ]
         )
     session.commit()
@@ -110,3 +111,16 @@ class TestUserEndpoint:
             'is_admin': False
         })
         assert response.status_code == 415
+
+    def test_get_users_with_query(self, client, user_db_session):
+        """Test getting users with a query."""
+        # Send a GET request with query parameters
+        response = client.get("/users?is_admin=true&is_teacher=false")
+        assert response.status_code == 200
+
+        # Check that the response contains only the user that matches the query
+        users = response.json["data"]
+        assert len(users) == 1
+        assert users[0]["uid"] == "query_user"
+        assert users[0]["is_admin"] == True
+        assert users[0]["is_teacher"] == False
