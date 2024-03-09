@@ -7,6 +7,7 @@ from .db_in import db
 from .endpoints.index.index import index_bp
 from .endpoints.projects.project_endpoint import project_bp
 from .endpoints.courses.courses_config import courses_bp
+from .endpoints.users import users_bp
 from .endpoints.courses.join_codes.join_codes_config import join_codes_bp
 
 
@@ -22,6 +23,7 @@ def create_app():
     app.register_blueprint(project_bp)
     app.register_blueprint(courses_bp)
     app.register_blueprint(join_codes_bp)
+    app.register_blueprint(users_bp)
 
     return app
 
