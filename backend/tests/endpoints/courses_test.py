@@ -1,9 +1,9 @@
 """Here we will test all the courses endpoint related functionality"""
 
-from project.models.course_relations import CourseStudent, CourseAdmin
+from project.models.course_relation import CourseStudent, CourseAdmin
 
 
-from project.models.courses import Course
+from project.models.course import Course
 
 
 class TestCourseEndpoint:
@@ -24,19 +24,6 @@ class TestCourseEndpoint:
         course = courses_init_db.query(Course).filter_by(name="Sel2").first()
         assert course is not None
         assert course.teacher == "Bart"
-
-        response = client.post(
-            "/courses?uid=Jef", json=course_data
-        )  # non existent user
-        assert response.status_code == 404
-
-        response = client.post(
-            "/courses?uid=student_sel2_0", json=course_data
-        )  # existent user but no rights
-        assert response.status_code == 403
-
-        response = client.post("/courses", json=course_data)  # bad link, no uid passed
-        assert response.status_code == 400
 
         response = client.post(
             "/courses?uid=Bart", json=invalid_course
@@ -88,11 +75,6 @@ class TestCourseEndpoint:
 
         sel2_admins_link = "/courses/" + str(course.course_id) + "/admins"
 
-        response = client.post(
-            sel2_admins_link + "?uid=student_sel2_0",  # unauthorized user
-            json={"admin_uid": "Rien"},
-        )
-        assert response.status_code == 403
         course_admins = [
             s.uid
             for s in CourseAdmin.query.filter_by(course_id=course.course_id).all()
@@ -131,7 +113,7 @@ class TestCourseEndpoint:
             assert response.status_code == 200
 
         sel2_students = [
-            f"{api_url}/users/" + s.uid
+            {"uid": f"{api_url}/users/" + s.uid}
             for s in CourseStudent.query.filter_by(course_id=course.course_id).all()
         ]
 

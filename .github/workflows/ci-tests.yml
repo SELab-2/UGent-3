@@ -1,6 +1,6 @@
 name: UGent-3
 run-name: ${{ github.actor }} is running tests 🚀
-on: [push, pull_request]
+on: [pull_request]
 jobs:
   Frontend-tests:
     runs-on: self-hosted
@@ -57,6 +57,6 @@ jobs:
 
       - name: Run linting
         working-directory: ./backend
-        run: pylint --recursive=yes .
+        run: find . -type f -name "*.py" | xargs pylint 
 
       

@@ -3,10 +3,10 @@ from datetime import datetime
 
 import os
 import pytest
-from project.models.courses import Course
-from project.models.users import User
-from project.models.projects import Project
-from project.models.course_relations import CourseStudent,CourseAdmin
+from project.models.course import Course
+from project.models.user import User
+from project.models.project import Project
+from project.models.course_relation import CourseStudent,CourseAdmin
 from project import create_app_with_db, db
 from project.db_in import url
 
