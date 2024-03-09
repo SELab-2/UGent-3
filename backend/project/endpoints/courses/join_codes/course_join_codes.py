@@ -10,7 +10,6 @@ from flask_restful import Resource
 from flask import request
 from project.utils.query_agent import query_selected_from_model, insert_into_model
 from project.models.course_share_code import CourseShareCode
-from project.endpoints.courses.join_codes.join_codes_utils import check_course_exists
 from project.endpoints.courses.courses_utils import get_course_abort_if_not_found
 
 load_dotenv()

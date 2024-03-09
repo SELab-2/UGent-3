@@ -1,3 +1,6 @@
+"""
+This module contains functions that are used by the join codes resources.
+"""
 
 from project.endpoints.courses.courses_utils import get_course_abort_if_not_found
 
