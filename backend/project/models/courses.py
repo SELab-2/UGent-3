@@ -1,8 +1,8 @@
 """The Course model"""
+
 from dataclasses import dataclass
 from sqlalchemy import Integer, Column, ForeignKey, String
 from project import db
-
 
 @dataclass
 class Course(db.Model):
