@@ -44,7 +44,7 @@ class TestUserEndpoint:
         # Delete the user
         response = client.delete("/users/del")
         assert response.status_code == 200
-        assert response.json == {"message": "User deleted successfully!"}
+        assert response.json["message"] ==  "User deleted successfully!"
 
     def test_delete_not_present(self, client,user_db_session):
         """Test deleting a user that does not exist."""
