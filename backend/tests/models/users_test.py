@@ -1,7 +1,7 @@
 """
 This file contains the tests for the User model.
 """
-from project.models.users import User
+from project.models.user import User
 
 
 class TestUserModel:

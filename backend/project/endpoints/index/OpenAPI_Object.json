@@ -245,7 +245,24 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "type": "string"
+                        "type": "object",
+                        "properties": {
+                          "course_id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "ufora_id": {
+                            "type": "string"
+                          },
+                          "teacher": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          }
+                        }
                       }
                     },
                     "url": {
@@ -1341,6 +1358,189 @@
         }
       }
     },
+    "/users": {
+      "get": {
+        "summary": "Get all users",
+        "responses": {
+          "200": {
+            "description": "A list of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "uid": {
+                        "type": "string"
+                      },
+                      "is_teacher": {
+                        "type": "boolean"
+                      },
+                      "is_admin": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": ["uid", "is_teacher", "is_admin"]
+                  }
+                }
+              }
+            }
+          }}},
+          "post": {
+            "summary": "Create a new user",
+            "requestBody": {
+              "required": true,
+              "content":{
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "uid": {
+                        "type": "string"
+                      },
+                      "is_teacher": {
+                        "type": "boolean"
+                      },
+                      "is_admin": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": ["uid", "is_teacher", "is_admin"]
+                  }
+                }
+              }
+            },
+            "responses": {
+              "201": {
+                "description": "User created successfully"
+              },
+              "400": {
+                "description": "Invalid request data"
+              },
+              "415": {
+                "description": "Unsupported Media Type. Expected JSON."
+              },
+              "500": {
+                "description": "An error occurred while creating the user"
+              }
+            }
+
+        },
+        "/users/{user_id}": {
+          "get": {
+            "summary": "Get a user by ID",
+            "parameters": [
+              {
+                "name": "user_id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "A user",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "uid": {
+                          "type": "string"
+                        },
+                        "is_teacher": {
+                          "type": "boolean"
+                        },
+                        "is_admin": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["uid", "is_teacher", "is_admin"]
+                    }
+                  }
+                }
+              },
+              "404": {
+                "description": "User not found"
+              }
+            }
+          },
+          "patch": {
+            "summary": "Update a user's information",
+            "parameters": [
+              {
+                "name": "user_id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            ],
+            "requestBody": {
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "is_teacher": {
+                        "type": "boolean"
+                      },
+                      "is_admin": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": ["is_teacher", "is_admin"]
+                  }
+                }
+              }
+            },
+            "responses": {
+              "200": {
+                "description": "User updated successfully"
+              },
+              "404": {
+                "description": "User not found"
+              },
+              "415": {
+                "description": "Unsupported Media Type. Expected JSON."
+              },
+              "500": {
+                "description": "An error occurred while patching the user"
+              }
+            }
+          },
+          "delete": {
+            "summary": "Delete a user",
+            "parameters": [
+              {
+                "name": "user_id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "User deleted successfully"
+              },
+              "404": {
+                "description": "User not found"
+              },
+              "500": {
+                "description": "An error occurred while deleting the user"
+              }
+            }
+          }
+        }
+      }
+    },
     "/submissions": {
       "get": {
         "summary": "Gets the submissions",
@@ -1794,4 +1994,3 @@
       ]
     }
   }
-}
