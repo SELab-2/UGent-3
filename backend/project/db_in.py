@@ -2,12 +2,9 @@
 
 import os
 from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
 from sqlalchemy import URL
 
 db = SQLAlchemy()
-
-load_dotenv()
 
 DATABSE_NAME = os.getenv("POSTGRES_DB")
 DATABASE_USER = os.getenv("POSTGRES_USER")
