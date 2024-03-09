@@ -1,5 +1,6 @@
 """ Configuration for pytest, Flask, and the test client."""
 
+import tempfile
 import os
 from datetime import datetime
 import pytest
@@ -64,7 +65,7 @@ def projects(courses):
             archieved=False,
             test_path="/tests",
             script_name="script.sh",
-            regex_expressions=["*"]
+            regex_expressions=["solution"]
         ),
         Project(
             project_id=2,
@@ -77,7 +78,7 @@ def projects(courses):
             archieved=True,
             test_path="/tests",
             script_name="script.sh",
-            regex_expressions=["*"]
+            regex_expressions=[".*"]
         )
     ]
 
@@ -115,6 +116,35 @@ def submissions(projects):
             submission_status=True
         )
     ]
+
+@pytest.fixture
+def file_empty():
+    """Return an empty file"""
+    descriptor, name = tempfile.mkstemp()
+    with open(descriptor, "rb") as temp:
+        yield temp, name
+
+@pytest.fixture
+def file_no_name():
+    """Return a file with no name"""
+    descriptor, name = tempfile.mkstemp()
+    with open(descriptor, "w", encoding="UTF-8") as temp:
+        temp.write("This is a test file.")
+    with open(name, "rb") as temp:
+        yield temp, ""
+
+@pytest.fixture
+def files():
+    """Return a temporary file"""
+    descriptor01, name01 = tempfile.mkstemp()
+    with open(descriptor01, "w", encoding="UTF-8") as temp:
+        temp.write("This is a test file.")
+    descriptor02, name02 = tempfile.mkstemp()
+    with open(descriptor02, "w", encoding="UTF-8") as temp:
+        temp.write("This is a test file.")
+    with open(name01, "rb") as temp01:
+        with open(name02, "rb") as temp02:
+            yield [(temp01, name01), (temp02, name02)]
 
 engine = create_engine(url)
 Session = sessionmaker(bind=engine)

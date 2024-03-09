@@ -76,66 +76,123 @@ class TestSubmissionsEndpoint:
         ]
 
     ### POST SUBMISSIONS ###
-    def test_post_submissions_no_user(self, client: FlaskClient, session: Session):
+    def test_post_submissions_no_user(self, client: FlaskClient, session: Session, files):
         """Test posting a submission without specifying a user"""
         response = client.post("/submissions", data={
-            "project_id": 1
+            "project_id": 1,
+            "files": files
         })
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "The uid data field is required"
 
-    def test_post_submissions_wrong_user(self, client: FlaskClient, session: Session):
+    def test_post_submissions_wrong_user(self, client: FlaskClient, session: Session, files):
         """Test posting a submission for a non-existing user"""
         response = client.post("/submissions", data={
             "uid": "unknown",
-            "project_id": 1
+            "project_id": 1,
+            "files": files
         })
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "Invalid user (uid=unknown)"
 
-    def test_post_submissions_no_project(self, client: FlaskClient, session: Session):
+    def test_post_submissions_no_project(self, client: FlaskClient, session: Session, files):
         """Test posting a submission without specifying a project"""
         response = client.post("/submissions", data={
-            "uid": "student01"
+            "uid": "student01",
+            "files": files
         })
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "The project_id data field is required"
 
-    def test_post_submissions_wrong_project(self, client: FlaskClient, session: Session):
+    def test_post_submissions_wrong_project(self, client: FlaskClient, session: Session, files):
         """Test posting a submission for a non-existing project"""
         response = client.post("/submissions", data={
             "uid": "student01",
-            "project_id": -1
+            "project_id": -1,
+            "files": files
         })
         data  = response.json
         assert response.status_code == 400
         assert data["message"] == "Invalid project (project_id=-1)"
 
-    def test_post_submissions_wrong_project_type(self, client: FlaskClient, session: Session):
+    def test_post_submissions_wrong_project_type(
+            self, client: FlaskClient, session: Session, files
+        ):
         """Test posting a submission for a non-existing project of the wrong type"""
         response = client.post("/submissions", data={
             "uid": "student01",
-            "project_id": "zero"
+            "project_id": "zero",
+            "files": files
         })
         data  = response.json
         assert response.status_code == 400
         assert data["message"] == "Invalid project (project_id=zero)"
 
-    def test_post_submissions_correct(self, client: FlaskClient, session: Session):
-        """Test posting a submission"""
+    def test_post_submissions_no_files(self, client: FlaskClient, session: Session):
+        """Test posting a submission when no files are uploaded"""
         response = client.post("/submissions", data={
             "uid": "student01",
             "project_id": 1
+        })
+        data = response.json
+        assert response.status_code == 400
+        assert data["message"] == "No files were uploaded"
+
+    def test_post_submissions_empty_file(self, client: FlaskClient, session: Session, file_empty):
+        """Test posting a submission for an empty file"""
+        response = client.post("/submissions", data={
+            "uid": "student01",
+            "project_id": 1,
+            "files": file_empty
+        })
+        data = response.json
+        assert response.status_code == 400
+        assert data["message"] == "No files were uploaded"
+
+    def test_post_submissions_file_with_no_name(
+            self, client: FlaskClient, session: Session, file_no_name
+        ):
+        """Test posting a submission for a file without a name"""
+        response = client.post("/submissions", data={
+            "uid": "student01",
+            "project_id": 1,
+            "files": file_no_name
+        })
+        data = response.json
+        assert response.status_code == 400
+        assert data["message"] == "No files were uploaded"
+
+    def test_post_submissions_file_with_wrong_name(
+            self, client: FlaskClient, session: Session, files
+        ):
+        """Test posting a submissions for a file with a wrong name"""
+        response = client.post("/submissions", data={
+            "uid": "student01",
+            "project_id": 1,
+            "files": files
+        })
+        data = response.json
+        assert response.status_code == 400
+        assert "Invalid filename(s)" in data["message"]
+
+    def test_post_submissions_correct(
+            self, client: FlaskClient, session: Session, files
+        ):
+        """Test posting a submission"""
+        response = client.post("/submissions", data={
+            "uid": "student01",
+            "project_id": 2,
+            "files": files
         })
         data = response.json
         assert response.status_code == 201
         assert data["message"] == "Successfully fetched the submissions"
         assert data["url"] == f"{API_HOST}/submissions/{data['data']['id']}"
         assert data["data"]["user"] == f"{API_HOST}/users/student01"
-        assert data["data"]["project"] == f"{API_HOST}/projects/1"
+        assert data["data"]["project"] == f"{API_HOST}/projects/2"
 
     ### GET SUBMISSION ###
     def test_get_submission_wrong_id(self, client: FlaskClient, session: Session):

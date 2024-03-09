@@ -2,7 +2,7 @@
 
 from urllib.parse import urljoin
 from datetime import datetime
-from os import getenv
+from os import getenv, path
 from dotenv import load_dotenv
 from flask import Blueprint, request
 from flask_restful import Resource
@@ -11,6 +11,7 @@ from project.db_in import db
 from project.models.submissions import Submission
 from project.models.projects import Project
 from project.models.users import User
+from project.utils import check_filename, zip_files
 
 load_dotenv()
 API_HOST = getenv("API_HOST")
@@ -96,8 +97,33 @@ class SubmissionsEndpoint(Resource):
                 submission.submission_time = datetime.now()
 
                 # Submission path
-                # Get the files, store them, test them ...
-                submission.submission_path = "/tbd"
+                regexes = session.get(Project, int(project_id)).regex_expressions
+                # Filter out incorrect or empty files
+                files = list(filter(lambda file:
+                    file and file.filename != "" and path.getsize(file.filename) > 0,
+                    request.files.getlist("files")
+                ))
+
+                # Filter out files that don't follow the project's regexes
+                correct_files = list(filter(lambda file:
+                    check_filename(file.filename, regexes),
+                    files
+                ))
+                # Return with a bad request and tell which files where invalid
+                if not correct_files:
+                    incorrect_files = [file.filename for file in files if file not in correct_files]
+                    data["message"] = "No files were uploaded" if not files else \
+                        f"Invalid filename(s) (filenames={','.join(incorrect_files)})"
+                    data["data"] = incorrect_files
+                    return data, 400
+                # Zip the files and save the zip
+                zip_file = zip_files("", correct_files)
+                if zip_file is None:
+                    data["message"] = "Something went wrong while zipping the files"
+                    return data, 500
+                # FIXME app.config["UPLOAD_FOLDER"] instead of "/"
+                submission.submission_path = "/zip.zip"
+                zip_file.save(path.join("/", submission.submission_path))
 
                 # Submission status
                 submission.submission_status = False

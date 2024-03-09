@@ -36,6 +36,7 @@ def create_app_with_db(db_uri: str):
 
     app = create_app()
     app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
+    app.config["UPLOAD_FOLDER"] = "/"
     db.init_app(app)
 
     return app
