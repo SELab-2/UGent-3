@@ -3,7 +3,7 @@
 from os import getenv
 from flask.testing import FlaskClient
 from sqlalchemy.orm import Session
-from project.models.submissions import Submission
+from project.models.submission import Submission
 
 API_HOST = getenv("API_HOST")
 

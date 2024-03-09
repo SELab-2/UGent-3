@@ -8,10 +8,10 @@ from flask import Blueprint, request
 from flask_restful import Resource
 from sqlalchemy import exc
 from project.db_in import db
-from project.models.submissions import Submission
-from project.models.projects import Project
-from project.models.users import User
-from project.utils import check_filename, zip_files
+from project.models.submission import Submission
+from project.models.project import Project
+from project.models.user import User
+from project.utils.files import check_filename, zip_files
 
 load_dotenv()
 API_HOST = getenv("API_HOST")

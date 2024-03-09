@@ -1,4 +1,4 @@
-"""Utility functions"""
+"""Utility functions for files"""
 
 from re import match
 from typing import List
