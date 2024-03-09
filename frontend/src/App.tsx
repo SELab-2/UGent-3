@@ -1,6 +1,5 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Home from "./pages/home/Home";
-import { Header } from "./components/Header/Header";
+import { BrowserRouter } from "react-router-dom";
+import Navbar from "./components/Header/Navbar";
 
 /**
  * This component is the main application component that will be rendered by the ReactDOM. 
@@ -9,10 +8,7 @@ import { Header } from "./components/Header/Header";
 function App(): JSX.Element {
   return (
     <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route index element={<Home />} />
-      </Routes>
+      <Navbar/>
     </BrowserRouter>
   );
 }
