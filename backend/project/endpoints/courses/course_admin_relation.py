@@ -7,8 +7,10 @@ from os import getenv
 from urllib.parse import urljoin
 from dotenv import load_dotenv
 
-from flask import request
+from flask import abort, request
 from flask_restful import Resource
+
+from utils.authentication import add_user_if_not_in_database, get_user_info
 
 from project.models.course_relations import CourseAdmin
 from project.models.users import User
@@ -36,8 +38,23 @@ class CourseForAdmins(Resource):
         """
         This function will return all the admins of a course
         """
+        # geen authorization meegegeven
+        if not request.headers.get("Authorization"):
+            abort(401)
+        
+        user_info = get_user_info(request.headers.get("Authorization"))
+        # probleem met access_token
+        if user_info: # mogelijke error code bekijken?
+            abort(401)
+        
+        # hier checken of user bestaat en toevoegen indien nodig
+        add_user_if_not_in_database(user_info)
+
         abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
-        get_course_abort_if_not_found(course_id)
+        course = get_course_abort_if_not_found(course_id)
+
+        # hier controleren of persoon teacher/admin is van huidige course
+        
 
         return query_selected_from_model(
             CourseAdmin,
