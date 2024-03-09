@@ -14,6 +14,14 @@ CREATE TABLE courses (
 	PRIMARY KEY(course_id)
 );
 
+CREATE TABLE course_join_codes (
+    join_code UUID DEFAULT gen_random_uuid() NOT NULL,
+    course_id INT NOT NULL,
+	expiry_time DATE,
+	for_admins BOOLEAN NOT NULL,
+	CONSTRAINT fk_course_join_link FOREIGN KEY(course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
+	PRIMARY KEY(join_code)
+);
 
 CREATE TABLE course_admins (
 	course_id INT NOT NULL REFERENCES courses(course_id) ON DELETE CASCADE,
@@ -55,3 +63,17 @@ CREATE TABLE submissions (
 	CONSTRAINT fk_project FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE,
 	CONSTRAINT fk_user FOREIGN KEY(uid) REFERENCES users(uid)
 );
+
+CREATE OR REPLACE FUNCTION remove_expired_codes()
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM course_join_codes
+    WHERE expiry_time < CURRENT_DATE;
+    
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER remove_expired_codes_trigger
+AFTER INSERT OR UPDATE ON course_join_codes
+FOR EACH ROW EXECUTE FUNCTION remove_expired_codes();
