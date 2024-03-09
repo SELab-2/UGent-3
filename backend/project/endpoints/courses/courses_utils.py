@@ -213,7 +213,7 @@ def json_message(message):
     return {"message": message}
 
 
-def get_course_abort_if_not_found(course_id):
+def get_course_abort_if_not_found(course_id, url=f"{API_URL}/courses"):
     """
     Get a course by its ID.
 
@@ -224,11 +224,11 @@ def get_course_abort_if_not_found(course_id):
         Course: The course with the given ID.
     """
     query = Course.query.filter_by(course_id=course_id)
-    course = execute_query_abort_if_db_error(query, f"{API_URL}/courses")
+    course = execute_query_abort_if_db_error(query, url)
 
     if not course:
         response = json_message("Course not found")
-        response["url"] = f"{API_URL}/courses"
+        response["url"] = url
         abort(404, description=response)
 
     return course
