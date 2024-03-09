@@ -4,18 +4,18 @@ for example /projects/1 if the project id of
 the corresponding project is 1
 """
 from os import getenv
-from dotenv import load_dotenv
+from urllib.parse import urljoin
 
-from flask import jsonify
-from flask_restful import Resource, abort
-from sqlalchemy import exc
-from project.endpoints.projects.endpoint_parser import parse_project_params
+from flask import request
+from flask_restful import Resource
 
-from project import db
 from project.models.project import Project
+from project.utils.query_agent import query_by_id_from_model, delete_by_id_from_model, \
+    patch_by_id_from_model
 
-load_dotenv()
+
 API_URL = getenv('API_HOST')
+RESPONSE_URL = urljoin(API_URL, "projects")
 
 class ProjectDetail(Resource):
     """
@@ -24,14 +24,6 @@ class ProjectDetail(Resource):
     for implementing get, delete and put methods
     """
 
-    def abort_if_not_present(self, project):
-        """
-        Check if the project exists in the database
-        and if not abort the request and give back a 404 not found
-        """
-        if project is None:
-            abort(404)
-
     def get(self, project_id):
         """
         Get method for listing a specific project
@@ -39,22 +31,11 @@ class ProjectDetail(Resource):
         the id fetched from the url with the reaparse
         """
 
-        try:
-            # fetch the project with the id that is specified in the url
-            project = Project.query.filter_by(project_id=project_id).first()
-            self.abort_if_not_present(project)
-
-            # return the fetched project and return 200 OK status
-            return {
-                "data": jsonify(project).json,
-                "url": f"{API_URL}/projects/{project_id}",
-                "message": "Got project successfully"
-            }, 200
-        except exc.SQLAlchemyError:
-            return {
-                "message": "Internal server error",
-                "url": f"{API_URL}/projects/{project_id}"
-            }, 500
+        return query_by_id_from_model(
+            Project,
+            "project_id",
+            project_id,
+            RESPONSE_URL)
 
     def patch(self, project_id):
         """
@@ -62,30 +43,13 @@ class ProjectDetail(Resource):
         filtered by id of that specific project
         """
 
-        # get the project that need to be edited
-        project = Project.query.filter_by(project_id=project_id).first()
-
-        # check which values are not None in the dict
-        # if it is not None it needs to be modified in the database
-
-        # commit the changes and return the 200 OK code if it succeeds, else 500
-        try:
-            var_dict = parse_project_params()
-            for key, value in var_dict.items():
-                setattr(project, key, value)
-            db.session.commit()
-            # get the updated version
-            return {
-                "message": f"Succesfully changed project with id: {id}",
-                "url": f"{API_URL}/projects/{id}",
-                "data": project
-            }, 200
-        except exc.SQLAlchemyError:
-            db.session.rollback()
-            return {
-                "message": f"Something unexpected happenend when trying to edit project {id}",
-                "url": f"{API_URL}/projects/{id}"
-            }, 500
+        return patch_by_id_from_model(
+            Project,
+            "project_id",
+            project_id,
+            RESPONSE_URL,
+            request.json
+        )
 
     def delete(self, project_id):
         """
@@ -93,25 +57,8 @@ class ProjectDetail(Resource):
         done by project id
         """
 
-        # fetch the project that needs to be removed
-        deleted_project = Project.query.filter_by(project_id=project_id).first()
-
-        # check if its an existing one
-        self.abort_if_not_present(deleted_project)
-
-        # if it exists delete it and commit the changes in the database
-        try:
-            db.session.delete(deleted_project)
-            db.session.commit()
-
-            # return 200 if content is deleted succesfully
-            return {
-                "message": f"Project with id: {id} deleted successfully",
-                "url": f"{API_URL}/projects/{id} deleted successfully!",
-                "data": deleted_project
-            }, 200
-        except exc.SQLAlchemyError:
-            return {
-                "message": f"Something unexpected happened when removing project {project_id}",
-                "url": f"{API_URL}/projects/{id}"
-            }, 500
+        return delete_by_id_from_model(
+            Project,
+            "project_id",
+            project_id,
+            RESPONSE_URL)
