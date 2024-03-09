@@ -1437,10 +1437,11 @@
                     "type": "integer",
                     "required": true
                   },
-                  "grading": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 20
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "file"
+                    }
                   }
                 }
               }
@@ -1497,7 +1498,7 @@
             }
           },
           "400": {
-            "description": "An invalid user or project is given",
+            "description": "An invalid user, project or list of files is given",
             "content": {
               "application/json": {
                 "schema": {
