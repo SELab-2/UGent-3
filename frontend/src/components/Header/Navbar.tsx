@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  Avatar,
   IconButton,
   List,
   ListItemText,
@@ -35,25 +34,14 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function NavBarItem(link: string, text: string) {
-  const navigate = useNavigate();
-  const classes = useStyles();
-
-  return (
-    <ListItemButton 
-      onClick={() => {return navigate(link)}}
-    >
-      <ListItemText primary={text} className={classes.listItem} />
-    </ListItemButton>
-  );
-}
-
+/**
+ * Renders the navbar.
+ * @returns - A Drawer with a list of navigation items.
+ */
 export default function Navbar() {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
-
-  const isStudent = true;
-
+  const navigate = useNavigate();
   const toggleSlider = (openState: boolean) => () => {
     setOpen(openState);
   };
@@ -64,29 +52,23 @@ export default function Navbar() {
     {link: "/courses", text: "Mijn vakken"}
   ]
 
-  if (isStudent) {
-    listItems.splice(1, 0, {link: "/scores", text: "Mijn scores"});
-  }
-
-  const sideList = () => (
+  const SideList = () => (
     <Grid container direction="column" className={classes.menuSliderContainer}>
       <Grid item container direction="row" alignItems="flex-start">
         <IconButton onClick={toggleSlider(!open)} className={classes.iconButton}>
           <Menu style={{fontSize:"3rem"}} />
         </IconButton>
-        <Avatar
-          className={classes.avatar}
-          src="https://i.ibb.co/rx5DFbs/avatar.png"
-          alt="Juaneme8"
-          style={{ margin: "0.5rem 0 0.5rem auto" }}
-        />
       </Grid>
       <Grid item>
       </Grid>
       <Grid item>
         <List>
           {listItems.map((listItem) => (
-            NavBarItem(listItem.link, listItem.text)
+            <ListItemButton 
+              onClick={() => {return navigate(listItem.link)}}
+            >
+              <ListItemText primary={listItem.text} className={classes.listItem} />
+            </ListItemButton>
           ))}
         </List>
       </Grid>
@@ -100,7 +82,7 @@ export default function Navbar() {
         <Menu style={{fontSize:"3rem"}} />
       </IconButton>
       <Drawer open={open} anchor="left" onClose={toggleSlider(false)}>
-        {sideList()}
+        <SideList />
       </Drawer>
     </>
   );
