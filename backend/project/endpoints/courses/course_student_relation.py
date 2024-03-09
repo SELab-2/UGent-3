@@ -14,7 +14,7 @@ from flask import request
 from flask_restful import Resource
 
 from project import db
-from project.models.course_relations import CourseStudent
+from project.models.course_relation import CourseStudent
 from project.endpoints.courses.courses_utils import (
     execute_query_abort_if_db_error,
     add_abort_if_error,
