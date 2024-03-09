@@ -1,7 +1,7 @@
 """Utility functions for files"""
 
 from re import match
-from typing import List
+from typing import List, Union
 from io import BytesIO
 from zipfile import ZipFile, ZIP_DEFLATED
 from werkzeug.utils import secure_filename
@@ -21,7 +21,7 @@ def check_filename(filename: str, regexes: List[str]) -> bool:
     # Return true if the filename matches for all regexes
     return all(map(lambda regex: match(regex, filename) is not None, regexes))
 
-def zip_files(name: str, files: List[FileStorage]) -> FileStorage | None:
+def zip_files(name: str, files: List[FileStorage]) -> Union[FileStorage, None]:
     """Zip a dictionary of files
 
     Args:
