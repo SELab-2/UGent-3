@@ -1570,6 +1570,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     },
@@ -1595,6 +1599,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     }
@@ -1610,6 +1618,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     }
@@ -1656,12 +1668,12 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": {
-                      "type": "string"
-                    },
                     "url": {
                       "type": "string",
                       "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
                     },
                     "data": {
                       "type": "object",
@@ -1704,6 +1716,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     }
@@ -1719,6 +1735,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     }
@@ -1741,6 +1761,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     },
@@ -1791,6 +1815,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     }
@@ -1806,6 +1834,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     }
@@ -1843,12 +1875,12 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": {
-                      "type": "string"
-                    },
                     "url": {
                       "type": "string",
                       "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
                     },
                     "data": {
                       "type": "object",
@@ -1891,6 +1923,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     }
@@ -1906,6 +1942,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     }
@@ -1921,6 +1961,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     }
@@ -1941,6 +1985,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     }
@@ -1956,6 +2004,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     }
@@ -1971,6 +2023,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "message": {
                       "type": "string"
                     }

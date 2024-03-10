@@ -28,7 +28,9 @@ class SubmissionsEndpoint(Resource):
             dict[str, any]: The list of submission URLs
         """
 
-        data = {}
+        data = {
+            "url": urljoin(f"{API_HOST}/", "/submissions")
+        }
         try:
             with db.session() as session:
                 query = session.query(Submission)
@@ -68,7 +70,9 @@ class SubmissionsEndpoint(Resource):
             dict[str, any]: The URL to the submission
         """
 
-        data = {}
+        data = {
+            "url": urljoin(f"{API_HOST}/", "/submissions")
+        }
         try:
             with db.session() as session:
                 submission = Submission()
@@ -114,7 +118,6 @@ class SubmissionsEndpoint(Resource):
                     incorrect_files = [file.filename for file in files if file not in correct_files]
                     data["message"] = "No files were uploaded" if not files else \
                         f"Invalid filename(s) (filenames={','.join(incorrect_files)})"
-                    data["data"] = incorrect_files
                     return data, 400
                 # Zip the files and save the zip
                 zip_file = zip_files("", correct_files)
@@ -162,7 +165,9 @@ class SubmissionEndpoint(Resource):
             dict[str, any]: The submission
         """
 
-        data = {}
+        data = {
+            "url": urljoin(f"{API_HOST}/", f"/submissions/{submission_id}")
+        }
         try:
             with db.session() as session:
                 submission = session.get(Submission, submission_id)
@@ -197,7 +202,9 @@ class SubmissionEndpoint(Resource):
             dict[str, any]: A message
         """
 
-        data = {}
+        data = {
+            "url": urljoin(f"{API_HOST}/", f"/submissions/{submission_id}")
+        }
         try:
             with db.session() as session:
                 # Get the submission
@@ -246,7 +253,9 @@ class SubmissionEndpoint(Resource):
             dict[str, any]: A message
         """
 
-        data = {}
+        data = {
+            "url": urljoin(f"{API_HOST}/", "/submissions")
+        }
         try:
             with db.session() as session:
                 submission = session.get(Submission, submission_id)
