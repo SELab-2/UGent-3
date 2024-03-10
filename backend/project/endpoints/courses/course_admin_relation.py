@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from flask import abort, request
 from flask_restful import Resource
 
-from utils.authentication import add_user_if_not_in_database, get_user_info
+from utils.authentication import login_required, authenticate_teacher, authenticate_teacher_or_course_admin
 
 from project.models.course_relations import CourseAdmin
 from project.models.users import User
@@ -33,28 +33,14 @@ class CourseForAdmins(Resource):
     This class will handle post and delete queries to
     the /courses/course_id/admins url, only the teacher of a course can do this
     """
-
+    @login_required
+    @authenticate_teacher_or_course_admin
     def get(self, course_id):
         """
         This function will return all the admins of a course
         """
-        # geen authorization meegegeven
-        if not request.headers.get("Authorization"):
-            abort(401)
-        
-        user_info = get_user_info(request.headers.get("Authorization"))
-        # probleem met access_token
-        if user_info: # mogelijke error code bekijken?
-            abort(401)
-        
-        # hier checken of user bestaat en toevoegen indien nodig
-        add_user_if_not_in_database(user_info)
-
         abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
-        course = get_course_abort_if_not_found(course_id)
-
-        # hier controleren of persoon teacher/admin is van huidige course
-        
+        get_course_abort_if_not_found(course_id)
 
         return query_selected_from_model(
             CourseAdmin,
@@ -64,6 +50,8 @@ class CourseForAdmins(Resource):
             filters={"course_id": course_id},
         )
 
+    @login_required
+    @authenticate_teacher
     def post(self, course_id):
         """
         Api endpoint for adding new admins to a course, can only be done by the teacher
@@ -89,6 +77,8 @@ class CourseForAdmins(Resource):
             "uid"
         )
 
+    @login_required
+    @authenticate_teacher
     def delete(self, course_id):
         """
         Api endpoint for removing admins of a course, can only be done by the teacher
