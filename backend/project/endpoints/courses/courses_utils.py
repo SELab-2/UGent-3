@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from flask import abort
 from sqlalchemy.exc import SQLAlchemyError
 
-from project import db
+from project.db_in import db
 from project.models.course_relation import CourseAdmin
 from project.models.user import User
 from project.models.course import Course

@@ -2,7 +2,7 @@
 import dataclasses
 
 from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
-from project import db
+from project.db_in import db
 
 @dataclasses.dataclass
 class Project(db.Model): # pylint: disable=too-many-instance-attributes
