@@ -162,7 +162,7 @@ class TestSubmissionsEndpoint:
         assert response.status_code == 400
         assert data["message"] == "No files were uploaded"
 
-    def test_post_submissions_file_with_wrong_name(
+    def test_post_submissions_missing_required_files(
             self, client: FlaskClient, session: Session, files
         ):
         """Test posting a submissions for a file with a wrong name"""
@@ -174,7 +174,7 @@ class TestSubmissionsEndpoint:
         })
         data = response.json
         assert response.status_code == 400
-        assert "Invalid filename(s)" in data["message"]
+        assert data["message"] == "Not all required files were uploaded"
 
     def test_post_submissions_correct(
             self, client: FlaskClient, session: Session, files

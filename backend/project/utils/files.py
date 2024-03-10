@@ -21,6 +21,25 @@ def check_filename(filename: str, regexes: List[str]) -> bool:
     # Return true if the filename matches for all regexes
     return all(map(lambda regex: match(regex, filename) is not None, regexes))
 
+def all_files_uploaded(files: List[FileStorage], regexes: List[str]) -> bool:
+    """Check if all the required files are uploaded
+
+    Args:
+        files (List[FileStorage]): The files uploaded
+        regexes (List[str]): The list of regexes to match against
+
+    Returns:
+        bool: Are all required files uploaded
+    """
+
+    all_uploaded = True
+    for regex in regexes:
+        match_found = any(match(regex, file.filename) is not None for file in files)
+        if not match_found:
+            all_uploaded = False
+            break
+    return all_uploaded
+
 def zip_files(name: str, files: List[FileStorage]) -> Union[FileStorage, None]:
     """Zip a dictionary of files
 

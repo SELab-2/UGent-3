@@ -11,7 +11,7 @@ from project.db_in import db
 from project.models.submission import Submission
 from project.models.project import Project
 from project.models.user import User
-from project.utils.files import check_filename, zip_files
+from project.utils.files import all_files_uploaded, zip_files
 
 load_dotenv()
 API_HOST = getenv("API_HOST")
@@ -105,26 +105,22 @@ class SubmissionsEndpoint(Resource):
                 submission.submission_time = datetime.now()
 
                 # Submission path
-                regexes = project.regex_expressions
                 # Filter out incorrect or empty files
                 files = list(filter(lambda file:
                     file and file.filename != "" and path.getsize(file.filename) > 0,
                     request.files.getlist("files")
                 ))
-
-                # Filter out files that don't follow the project's regexes
-                correct_files = list(filter(lambda file:
-                    check_filename(file.filename, regexes),
-                    files
-                ))
-                # Return with a bad request and tell which files where invalid
-                if not correct_files:
-                    incorrect_files = [file.filename for file in files if file not in correct_files]
-                    data["message"] = "No files were uploaded" if not files else \
-                        f"Invalid filename(s) (filenames={','.join(incorrect_files)})"
+                if not files:
+                    data["message"] = "No files were uploaded"
                     return data, 400
+
+                # Check if all files are uploaded
+                if not all_files_uploaded(files, project.regex_expressions):
+                    data["message"] = "Not all required files were uploaded"
+                    return data, 400
+
                 # Zip the files and save the zip
-                zip_file = zip_files("", correct_files)
+                zip_file = zip_files("", files)
                 if zip_file is None:
                     data["message"] = "Something went wrong while zipping the files"
                     return data, 500
