@@ -11,7 +11,9 @@ from project.db_in import db
 from project.models.submission import Submission
 from project.models.project import Project
 from project.models.user import User
-from project.utils.files import all_files_uploaded, zip_files
+from project.utils.files import filter_files, all_files_uploaded, zip_files
+from project.utils.user import is_valid_user
+from project.utils.project import is_valid_project
 
 load_dotenv()
 API_HOST = getenv("API_HOST")
@@ -80,25 +82,17 @@ class SubmissionsEndpoint(Resource):
 
                 # User
                 uid = request.form.get("uid")
-                if (uid is None) or (session.get(User, uid) is None):
-                    if uid is None:
-                        data["message"] = "The uid data field is required"
-                    else:
-                        data["message"] = f"Invalid user (uid={uid})"
+                valid, message = is_valid_user(session, uid)
+                if not valid:
+                    data["message"] = message
                     return data, 400
                 submission.uid = uid
 
                 # Project
                 project_id = request.form.get("project_id")
-                if project_id is None:
-                    data["message"] = "The project_id data field is required"
-                    return data, 400
-                if not project_id.isdigit():
-                    data["message"] = f"Invalid project (project_id={project_id})"
-                    return data, 400
-                project = session.get(Project, int(project_id))
-                if project is None:
-                    data["message"] = f"Invalid project (project_id={project_id})"
+                valid, message = is_valid_project(session, project_id)
+                if not valid:
+                    data["message"] = message
                     return data, 400
                 submission.project_id = int(project_id)
 
@@ -106,18 +100,11 @@ class SubmissionsEndpoint(Resource):
                 submission.submission_time = datetime.now()
 
                 # Submission path
-                # Filter out incorrect or empty files
-                files = list(filter(lambda file:
-                    file and file.filename != "" and path.getsize(file.filename) > 0,
-                    request.files.getlist("files")
-                ))
-                if not files:
-                    data["message"] = "No files were uploaded"
-                    return data, 400
-
-                # Check if all files are uploaded
-                if not all_files_uploaded(files, project.regex_expressions):
-                    data["message"] = "Not all required files were uploaded"
+                files = filter_files(request.files.getlist("files"))
+                project = session.get(Project, submission.project_id)
+                if not files or not all_files_uploaded(files, project.regex_expressions):
+                    data["message"] = "No files were uploaded" if not files else \
+                        "Not all required files were uploaded"
                     return data, 400
 
                 # Zip the files and save the zip

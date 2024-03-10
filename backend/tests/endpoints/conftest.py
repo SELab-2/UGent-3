@@ -6,7 +6,6 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from project import create_app_with_db
 from project.db_in import url, db
 from project.models.course import Course
@@ -136,39 +135,23 @@ def files():
         with open(name02, "rb") as temp02:
             yield [(temp01, name01), (temp02, name02)]
 
-engine = create_engine(url)
-Session = sessionmaker(bind=engine)
 @pytest.fixture
-def session():
+def session(db_session):
     """Create a database session for the tests"""
-    # Create all tables and get a session
-    db.metadata.create_all(engine)
-    session = Session()
+    # Populate the database
+    db_session.add_all(users())
+    db_session.commit()
+    db_session.add_all(courses())
+    db_session.commit()
+    db_session.add_all(course_relations(db_session))
+    db_session.commit()
+    db_session.add_all(projects(db_session))
+    db_session.commit()
+    db_session.add_all(submissions(db_session))
+    db_session.commit()
 
-    try:
-        # Populate the database
-        session.add_all(users())
-        session.commit()
-        session.add_all(courses())
-        session.commit()
-        session.add_all(course_relations(session))
-        session.commit()
-        session.add_all(projects(session))
-        session.commit()
-        session.add_all(submissions(session))
-        session.commit()
-
-        # Tests can now use a populated database
-        yield session
-    finally:
-        # Rollback
-        session.rollback()
-        session.close()
-
-        # Remove all tables
-        for table in reversed(db.metadata.sorted_tables):
-            session.execute(table.delete())
-        session.commit()
+    # Tests can now use a populated database
+    yield db_session
 
 @pytest.fixture
 def app():
@@ -239,19 +222,6 @@ def client(app):
     with app.test_client() as client:
         with app.app_context():
             yield client
-
-@pytest.fixture
-def db_session(app):
-    """Create a new database session for a test.
-    After the test, all changes are rolled back and the session is closed."""
-    app = create_app_with_db(url)
-    with app.app_context():
-        for table in reversed(db.metadata.sorted_tables):
-            db.session.execute(table.delete())
-        db.session.commit()
-
-        yield db.session
-        db.session.close()
 
 @pytest.fixture
 def courses_get_db(db_with_course):

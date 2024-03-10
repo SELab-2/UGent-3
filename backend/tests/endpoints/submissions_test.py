@@ -77,7 +77,7 @@ class TestSubmissionsEndpoint:
         })
         data = response.json
         assert response.status_code == 400
-        assert data["message"] == "The uid data field is required"
+        assert data["message"] == "The uid is missing"
 
     def test_post_submissions_wrong_user(self, client: FlaskClient, session: Session, files):
         """Test posting a submission for a non-existing user"""
@@ -99,18 +99,18 @@ class TestSubmissionsEndpoint:
         })
         data = response.json
         assert response.status_code == 400
-        assert data["message"] == "The project_id data field is required"
+        assert data["message"] == "The project_id is missing"
 
     def test_post_submissions_wrong_project(self, client: FlaskClient, session: Session, files):
         """Test posting a submission for a non-existing project"""
         response = client.post("/submissions", data={
             "uid": "student01",
-            "project_id": -1,
+            "project_id": 0,
             "files": files
         })
         data  = response.json
         assert response.status_code == 400
-        assert data["message"] == "Invalid project (project_id=-1)"
+        assert data["message"] == "Invalid project (project_id=0)"
 
     def test_post_submissions_wrong_project_type(
             self, client: FlaskClient, session: Session, files
@@ -123,7 +123,7 @@ class TestSubmissionsEndpoint:
         })
         data  = response.json
         assert response.status_code == 400
-        assert data["message"] == "Invalid project (project_id=zero)"
+        assert data["message"] == "Invalid project_id typing (project_id=zero)"
 
     def test_post_submissions_no_files(self, client: FlaskClient, session: Session):
         """Test posting a submission when no files are uploaded"""
