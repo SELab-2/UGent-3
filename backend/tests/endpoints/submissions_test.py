@@ -216,7 +216,7 @@ class TestSubmissionsEndpoint:
             "user": f"{API_HOST}/users/student01",
             "project": f"{API_HOST}/projects/{project.project_id}",
             "grading": 16,
-            "time": "Thu, 14 Mar 2024 11:00:00 GMT",
+            "time": "Thu, 14 Mar 2024 12:00:00 GMT",
             "path": "/submissions/1",
             "status": True
         }
@@ -267,7 +267,7 @@ class TestSubmissionsEndpoint:
             "user": f"{API_HOST}/users/student02",
             "project": f"{API_HOST}/projects/{project.project_id}",
             "grading": 20,
-            "time": 'Thu, 14 Mar 2024 22:59:59 GMT',
+            "time": 'Thu, 14 Mar 2024 23:59:59 GMT',
             "path": "/submissions/2",
             "status": False
         }

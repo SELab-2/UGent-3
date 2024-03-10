@@ -3,6 +3,7 @@
 import tempfile
 import os
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -85,14 +86,14 @@ def submissions(session):
             uid="student01",
             project_id=project_id_ad3,
             grading=16,
-            submission_time=datetime(2024,3,14,12,0,0),
+            submission_time=datetime(2024,3,14,12,0,0,tzinfo=ZoneInfo("GMT")),
             submission_path="/submissions/1",
             submission_status=True
         ),
         Submission(
             uid="student02",
             project_id=project_id_ad3,
-            submission_time=datetime(2024,3,14,23,59,59),
+            submission_time=datetime(2024,3,14,23,59,59,tzinfo=ZoneInfo("GMT")),
             submission_path="/submissions/2",
             submission_status=False
         ),
@@ -100,7 +101,7 @@ def submissions(session):
             uid="student02",
             project_id=project_id_raf,
             grading=15,
-            submission_time=datetime(2023,3,5,10,0,0),
+            submission_time=datetime(2023,3,5,10,0,0,tzinfo=ZoneInfo("GMT")),
             submission_path="/submissions/3",
             submission_status=True
         )
