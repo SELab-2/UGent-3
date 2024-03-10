@@ -15,6 +15,7 @@ from project.utils.files import all_files_uploaded, zip_files
 
 load_dotenv()
 API_HOST = getenv("API_HOST")
+UPLOAD_FOLDER = getenv("UPLOAD_FOLDER")
 
 submissions_bp = Blueprint("submissions", __name__)
 
@@ -124,9 +125,8 @@ class SubmissionsEndpoint(Resource):
                 if zip_file is None:
                     data["message"] = "Something went wrong while zipping the files"
                     return data, 500
-                # FIXME app.config["UPLOAD_FOLDER"] instead of "/"
                 submission.submission_path = "/zip.zip"
-                zip_file.save(path.join("/", submission.submission_path))
+                zip_file.save(path.join(f"{UPLOAD_FOLDER}/", submission.submission_path))
 
                 # Submission status
                 submission.submission_status = False
