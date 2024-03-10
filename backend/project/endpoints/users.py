@@ -8,6 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from project import db
 from project.models.users import User as userModel
+from project.utils.authentication import login_required, authorize_teacher, authorize_user
 
 users_bp = Blueprint("users", __name__)
 users_api = Api(users_bp)
@@ -18,6 +19,7 @@ API_URL = getenv("API_HOST")
 class Users(Resource):
     """Api endpoint for the /users route"""
 
+    @login_required
     def get(self):
         """
         This function will respond to get requests made to /users.
@@ -43,6 +45,8 @@ class Users(Resource):
             return {"message": "An error occurred while fetching the users",
                     "url": f"{API_URL}/users"}, 500
 
+    @login_required
+    @authorize_teacher
     def post(self):
         """
         This function will respond to post requests made to /users.
@@ -84,6 +88,7 @@ class Users(Resource):
 class User(Resource):
     """Api endpoint for the /users/{user_id} route"""
 
+    @login_required
     def get(self, user_id):
         """
         This function will respond to GET requests made to /users/<user_id>.
@@ -100,6 +105,8 @@ class User(Resource):
             return {"message": "An error occurred while fetching the user",
                     "url": f"{API_URL}/users"}, 500
 
+    @login_required
+    @authorize_user
     def patch(self, user_id):
         """
         Update the user's information.
@@ -131,6 +138,8 @@ class User(Resource):
                     "url": f"{API_URL}/users"}, 500
 
 
+    @login_required
+    @authorize_user
     def delete(self, user_id):
         """
         This function will respond to DELETE requests made to /users/<user_id>.

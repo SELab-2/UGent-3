@@ -40,7 +40,7 @@ class CourseToAddStudents(Resource):
     and everyone should be able to list all students assigned to a course
     """
 
-    @login_required
+    @login_required()
     def get(self, course_id):
         """
         Get function at /courses/course_id/students

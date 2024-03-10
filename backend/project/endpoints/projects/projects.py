@@ -9,6 +9,7 @@ from flask_restful import Resource
 
 from project.models.projects import Project
 from project.utils.query_agent import query_selected_from_model, insert_into_model
+from project.utils.authentication import login_required, authorize_teacher
 
 API_URL = getenv('API_HOST')
 
@@ -19,6 +20,8 @@ class ProjectsEndpoint(Resource):
     for implementing get method
     """
 
+    @login_required
+    @authorize_teacher
     def get(self):
         """
         Get method for listing all available projects
@@ -34,6 +37,8 @@ class ProjectsEndpoint(Resource):
             filters=request.args
         )
 
+    @login_required
+    @authorize_teacher
     def post(self):
         """
         Post functionality for project
