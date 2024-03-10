@@ -1,5 +1,6 @@
 import { BrowserRouter } from "react-router-dom";
-import Navbar from "./components/Header/Navbar";
+//import Navbar from "./components/Header/Navbar";
+import { Header } from "./components/Header/Header";
 
 /**
  * This component is the main application component that will be rendered by the ReactDOM. 
@@ -8,7 +9,7 @@ import Navbar from "./components/Header/Navbar";
 function App(): JSX.Element {
   return (
     <BrowserRouter>
-      <Navbar/>
+      <Header />
     </BrowserRouter>
   );
 }

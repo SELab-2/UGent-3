@@ -2,11 +2,10 @@ import {
   AppBar,
   Box,
   Button,
-  IconButton,
   Toolbar,
-  Typography,
+  Typography
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
+import Navbar from "./Navbar";
 
 /**
  * The header component for the application that will be rendered at the top of the page.
@@ -17,9 +16,9 @@ export function Header(): JSX.Element {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky">
         <Toolbar>
-          <IconButton size="large" color="inherit">
-            <MenuIcon />
-          </IconButton>
+          <Box sx={{ flexGrow: 1 }}>
+            <Navbar />
+          </Box>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Home
           </Typography>
