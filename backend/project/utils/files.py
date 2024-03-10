@@ -7,20 +7,6 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 
-def check_filename(filename: str, regexes: List[str]) -> bool:
-    """Check if the filename 
-
-    Args:
-        filename (str): The filename
-        regex_list (List[str]): A list of regexes to match against
-
-    Returns:
-        bool: Is the filename ok
-    """
-
-    # Return true if the filename matches for all regexes
-    return all(map(lambda regex: match(regex, filename) is not None, regexes))
-
 def all_files_uploaded(files: List[FileStorage], regexes: List[str]) -> bool:
     """Check if all the required files are uploaded
 
