@@ -53,7 +53,7 @@ class SubmissionsEndpoint(Resource):
                 # Get the submissions
                 data["message"] = "Successfully fetched the submissions"
                 data["data"] = [
-                    urljoin(API_HOST, f"/submissions/{s.submission_id}") for s in query.all()
+                    urljoin(f"{API_HOST}/", f"/submissions/{s.submission_id}") for s in query.all()
                 ]
                 return data, 200
 
@@ -132,11 +132,11 @@ class SubmissionsEndpoint(Resource):
                 session.commit()
 
                 data["message"] = "Successfully fetched the submissions"
-                data["url"] = urljoin(API_HOST, f"/submissions/{submission.submission_id}")
+                data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
                 data["data"] = {
                     "id": submission.submission_id,
-                    "user": urljoin(API_HOST, f"/users/{submission.uid}"),
-                    "project": urljoin(API_HOST, f"/projects/{submission.project_id}"),
+                    "user": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
+                    "project": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
                     "grading": submission.grading,
                     "time": submission.submission_time,
                     "path": submission.submission_path,
@@ -173,8 +173,8 @@ class SubmissionEndpoint(Resource):
                 data["message"] = "Successfully fetched the submission"
                 data["data"] = {
                     "id": submission.submission_id,
-                    "user": urljoin(API_HOST, f"/users/{submission.uid}"),
-                    "project": urljoin(API_HOST, f"/projects/{submission.project_id}"),
+                    "user": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
+                    "project": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
                     "grading": submission.grading,
                     "time": submission.submission_time,
                     "path": submission.submission_path,
@@ -218,11 +218,11 @@ class SubmissionEndpoint(Resource):
                 session.commit()
 
                 data["message"] = f"Submission (submission_id={submission_id}) patched"
-                data["url"] = urljoin(API_HOST, f"/submissions/{submission.submission_id}")
+                data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
                 data["data"] = {
                     "id": submission.submission_id,
-                    "user": urljoin(API_HOST, f"/users/{submission.uid}"),
-                    "project": urljoin(API_HOST, f"/projects/{submission.project_id}"),
+                    "user": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
+                    "project": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
                     "grading": submission.grading,
                     "time": submission.submission_time,
                     "path": submission.submission_path,
