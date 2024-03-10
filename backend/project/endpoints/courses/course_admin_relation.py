@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from flask import abort, request
 from flask_restful import Resource
 
-from utils.authentication import login_required, authenticate_teacher, authenticate_teacher_or_course_admin
+from utils.authentication import login_required, authorize_teacher_of_course, authorize_teacher_or_course_admin
 
 from project.models.course_relations import CourseAdmin
 from project.models.users import User
@@ -34,7 +34,7 @@ class CourseForAdmins(Resource):
     the /courses/course_id/admins url, only the teacher of a course can do this
     """
     @login_required
-    @authenticate_teacher_or_course_admin
+    @authorize_teacher_or_course_admin
     def get(self, course_id):
         """
         This function will return all the admins of a course
@@ -51,7 +51,7 @@ class CourseForAdmins(Resource):
         )
 
     @login_required
-    @authenticate_teacher
+    @authorize_teacher_of_course
     def post(self, course_id):
         """
         Api endpoint for adding new admins to a course, can only be done by the teacher
@@ -78,7 +78,7 @@ class CourseForAdmins(Resource):
         )
 
     @login_required
-    @authenticate_teacher
+    @authorize_teacher_of_course
     def delete(self, course_id):
         """
         Api endpoint for removing admins of a course, can only be done by the teacher

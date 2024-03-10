@@ -17,6 +17,7 @@ from sqlalchemy.exc import SQLAlchemyError
 load_dotenv()
 API_URL = getenv("API_HOST")
 AUTHENTICATION_URL = "https://graph.microsoft.com/v1.0/me"
+# mss https://graph.microsoft.com/oidc/userinfo
 
 
 def login_required(f):
@@ -29,14 +30,16 @@ def login_required(f):
         authentication = request.headers.get("Authorization")
         if not authentication:
             abort(401)
-        auth_header = {"Authorization": authentication}
-        user_info = requests.get(AUTHENTICATION_URL, headers=auth_header).json()
-        # hier nog controleren of user wel juiste access token had
         
-        # header toevoegen in request voor volgende decorator?
-        request.headers.add_header("AuthenticatedUserID", ) # of enkel id van de user die request maakt toevoegen?
+        auth_header = {"Authorization": authentication}
+        response = requests.get(AUTHENTICATION_URL, headers=auth_header)
+        if response.status_code != 200:
+            abort(401) # TODO error message meegeven van request
+
+        user_info = response.json()
+        kwargs["AuthenticatedUserID"] = user_info["id"] # of enkel id van de user die request maakt toevoegen?
         try:
-            user = db.session.get(User, uid)
+            user = db.session.get(User, user_info["id"])
         except SQLAlchemyError:
         # every exception should result in a rollback
             db.session.rollback()
@@ -45,10 +48,12 @@ def login_required(f):
 
         if user:
             return f(*args, **kwargs)
-        
+        is_teacher = False
+        if user_info["jobTitle"] != None:
+            is_teacher = True
         # toevoegen
         try:
-            new_user = User(uid=uid, is_teacher=is_teacher, is_admin=False)
+            new_user = User(uid=user_info["id"], is_teacher=is_teacher, is_admin=False)
             db.session.add(new_user)
             db.session.commit()
         except SQLAlchemyError:
@@ -60,17 +65,46 @@ def login_required(f):
     return wrap
 
 
-def authenticate_teacher(f):
+def authorize_teacher(f):
     @wraps(f)
     def wrap(*args, **kwargs):
+        if not kwargs["AuthenticatedUserID"]:
+            abort(500)
         
-        return 0
+
+        # abort(403)
+        return f(*args, **kwargs)
     return wrap
 
 
-def authenticate_teacher_or_course_admin(f):
+def authorize_teacher_of_course(f):
     @wraps(f)
     def wrap(*args, **kwargs):
+        if not kwargs["AuthenticatedUserID"]:
+            abort(500)
         
-        return 0
+
+
+        # abort(403)
+        return f(*args, **kwargs)
+    return wrap
+
+
+def authorize_teacher_or_course_admin(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if not kwargs["AuthenticatedUserID"]:
+            abort(500)
+        #abort(403)
+        return f(*args, **kwargs)
+    return wrap
+
+
+def authorize_student_of_course(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if not kwargs["AuthenticatedUserID"]:
+            abort(500)
+        
+        return f(*args, **kwargs)
     return wrap
