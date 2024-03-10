@@ -92,7 +92,11 @@ class SubmissionsEndpoint(Resource):
                 if project_id is None:
                     data["message"] = "The project_id data field is required"
                     return data, 400
-                if not project_id.isdigit() or session.get(Project, int(project_id)) is None:
+                if not project_id.isdigit():
+                    data["message"] = f"Invalid project (project_id={project_id})"
+                    return data, 400
+                project = session.get(Project, int(project_id))
+                if project is None:
                     data["message"] = f"Invalid project (project_id={project_id})"
                     return data, 400
                 submission.project_id = int(project_id)
@@ -101,7 +105,7 @@ class SubmissionsEndpoint(Resource):
                 submission.submission_time = datetime.now()
 
                 # Submission path
-                regexes = session.get(Project, int(project_id)).regex_expressions
+                regexes = project.regex_expressions
                 # Filter out incorrect or empty files
                 files = list(filter(lambda file:
                     file and file.filename != "" and path.getsize(file.filename) > 0,
