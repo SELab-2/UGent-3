@@ -13,6 +13,7 @@ import {
   Menu
 } from "@material-ui/icons";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   menuSliderContainer: {
@@ -45,11 +46,11 @@ export default function Navbar() {
   const toggleSlider = (openState: boolean) => () => {
     setOpen(openState);
   };
-
+  const { t } = useTranslation();
   const listItems = [
-    {link: "/", text: "Homepage"},
-    {link: "/projects", text: "Mijn projecten"},
-    {link: "/courses", text: "Mijn vakken"}
+    {link: "/", text: t("Homepage")},
+    {link: "/projects", text: t("Mijn projecten")},
+    {link: "/courses", text: t("Mijn vakken")}
   ]
 
   const SideList = () => (
@@ -63,8 +64,8 @@ export default function Navbar() {
       </Grid>
       <Grid item>
         <List>
-          {listItems.map((listItem) => (
-            <ListItemButton 
+          {listItems.map((listItem,index) => (
+            <ListItemButton key={index}
               onClick={() => {return navigate(listItem.link)}}
             >
               <ListItemText primary={listItem.text} className={classes.listItem} />

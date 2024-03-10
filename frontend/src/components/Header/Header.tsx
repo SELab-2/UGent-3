@@ -6,12 +6,14 @@ import {
   Typography
 } from "@mui/material";
 import Navbar from "./Navbar";
-
+import { useTranslation } from 'react-i18next';
 /**
  * The header component for the application that will be rendered at the top of the page.
  * @returns - The header component
  */
 export function Header(): JSX.Element {
+  const { t } = useTranslation();
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky">
@@ -20,9 +22,9 @@ export function Header(): JSX.Element {
             <Navbar />
           </Box>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Home
+            {t('Home')}
           </Typography>
-          <Button color="inherit">Login</Button>
+          <Button color="inherit">{t('Login')}</Button>
         </Toolbar>
       </AppBar>
     </Box>
