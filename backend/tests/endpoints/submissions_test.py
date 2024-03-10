@@ -3,6 +3,7 @@
 from os import getenv
 from flask.testing import FlaskClient
 from sqlalchemy.orm import Session
+from project.models.project import Project
 from project.models.submission import Submission
 
 API_HOST = getenv("API_HOST")
@@ -38,11 +39,7 @@ class TestSubmissionsEndpoint:
         data = response.json
         assert response.status_code == 200
         assert data["message"] == "Successfully fetched the submissions"
-        assert data["data"] == [
-            f"{API_HOST}/submissions/1",
-            f"{API_HOST}/submissions/2",
-            f"{API_HOST}/submissions/3"
-        ]
+        assert len(data["data"]) == 3
 
     def test_get_submissions_user(self, client: FlaskClient, session: Session):
         """Test getting the submissions given a specific user"""
@@ -50,36 +47,32 @@ class TestSubmissionsEndpoint:
         data = response.json
         assert response.status_code == 200
         assert data["message"] == "Successfully fetched the submissions"
-        assert data["data"] == [
-            f"{API_HOST}/submissions/1"
-        ]
+        assert len(data["data"]) == 1
 
     def test_get_submissions_project(self, client: FlaskClient, session: Session):
         """Test getting the submissions given a specific project"""
-        response = client.get("/submissions?project_id=1")
+        project = session.query(Project).filter_by(title="B+ Trees").first()
+        response = client.get(f"/submissions?project_id={project.project_id}")
         data = response.json
         assert response.status_code == 200
         assert data["message"] == "Successfully fetched the submissions"
-        assert data["data"] == [
-            f"{API_HOST}/submissions/1",
-            f"{API_HOST}/submissions/2"
-        ]
+        assert len(data["data"]) == 2
 
     def test_get_submissions_user_project(self, client: FlaskClient, session: Session):
         """Test getting the submissions given a specific user and project"""
-        response = client.get("/submissions?uid=student01&project_id=1")
+        project = session.query(Project).filter_by(title="B+ Trees").first()
+        response = client.get(f"/submissions?uid=student01&project_id={project.project_id}")
         data = response.json
         assert response.status_code == 200
         assert data["message"] == "Successfully fetched the submissions"
-        assert data["data"] == [
-            f"{API_HOST}/submissions/1"
-        ]
+        assert len(data["data"]) == 1
 
     ### POST SUBMISSIONS ###
     def test_post_submissions_no_user(self, client: FlaskClient, session: Session, files):
         """Test posting a submission without specifying a user"""
+        project = session.query(Project).filter_by(title="B+ Trees").first()
         response = client.post("/submissions", data={
-            "project_id": 1,
+            "project_id": project.project_id,
             "files": files
         })
         data = response.json
@@ -88,9 +81,10 @@ class TestSubmissionsEndpoint:
 
     def test_post_submissions_wrong_user(self, client: FlaskClient, session: Session, files):
         """Test posting a submission for a non-existing user"""
+        project = session.query(Project).filter_by(title="B+ Trees").first()
         response = client.post("/submissions", data={
             "uid": "unknown",
-            "project_id": 1,
+            "project_id": project.project_id,
             "files": files
         })
         data = response.json
@@ -133,9 +127,10 @@ class TestSubmissionsEndpoint:
 
     def test_post_submissions_no_files(self, client: FlaskClient, session: Session):
         """Test posting a submission when no files are uploaded"""
+        project = session.query(Project).filter_by(title="B+ Trees").first()
         response = client.post("/submissions", data={
             "uid": "student01",
-            "project_id": 1
+            "project_id": project.project_id
         })
         data = response.json
         assert response.status_code == 400
@@ -143,9 +138,10 @@ class TestSubmissionsEndpoint:
 
     def test_post_submissions_empty_file(self, client: FlaskClient, session: Session, file_empty):
         """Test posting a submission for an empty file"""
+        project = session.query(Project).filter_by(title="B+ Trees").first()
         response = client.post("/submissions", data={
             "uid": "student01",
-            "project_id": 1,
+            "project_id": project.project_id,
             "files": file_empty
         })
         data = response.json
@@ -156,9 +152,10 @@ class TestSubmissionsEndpoint:
             self, client: FlaskClient, session: Session, file_no_name
         ):
         """Test posting a submission for a file without a name"""
+        project = session.query(Project).filter_by(title="B+ Trees").first()
         response = client.post("/submissions", data={
             "uid": "student01",
-            "project_id": 1,
+            "project_id": project.project_id,
             "files": file_no_name
         })
         data = response.json
@@ -169,9 +166,10 @@ class TestSubmissionsEndpoint:
             self, client: FlaskClient, session: Session, files
         ):
         """Test posting a submissions for a file with a wrong name"""
+        project = session.query(Project).filter_by(title="B+ Trees").first()
         response = client.post("/submissions", data={
             "uid": "student01",
-            "project_id": 1,
+            "project_id": project.project_id,
             "files": files
         })
         data = response.json
@@ -182,36 +180,41 @@ class TestSubmissionsEndpoint:
             self, client: FlaskClient, session: Session, files
         ):
         """Test posting a submission"""
+        project = session.query(Project).filter_by(title="Predicaten").first()
         response = client.post("/submissions", data={
-            "uid": "student01",
-            "project_id": 2,
+            "uid": "student02",
+            "project_id": project.project_id,
             "files": files
         })
         data = response.json
         assert response.status_code == 201
         assert data["message"] == "Successfully fetched the submissions"
         assert data["url"] == f"{API_HOST}/submissions/{data['data']['id']}"
-        assert data["data"]["user"] == f"{API_HOST}/users/student01"
-        assert data["data"]["project"] == f"{API_HOST}/projects/2"
+        assert data["data"]["user"] == f"{API_HOST}/users/student02"
+        assert data["data"]["project"] == f"{API_HOST}/projects/{project.project_id}"
 
     ### GET SUBMISSION ###
     def test_get_submission_wrong_id(self, client: FlaskClient, session: Session):
         """Test getting a submission for a non-existing submission id"""
-        response = client.get("/submissions/100")
+        response = client.get("/submissions/0")
         data = response.json
         assert response.status_code == 404
-        assert data["message"] == "Submission (submission_id=100) not found"
+        assert data["message"] == "Submission (submission_id=0) not found"
 
     def test_get_submission_correct(self, client: FlaskClient, session: Session):
         """Test getting a submission"""
-        response = client.get("/submissions/1")
+        project = session.query(Project).filter_by(title="B+ Trees").first()
+        submission = session.query(Submission).filter_by(
+            uid="student01", project_id=project.project_id
+        ).first()
+        response = client.get(f"/submissions/{submission.submission_id}")
         data = response.json
         assert response.status_code == 200
         assert data["message"] == "Successfully fetched the submission"
         assert data["data"] == {
-            "id": 1,
+            "id": submission.submission_id,
             "user": f"{API_HOST}/users/student01",
-            "project": f"{API_HOST}/projects/1",
+            "project": f"{API_HOST}/projects/{project.project_id}",
             "grading": 16,
             "time": "Thu, 14 Mar 2024 11:00:00 GMT",
             "path": "/submissions/1",
@@ -221,36 +224,48 @@ class TestSubmissionsEndpoint:
     ### PATCH SUBMISSION ###
     def test_patch_submission_wrong_id(self, client: FlaskClient, session: Session):
         """Test patching a submission for a non-existing submission id"""
-        response = client.patch("/submissions/100", data={"grading": 20})
+        response = client.patch("/submissions/0", data={"grading": 20})
         data = response.json
         assert response.status_code == 404
-        assert data["message"] == "Submission (submission_id=100) not found"
+        assert data["message"] == "Submission (submission_id=0) not found"
 
     def test_patch_submission_wrong_grading(self, client: FlaskClient, session: Session):
         """Test patching a submission with a wrong grading"""
-        response = client.patch("/submissions/2", data={"grading": 100})
+        project = session.query(Project).filter_by(title="B+ Trees").first()
+        submission = session.query(Submission).filter_by(
+            uid="student02", project_id=project.project_id
+        ).first()
+        response = client.patch(f"/submissions/{submission.submission_id}", data={"grading": 100})
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "Invalid grading (grading=0-20)"
 
     def test_patch_submission_wrong_grading_type(self, client: FlaskClient, session: Session):
         """Test patching a submission with a wrong grading type"""
-        response = client.patch("/submissions/2", data={"grading": "zero"})
+        project = session.query(Project).filter_by(title="B+ Trees").first()
+        submission = session.query(Submission).filter_by(
+            uid="student02", project_id=project.project_id
+        ).first()
+        response = client.patch(f"/submissions/{submission.submission_id}",data={"grading": "zero"})
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "Invalid grading (grading=0-20)"
 
     def test_patch_submission_correct(self, client: FlaskClient, session: Session):
         """Test patching a submission"""
-        response = client.patch("/submissions/2", data={"grading": 20})
+        project = session.query(Project).filter_by(title="B+ Trees").first()
+        submission = session.query(Submission).filter_by(
+            uid="student02", project_id=project.project_id
+        ).first()
+        response = client.patch(f"/submissions/{submission.submission_id}", data={"grading": 20})
         data = response.json
         assert response.status_code == 200
-        assert data["message"] == "Submission (submission_id=2) patched"
-        assert data["url"] == f"{API_HOST}/submissions/2"
+        assert data["message"] == f"Submission (submission_id={submission.submission_id}) patched"
+        assert data["url"] == f"{API_HOST}/submissions/{submission.submission_id}"
         assert data["data"] == {
-            "id": 2,
+            "id": submission.submission_id,
             "user": f"{API_HOST}/users/student02",
-            "project": f"{API_HOST}/projects/1",
+            "project": f"{API_HOST}/projects/{project.project_id}",
             "grading": 20,
             "time": 'Thu, 14 Mar 2024 22:59:59 GMT',
             "path": "/submissions/2",
@@ -260,17 +275,21 @@ class TestSubmissionsEndpoint:
     ### DELETE SUBMISSION ###
     def test_delete_submission_wrong_id(self, client: FlaskClient, session: Session):
         """Test deleting a submission for a non-existing submission id"""
-        response = client.delete("submissions/100")
+        response = client.delete("submissions/0")
         data = response.json
         assert response.status_code == 404
-        assert data["message"] == "Submission (submission_id=100) not found"
+        assert data["message"] == "Submission (submission_id=0) not found"
 
     def test_delete_submission_correct(self, client: FlaskClient, session: Session):
         """Test deleting a submission"""
-        response = client.delete("submissions/1")
+        project = session.query(Project).filter_by(title="B+ Trees").first()
+        submission = session.query(Submission).filter_by(
+            uid="student01", project_id=project.project_id
+        ).first()
+        response = client.delete(f"submissions/{submission.submission_id}")
         data = response.json
         assert response.status_code == 200
-        assert data["message"] == "Submission (submission_id=1) deleted"
-
-        submission = session.get(Submission, 1)
-        assert submission is None
+        assert data["message"] == f"Submission (submission_id={submission.submission_id}) deleted"
+        assert submission.submission_id not in list(map(
+            lambda s: s.submission_id, session.query(Submission).all()
+        ))

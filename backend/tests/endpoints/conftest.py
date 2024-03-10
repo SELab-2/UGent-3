@@ -14,7 +14,6 @@ from project.models.project import Project
 from project.models.course_relation import CourseStudent,CourseAdmin
 from project.models.submission import Submission
 
-@pytest.fixture
 def users():
     """Return a list of users to populate the database"""
     return [
@@ -24,19 +23,17 @@ def users():
         User(uid="student02", is_admin=False, is_teacher=False)
     ]
 
-@pytest.fixture
 def courses():
     """Return a list of courses to populate the database"""
     return [
-        Course(course_id=1, name="AD3", teacher="brinkmann"),
-        Course(course_id=2, name="RAF", teacher="laermans"),
+        Course(name="AD3", teacher="brinkmann"),
+        Course(name="RAF", teacher="laermans"),
     ]
 
-@pytest.fixture
-def course_relations(courses):
+def course_relations(session):
     """Returns a list of course relations to populate the database"""
-    course_id_ad3 = courses[0].course_id
-    course_id_raf = courses[1].course_id
+    course_id_ad3 = session.query(Course).filter_by(name="AD3").first().course_id
+    course_id_raf = session.query(Course).filter_by(name="RAF").first().course_id
 
     return [
         CourseAdmin(course_id=course_id_ad3, uid="brinkmann"),
@@ -46,15 +43,13 @@ def course_relations(courses):
         CourseStudent(course_id=course_id_raf, uid="student02")
     ]
 
-@pytest.fixture
-def projects(courses):
+def projects(session):
     """Return  a list of projects to populate the database"""
-    course_id_ad3 = courses[0].course_id
-    course_id_raf = courses[1].course_id
+    course_id_ad3 = session.query(Course).filter_by(name="AD3").first().course_id
+    course_id_raf = session.query(Course).filter_by(name="RAF").first().course_id
 
     return [
         Project(
-            project_id=1,
             title="B+ Trees",
             descriptions="Implement B+ trees",
             assignment_file="assignement.pdf",
@@ -67,7 +62,6 @@ def projects(courses):
             regex_expressions=["solution"]
         ),
         Project(
-            project_id=2,
             title="Predicaten",
             descriptions="Predicaten project",
             assignment_file="assignment.pdf",
@@ -81,15 +75,13 @@ def projects(courses):
         )
     ]
 
-@pytest.fixture
-def submissions(projects):
+def submissions(session):
     """Return a list of submissions to populate the database"""
-    project_id_ad3 = projects[0].project_id
-    project_id_raf = projects[1].project_id
+    project_id_ad3 = session.query(Project).filter_by(title="B+ Trees").first().project_id
+    project_id_raf = session.query(Project).filter_by(title="Predicaten").first().project_id
 
     return [
         Submission(
-            submission_id=1,
             uid="student01",
             project_id=project_id_ad3,
             grading=16,
@@ -98,7 +90,6 @@ def submissions(projects):
             submission_status=True
         ),
         Submission(
-            submission_id=2,
             uid="student02",
             project_id=project_id_ad3,
             submission_time=datetime(2024,3,14,23,59,59),
@@ -106,7 +97,6 @@ def submissions(projects):
             submission_status=False
         ),
         Submission(
-            submission_id=3,
             uid="student02",
             project_id=project_id_raf,
             grading=15,
@@ -148,7 +138,7 @@ def files():
 engine = create_engine(url)
 Session = sessionmaker(bind=engine)
 @pytest.fixture
-def session(users,courses,course_relations,projects,submissions):
+def session():
     """Create a database session for the tests"""
     # Create all tables and get a session
     db.metadata.create_all(engine)
@@ -156,15 +146,15 @@ def session(users,courses,course_relations,projects,submissions):
 
     try:
         # Populate the database
-        session.add_all(users)
+        session.add_all(users())
         session.commit()
-        session.add_all(courses)
+        session.add_all(courses())
         session.commit()
-        session.add_all(course_relations)
+        session.add_all(course_relations(session))
         session.commit()
-        session.add_all(projects)
+        session.add_all(projects(session))
         session.commit()
-        session.add_all(submissions)
+        session.add_all(submissions(session))
         session.commit()
 
         # Tests can now use a populated database
