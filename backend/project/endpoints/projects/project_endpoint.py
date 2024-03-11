@@ -4,7 +4,6 @@ of both routes
 """
 
 from flask import Blueprint
-from flask_restful import Api
 
 from project.endpoints.projects.projects import ProjectsEndpoint
 from project.endpoints.projects.project_detail import ProjectDetail

@@ -55,6 +55,9 @@ def create_model_instance(model: DeclarativeMeta,
                       data: Dict[str, Union[str, int]],
                       response_url_base: str,
                       required_fields: List[str] = None):
+    """
+    Create an instance of a model
+    """
     if required_fields is None:
         required_fields = []
     # Check if all non-nullable fields are present in the data
@@ -96,11 +99,14 @@ def insert_into_model(model: DeclarativeMeta,
         # is the right format of error message and we just need to return
         if isinstance(new_instance, tuple):
             return new_instance
-        else:
-            return jsonify({
-                    "data": new_instance,
-                    "message": "Object created succesfully.",
-                    "url": urljoin(response_url_base + "/", str(getattr(new_instance, url_id_field)))}), 201
+
+        return (jsonify({
+                "data": new_instance,
+                "message": "Object created succesfully.",
+                "url":
+                    urljoin(response_url_base + "/",
+                            str(getattr(new_instance, url_id_field)))}),
+                201)
     except SQLAlchemyError:
         db.session.rollback()
         return jsonify({"error": "Something went wrong while inserting into the database.",

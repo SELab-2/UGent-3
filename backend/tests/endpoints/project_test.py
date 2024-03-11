@@ -1,6 +1,5 @@
 """Tests for project endpoints."""
 from project.models.projects import Project
-import pytest
 
 def test_projects_home(client):
     """Test home project endpoint."""
@@ -24,6 +23,8 @@ def test_post_project(db_session, client, course_ad, course_teacher_ad, project_
     db_session.commit()
 
     project_json["course_id"] = course_ad.course_id
+    # cant be done with 'with' because it autocloses then
+    # pylint: disable=R1732
     project_json["assignment_file"] = open("testzip.zip", "rb")
 
     # post the project
@@ -50,8 +51,10 @@ def test_remove_project(db_session, client, course_ad, course_teacher_ad, projec
     db_session.commit()
 
     project_json["course_id"] = course_ad.course_id
-    project_json["assignment_file"] = open("testzip.zip", "rb")
 
+    # cant be done with 'with' because it autocloses then
+    # pylint: disable=R1732
+    project_json["assignment_file"] = open("testzip.zip", "rb")
     # post the project
     response = client.post("/projects", data=project_json)
     print(response)

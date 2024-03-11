@@ -5,13 +5,13 @@ import os
 from os import getenv
 from urllib.parse import urljoin
 
+import zipfile
+
 from flask import request
 from flask_restful import Resource
 
-import zipfile
-
 from project.models.projects import Project
-from project.utils.query_agent import query_selected_from_model, insert_into_model, create_model_instance
+from project.utils.query_agent import query_selected_from_model, create_model_instance
 
 from project.endpoints.projects.endpoint_parser import parse_project_params
 
@@ -20,20 +20,13 @@ UPLOAD_FOLDER = getenv('UPLOAD_URL')
 ALLOWED_EXTENSIONS = {'zip'}
 
 
-def parse_immutabledict(request):
-    output_json = {}
-    for key, value in request.form.items():
-        if value == "false":
-            print("false")
-            output_json[key] = False
-        if value == "true":
-            output_json[key] = True
-        else:
-            output_json[key] = value
-    return output_json
+
 
 
 def allowed_file(filename: str):
+    """
+    check if file extension is allowed for upload
+    """
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -72,15 +65,19 @@ class ProjectsEndpoint(Resource):
 
         # save the file that is given with the request
 
-        new_new_project = create_model_instance(
+        new_project = create_model_instance(
             Project,
             project_json,
             urljoin(API_URL, "/projects"),
-            required_fields=["title", "descriptions", "course_id", "visible_for_students", "archieved"]
+            required_fields=[
+                "title",
+                "descriptions",
+                "course_id",
+                "visible_for_students",
+                "archieved"]
         )
-        id = new_new_project.project_id
 
-        project_upload_directory = f"{UPLOAD_FOLDER}{new_new_project.project_id}"
+        project_upload_directory = f"{UPLOAD_FOLDER}{new_project.project_id}"
 
         file_location = "." + os.path.join(project_upload_directory)
 
@@ -89,13 +86,13 @@ class ProjectsEndpoint(Resource):
 
         file.save(file_location + "/" + filename)
         try:
-            with zipfile.ZipFile(file_location + "/" + filename) as zip:
-                zip.extractall(file_location)
+            with zipfile.ZipFile(file_location + "/" + filename) as upload_zip:
+                upload_zip.extractall(file_location)
         except zipfile.BadZipfile:
             return {"message": "Please provide a .zip file for uploading the instructions"}, 400
 
         return {
             "message": "Project created succesfully",
-            "data": new_new_project,
-            "url": f"{API_URL}/projects/{id}"
+            "data": new_project,
+            "url": f"{API_URL}/projects/{new_project.project_id}"
         }, 201
