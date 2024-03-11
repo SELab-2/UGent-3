@@ -12,11 +12,11 @@ class TestUserModel:
         session.add(user)
         session.commit()
         assert session.get(User, "user01") is not None
+        assert session.query(User).count() == 5
 
     def test_query_user(self, session: Session):
         """Test if a user can be queried"""
         assert session.query(User).count() == 4
-
         teacher = session.query(User).filter_by(uid="brinkmann").first()
         assert teacher is not None
         assert teacher.is_teacher

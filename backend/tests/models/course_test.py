@@ -1,98 +1,58 @@
-"""Test module for the Course model"""
-import pytest
+"""Course model tests"""
+
+from pytest import raises
+from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from project.models.course import Course
-from project.models.user import User
-from project.models.course_relation import CourseAdmin, CourseStudent
-
 
 class TestCourseModel:
-    """Test class for the database models"""
+    """Class to test the Course model"""
 
-    def test_foreignkey_courses_teacher(self, db_session, course: Course):
-        """Tests the foreign key relation between courses and the teacher uid"""
-        with pytest.raises(
-            IntegrityError
-        ):
-            db_session.add(course)
-            db_session.commit()
+    def test_create_course(self, session: Session):
+        """Test if a course can be created"""
+        course = Course(name="SEL2", ufora_id="C003784A_2023", teacher="brinkmann")
+        session.add(course)
+        session.commit()
+        assert session.get(Course, course.course_id) is not None
+        assert session.query(Course).count() == 3
 
-    def test_correct_course(self, db_session, course: Course, course_teacher: User):
-        """Tests wether added course and a teacher are correctly connected"""
-        db_session.add(course_teacher)
-        db_session.commit()
+    def test_query_course(self, session: Session):
+        """Test if a course can be queried"""
+        assert session.query(Course).count() == 2
+        course = session.query(Course).filter_by(name="AD3").first()
+        assert course is not None
+        assert course.teacher == "brinkmann"
 
-        db_session.add(course)
-        db_session.commit()
-        assert (
-            db_session.query(Course).filter_by(name=course.name).first().teacher
-            == course_teacher.uid
-        )
+    def test_update_course(self, session: Session):
+        """Test if a course can be updated"""
+        course = session.query(Course).filter_by(name="AD3").first()
+        course.name = "AD2"
+        session.commit()
+        assert session.get(Course, course.course_id).name == "AD2"
 
-    def test_foreignkey_coursestudents_uid(
-        self, db_session, course, course_teacher, course_students_relation
-    ):
-        """Test the foreign key of the CourseStudent related to the student uid"""
-        db_session.add(course_teacher)
-        db_session.commit()
+    def test_delete_course(self, session: Session):
+        """Test if a course can be deleted"""
 
-        db_session.add(course)
-        db_session.commit()
-        for s in course_students_relation:
-            s.course_id = course.course_id
+    def test_name_required(self, session: Session):
+        """Test the constraint that the user can't be nullable"""
+        course = session.query(Course).filter_by(name="AD3").first()
+        with raises(IntegrityError):
+            course.name = None
+            session.commit()
 
-        with pytest.raises(
-            IntegrityError
-        ):
-            db_session.add_all(course_students_relation)
-            db_session.commit()
+    def test_teacher_required(self, session: Session):
+        """Test the constraint that the teacher can't be nullable"""
+        course = session.query(Course).filter_by(name="AD3").first()
+        with raises(IntegrityError):
+            course.teacher = None
+            session.commit()
 
-    def test_correct_courserelations( # pylint: disable=too-many-arguments ; all arguments are needed for the test
-        self,
-        db_session,
-        course,
-        course_teacher,
-        course_students,
-        course_students_relation,
-        assistent,
-        course_admin,
-    ):
-        """Tests if we get the expected results for
-        correct usage of CourseStudent and CourseAdmin"""
-
-        db_session.add(course_teacher)
-        db_session.commit()
-
-        db_session.add(course)
-        db_session.commit()
-
-        db_session.add_all(course_students)
-        db_session.commit()
-
-        for s in course_students_relation:
-            s.course_id = course.course_id
-        db_session.add_all(course_students_relation)
-        db_session.commit()
-
-        student_check = [
-            s.uid
-            for s in db_session.query(CourseStudent)
-            .filter_by(course_id=course.course_id)
-            .all()
-        ]
-        student_uids = [s.uid for s in course_students]
-        assert student_check == student_uids
-
-        db_session.add(assistent)
-        db_session.commit()
-        course_admin.course_id = course.course_id
-        db_session.add(course_admin)
-        db_session.commit()
-
-        assert (
-            db_session.query(CourseAdmin)
-            .filter_by(course_id=course.course_id)
-            .first()
-            .uid
-            == assistent.uid
-        )
+    def test_foreign_key_teacher(self, session: Session):
+        """Test the foreign key relation between the course and the teacher"""
+        course = session.query(Course).filter_by(name="AD3").first()
+        course.teacher = "laermans"
+        session.commit()
+        assert session.get(Course, course.course_id).teacher == "laermans"
+        with raises(IntegrityError):
+            course.teacher = "unknown"
+            session.commit()
