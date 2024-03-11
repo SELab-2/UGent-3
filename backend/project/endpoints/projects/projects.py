@@ -53,7 +53,7 @@ class ProjectsEndpoint(Resource):
         new_project = create_model_instance(
             Project,
             project_json,
-            urljoin(API_URL, "/projects"),
+            urljoin(f"{API_URL}/", "/projects"),
             required_fields=[
                 "title",
                 "descriptions",
