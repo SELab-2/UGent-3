@@ -3,14 +3,14 @@ Parser for the argument when posting or patching a project
 """
 
 from flask_restful import reqparse
-import werkzeug
+from werkzeug.datastructures import FileStorage
 
 parser = reqparse.RequestParser()
 parser.add_argument('title', type=str, help='Projects title', location="form")
 parser.add_argument('descriptions', type=str, help='Projects description', location="form")
 parser.add_argument(
     'assignment_file',
-    type=werkzeug.datastructures.FileStorage,
+    type=FileStorage,
     help='Projects assignment file',
     location="form"
 )
