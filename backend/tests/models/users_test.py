@@ -1,25 +1,32 @@
-"""
-This file contains the tests for the User model.
-"""
+"""User model tests"""
+
+from sqlalchemy.orm import Session
 from project.models.user import User
 
-
 class TestUserModel:
-    """Test class for the database models"""
+    """Class to test the User model"""
 
-    def test_valid_user(self, db_session, valid_user):
-        """Tests if a valid user can be added to the database."""
-        db_session.add(valid_user)
-        db_session.commit()
-        assert valid_user in db_session.query(User).all()
+    def test_create_user(self, session: Session):
+        """Test if a user can be created"""
+        user = User(uid="user01", is_teacher=False, is_admin=False)
+        session.add(user)
+        session.commit()
+        assert session.get(User, "user01") is not None
 
-    def test_is_teacher(self, db_session, teachers):
-        """Tests if the is_teacher field is correctly set to True
-        for the teachers when added to the database."""
-        db_session.add_all(teachers)
-        db_session.commit()
-        teacher_count = 0
-        for usr in db_session.query(User).filter_by(is_teacher=True):
-            teacher_count += 1
-            assert usr.is_teacher
-        assert teacher_count == 10
+    def test_query_user(self, session: Session):
+        """Test if a user can be queried"""
+        assert session.query(User).count() == 4
+
+        teacher = session.query(User).filter_by(uid="brinkmann").first()
+        assert teacher is not None
+        assert teacher.is_teacher
+
+    def test_update_user(self, session: Session):
+        """Test if a user can be updated"""
+        student = session.query(User).filter_by(uid="student01").first()
+        student.is_admin = True
+        session.commit()
+        assert session.get(User, "student01").is_admin
+
+    def test_delete_user(self, session: Session):
+        """Test if a user can be deleted"""
