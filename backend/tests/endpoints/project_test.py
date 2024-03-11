@@ -54,9 +54,12 @@ def test_remove_project(db_session, client, course_ad, course_teacher_ad, projec
 
     # cant be done with 'with' because it autocloses then
     # pylint: disable=R1732
-    project_json["assignment_file"] = open("testzip.zip", "rb")
+    # project_json["assignment_file"] = open("testzip.zip", "rb")
     # post the project
-    response = client.post("/projects", data=project_json)
+    # response = client.post("/projects", data=project_json)
+    with open("testzip.zip", "rb") as zip_file:
+        project_json["assignment_file"] = open("testzip.zip", "rb")
+        response = client.post("/projects", data=project_json)
 
     # check if the project with the id is present
     project_id = response.json["data"]["project_id"]
