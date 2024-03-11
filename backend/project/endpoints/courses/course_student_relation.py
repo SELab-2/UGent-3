@@ -14,7 +14,7 @@ from flask import request
 from flask_restful import Resource
 
 from project import db
-from project.models.course_relations import CourseStudent
+from project.models.course_relation import CourseStudent
 from project.endpoints.courses.courses_utils import (
     execute_query_abort_if_db_error,
     add_abort_if_error,
@@ -44,14 +44,14 @@ class CourseToAddStudents(Resource):
         to get all the users assigned to a course
         everyone can get this data so no need to have uid query in the link
         """
-        abort_url = API_URL + "/courses/" + str(course_id) + "/students"
+        abort_url = f"{API_URL}/courses/{str(course_id)}/students"
         get_course_abort_if_not_found(course_id)
 
         return query_selected_from_model(
             CourseStudent,
             abort_url,
             select_values=["uid"],
-            url_mapper={"uid": urljoin(API_URL + "/", "users")},
+            url_mapper={"uid": urljoin(f"{API_URL}/", "users")},
             filters={"course_id": course_id}
         )
 
@@ -60,7 +60,7 @@ class CourseToAddStudents(Resource):
         Allows admins of a course to assign new students by posting to:
         /courses/course_id/students with a list of uid in the request body under key "students"
         """
-        abort_url = API_URL + "/courses/" + str(course_id) + "/students"
+        abort_url = f"{API_URL}/courses/{str(course_id)}/students"
         uid = request.args.get("uid")
         data = request.get_json()
         student_uids = data.get("students")
@@ -74,14 +74,14 @@ class CourseToAddStudents(Resource):
             if student_relation:
                 db.session.rollback()
                 message = (
-                    "Student with uid " + uid + " is already assigned to the course"
+                    f"Student with uid {uid} is already assigned to the course"
                 )
                 return json_message(message), 400
             add_abort_if_error(CourseStudent(uid=uid, course_id=course_id), abort_url)
         commit_abort_if_error(abort_url)
-        response = json_message("User were succesfully added to the course")
+        response = json_message("Users were succesfully added to the course")
         response["url"] = abort_url
-        data = {"students": [API_URL + "/users/" + uid for uid in student_uids]}
+        data = {"students": [f"{API_URL}/users/{uid}" for uid in student_uids]}
         response["data"] = data
         return response, 201
 
@@ -91,7 +91,7 @@ class CourseToAddStudents(Resource):
         /courses/course_id/students with inside the request body
         a field "students" = [list of uids to unassign]
         """
-        abort_url = API_URL + "/courses/" + str(course_id) + "/students"
+        abort_url = f"{API_URL}/courses/{str(course_id)}/students"
         uid = request.args.get("uid")
         data = request.get_json()
         student_uids = data.get("students")
@@ -106,6 +106,6 @@ class CourseToAddStudents(Resource):
                 delete_abort_if_error(student_relation, abort_url)
         commit_abort_if_error(abort_url)
 
-        response = json_message("User were succesfully removed from the course")
-        response["url"] = API_URL + "/courses/" + str(course_id) + "/students"
+        response = json_message("Users were succesfully removed from the course")
+        response["url"] = f"{API_URL}/courses/{str(course_id)}/students"
         return response

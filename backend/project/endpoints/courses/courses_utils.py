@@ -11,9 +11,9 @@ from flask import abort
 from sqlalchemy.exc import SQLAlchemyError
 
 from project import db
-from project.models.course_relations import CourseAdmin
-from project.models.users import User
-from project.models.courses import Course
+from project.models.course_relation import CourseAdmin
+from project.models.user import User
+from project.models.course import Course
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -100,7 +100,7 @@ def abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant):
         HTTPException: If the current user is not authorized or
         if the UID of the person to be made an admin is missing in the request body.
     """
-    url = API_URL + "/courses/" + str(course_id) + "/admins"
+    url = f"{API_URL}/courses/{str(course_id)}/admins"
     abort_if_uid_is_none(teacher, url)
 
     course = get_course_abort_if_not_found(course_id)
@@ -131,7 +131,7 @@ def abort_if_none_uid_student_uids_or_non_existant_course_id(
         403: If the user is not authorized to assign new students to the course.
         400: If the request body does not contain the required 'students' field.
     """
-    url = API_URL + "/courses/" + str(course_id) + "/students"
+    url = f"{API_URL}/courses/{str(course_id)}/students"
     get_course_abort_if_not_found(course_id)
     abort_if_no_user_found_for_uid(uid, url)
     query = CourseAdmin.query.filter_by(uid=uid, course_id=course_id)
@@ -177,7 +177,7 @@ def abort_if_no_user_found_for_uid(uid, url):
     user = execute_query_abort_if_db_error(query, url)
 
     if not user:
-        response = json_message("User with uid " + uid + " was not found")
+        response = json_message(f"User with uid {uid} was not found")
         response["url"] = url
         abort(404, description=response)
     return user
@@ -196,7 +196,7 @@ def get_admin_relation(uid, course_id):
     """
     return execute_query_abort_if_db_error(
         CourseAdmin.query.filter_by(uid=uid, course_id=course_id),
-        url=API_URL + "/courses/" + str(course_id) + "/admins",
+        url=f"{API_URL}/courses/{str(course_id)}/admins",
     )
 
 
@@ -224,11 +224,11 @@ def get_course_abort_if_not_found(course_id):
         Course: The course with the given ID.
     """
     query = Course.query.filter_by(course_id=course_id)
-    course = execute_query_abort_if_db_error(query, API_URL + "/courses")
+    course = execute_query_abort_if_db_error(query, f"{API_URL}/courses")
 
     if not course:
         response = json_message("Course not found")
-        response["url"] = API_URL + "/courses"
+        response["url"] = f"{API_URL}/courses"
         abort(404, description=response)
 
     return course

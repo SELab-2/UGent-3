@@ -14,8 +14,8 @@ from flask import request
 from flask_restful import Resource
 from sqlalchemy.exc import SQLAlchemyError
 
-from project.models.courses import Course
-from project.models.course_relations import CourseAdmin, CourseStudent
+from project.models.course import Course
+from project.models.course_relation import CourseAdmin, CourseStudent
 
 from project import db
 from project.utils.query_agent import delete_by_id_from_model, patch_by_id_from_model
@@ -64,8 +64,8 @@ class CourseByCourseId(Resource):
 
             user_url = urljoin(API_URL + "/", "users")
 
-            admin_ids = [ urljoin(user_url + "/" , admin[0]) for admin in admins]
-            student_ids = [ urljoin(user_url + "/", student[0])  for student in students]
+            admin_ids = [ urljoin(f"{user_url}/" , admin[0]) for admin in admins]
+            student_ids = [ urljoin(f"{user_url}/", student[0])  for student in students]
 
             result = {
                 'course_id': course_details.course_id,
@@ -77,9 +77,9 @@ class CourseByCourseId(Resource):
             }
 
             return {
-                "message": "Succesfully retrieved course with course_id: " + str(course_id),
+                "message": f"Succesfully retrieved course with course_id: {str(course_id)}",
                 "data": result,
-                "url": urljoin(RESPONSE_URL + "/", str(course_id))
+                "url": urljoin(f"{RESPONSE_URL}/", str(course_id))
             }
         except SQLAlchemyError:
             return {

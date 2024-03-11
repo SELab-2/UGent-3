@@ -189,7 +189,7 @@ def query_by_id_from_model(model: DeclarativeMeta,
         return jsonify({
             "data": result,
             "message": "Resource fetched correctly",
-            "url": urljoin(base_url + "/", str(column_id))}), 200
+            "url": urljoin(f"{base_url}/", str(column_id))}), 200
     except SQLAlchemyError:
         return {
             "error": "Something went wrong while querying the database.",
@@ -224,7 +224,7 @@ def patch_by_id_from_model(model: DeclarativeMeta,
         return jsonify({
             "data": result,
             "message": "Resource updated successfully",
-            "url": urljoin(base_url + "/", str(column_id))}), 200
+            "url": urljoin(f"{base_url}/", str(column_id))}), 200
     except SQLAlchemyError:
         return {"error": "Something went wrong while updating the database.",
                 "url": base_url}, 500

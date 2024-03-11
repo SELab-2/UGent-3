@@ -1,5 +1,5 @@
 """Tests for project endpoints."""
-from project.models.projects import Project
+from project.models.project import Project
 
 def test_projects_home(client):
     """Test home project endpoint."""
