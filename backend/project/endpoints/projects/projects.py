@@ -50,7 +50,7 @@ class ProjectsEndpoint(Resource):
 
         # save the file that is given with the request
 
-        new_project = create_model_instance(
+        new_project, _ = create_model_instance(
             Project,
             project_json,
             urljoin(f"{API_URL}/", "/projects"),
@@ -60,7 +60,7 @@ class ProjectsEndpoint(Resource):
                 "course_id",
                 "visible_for_students",
                 "archieved"]
-        )[0]
+        )
 
         project_upload_directory = os.path.join(f"{UPLOAD_FOLDER}", f"{new_project.project_id}")
 
