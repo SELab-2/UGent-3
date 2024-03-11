@@ -2,7 +2,6 @@
 Module that implements the /projects endpoint of the API
 """
 import os
-from os import getenv
 from urllib.parse import urljoin
 import zipfile
 
