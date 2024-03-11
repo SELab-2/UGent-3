@@ -1,7 +1,7 @@
 {
-  "Homepage": "Homepage",
-  "Mijn projecten": "My Projects",
-  "Mijn vakken": "My Courses",
-  "Login": "Login",
-  "Home": "Home"
+  "homepage": "Homepage",
+  "myProjects": "My Projects",
+  "myCourses": "My Courses",
+  "login": "Login",
+  "home": "Home"
 }

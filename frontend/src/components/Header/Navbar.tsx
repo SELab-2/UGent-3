@@ -48,9 +48,9 @@ export default function Navbar() {
   };
   const { t } = useTranslation();
   const listItems = [
-    {link: "/", text: t("Homepage")},
-    {link: "/projects", text: t("Mijn projecten")},
-    {link: "/courses", text: t("Mijn vakken")}
+    {link: "/", text: t("homepage")},
+    {link: "/projects", text: t("myProjects")},
+    {link: "/courses", text: t("myCourses")}
   ]
 
   const SideList = () => (

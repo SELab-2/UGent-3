@@ -22,9 +22,9 @@ export function Header(): JSX.Element {
             <Navbar />
           </Box>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {t('Home')}
+            {t('home')}
           </Typography>
-          <Button color="inherit">{t('Login')}</Button>
+          <Button color="inherit">{t('login')}</Button>
         </Toolbar>
       </AppBar>
     </Box>
