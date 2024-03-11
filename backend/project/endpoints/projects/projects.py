@@ -68,7 +68,7 @@ class ProjectsEndpoint(Resource):
 
         file.save(os.path.join(project_upload_directory, filename))
         try:
-            with zipfile.ZipFile(project_upload_directory + "/" + filename) as upload_zip:
+            with zipfile.ZipFile(os.path.join(project_upload_directory, filename)) as upload_zip:
                 upload_zip.extractall(project_upload_directory)
         except zipfile.BadZipfile:
             return ({
