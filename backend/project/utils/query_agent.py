@@ -94,7 +94,11 @@ def insert_into_model(model: DeclarativeMeta,
         a message indicating that something went wrong while inserting into the database.
     """
     try:
-        model_instance, status_code = create_model_instance(model, data, response_url_base, required_fields)
+        model_instance, status_code = create_model_instance(
+            model,
+            data,
+            response_url_base,
+            required_fields)
 
         # if its a tuple the model instance couldn't be created so it already
         # is the right format of error message and we just need to return
