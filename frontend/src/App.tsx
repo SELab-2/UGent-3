@@ -1,5 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Home from "./pages/home/Home";
+import { BrowserRouter } from "react-router-dom";
 import { Header } from "./components/Header/Header";
 
 /**
@@ -10,11 +9,7 @@ function App(): JSX.Element {
   return (
     <BrowserRouter>
       <Header />
-      <Routes>
-        <Route index element={<Home />} />
-      </Routes>
     </BrowserRouter>
   );
 }
-
 export default App;
