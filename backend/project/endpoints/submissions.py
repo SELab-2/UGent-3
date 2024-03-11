@@ -159,6 +159,7 @@ class SubmissionEndpoint(Resource):
             with db.session() as session:
                 submission = session.get(Submission, submission_id)
                 if submission is None:
+                    data["url"] = urljoin(f"{API_HOST}/", "/submissions")
                     data["message"] = f"Submission (submission_id={submission_id}) not found"
                     return data, 404
 
@@ -197,6 +198,7 @@ class SubmissionEndpoint(Resource):
                 # Get the submission
                 submission = session.get(Submission, submission_id)
                 if submission is None:
+                    data["url"] = urljoin(f"{API_HOST}/", "/submissions")
                     data["message"] = f"Submission (submission_id={submission_id}) not found"
                     return data, 404
 
@@ -247,6 +249,7 @@ class SubmissionEndpoint(Resource):
             with db.session() as session:
                 submission = session.get(Submission, submission_id)
                 if submission is None:
+                    data["url"] = urljoin(f"{API_HOST}/", "/submissions")
                     data["message"] = f"Submission (submission_id={submission_id}) not found"
                     return data, 404
 
