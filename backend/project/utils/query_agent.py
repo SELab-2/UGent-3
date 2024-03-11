@@ -105,7 +105,7 @@ def insert_into_model(model: DeclarativeMeta,
                 "data": model_instance,
                 "message": "Object created succesfully.",
                 "url":
-                    urljoin(response_url_base + "/",
+                    urljoin(f"{response_url_base}/",
                             str(getattr(model_instance, url_id_field)))}),
                 status_code)
     except SQLAlchemyError:
