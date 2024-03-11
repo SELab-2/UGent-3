@@ -25,14 +25,15 @@ def test_post_project(db_session, client, course_ad, course_teacher_ad, project_
     project_json["course_id"] = course_ad.course_id
     # cant be done with 'with' because it autocloses then
     # pylint: disable=R1732
-    project_json["assignment_file"] = open("testzip.zip", "rb")
+    with open("testzip.zip", "rb") as zip_file:
+        project_json["assignment_file"] = zip_file
+        # post the project
+        response = client.post(
+            "/projects",
+            data=project_json,
+            content_type='multipart/form-data'
+        )
 
-    # post the project
-    response = client.post(
-        "/projects",
-        data=project_json,
-        content_type='multipart/form-data'
-    )
     assert response.status_code == 201
 
     # check if the project with the id is present
@@ -52,13 +53,9 @@ def test_remove_project(db_session, client, course_ad, course_teacher_ad, projec
 
     project_json["course_id"] = course_ad.course_id
 
-    # cant be done with 'with' because it autocloses then
-    # pylint: disable=R1732
-    # project_json["assignment_file"] = open("testzip.zip", "rb")
     # post the project
-    # response = client.post("/projects", data=project_json)
     with open("testzip.zip", "rb") as zip_file:
-        project_json["assignment_file"] = open("testzip.zip", "rb")
+        project_json["assignment_file"] = zip_file
         response = client.post("/projects", data=project_json)
 
     # check if the project with the id is present
