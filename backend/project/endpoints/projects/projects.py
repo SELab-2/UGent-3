@@ -69,7 +69,7 @@ class ProjectsEndpoint(Resource):
         if not os.path.exists(project_upload_directory):
             os.makedirs(file_location)
 
-        file.save(file_location + "/" + filename)
+        file.save(os.path.join(file_location, filename))
         try:
             with zipfile.ZipFile(file_location + "/" + filename) as upload_zip:
                 upload_zip.extractall(file_location)
