@@ -74,7 +74,11 @@ class ProjectsEndpoint(Resource):
             with zipfile.ZipFile(file_location + "/" + filename) as upload_zip:
                 upload_zip.extractall(file_location)
         except zipfile.BadZipfile:
-            return {"message": "Please provide a .zip file for uploading the instructions"}, 400
+            return ({
+                        "message": "Please provide a .zip file for uploading the instructions",
+                        "url": f"{API_URL}/projects"
+                    },
+                    400)
 
         return {
             "message": "Project created succesfully",
