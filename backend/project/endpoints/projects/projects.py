@@ -90,6 +90,10 @@ class ProjectsEndpoint(Resource):
             with zipfile.ZipFile(file_location+"/"+file.filename) as zip:
                 zip.extractall(file_location)
         else:
-            print("no zip file given")
+            return {"message": "Please provide a .zip file for uploading the instructions"}, 400
 
-        return {}, 200
+        return {
+            "message": "Project created succesfully",
+            "data": new_new_project,
+            "url": f"{API_URL}/projects/{id}"
+        }, 200
