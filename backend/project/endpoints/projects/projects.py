@@ -60,7 +60,7 @@ class ProjectsEndpoint(Resource):
                 "course_id",
                 "visible_for_students",
                 "archieved"]
-        )
+        )[0]
 
         project_upload_directory = os.path.join(f"{UPLOAD_FOLDER}", f"{new_project.project_id}")
 
