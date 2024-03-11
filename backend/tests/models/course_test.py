@@ -53,6 +53,7 @@ class TestCourseModel:
         course.teacher = "laermans"
         session.commit()
         assert session.get(Course, course.course_id).teacher == "laermans"
+
         with raises(IntegrityError):
             course.teacher = "unknown"
             session.commit()
