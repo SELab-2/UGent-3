@@ -19,6 +19,7 @@ API_URL = getenv('API_HOST')
 UPLOAD_FOLDER = getenv('UPLOAD_URL')
 ALLOWED_EXTENSIONS = {'zip'}
 
+
 def parse_immutabledict(request):
     output_json = {}
     for key, value in request.form.items():
@@ -31,9 +32,11 @@ def parse_immutabledict(request):
             output_json[key] = value
     return output_json
 
+
 def allowed_file(filename: str):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 class ProjectsEndpoint(Resource):
     """
@@ -65,6 +68,7 @@ class ProjectsEndpoint(Resource):
 
         file = request.files["assignment_file"]
         project_json = parse_project_params()
+        filename = file.filename.split("/")[-1]
 
         # save the file that is given with the request
 
@@ -74,26 +78,24 @@ class ProjectsEndpoint(Resource):
             urljoin(API_URL, "/projects"),
             required_fields=["title", "descriptions", "course_id", "visible_for_students", "archieved"]
         )
-
-        print(new_new_project)
         id = new_new_project.project_id
-        print(id)
-        project_upload_directory = f"{UPLOAD_FOLDER}{new_new_project.project_id}"
-        file_location = "."+os.path.join(project_upload_directory)
-        print(file_location)
-        # print(new_new_project.json)
-        if not os.path.exists(project_upload_directory):
-            os.makedirs(file_location)
 
-        if allowed_file(file.filename):
-            file.save(file_location+"/"+file.filename)
-            with zipfile.ZipFile(file_location+"/"+file.filename) as zip:
+        project_upload_directory = f"{UPLOAD_FOLDER}{new_new_project.project_id}"
+
+        file_location = "." + os.path.join(project_upload_directory)
+
+        if not os.path.exists(project_upload_directory):
+            os.makedirs(file_location, exist_ok=True)
+
+        file.save(file_location + "/" + filename)
+        try:
+            with zipfile.ZipFile(file_location + "/" + filename) as zip:
                 zip.extractall(file_location)
-        else:
+        except zipfile.BadZipfile:
             return {"message": "Please provide a .zip file for uploading the instructions"}, 400
 
         return {
             "message": "Project created succesfully",
             "data": new_new_project,
             "url": f"{API_URL}/projects/{id}"
-        }, 200
+        }, 201

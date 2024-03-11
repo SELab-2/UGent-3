@@ -92,11 +92,15 @@ def insert_into_model(model: DeclarativeMeta,
     """
     try:
         new_instance = create_model_instance(model, data, response_url_base, required_fields)
-
-        return jsonify({
-                "data": new_instance,
-                "message": "Object created succesfully.",
-                "url": urljoin(response_url_base + "/", str(getattr(new_instance, url_id_field)))}), 201
+        # if its a tuple the model instance couldn't be created so it already
+        # is the right format of error message and we just need to return
+        if isinstance(new_instance, tuple):
+            return new_instance
+        else:
+            return jsonify({
+                    "data": new_instance,
+                    "message": "Object created succesfully.",
+                    "url": urljoin(response_url_base + "/", str(getattr(new_instance, url_id_field)))}), 201
     except SQLAlchemyError:
         db.session.rollback()
         return jsonify({"error": "Something went wrong while inserting into the database.",

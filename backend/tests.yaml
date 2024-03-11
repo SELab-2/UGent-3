@@ -29,6 +29,7 @@ services:
       POSTGRES_PASSWORD: test_password
       POSTGRES_DB: test_database
       API_HOST: http://api_is_here
+      UPLOAD_URL: /project/endpoints/uploads/
     volumes:
       - .:/app
     command: ["pytest"]
