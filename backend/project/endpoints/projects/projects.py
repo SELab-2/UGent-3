@@ -46,7 +46,7 @@ class ProjectsEndpoint(Resource):
 
         file = request.files["assignment_file"]
         project_json = parse_project_params()
-        filename = file.filename.split("/")[-1]
+        filename = os.path.split(file.filename)[1]
 
         # save the file that is given with the request
 
