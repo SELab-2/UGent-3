@@ -39,7 +39,6 @@ def parse_project_params():
     """
     args = parser.parse_args()
     result_dict = {}
-    print(args)
 
     for key, value in args.items():
         if value is not None:
