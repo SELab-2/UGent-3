@@ -67,7 +67,7 @@ class ProjectsEndpoint(Resource):
         file_location = os.path.join(project_upload_directory)
 
         if not os.path.exists(project_upload_directory):
-            os.makedirs(file_location, exist_ok=True)
+            os.makedirs(file_location)
 
         file.save(file_location + "/" + filename)
         try:
