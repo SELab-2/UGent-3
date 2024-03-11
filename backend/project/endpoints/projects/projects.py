@@ -8,8 +8,10 @@ from urllib.parse import urljoin
 from flask import request
 from flask_restful import Resource
 
+import zipfile
+
 from project.models.projects import Project
-from project.utils.query_agent import query_selected_from_model, insert_into_model
+from project.utils.query_agent import query_selected_from_model, insert_into_model, create_model_instance
 
 from project.endpoints.projects.endpoint_parser import parse_project_params
 
@@ -63,15 +65,31 @@ class ProjectsEndpoint(Resource):
 
         file = request.files["assignment_file"]
         project_json = parse_project_params()
-        print("args")
-        print(arg)
 
         # save the file that is given with the request
+
+        new_new_project = create_model_instance(
+            Project,
+            project_json,
+            urljoin(API_URL, "/projects"),
+            required_fields=["title", "descriptions", "course_id", "visible_for_students", "archieved"]
+        )
+
+        print(new_new_project)
+        id = new_new_project.project_id
+        print(id)
+        project_upload_directory = f"{UPLOAD_FOLDER}{new_new_project.project_id}"
+        file_location = "."+os.path.join(project_upload_directory)
+        print(file_location)
+        # print(new_new_project.json)
+        if not os.path.exists(project_upload_directory):
+            os.makedirs(file_location)
+
         if allowed_file(file.filename):
-            file.save("."+os.path.join(UPLOAD_FOLDER, file.filename))
+            file.save(file_location+"/"+file.filename)
+            with zipfile.ZipFile(file_location+"/"+file.filename) as zip:
+                zip.extractall(file_location)
         else:
             print("no zip file given")
 
-        new_project = insert_into_model(Project, project_json, urljoin(API_URL, "/projects"), "project_id", required_fields=["title", "descriptions", "course_id", "visible_for_students", "archieved"])
-
-        return new_project
+        return {}, 200

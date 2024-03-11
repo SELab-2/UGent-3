@@ -50,6 +50,28 @@ def delete_by_id_from_model(
         return {"error": "Something went wrong while deleting from the database.",
                 "url": base_url}, 500
 
+
+def create_model_instance(model: DeclarativeMeta,
+                      data: Dict[str, Union[str, int]],
+                      response_url_base: str,
+                      required_fields: List[str] = None):
+    if required_fields is None:
+        required_fields = []
+    # Check if all non-nullable fields are present in the data
+    missing_fields = [field for field in required_fields if field not in data]
+
+    if missing_fields:
+        return {"error": f"Missing required fields: {', '.join(missing_fields)}",
+                "url": response_url_base}, 400
+
+    filtered_data = filter_model_fields(model, data)
+    new_instance: DeclarativeMeta = model(**filtered_data)
+    db.session.add(new_instance)
+    db.session.commit()
+
+    return new_instance
+
+
 def insert_into_model(model: DeclarativeMeta,
                       data: Dict[str, Union[str, int]],
                       response_url_base: str,
@@ -69,26 +91,14 @@ def insert_into_model(model: DeclarativeMeta,
         a message indicating that something went wrong while inserting into the database.
     """
     try:
-        if required_fields is None:
-            required_fields = []
-        # Check if all non-nullable fields are present in the data
-        missing_fields = [field for field in required_fields if field not in data]
+        new_instance = create_model_instance(model, data, response_url_base, required_fields)
 
-        if missing_fields:
-            return {"error": f"Missing required fields: {', '.join(missing_fields)}",
-                    "url": response_url_base}, 400
-
-        filtered_data = filter_model_fields(model, data)
-        new_instance: DeclarativeMeta = model(**filtered_data)
-        db.session.add(new_instance)
-        db.session.commit()
         return jsonify({
                 "data": new_instance,
                 "message": "Object created succesfully.",
-                "url": urljoin(response_url_base, str(getattr(new_instance, url_id_field)))}), 201
-    except SQLAlchemyError as e:
-        print("error")
-        print(e)
+                "url": urljoin(response_url_base + "/", str(getattr(new_instance, url_id_field)))}), 201
+    except SQLAlchemyError:
+        db.session.rollback()
         return jsonify({"error": "Something went wrong while inserting into the database.",
                 "url": response_url_base}), 500
 
