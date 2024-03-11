@@ -13,21 +13,8 @@ from project.utils.query_agent import query_selected_from_model, create_model_in
 
 from project.endpoints.projects.endpoint_parser import parse_project_params
 
-API_URL = getenv('API_HOST')
-UPLOAD_FOLDER = getenv('UPLOAD_URL')
-ALLOWED_EXTENSIONS = {'zip'}
-
-
-
-
-
-def allowed_file(filename: str):
-    """
-    check if file extension is allowed for upload
-    """
-    return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
+API_URL = os.getenv('API_HOST')
+UPLOAD_FOLDER = os.getenv('UPLOAD_URL')
 
 class ProjectsEndpoint(Resource):
     """
