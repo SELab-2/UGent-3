@@ -62,9 +62,9 @@ class ProjectsEndpoint(Resource):
                 "archieved"]
         )
 
-        project_upload_directory = f"{UPLOAD_FOLDER}{new_project.project_id}"
+        project_upload_directory = os.path.join(f"{UPLOAD_FOLDER}", f"{new_project.project_id}")
 
-        file_location = "." + os.path.join(project_upload_directory)
+        file_location = os.path.join(project_upload_directory)
 
         if not os.path.exists(project_upload_directory):
             os.makedirs(file_location, exist_ok=True)
