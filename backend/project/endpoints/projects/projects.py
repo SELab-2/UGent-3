@@ -64,14 +64,12 @@ class ProjectsEndpoint(Resource):
 
         project_upload_directory = os.path.join(f"{UPLOAD_FOLDER}", f"{new_project.project_id}")
 
-        file_location = os.path.join(project_upload_directory)
+        os.makedirs(project_upload_directory, exist_ok=True)
 
-        os.makedirs(file_location, exist_ok=True)
-
-        file.save(os.path.join(file_location, filename))
+        file.save(os.path.join(project_upload_directory, filename))
         try:
-            with zipfile.ZipFile(file_location + "/" + filename) as upload_zip:
-                upload_zip.extractall(file_location)
+            with zipfile.ZipFile(project_upload_directory + "/" + filename) as upload_zip:
+                upload_zip.extractall(project_upload_directory)
         except zipfile.BadZipfile:
             return ({
                         "message": "Please provide a .zip file for uploading the instructions",
