@@ -33,6 +33,20 @@ class TestCourseModel:
     def test_delete_course(self, session: Session):
         """Test if a course can be deleted"""
 
+    def test_primary_key(self, session: Session):
+        """Test the primary key"""
+        course = Course(name="SEL2", teacher="brinkmann")
+        session.add(course)
+        session.commit()
+        with raises(IntegrityError):
+            course.course_id = None
+            session.commit()
+        session.rollback()
+        with raises(IntegrityError):
+            course.course_id = session.query(Course).first().course_id
+            session.commit()
+        session.rollback()
+
     def test_foreign_key_teacher(self, session: Session):
         """Test the foreign key teacher"""
         course = session.query(Course).filter_by(name="AD3").first()
@@ -44,20 +58,11 @@ class TestCourseModel:
             session.commit()
         session.rollback()
 
-    @mark.parametrize("property_name", ["course_id","name","teacher"])
+    @mark.parametrize("property_name", ["name","teacher"])
     def test_property_not_nullable(self, session: Session, property_name: str):
         """Test if the property is not nullable"""
         course = session.query(Course).first()
         with raises(IntegrityError):
             setattr(course, property_name, None)
-            session.commit()
-        session.rollback()
-
-    @mark.parametrize("property_name", ["course_id"])
-    def test_property_unique(self, session: Session, property_name: str):
-        """Test if the property is unique"""
-        courses = session.query(Course).all()
-        with raises(IntegrityError):
-            setattr(courses[0], property_name, getattr(courses[1], property_name))
             session.commit()
         session.rollback()
