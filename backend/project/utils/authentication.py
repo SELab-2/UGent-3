@@ -14,6 +14,7 @@ from project import db
 from project.models.user import User
 from project.models.course import Course
 from project.models.project import Project
+from project.models.submission import Submission
 from project.models.course_relation import CourseAdmin, CourseStudent
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -153,6 +154,30 @@ def get_course_of_project(project_id):
         abort(404)
 
     return project.course_id
+
+
+def project_visible(project_id):
+    try:
+        project = db.session.get(Project, project_id)
+    except SQLAlchemyError:
+    # every exception should result in a rollback
+        db.session.rollback()
+        abort_with_message(500, "An error occurred while fetching the project")
+    if not project:
+        abort_with_message(404, "Project with given id not found")
+    return project.visible_for_students
+
+
+def get_course_of_submission(submission_id):
+    try:
+        submission = db.session.get(Submission, submission_id)
+    except SQLAlchemyError:
+    # every exception should result in a rollback
+        db.session.rollback()
+        abort_with_message(500, "An error occurred while fetching the submission")
+    if not submission:
+        abort_with_message(404, "Submission with given id not found")
+    return get_course_of_project(submission.project_id)
 
 
 def login_required(f):
@@ -299,17 +324,103 @@ def authorize_project_visible(f):
         course_id = get_course_of_project(project_id)
         if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
             return f(*args, **kwargs)
-        
-        try:
-            project = db.session.get(Project, project_id)
-        except SQLAlchemyError:
-        # every exception should result in a rollback
-            db.session.rollback()
-            return {"message": "An error occurred while fetching the project",
-                    "url": f"{API_URL}/users"}, 500
-        if not project:
-            abort_with_message(404, "Project with given id not found")
-        if is_student_of_course(auth_user_id, course_id) and project.visible_for_students:
+        if is_student_of_course(auth_user_id, course_id) and project_visible(project_id):
             return f(*args, **kwargs)
         abort_with_message(403, "What project?")
+    return wrap
+
+def authorize_submissions_request(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        auth_user_id = return_authenticated_user_id()
+        project_id = request.args["project_id"]
+        course_id = get_course_of_project(project_id)
+
+        if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
+            return f(*args, **kwargs)
+        
+        if is_student_of_course(auth_user_id, course_id) and project_visible(project_id) and auth_user_id == request.form.get("uid"):
+            # TODO check whether it's request.form.get("uid") or request.args.get("uid")
+            return f(*args, **kwargs)
+        abort_with_message(403, "Uhhhh")
+    return wrap
+
+
+def authorize_student_submission(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        auth_user_id = return_authenticated_user_id()
+        project_id = request.args["project_id"]
+        course_id = get_course_of_project(project_id)
+        if is_student_of_course(auth_user_id, course_id) and project_visible(project_id) and auth_user_id == request.form.get("uid"):
+            return f(*args, **kwargs)
+        abort_with_message(403, "Nah")
+    return wrap
+
+
+def authorize_submissions_request(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        auth_user_id = return_authenticated_user_id()
+        project_id = request.args["project_id"]
+        course_id = get_course_of_project(project_id)
+
+        if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
+            return f(*args, **kwargs)
+        
+        if is_student_of_course(auth_user_id, course_id) and project_visible(project_id) and auth_user_id == request.form.get("uid"):
+            # TODO check whether it's request.form.get("uid") or request.args.get("uid")
+            return f(*args, **kwargs)
+        abort_with_message(403, "Uhhhh")
+    return wrap
+
+
+def authorize_submission_author(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        auth_user_id = return_authenticated_user_id()
+        try:
+            submission = db.session.get(Submission, request.args["submission_id"])
+        except SQLAlchemyError:
+            # every exception should result in a rollback
+            db.session.rollback()
+            abort_with_message(500, "An error occurred while fetching the submission")
+        if not submission:
+            abort_with_message(404, "Submission with given id not found")
+        if submission.uid == auth_user_id:
+            return f(*args, **kwargs)
+        abort_with_message(403, "")
+    return wrap
+
+
+def authorize_grader(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        auth_user_id = return_authenticated_user_id()
+        course_id = get_course_of_submission(request.args["submission_id"])
+        if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
+            return f(*args, **kwargs)
+        abort_with_message(403, "")
+    return wrap
+
+
+def authorize_submission_request(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        # submission_author / grader mag hier aan
+        auth_user_id = return_authenticated_user_id()
+        try:
+            submission = db.session.get(Submission, request.args["submission_id"])
+        except SQLAlchemyError:
+            # every exception should result in a rollback
+            db.session.rollback()
+            abort_with_message(500, "An error occurred while fetching the submission")
+        if not submission:
+            abort_with_message(404, "Submission with given id not found")
+        if submission.uid == auth_user_id:
+            return f(*args, **kwargs)
+        course_id = get_course_of_project(submission.project_id)
+        if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
+            return f(*args, **kwargs)
+        abort_with_message(403, "")
     return wrap
