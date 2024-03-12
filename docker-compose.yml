@@ -11,6 +11,8 @@ services:
       - backend
 
   backend:
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
     build: 
       context: ./backend
       dockerfile: Dockerfile
