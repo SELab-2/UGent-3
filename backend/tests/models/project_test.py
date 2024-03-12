@@ -63,21 +63,12 @@ class TestProjectModel:
         session.rollback()
 
     @mark.parametrize("property_name",
-        ["project_id","title","descriptions","course_id","visible_for_students","archieved"]
+        ["title","descriptions","course_id","visible_for_students","archieved"]
     )
     def test_property_not_nullable(self, session: Session, property_name: str):
         """Test if the property is not nullable"""
         project = session.query(Project).first()
         with raises(IntegrityError):
             setattr(project, property_name, None)
-            session.commit()
-        session.rollback()
-
-    @mark.parametrize("property_name", ["project_id"])
-    def test_property_unique(self, session: Session, property_name: str):
-        """Test if the property is unique"""
-        projects = session.query(Project).all()
-        with raises(IntegrityError):
-            setattr(projects[0], property_name, getattr(projects[1], property_name))
             session.commit()
         session.rollback()

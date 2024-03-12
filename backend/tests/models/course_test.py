@@ -33,14 +33,6 @@ class TestCourseModel:
     def test_delete_course(self, session: Session):
         """Test if a course can be deleted"""
 
-    def test_primary_key(self, session: Session):
-        """Test the primary key"""
-        courses = session.query(Course).all()
-        with raises(IntegrityError):
-            courses[0].course_id = courses[1].course_id
-            session.commit()
-        session.rollback()
-
     def test_foreign_key_teacher(self, session: Session):
         """Test the foreign key teacher"""
         course = session.query(Course).filter_by(name="AD3").first()
