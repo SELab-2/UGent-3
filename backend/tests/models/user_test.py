@@ -34,6 +34,14 @@ class TestUserModel:
         """Test if a user can be deleted"""
 
     @mark.parametrize("property_name", ["uid"])
+    def test_property_not_nullable(self, session: Session, property_name: str):
+        """Test if the property is not nullable"""
+        user = session.query(User).first()
+        with raises(IntegrityError):
+            setattr(user, property_name, None)
+            session.commit()
+
+    @mark.parametrize("property_name", ["uid"])
     def test_property_unique(self, session: Session, property_name: str):
         """Test if the property is unique"""
         users = session.query(User).all()
