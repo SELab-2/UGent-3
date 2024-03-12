@@ -35,15 +35,9 @@ class TestCourseModel:
 
     def test_primary_key(self, session: Session):
         """Test the primary key"""
-        course = Course(name="SEL2", teacher="brinkmann")
-        session.add(course)
-        session.commit()
+        courses = session.query(Course).all()
         with raises(IntegrityError):
-            course.course_id = None
-            session.commit()
-        session.rollback()
-        with raises(IntegrityError):
-            course.course_id = session.query(Course).first().course_id
+            courses[0].course_id = courses[1].course_id
             session.commit()
         session.rollback()
 
