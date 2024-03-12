@@ -7,7 +7,7 @@ from flask_restful import Resource, Api
 from sqlalchemy.exc import SQLAlchemyError
 
 from project import db
-from project.models.users import User as userModel
+from project.models.user import User as userModel
 from project.utils.authentication import login_required, authorize_teacher, authorize_user, not_allowed
 
 users_bp = Blueprint("users", __name__)

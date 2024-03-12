@@ -9,7 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from flask import request, jsonify
 from flask_restful import Resource
 
-from project.models.projects import Project
+from project.models.project import Project
 from project.utils.query_agent import query_selected_from_model, insert_into_model
 from project.utils.authentication import login_required, authorize_teacher
 
@@ -56,7 +56,7 @@ class ProjectsEndpoint(Resource):
 
         # save the file that is given with the request
         try:
-            new_project, status_code = create_model_instance(
+            new_project, status_code = insert_into_model(
                 Project,
                 project_json,
                 urljoin(f"{API_URL}/", "/projects"),

@@ -11,10 +11,10 @@ import requests
 
 from project import db
 
-from project.models.users import User
-from project.models.courses import Course
-from project.models.projects import Project
-from project.models.course_relations import CourseAdmin, CourseStudent
+from project.models.user import User
+from project.models.course import Course
+from project.models.project import Project
+from project.models.course_relation import CourseAdmin, CourseStudent
 from sqlalchemy.exc import SQLAlchemyError
 
 load_dotenv()
