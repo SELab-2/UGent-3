@@ -36,7 +36,7 @@ export function Header(): JSX.Element {
           <Button color="inherit">{t('login')}</Button>
         </Toolbar>
       </AppBar>
-      <DrawerMenu open={open} onClose={() => setOpen(false)} listItems={listItems} navigate={navigate} />
+      <DrawerMenu open={open} onClose={() => setOpen(false)} listItems={listItems} />
     </Box>
   );
 }
