@@ -54,11 +54,14 @@ def test_remove_project(db_session, client, course_ad, course_teacher_ad, projec
     project_json["course_id"] = course_ad.course_id
 
     # post the project
+    print(project_json)
     with open("testzip.zip", "rb") as zip_file:
         project_json["assignment_file"] = zip_file
         response = client.post("/projects", data=project_json)
 
     # check if the project with the id is present
+    print("joink")
+    print(response)
     project_id = response.json["data"]["project_id"]
 
     response = client.delete(f"/projects/{project_id}")
@@ -87,14 +90,14 @@ def test_patch_project(db_session, client, course_ad, course_teacher_ad, project
     project_id = project.project_id
 
     new_title = "patched title"
-    new_archieved = not project.archieved
+    new_archived = not project.archived
 
     response = client.patch(f"/projects/{project_id}", json={
-        "title": new_title, "archieved": new_archieved
+        "title": new_title, "archived": new_archived
     })
     db_session.commit()
     updated_project = db_session.get(Project, {"project_id": project.project_id})
 
     assert response.status_code == 200
     assert updated_project.title == new_title
-    assert updated_project.archieved == new_archieved
+    assert updated_project.archived == new_archived

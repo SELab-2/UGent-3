@@ -35,7 +35,7 @@ class ProjectsEndpoint(Resource):
         return query_selected_from_model(
             Project,
             response_url,
-            select_values=["project_id", "title", "descriptions"],
+            select_values=["project_id", "title", "description"],
             url_mapper={"project_id": response_url},
             filters=request.args
         )
@@ -58,10 +58,10 @@ class ProjectsEndpoint(Resource):
                 urljoin(f"{API_URL}/", "/projects"),
                 required_fields=[
                     "title",
-                    "descriptions",
+                    "description",
                     "course_id",
                     "visible_for_students",
-                    "archieved"]
+                    "archived"]
             )
         except SQLAlchemyError:
             return jsonify({"error": "Something went wrong while inserting into the database.",

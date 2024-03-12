@@ -7,7 +7,7 @@ from werkzeug.datastructures import FileStorage
 
 parser = reqparse.RequestParser()
 parser.add_argument('title', type=str, help='Projects title', location="form")
-parser.add_argument('descriptions', type=str, help='Projects description', location="form")
+parser.add_argument('description', type=str, help='Projects description', location="form")
 parser.add_argument(
     'assignment_file',
     type=FileStorage,
@@ -22,7 +22,7 @@ parser.add_argument(
     help='Projects visibility for students',
     location="form"
 )
-parser.add_argument("archieved", type=bool, help='Projects', location="form")
+parser.add_argument("archived", type=bool, help='Projects', location="form")
 parser.add_argument("test_path", type=str, help='Projects test path', location="form")
 parser.add_argument("script_name", type=str, help='Projects test script path', location="form")
 parser.add_argument(
