@@ -33,7 +33,6 @@ def project(course):
         title="Project",
         descriptions="Test project",
         course_id=course.course_id,
-        assignment_file="testfile",
         deadline=date,
         visible_for_students=True,
         archieved=False,

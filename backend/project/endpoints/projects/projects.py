@@ -1,16 +1,22 @@
 """
 Module that implements the /projects endpoint of the API
 """
-from os import getenv
+import os
 from urllib.parse import urljoin
+import zipfile
+from sqlalchemy.exc import SQLAlchemyError
 
-from flask import request
+from flask import request, jsonify
 from flask_restful import Resource
 
-from project.models.project import Project
-from project.utils.query_agent import query_selected_from_model, insert_into_model
 
-API_URL = getenv('API_HOST')
+from project.models.project import Project
+from project.utils.query_agent import query_selected_from_model, create_model_instance
+
+from project.endpoints.projects.endpoint_parser import parse_project_params
+
+API_URL = os.getenv('API_HOST')
+UPLOAD_FOLDER = os.getenv('UPLOAD_URL')
 
 class ProjectsEndpoint(Resource):
     """
@@ -40,7 +46,47 @@ class ProjectsEndpoint(Resource):
         using flask_restfull parse lib
         """
 
-        return insert_into_model(
-            Project,request.json,
-            urljoin(API_URL, "/projects"),
-            "project_id")
+        file = request.files["assignment_file"]
+        project_json = parse_project_params()
+        filename = os.path.split(file.filename)[1]
+
+        # save the file that is given with the request
+        try:
+            new_project, status_code = create_model_instance(
+                Project,
+                project_json,
+                urljoin(f"{API_URL}/", "/projects"),
+                required_fields=[
+                    "title",
+                    "descriptions",
+                    "course_id",
+                    "visible_for_students",
+                    "archieved"]
+            )
+        except SQLAlchemyError:
+            return jsonify({"error": "Something went wrong while inserting into the database.",
+                            "url": f"{API_URL}/projects"}), 500
+
+        if status_code == 400:
+            return new_project, status_code
+
+        project_upload_directory = os.path.join(f"{UPLOAD_FOLDER}", f"{new_project.project_id}")
+
+        os.makedirs(project_upload_directory, exist_ok=True)
+
+        file.save(os.path.join(project_upload_directory, filename))
+        try:
+            with zipfile.ZipFile(os.path.join(project_upload_directory, filename)) as upload_zip:
+                upload_zip.extractall(project_upload_directory)
+        except zipfile.BadZipfile:
+            return ({
+                        "message": "Please provide a .zip file for uploading the instructions",
+                        "url": f"{API_URL}/projects"
+                    },
+                    400)
+
+        return {
+            "message": "Project created succesfully",
+            "data": new_project,
+            "url": f"{API_URL}/projects/{new_project.project_id}"
+        }, 201
