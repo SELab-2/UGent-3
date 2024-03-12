@@ -54,11 +54,14 @@ def test_remove_project(db_session, client, course_ad, course_teacher_ad, projec
     project_json["course_id"] = course_ad.course_id
 
     # post the project
+    print(project_json)
     with open("testzip.zip", "rb") as zip_file:
         project_json["assignment_file"] = zip_file
         response = client.post("/projects", data=project_json)
 
     # check if the project with the id is present
+    print("joink")
+    print(response)
     project_id = response.json["data"]["project_id"]
 
     response = client.delete(f"/projects/{project_id}")
