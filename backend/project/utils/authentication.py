@@ -19,7 +19,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 load_dotenv()
 API_URL = getenv("API_HOST")
-AUTHENTICATION_URL = "https://graph.microsoft.com/v1.0/me"
+AUTHENTICATION_URL = getenv("AUTHENTICATION_URL")
 # maybe https://graph.microsoft.com/oidc/userinfo -> this returns less data
 
 
@@ -40,13 +40,13 @@ def login_required(f):
             abort(401) # TODO error message meegeven van request
 
         user_info = response.json()
-        kwargs["AuthenticatedUserID"] = user_info["id"]
+        kwargs["AuthenticatedUserID"] = user_info["id"] # shit is fucked yo
         try:
             user = db.session.get(User, user_info["id"])
         except SQLAlchemyError:
         # every exception should result in a rollback
             db.session.rollback()
-            return {"message": "An error occurred while fetching the user",
+            return {"message": "An error occured while fetching the user",
                         "url": f"{API_URL}/users"}, 500
 
         if user:
@@ -431,4 +431,12 @@ def authorize_project_visible(f):
             if project.visible_for_students:
                 return f(*args, **kwargs)
         abort(403)   
+    return wrap
+
+
+def cleanup(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        kwargs.pop("AuthenticatedUserID")
+        return f(*args, **kwargs)
     return wrap

@@ -8,7 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from project import db
 from project.models.users import User as userModel
-from project.utils.authentication import login_required, authorize_teacher, authorize_user
+from project.utils.authentication import login_required, authorize_teacher, authorize_user, cleanup
 
 users_bp = Blueprint("users", __name__)
 users_api = Api(users_bp)
@@ -20,6 +20,7 @@ class Users(Resource):
     """Api endpoint for the /users route"""
 
     @login_required
+    @cleanup
     def get(self):
         """
         This function will respond to get requests made to /users.
@@ -47,6 +48,7 @@ class Users(Resource):
 
     @login_required
     @authorize_teacher
+    @cleanup
     def post(self):
         """
         This function will respond to post requests made to /users.
@@ -89,6 +91,7 @@ class User(Resource):
     """Api endpoint for the /users/{user_id} route"""
 
     @login_required
+    @cleanup
     def get(self, user_id):
         """
         This function will respond to GET requests made to /users/<user_id>.
@@ -106,7 +109,8 @@ class User(Resource):
                     "url": f"{API_URL}/users"}, 500
 
     @login_required
-    @authorize_user
+    @authorize_user # TODO niet iedereen mag zomaar patchen, wie mag er wel patchen?
+    @cleanup
     def patch(self, user_id):
         """
         Update the user's information.
@@ -139,7 +143,8 @@ class User(Resource):
 
 
     @login_required
-    @authorize_user
+    @authorize_user # TODO users mogen enkel zichzelf verwijderen
+    @cleanup
     def delete(self, user_id):
         """
         This function will respond to DELETE requests made to /users/<user_id>.
