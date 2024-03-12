@@ -1,7 +1,7 @@
 import { AppBar, Box, Button, Drawer, Grid, IconButton, List, ListItemButton, ListItemText, Toolbar, Typography } from "@mui/material";
 import { Menu } from "@mui/icons-material";
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useState } from "react";
 
 /**
@@ -11,7 +11,6 @@ import { useState } from "react";
 export function Header(): JSX.Element {
   const { t } = useTranslation();
   const location = useLocation();
-  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   const listItems = [
@@ -83,7 +82,7 @@ function DrawerMenu({ open, onClose, listItems }: { open: boolean, onClose: () =
         </Grid>
         <List>
           {listItems.map((listItem, index) => (
-            <ListItemButton key={index} component={Link} to={listItem.link} role="listitem">
+            <ListItemButton key={index} component={Link} to={listItem.link} role="listitem" onClick={onClose}>
               <ListItemText primary={listItem.text} sx={{color:"white"}} />
             </ListItemButton>
           ))}
