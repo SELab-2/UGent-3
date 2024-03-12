@@ -233,7 +233,7 @@ class SubmissionEndpoint(Resource):
             return data, 500
 
     def delete(self, submission_id: int) -> dict[str, any]:
-        """Delete a submission given an submission ID
+        """Delete a submission given a submission ID
 
         Args:
             submission_id (int): Submission ID

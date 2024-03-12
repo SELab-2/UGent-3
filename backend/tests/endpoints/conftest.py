@@ -155,7 +155,7 @@ def session(db_session):
 
 @pytest.fixture
 def app():
-    """A fixture that creates and configure a new app instance for each test.
+    """A fixture that creates and configures a new app instance for each test.
     Returns:
         Flask -- A Flask application instance
     """
@@ -196,7 +196,7 @@ def project(course):
 
 @pytest.fixture
 def project_json(project: Project):
-    """A function that return the json data of a project including the PK neede for testing"""
+    """A function that return the json data of a project including the PK needed for testing"""
     data = {
         "title": project.title,
         "descriptions": project.descriptions,
