@@ -4,9 +4,11 @@ Module that implements the /projects endpoint of the API
 import os
 from urllib.parse import urljoin
 import zipfile
+from sqlalchemy.exc import SQLAlchemyError
 
-from flask import request
+from flask import request, jsonify
 from flask_restful import Resource
+
 
 from project.models.project import Project
 from project.utils.query_agent import query_selected_from_model, create_model_instance
@@ -62,7 +64,6 @@ class ProjectsEndpoint(Resource):
                     "archieved"]
             )
         except SQLAlchemyError:
-            db.session.rollback()
             return jsonify({"error": "Something went wrong while inserting into the database.",
                             "url": f"{API_URL}/projects"}), 500
 
