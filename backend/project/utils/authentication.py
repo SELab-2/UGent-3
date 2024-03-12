@@ -42,7 +42,7 @@ def return_authenticated_user_id():
     auth_header = {"Authorization": authentication}
     response = requests.get(AUTHENTICATION_URL, headers=auth_header)
     if response.status_code != 200:
-          abort_with_message(401, "Error authenticating access token")
+          abort_with_message(401, response.json()["error"])
 
     user_info = response.json()
     auth_user_id = user_info["id"]
@@ -56,7 +56,7 @@ def return_authenticated_user_id():
     if user:
         return auth_user_id
     is_teacher = False
-    if user_info["jobTitle"] != None:
+    if user_info["jobTitle"] != None: # TODO check what this is for an actual teacher
         is_teacher = True
     
     # add user if not yet in database
@@ -100,7 +100,7 @@ def is_teacher_of_course(auth_user_id, course_id):
 
     if auth_user_id == course.teacher:
         return True
-    
+
 
 def is_admin_of_course(auth_user_id, course_id):
     try:
@@ -143,8 +143,7 @@ def get_course_of_project(project_id):
         abort(404)
 
     return project.course_id
-    
-    
+
 
 def login_required(f):
     """
