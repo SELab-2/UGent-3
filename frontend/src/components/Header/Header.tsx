@@ -56,13 +56,12 @@ function getTitle(pathname: string, t: (key: string) => string): string {
   }
 }
 
-// eslint-disable-next-line jsdoc/require-param
 /**
  * Renders the drawer menu component.
  * @param open - Whether the drawer menu is open or not.
  * @param onClose - Function to handle the close event of the drawer menu.
  * @param listItems - Array of objects representing the list items in the drawer menu.
- * @returns - The Side Bar
+ * @returns The Side Bar
  */
 function DrawerMenu({ open, onClose, listItems }: { open: boolean, onClose: () => void, listItems: { link: string, text: string }[] }) {
 
