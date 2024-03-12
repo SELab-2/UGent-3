@@ -2,7 +2,7 @@
 import dataclasses
 
 from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
-from project import db
+from project.db_in import db
 
 @dataclasses.dataclass
 class Project(db.Model): # pylint: disable=too-many-instance-attributes
@@ -12,7 +12,7 @@ class Project(db.Model): # pylint: disable=too-many-instance-attributes
     an optional deadline,
     the course id of the course to which the project belongs,
     visible for students variable so a teacher can decide if the students can see it yet,
-    archieved var so we can implement the archiving functionality,
+    archived var so we can implement the archiving functionality,
     a test path,script name and regex expressions for automated testing
 
     Pylint disable too many instance attributes because we can't reduce the amount

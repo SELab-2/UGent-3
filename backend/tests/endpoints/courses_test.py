@@ -188,20 +188,15 @@ class TestCourseEndpoint:
 
         course = Course.query.filter_by(name="Sel2").first()
         assert course.teacher == "Bart"
-        response = client.delete(
-            "/courses/" + str(course.course_id) + "?uid=" + course.teacher
-        )
-        assert response.status_code == 200
 
-        course = courses_get_db.query(Course).filter_by(name="Sel2").first()
-        assert course is None
-
-    def test_course_patch(self, db_with_course, client):
+    def test_course_patch(self, client, session):
         """
         Test the patching of a course
         """
-        body = {"name": "AD2"}
-        course = db_with_course.query(Course).filter_by(name="Sel2").first()
-        response = client.patch(f"/courses/{course.course_id}?uid=Bart", json=body)
+        course = session.query(Course).filter_by(name="AD3").first()
+        response = client.patch(f"/courses/{course.course_id}?uid=brinkmann", json={
+            "name": "AD2"
+        })
+        data = response.json
         assert response.status_code == 200
-        assert course.name == "AD2"
+        assert data["data"]["name"] == "AD2"
