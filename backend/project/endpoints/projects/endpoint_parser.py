@@ -11,7 +11,7 @@ parser.add_argument('assignment_file', type=str, help='Projects assignment file'
 parser.add_argument("deadline", type=str, help='Projects deadline')
 parser.add_argument("course_id", type=str, help='Projects course_id')
 parser.add_argument("visible_for_students", type=bool, help='Projects visibility for students')
-parser.add_argument("archieved", type=bool, help='Projects')
+parser.add_argument("archived", type=bool, help='Projects')
 parser.add_argument("test_path", type=str, help='Projects test path')
 parser.add_argument("script_name", type=str, help='Projects test script path')
 parser.add_argument("regex_expressions", type=str, help='Projects regex expressions')

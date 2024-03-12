@@ -35,7 +35,7 @@ CREATE TABLE projects (
 	deadline TIMESTAMP WITH TIME ZONE,
 	course_id INT NOT NULL,
 	visible_for_students BOOLEAN NOT NULL,
-	archieved BOOLEAN NOT NULL,
+	archived BOOLEAN NOT NULL,
 	test_path VARCHAR(50),
 	script_name VARCHAR(50),
 	regex_expressions VARCHAR(50)[],

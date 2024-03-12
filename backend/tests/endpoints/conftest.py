@@ -36,7 +36,7 @@ def project(course):
         assignment_file="testfile",
         deadline=date,
         visible_for_students=True,
-        archieved=False,
+        archived=False,
         test_path="testpad",
         script_name="testscript",
         regex_expressions='r'
@@ -54,7 +54,7 @@ def project_json(project: Project):
         "deadline": project.deadline,
         "course_id": project.course_id,
         "visible_for_students": project.visible_for_students,
-        "archieved": project.archieved,
+        "archived": project.archived,
         "test_path": project.test_path,
         "script_name": project.script_name,
         "regex_expressions": project.regex_expressions

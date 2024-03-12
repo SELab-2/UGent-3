@@ -27,7 +27,7 @@ class Project(db.Model): # pylint: disable=too-many-instance-attributes
     deadline: str = Column(DateTime(timezone=True))
     course_id: int = Column(Integer, ForeignKey("courses.course_id"), nullable=False)
     visible_for_students: bool = Column(Boolean, nullable=False)
-    archieved: bool = Column(Boolean, nullable=False)
+    archived: bool = Column(Boolean, nullable=False)
     test_path: str = Column(String(50))
     script_name: str = Column(String(50))
     regex_expressions: list[str] = Column(ARRAY(String(50)))

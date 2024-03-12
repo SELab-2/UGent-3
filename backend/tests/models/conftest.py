@@ -79,6 +79,6 @@ def valid_project():
         descriptions="Test project",
         deadline=deadline,
         visible_for_students=True,
-        archieved=False,
+        archived=False,
     )
     return project
