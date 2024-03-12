@@ -49,18 +49,22 @@ class ProjectsEndpoint(Resource):
         filename = os.path.split(file.filename)[1]
 
         # save the file that is given with the request
-
-        new_project, status_code = create_model_instance(
-            Project,
-            project_json,
-            urljoin(f"{API_URL}/", "/projects"),
-            required_fields=[
-                "title",
-                "descriptions",
-                "course_id",
-                "visible_for_students",
-                "archieved"]
-        )
+        try:
+            new_project, status_code = create_model_instance(
+                Project,
+                project_json,
+                urljoin(f"{API_URL}/", "/projects"),
+                required_fields=[
+                    "title",
+                    "descriptions",
+                    "course_id",
+                    "visible_for_students",
+                    "archieved"]
+            )
+        except SQLAlchemyError:
+            db.session.rollback()
+            return jsonify({"error": "Something went wrong while inserting into the database.",
+                            "url": f"{API_URL}/projects"}), 500
 
         if status_code == 400:
             return new_project, status_code
