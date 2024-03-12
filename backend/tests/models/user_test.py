@@ -1,6 +1,8 @@
 """User model tests"""
 
+from pytest import raises, mark
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from project.models.user import User
 
 class TestUserModel:
@@ -30,3 +32,11 @@ class TestUserModel:
 
     def test_delete_user(self, session: Session):
         """Test if a user can be deleted"""
+
+    @mark.parametrize("property_name", ["uid"])
+    def test_property_unique(self, session: Session, property_name: str):
+        """Test if the property is unique"""
+        users = session.query(User).all()
+        with raises(IntegrityError):
+            setattr(users[0], property_name, getattr(users[1], property_name))
+            session.commit()

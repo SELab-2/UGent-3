@@ -1,6 +1,6 @@
 """Course relation tests"""
 
-from pytest import raises
+from pytest import raises, mark
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from project.models.course import Course
@@ -41,15 +41,21 @@ class TestCourseRelationModel:
         assert session.get(CourseAdmin, (relation.course_id,relation.uid)) is None
         assert session.query(CourseAdmin).count() == 1
 
+    def test_primary_key(self, session: Session):
+        """Test the primary key"""
+        relations = session.query(CourseAdmin).all()
+        with raises(IntegrityError):
+            relations[0].course_id = relations[1].course_id
+            relations[0].uid = relations[1].uid
+            session.commit()
+
     def test_foreign_key_course_id(self, session: Session):
         """Test the foreign key course_id"""
-        course_ad3 = session.query(Course).filter_by(name="AD3").first()
-        course_raf = session.query(Course).filter_by(name="RAF").first()
-        relation = session.get(CourseAdmin, (course_ad3.course_id, "brinkmann"))
-        relation.course_id = course_raf.course_id
+        course = session.query(Course).filter_by(name="RAF").first()
+        relation = session.query(CourseAdmin).filter_by(uid="brinkmann").first()
+        relation.course_id = course.course_id
         session.commit()
-        assert session.get(CourseAdmin, (course_raf.course_id,"brinkmann")) is not None
-
+        assert session.get(CourseAdmin, (course.course_id, "brinkmann")) is not None
         with raises(IntegrityError):
             relation.course_id = 0
             session.commit()
@@ -60,7 +66,14 @@ class TestCourseRelationModel:
         relation.uid = "laermans"
         session.commit()
         assert session.get(CourseAdmin, (relation.course_id,relation.uid)) is not None
-
         with raises(IntegrityError):
             relation.uid = "unknown"
+            session.commit()
+
+    @mark.parametrize("property_name", ["course_id", "uid"])
+    def test_property_not_nullable(self, session: Session, property_name: str):
+        """Test if the property is not nullable"""
+        relation = session.query(CourseAdmin).first()
+        with raises(IntegrityError):
+            setattr(relation, property_name, None)
             session.commit()

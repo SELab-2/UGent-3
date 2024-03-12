@@ -1,6 +1,6 @@
 """Course model tests"""
 
-from pytest import raises
+from pytest import raises, mark
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from project.models.course import Course
@@ -33,27 +33,28 @@ class TestCourseModel:
     def test_delete_course(self, session: Session):
         """Test if a course can be deleted"""
 
-    def test_name_required(self, session: Session):
-        """Test the constraint that the user can't be nullable"""
-        course = session.query(Course).filter_by(name="AD3").first()
-        with raises(IntegrityError):
-            course.name = None
-            session.commit()
-
-    def test_teacher_required(self, session: Session):
-        """Test the constraint that the teacher can't be nullable"""
-        course = session.query(Course).filter_by(name="AD3").first()
-        with raises(IntegrityError):
-            course.teacher = None
-            session.commit()
-
     def test_foreign_key_teacher(self, session: Session):
-        """Test the foreign key relation between the course and the teacher"""
+        """Test the foreign key teacher"""
         course = session.query(Course).filter_by(name="AD3").first()
         course.teacher = "laermans"
         session.commit()
         assert session.get(Course, course.course_id).teacher == "laermans"
-
         with raises(IntegrityError):
             course.teacher = "unknown"
+            session.commit()
+
+    @mark.parametrize("property_name", ["course_id","name","teacher"])
+    def test_property_not_nullable(self, session: Session, property_name: str):
+        """Test if the property is not nullable"""
+        course = session.query(Course).first()
+        with raises(IntegrityError):
+            setattr(course, property_name, None)
+            session.commit()
+
+    @mark.parametrize("property_name", ["course_id"])
+    def test_property_unique(self, session: Session, property_name: str):
+        """Test if the property is unique"""
+        courses = session.query(Course).all()
+        with raises(IntegrityError):
+            setattr(courses[0], property_name, getattr(courses[1], property_name))
             session.commit()

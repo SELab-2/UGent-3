@@ -1,7 +1,7 @@
 """Project model tests"""
 
 from datetime import datetime
-from pytest import raises
+from pytest import raises, mark
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from project.models.course import Course
@@ -12,7 +12,7 @@ class TestProjectModel:
 
     def test_create_project(self, session: Session):
         """Test if a project can be created"""
-        course = session.query(Course).filter_by(name="AD3").first()
+        course = session.query(Course).first()
         project = Project(
             title="Pigeonhole",
             descriptions="A new project",
@@ -43,23 +43,12 @@ class TestProjectModel:
         project.title = "Trees"
         project.descriptions = "Implement 3 trees of your choosing"
         session.commit()
-        assert project.title == "Trees"
-        assert project.descriptions == "Implement 3 trees of your choosing"
+        updated_project = session.get(Project, project.project_id)
+        assert updated_project.title == "Trees"
+        assert updated_project.descriptions == "Implement 3 trees of your choosing"
 
     def test_delete_project(self, session: Session):
         """Test if a project can be deleted"""
-
-    def test_primary_key(self, session: Session):
-        """Test the primary key"""
-        project_ad3 = session.query(Project).filter_by(title="B+ Trees").first()
-        project_raf = session.query(Project).filter_by(title="Predicaten").first()
-        with raises(IntegrityError):
-            project_raf.project_id = project_ad3.project_id
-            session.commit()
-        session.rollback()
-        with raises(IntegrityError):
-            project_raf.project_id = 0
-            session.commit()
 
     def test_foreign_key_course_id(self, session: Session):
         """Test the foreign key course_id"""
@@ -72,37 +61,20 @@ class TestProjectModel:
             project.course_id = 0
             session.commit()
 
-    def test_title_required(self, session: Session):
-        """Test if a title is given"""
-        project = session.query(Project).filter_by(title="B+ Trees").first()
+    @mark.parametrize("property_name",
+        ["project_id","title","descriptions","course_id","visible_for_students","archieved"]
+    )
+    def test_property_not_nullable(self, session: Session, property_name: str):
+        """Test if the property is not nullable"""
+        project = session.query(Project).first()
         with raises(IntegrityError):
-            project.title = None
+            setattr(project, property_name, None)
             session.commit()
 
-    def test_description_required(self, session: Session):
-        """Test if description is given"""
-        project = session.query(Project).filter_by(title="B+ Trees").first()
+    @mark.parametrize("property_name", ["project_id"])
+    def test_property_unique(self, session: Session, property_name: str):
+        """Test if the property is unique"""
+        projects = session.query(Project).all()
         with raises(IntegrityError):
-            project.descriptions = None
-            session.commit()
-
-    def test_course_id_required(self, session: Session):
-        """Test if course_id is given"""
-        project = session.query(Project).filter_by(title="B+ Trees").first()
-        with raises(IntegrityError):
-            project.course_id = None
-            session.commit()
-
-    def test_visible_for_students_required(self, session: Session):
-        """Test if visible_for_students is given"""
-        project = session.query(Project).filter_by(title="B+ Trees").first()
-        with raises(IntegrityError):
-            project.visible_for_students = None
-            session.commit()
-
-    def test_archived_required(self, session: Session):
-        """Test if archived is given"""
-        project = session.query(Project).filter_by(title="B+ Trees").first()
-        with raises(IntegrityError):
-            project.archieved = None
+            setattr(projects[0], property_name, getattr(projects[1], property_name))
             session.commit()
