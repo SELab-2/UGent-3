@@ -48,6 +48,7 @@ class TestCourseRelationModel:
             relations[0].course_id = relations[1].course_id
             relations[0].uid = relations[1].uid
             session.commit()
+        session.rollback()
 
     def test_foreign_key_course_id(self, session: Session):
         """Test the foreign key course_id"""
@@ -59,6 +60,7 @@ class TestCourseRelationModel:
         with raises(IntegrityError):
             relation.course_id = 0
             session.commit()
+        session.rollback()
 
     def test_foreign_key_uid(self, session: Session):
         """Test the foreign key uid"""
@@ -69,6 +71,7 @@ class TestCourseRelationModel:
         with raises(IntegrityError):
             relation.uid = "unknown"
             session.commit()
+        session.rollback()
 
     @mark.parametrize("property_name", ["course_id", "uid"])
     def test_property_not_nullable(self, session: Session, property_name: str):
@@ -77,3 +80,4 @@ class TestCourseRelationModel:
         with raises(IntegrityError):
             setattr(relation, property_name, None)
             session.commit()
+        session.rollback()

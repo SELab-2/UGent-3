@@ -58,6 +58,7 @@ class TestSubmissionModel:
         with raises(IntegrityError):
             submission.uid = "unknown"
             session.commit()
+        session.rollback()
 
     def test_foreign_key_project_id(self, session: Session):
         """Test the foreign key project_id"""
@@ -69,6 +70,7 @@ class TestSubmissionModel:
         with raises(IntegrityError):
             submission.project_id = 0
             session.commit()
+        session.rollback()
 
     @mark.parametrize("property_name",
         ["submission_id","uid","project_id","submission_time","submission_path","submission_status"]
@@ -79,6 +81,7 @@ class TestSubmissionModel:
         with raises(IntegrityError):
             setattr(submission, property_name, None)
             session.commit()
+        session.rollback()
 
     @mark.parametrize("property_name", ["submission_id"])
     def test_property_unique(self, session: Session, property_name: str):
@@ -87,6 +90,7 @@ class TestSubmissionModel:
         with raises(IntegrityError):
             setattr(submissions[0], property_name, getattr(submissions[1], property_name))
             session.commit()
+        session.rollback()
 
     def test_grading_constraint(self, session: Session):
         """Test if the grading is between 0 and 20"""
@@ -94,3 +98,4 @@ class TestSubmissionModel:
         with raises(IntegrityError):
             submission.grading = 80
             session.commit()
+        session.rollback()

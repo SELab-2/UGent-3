@@ -60,6 +60,7 @@ class TestProjectModel:
         with raises(IntegrityError):
             project.course_id = 0
             session.commit()
+        session.rollback()
 
     @mark.parametrize("property_name",
         ["project_id","title","descriptions","course_id","visible_for_students","archieved"]
@@ -70,6 +71,7 @@ class TestProjectModel:
         with raises(IntegrityError):
             setattr(project, property_name, None)
             session.commit()
+        session.rollback()
 
     @mark.parametrize("property_name", ["project_id"])
     def test_property_unique(self, session: Session, property_name: str):
@@ -78,3 +80,4 @@ class TestProjectModel:
         with raises(IntegrityError):
             setattr(projects[0], property_name, getattr(projects[1], property_name))
             session.commit()
+        session.rollback()

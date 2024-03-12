@@ -42,6 +42,7 @@ class TestCourseModel:
         with raises(IntegrityError):
             course.teacher = "unknown"
             session.commit()
+        session.rollback()
 
     @mark.parametrize("property_name", ["course_id","name","teacher"])
     def test_property_not_nullable(self, session: Session, property_name: str):
@@ -50,6 +51,7 @@ class TestCourseModel:
         with raises(IntegrityError):
             setattr(course, property_name, None)
             session.commit()
+        session.rollback()
 
     @mark.parametrize("property_name", ["course_id"])
     def test_property_unique(self, session: Session, property_name: str):
@@ -58,3 +60,4 @@ class TestCourseModel:
         with raises(IntegrityError):
             setattr(courses[0], property_name, getattr(courses[1], property_name))
             session.commit()
+        session.rollback()

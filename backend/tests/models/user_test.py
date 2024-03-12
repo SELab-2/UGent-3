@@ -40,6 +40,7 @@ class TestUserModel:
         with raises(IntegrityError):
             setattr(user, property_name, None)
             session.commit()
+        session.rollback()
 
     @mark.parametrize("property_name", ["uid"])
     def test_property_unique(self, session: Session, property_name: str):
@@ -48,3 +49,4 @@ class TestUserModel:
         with raises(IntegrityError):
             setattr(users[0], property_name, getattr(users[1], property_name))
             session.commit()
+        session.rollback()
