@@ -6,7 +6,7 @@ from flask_restful import reqparse
 
 parser = reqparse.RequestParser()
 parser.add_argument('title', type=str, help='Projects title')
-parser.add_argument('descriptions', type=str, help='Projects description')
+parser.add_argument('description', type=str, help='Projects description')
 parser.add_argument('assignment_file', type=str, help='Projects assignment file')
 parser.add_argument("deadline", type=str, help='Projects deadline')
 parser.add_argument("course_id", type=str, help='Projects course_id')
