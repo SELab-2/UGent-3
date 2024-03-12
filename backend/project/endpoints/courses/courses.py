@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from flask import request
 from flask_restful import Resource
 
-from project.models.courses import Course
+from project.models.course import Course
 from project.utils.query_agent import query_selected_from_model, insert_into_model
 from project.utils.authentication import login_required, authorize_teacher
 

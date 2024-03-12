@@ -1,6 +1,6 @@
 """Models for relation between users and courses"""
 from sqlalchemy import Integer, Column, ForeignKey, PrimaryKeyConstraint, String
-from project import db
+from project.db_in import db
 
 class BaseCourseRelation(db.Model):
     """Base class for course relation models,

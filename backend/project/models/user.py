@@ -2,7 +2,7 @@
 import dataclasses
 
 from sqlalchemy import Boolean, Column, String
-from project import db
+from project.db_in import db
 
 @dataclasses.dataclass
 class User(db.Model):

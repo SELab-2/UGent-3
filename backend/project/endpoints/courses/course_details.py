@@ -14,10 +14,10 @@ from flask import request
 from flask_restful import Resource
 from sqlalchemy.exc import SQLAlchemyError
 
-from project.models.courses import Course
-from project.models.course_relations import CourseAdmin, CourseStudent
+from project.models.course import Course
+from project.models.course_relation import CourseAdmin, CourseStudent
 
-from project import db
+from project.db_in import db
 from project.utils.query_agent import delete_by_id_from_model, patch_by_id_from_model
 from project.utils.authentication import login_required, authorize_teacher_of_course
 
