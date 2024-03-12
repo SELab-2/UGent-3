@@ -14,6 +14,7 @@ from project.utils.query_agent import query_by_id_from_model, delete_by_id_from_
     patch_by_id_from_model
 
 
+
 API_URL = getenv('API_HOST')
 RESPONSE_URL = urljoin(API_URL, "projects")
 

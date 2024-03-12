@@ -15,12 +15,12 @@ class TestProjectModel:
         course = session.query(Course).first()
         project = Project(
             title="Pigeonhole",
-            descriptions="A new project",
+            description="A new project",
             assignment_file="assignment.pdf",
             deadline=datetime(2024,12,31,23,59,59),
             course_id=course.course_id,
             visible_for_students=True,
-            archieved=False,
+            archived=False,
             test_path="/test",
             script_name="script",
             regex_expressions=[r".*"]
@@ -41,11 +41,11 @@ class TestProjectModel:
         """Test if a project can be updated"""
         project = session.query(Project).filter_by(title="B+ Trees").first()
         project.title = "Trees"
-        project.descriptions = "Implement 3 trees of your choosing"
+        project.description = "Implement 3 trees of your choosing"
         session.commit()
         updated_project = session.get(Project, project.project_id)
         assert updated_project.title == "Trees"
-        assert updated_project.descriptions == "Implement 3 trees of your choosing"
+        assert updated_project.description == "Implement 3 trees of your choosing"
 
     def test_delete_project(self, session: Session):
         """Test if a project can be deleted"""
@@ -63,7 +63,7 @@ class TestProjectModel:
         session.rollback()
 
     @mark.parametrize("property_name",
-        ["title","descriptions","course_id","visible_for_students","archieved"]
+        ["title","description","course_id","visible_for_students","archived"]
     )
     def test_property_not_nullable(self, session: Session, property_name: str):
         """Test if the property is not nullable"""
