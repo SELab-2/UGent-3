@@ -19,8 +19,7 @@ from project.models.course_relations import CourseAdmin, CourseStudent
 
 from project import db
 from project.utils.query_agent import delete_by_id_from_model, patch_by_id_from_model
-
-from utils.authentication import login_required, authorize_teacher_of_course
+from project.utils.authentication import login_required, authorize_teacher_of_course
 
 load_dotenv()
 API_URL = getenv("API_HOST")

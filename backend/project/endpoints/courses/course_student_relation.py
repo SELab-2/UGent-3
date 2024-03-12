@@ -26,8 +26,7 @@ from project.endpoints.courses.courses_utils import (
 )
 
 from project.utils.query_agent import query_selected_from_model
-
-from utils.authentication import login_required, authorize_teacher_or_course_admin
+from project.utils.authentication import login_required, authorize_teacher_or_course_admin
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -40,7 +39,7 @@ class CourseToAddStudents(Resource):
     and everyone should be able to list all students assigned to a course
     """
 
-    @login_required()
+    @login_required
     def get(self, course_id):
         """
         Get function at /courses/course_id/students
