@@ -31,7 +31,7 @@ def project(course):
     date = datetime(2024, 2, 25, 12, 0, 0)
     project = Project(
         title="Project",
-        descriptions="Test project",
+        description="Test project",
         course_id=course.course_id,
         assignment_file="testfile",
         deadline=date,
@@ -49,7 +49,7 @@ def project_json(project: Project):
     """A function that return the json data of a project including the PK neede for testing"""
     data = {
         "title": project.title,
-        "descriptions": project.descriptions,
+        "description": project.description,
         "assignment_file": project.assignment_file,
         "deadline": project.deadline,
         "course_id": project.course_id,

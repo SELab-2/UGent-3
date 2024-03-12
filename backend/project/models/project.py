@@ -22,7 +22,7 @@ class Project(db.Model): # pylint: disable=too-many-instance-attributes
     __tablename__ = "projects"
     project_id: int = Column(Integer, primary_key=True)
     title: str = Column(String(50), nullable=False, unique=False)
-    descriptions: str = Column(Text, nullable=False)
+    description: str = Column(Text, nullable=False)
     assignment_file: str = Column(String(50))
     deadline: str = Column(DateTime(timezone=True))
     course_id: int = Column(Integer, ForeignKey("courses.course_id"), nullable=False)

@@ -76,7 +76,7 @@ def valid_project():
     deadline = datetime(2024, 2, 25, 12, 0, 0)  # February 25, 2024, 12:00 PM
     project = Project(
         title="Project",
-        descriptions="Test project",
+        description="Test project",
         deadline=deadline,
         visible_for_students=True,
         archived=False,

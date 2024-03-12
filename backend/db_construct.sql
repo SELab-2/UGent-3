@@ -30,7 +30,7 @@ CREATE TABLE course_students (
 CREATE TABLE projects (
 	project_id INT GENERATED ALWAYS AS IDENTITY,
 	title VARCHAR(50) NOT NULL,
-	descriptions TEXT NOT NULL,
+	description TEXT NOT NULL,
 	assignment_file VARCHAR(50),
 	deadline TIMESTAMP WITH TIME ZONE,
 	course_id INT NOT NULL,
