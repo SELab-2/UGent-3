@@ -43,7 +43,7 @@ class TestSubmissionModel:
 
     def test_delete_submission(self, session: Session):
         """Test if a submission can be deleted"""
-        submission = session.query(Submission).filter_by(uid="student01").first()
+        submission = session.query(Submission).first()
         session.delete(submission)
         session.commit()
         assert session.get(Submission, submission.submission_id) is None

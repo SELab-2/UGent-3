@@ -32,6 +32,11 @@ class TestUserModel:
 
     def test_delete_user(self, session: Session):
         """Test if a user can be deleted"""
+        user = session.query(User).first()
+        session.delete(user)
+        session.commit()
+        assert session.get(User, user.uid) is None
+        assert session.query(User).count() == 3
 
     @mark.parametrize("property_name", ["uid"])
     def test_property_not_nullable(self, session: Session, property_name: str):

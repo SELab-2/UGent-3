@@ -32,6 +32,11 @@ class TestCourseModel:
 
     def test_delete_course(self, session: Session):
         """Test if a course can be deleted"""
+        course = session.query(Course).first()
+        session.delete(course)
+        session.commit()
+        assert session.get(Course, course.course_id) is None
+        assert session.query(Course).count() == 1
 
     def test_foreign_key_teacher(self, session: Session):
         """Test the foreign key teacher"""

@@ -35,7 +35,7 @@ class TestCourseRelationModel:
 
     def test_delete_course_relation(self, session: Session):
         """Test if a course relation can be deleted"""
-        relation = session.query(CourseAdmin).filter_by(uid="brinkmann").first()
+        relation = session.query(CourseAdmin).first()
         session.delete(relation)
         session.commit()
         assert session.get(CourseAdmin, (relation.course_id,relation.uid)) is None

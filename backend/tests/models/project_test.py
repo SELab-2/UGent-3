@@ -49,6 +49,11 @@ class TestProjectModel:
 
     def test_delete_project(self, session: Session):
         """Test if a project can be deleted"""
+        project = session.query(Project).first()
+        session.delete(project)
+        session.commit()
+        assert session.get(Project, project.project_id) is None
+        assert session.query(Project).count() == 1
 
     def test_foreign_key_course_id(self, session: Session):
         """Test the foreign key course_id"""
