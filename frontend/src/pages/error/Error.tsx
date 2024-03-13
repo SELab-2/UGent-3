@@ -1,5 +1,9 @@
 import { isRouteErrorResponse, useRouteError } from "react-router-dom"
 
+/**
+ * This component is the error page component that will be rendered when an error occurs.
+ * @returns - The error page component
+ */
 export function Error() {
   const error = useRouteError();
 
