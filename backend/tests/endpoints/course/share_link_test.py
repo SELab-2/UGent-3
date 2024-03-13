@@ -2,7 +2,7 @@
 This file contains the tests for the share link endpoints of the course resource.
 """
 
-from project.models.courses import Course
+from project.models.course import Course
 
 class TestCourseShareLinks:
     """
