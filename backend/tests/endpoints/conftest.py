@@ -6,12 +6,14 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import pytest
 from sqlalchemy import create_engine
-from project import create_app_with_db
-from project.db_in import url, db
+
 from project.models.course import Course
 from project.models.user import User
 from project.models.project import Project
 from project.models.course_relation import CourseStudent,CourseAdmin
+from project.models.course_share_code import CourseShareCode
+from project import create_app_with_db
+from project.db_in import url, db
 from project.models.submission import Submission
 
 def users():
@@ -299,3 +301,12 @@ def course(course_teacher):
     """A course for testing, with the course teacher as the teacher."""
     sel2 = Course(name="Sel2", teacher=course_teacher.uid)
     return sel2
+
+@pytest.fixture
+def share_code_admin(db_with_course):
+    """A course with share codes for testing."""
+    course = db_with_course.query(Course).first()
+    share_code = CourseShareCode(course_id=course.course_id, for_admins=True)
+    db_with_course.add(share_code)
+    db_with_course.commit()
+    return share_code
