@@ -13,27 +13,27 @@ index_endpoint = Api(index_bp)
 token_dict = {
     "teacher1":{
         "id":"brinkmann",
-        "jobCategory":"teacher"
+        "jobTitle":"teacher"
     },
     "teacher2":{
         "id":"laermans",
-        "jobCategory":"teacher"
+        "jobTitle":"teacher"
     },
     "student1":{
         "id":"student01",
-        "jobCategory":None
+        "jobTitle":None
     },
     "student2":{
         "id":"student02",
-        "jobCategory":None
+        "jobTitle":None
     },
     "course_admin1":{
         "id":"Rien",
-        "jobCategory":None
+        "jobTitle":None
     },
     "del_user":{
         "id":"del",
-        "jobCategory":None
+        "jobTitle":None
     }
 }
 
