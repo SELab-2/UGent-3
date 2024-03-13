@@ -12,7 +12,8 @@ from project.models.user import User
 from project.models.project import Project
 from project.models.course_relation import CourseStudent,CourseAdmin
 from project.models.course_share_code import CourseShareCode
-from project.db_in import url, db, create_app_with_db
+from project import create_app_with_db
+from project.db_in import url, db
 from project.models.submission import Submission
 
 def users():
