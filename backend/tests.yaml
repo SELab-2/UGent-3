@@ -15,6 +15,37 @@ services:
       start_period: 5s
     volumes:
       - ./db_construct.sql:/docker-entrypoint-initdb.d/init.sql
+  auth-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: auth-user
+      POSTGRES_PASSWORD: auth-password
+      POSTGRES_DB: auth-database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth-user -d auth-database"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - ./test_auth_server/db_construct.sql:/docker-entrypoint-initdb.d/init.sql
+  auth-server:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_auth
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: auth-db  # Use the service name defined in Docker Compose
+      POSTGRES_USER: auth-user
+      POSTGRES_PASSWORD: auth-password
+      POSTGRES_DB: auth-database
+      API_HOST: http://auth-server
+    volumes:
+      - .:/auth-app
+    command: ["test_auth_server"]
+
 
   test-runner:
     build:
@@ -29,6 +60,7 @@ services:
       POSTGRES_PASSWORD: test_password
       POSTGRES_DB: test_database
       API_HOST: http://api_is_here
+      AUTHENTICATION_URL: auth-server # Use the service name defined in Docker Compose
       UPLOAD_URL: /data/assignments
     volumes:
       - .:/app
