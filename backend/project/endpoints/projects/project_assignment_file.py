@@ -5,7 +5,7 @@ of a project
 import os
 from urllib.parse import urljoin
 
-from flask import send_from_directory
+from flask import send_from_directory, send_file
 from werkzeug.utils import safe_join
 
 from flask_restful import Resource
@@ -38,6 +38,5 @@ class ProjectAssignmentFiles(Resource):
             }, 500
         file_url = safe_join(UPLOAD_FOLDER, f"{project_id}")
 
-        directory = safe_join(os.getcwd(), file_url)
-
-        return send_from_directory(directory, project.assignment_file, as_attachment=True)
+        # return send_from_directory(directory, project.assignment_file, as_attachment=True)
+        return send_from_directory(file_url,project.assignment_file)
