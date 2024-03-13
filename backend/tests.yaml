@@ -23,7 +23,7 @@ services:
       API_HOST: http://auth-server
     volumes:
       - .:/auth-app
-    command: ["CMD", "flask run"]
+    command: ["test_auth_server"]
 
 
   test-runner:

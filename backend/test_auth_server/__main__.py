@@ -18,6 +18,14 @@ token_dict = {
     "teacher2":{
         "id":"laermans",
         "jobCategory":"teacher"
+    },
+    "student1":{
+        "id":"student01",
+        "jobCategory":None
+    },
+    "student2":{
+        "id":"student02",
+        "jobCategory":None
     }
 }
 
