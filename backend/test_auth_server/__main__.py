@@ -43,13 +43,10 @@ class Index(Resource):
     def get(self):
         auth = request.headers.get("Authorization")
         if not auth:
-            return {"message":"Please give authorization"}, 401
-        bearer, token = auth.split(" ")
-        if bearer != "Bearer":
-            return {"message":"Not this kind of authorization"}, 401
-        if token in token_dict.keys():
-            return token_dict[token], 200
-        return {"message":"Wrong address"}, 401
+            return {"error":"Please give authorization"}, 401
+        if auth in token_dict.keys():
+            return token_dict[auth], 200
+        return {"error":"Wrong address"}, 401
         
 
 index_bp.add_url_rule("/", view_func=Index.as_view("index"))

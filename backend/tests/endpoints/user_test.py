@@ -43,18 +43,18 @@ class TestUserEndpoint:
     def test_delete_user(self, client,user_db_session):
         """Test deleting a user."""
         # Delete the user
-        response = client.delete("/users/del", headers={"Authorization":"Bearer del_user"})
+        response = client.delete("/users/del", headers={"Authorization":"del_user"})
         assert response.status_code == 200
         assert response.json["message"] ==  "User deleted successfully!"
 
     def test_delete_not_present(self, client,user_db_session):
         """Test deleting a user that does not exist."""
-        response = client.delete("/users/u_get", headers={"Authorization":"Bearer teacher1"})
+        response = client.delete("/users/u_get", headers={"Authorization":"teacher1"})
         assert response.status_code == 403 # User does not exist, so you are not the user
 
     def test_delete_not_yourself(self, client, user_db_session):
         """Test deleting a user that is not yourself."""
-        response = client.delete("/users/non", headers={"Authorization":"Bearer teacher1"})
+        response = client.delete("/users/non", headers={"Authorization":"teacher1"})
         assert response.status_code == 403 # User does not exist, so you are not the user
 
     def test_wrong_form_post(self, client,user_db_session):
@@ -77,14 +77,14 @@ class TestUserEndpoint:
 
     def test_get_all_users(self, client,user_db_session):
         """Test getting all users."""
-        response = client.get("/users", headers={"Authorization":"Bearer teacher1"})
+        response = client.get("/users", headers={"Authorization":"teacher1"})
         assert response.status_code == 200
         # Check that the response is a list (even if it's empty)
         assert isinstance(response.json["data"], list)
 
     def test_get_one_user(self, client,user_db_session):
         """Test getting a single user."""
-        response = client.get("users/u_get", headers={"Authorization":"Bearer teacher1"})
+        response = client.get("users/u_get", headers={"Authorization":"teacher1"})
         assert response.status_code == 200
         assert response.json["data"] == {
             'uid': 'u_get',
@@ -120,7 +120,7 @@ class TestUserEndpoint:
     def test_get_users_with_query(self, client, user_db_session):
         """Test getting users with a query."""
         # Send a GET request with query parameters, this is a nonsense entry but good for testing
-        response = client.get("/users?is_admin=true&is_teacher=false", headers={"Authorization":"Bearer teacher1"})
+        response = client.get("/users?is_admin=true&is_teacher=false", headers={"Authorization":"teacher1"})
         assert response.status_code == 200
 
         # Check that the response contains only the user that matches the query
@@ -137,5 +137,5 @@ class TestUserEndpoint:
 
     def test_get_user_wrong_authenticated(self, client, user_db_session):
         """Test getting a single user with incorrect authentication."""
-        response = client.get("users/u_get", headers={"Authorization":"Bearer wrong_token"})
+        response = client.get("users/u_get", headers={"Authorization":"wrong_token"})
         assert response.status_code == 401
