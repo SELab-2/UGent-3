@@ -12,7 +12,7 @@ index_endpoint = Api(index_bp)
 
 token_dict = {
     "teacher1":{
-        "id":"brinkmann",
+        "id":"Gunnar",
         "jobTitle":"teacher"
     },
     "teacher2":{

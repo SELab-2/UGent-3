@@ -78,12 +78,6 @@ def test_post_project_not_authorized(db_session, client, course_ad, course_teach
 
     assert response.status_code == 403
 
-    # check if the project with the id is not present
-    project_id = response.json["data"]["project_id"]
-    response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher1"})
-
-    assert response.status_code == 404
-
 def test_project_no_authentication(db_session, client, course_ad, course_teacher_ad, project_json):
     """Test posting a project to the database and testing if it's not present"""
     db_session.add(course_teacher_ad)
@@ -106,12 +100,6 @@ def test_project_no_authentication(db_session, client, course_ad, course_teacher
 
     assert response.status_code == 401
 
-    # check if the project with the id is not present
-    project_id = response.json["data"]["project_id"]
-    response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher1"})
-
-    assert response.status_code == 404
-
 
 def test_remove_project(db_session, client, course_ad, course_teacher_ad, project_json):
     """Test removing a project to the datab and fetching it, testing if it's not present anymore"""
@@ -131,6 +119,7 @@ def test_remove_project(db_session, client, course_ad, course_teacher_ad, projec
         response = client.post("/projects", data=project_json, headers={"Authorization":"teacher1"})
 
     # check if the project with the id is present
+    assert response.status_code == 201
     project_id = response.json["data"]["project_id"]
 
     response = client.delete(f"/projects/{project_id}", headers={"Authorization":"teacher1"})
@@ -158,6 +147,7 @@ def test_remove_project_wrong_teacher(db_session, client, course_ad, course_teac
         response = client.post("/projects", data=project_json, headers={"Authorization":"teacher1"})
 
     # check if the project with the id is present
+    assert response.status_code == 201
     project_id = response.json["data"]["project_id"]
 
     response = client.delete(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
@@ -185,6 +175,7 @@ def test_remove_project_student(db_session, client, course_ad, course_teacher_ad
         response = client.post("/projects", data=project_json, headers={"Authorization":"teacher1"})
 
     # check if the project with the id is present
+    assert response.status_code == 201
     project_id = response.json["data"]["project_id"]
 
     response = client.delete(f"/projects/{project_id}", headers={"Authorization":"student1"})
@@ -212,6 +203,7 @@ def test_remove_project_course_admin(db_session, client, course_ad, course_teach
         response = client.post("/projects", data=project_json, headers={"Authorization":"teacher1"})
 
     # check if the project with the id is present
+    assert response.status_code == 201
     project_id = response.json["data"]["project_id"]
 
     response = client.delete(f"/projects/{project_id}", headers={"Authorization":"course_admin1"})
