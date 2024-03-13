@@ -6,8 +6,8 @@ from flask import Blueprint, request, jsonify
 from flask_restful import Resource, Api
 from sqlalchemy.exc import SQLAlchemyError
 
-from project import db
-from project.models.users import User as userModel
+from project.db_in import db
+from project.models.user import User as userModel
 
 users_bp = Blueprint("users", __name__)
 users_api = Api(users_bp)

@@ -1,9 +1,9 @@
 """Test module for the Course model"""
 import pytest
 from sqlalchemy.exc import IntegrityError
-from project.models.courses import Course
-from project.models.users import User
-from project.models.course_relations import CourseAdmin, CourseStudent
+from project.models.course import Course
+from project.models.user import User
+from project.models.course_relation import CourseAdmin, CourseStudent
 
 
 class TestCourseModel:

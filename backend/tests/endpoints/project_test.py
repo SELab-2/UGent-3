@@ -1,5 +1,5 @@
 """Tests for project endpoints."""
-from project.models.projects import Project
+from project.models.project import Project
 
 def test_projects_home(client):
     """Test home project endpoint."""
@@ -23,9 +23,17 @@ def test_post_project(db_session, client, course_ad, course_teacher_ad, project_
     db_session.commit()
 
     project_json["course_id"] = course_ad.course_id
+    # cant be done with 'with' because it autocloses then
+    # pylint: disable=R1732
+    with open("testzip.zip", "rb") as zip_file:
+        project_json["assignment_file"] = zip_file
+        # post the project
+        response = client.post(
+            "/projects",
+            data=project_json,
+            content_type='multipart/form-data'
+        )
 
-    # post the project
-    response = client.post("/projects", json=project_json)
     assert response.status_code == 201
 
     # check if the project with the id is present
@@ -33,7 +41,6 @@ def test_post_project(db_session, client, course_ad, course_teacher_ad, project_
     response = client.get(f"/projects/{project_id}")
 
     assert response.status_code == 200
-
 
 def test_remove_project(db_session, client, course_ad, course_teacher_ad, project_json):
     """Test removing a project to the datab and fetching it, testing if it's not present anymore"""
@@ -47,9 +54,14 @@ def test_remove_project(db_session, client, course_ad, course_teacher_ad, projec
     project_json["course_id"] = course_ad.course_id
 
     # post the project
-    response = client.post("/projects", json=project_json)
+    print(project_json)
+    with open("testzip.zip", "rb") as zip_file:
+        project_json["assignment_file"] = zip_file
+        response = client.post("/projects", data=project_json)
 
     # check if the project with the id is present
+    print("joink")
+    print(response)
     project_id = response.json["data"]["project_id"]
 
     response = client.delete(f"/projects/{project_id}")
@@ -58,7 +70,6 @@ def test_remove_project(db_session, client, course_ad, course_teacher_ad, projec
     # check if the project isn't present anymore and the delete indeed went through
     response = client.delete(f"/projects/{project_id}")
     assert response.status_code == 404
-
 
 def test_patch_project(db_session, client, course_ad, course_teacher_ad, project):
     """
@@ -79,14 +90,14 @@ def test_patch_project(db_session, client, course_ad, course_teacher_ad, project
     project_id = project.project_id
 
     new_title = "patched title"
-    new_archieved = not project.archieved
+    new_archived = not project.archived
 
     response = client.patch(f"/projects/{project_id}", json={
-        "title": new_title, "archieved": new_archieved
+        "title": new_title, "archived": new_archived
     })
     db_session.commit()
     updated_project = db_session.get(Project, {"project_id": project.project_id})
 
     assert response.status_code == 200
     assert updated_project.title == new_title
-    assert updated_project.archieved == new_archieved
+    assert updated_project.archived == new_archived

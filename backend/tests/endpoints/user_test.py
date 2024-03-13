@@ -10,8 +10,8 @@ This module tests user management endpoints.
 import pytest
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from project.models.users import User
-from project import db
+from project.models.user import User
+from project.db_in import db
 from tests import db_url
 
 engine = create_engine(db_url)

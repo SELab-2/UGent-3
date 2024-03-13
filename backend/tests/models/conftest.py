@@ -6,10 +6,10 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pytest
-from project.models.courses import Course
-from project.models.course_relations import CourseAdmin, CourseStudent
-from project.models.projects import Project
-from project.models.users import User
+from project.models.course import Course
+from project.models.course_relation import CourseAdmin, CourseStudent
+from project.models.project import Project
+from project.models.user import User
 from project.db_in import url
 
 engine = create_engine(url)
@@ -76,9 +76,9 @@ def valid_project():
     deadline = datetime(2024, 2, 25, 12, 0, 0)  # February 25, 2024, 12:00 PM
     project = Project(
         title="Project",
-        descriptions="Test project",
+        description="Test project",
         deadline=deadline,
         visible_for_students=True,
-        archieved=False,
+        archived=False,
     )
     return project

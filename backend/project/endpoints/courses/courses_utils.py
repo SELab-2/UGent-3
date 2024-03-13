@@ -10,10 +10,10 @@ from dotenv import load_dotenv
 from flask import abort
 from sqlalchemy.exc import SQLAlchemyError
 
-from project import db
-from project.models.course_relations import CourseAdmin
-from project.models.users import User
-from project.models.courses import Course
+from project.db_in import db
+from project.models.course_relation import CourseAdmin
+from project.models.user import User
+from project.models.course import Course
 
 load_dotenv()
 API_URL = getenv("API_HOST")

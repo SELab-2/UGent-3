@@ -2,8 +2,8 @@
 from datetime import datetime
 import pytest
 from sqlalchemy.exc import IntegrityError
-from project.models.projects import Project
-from project.models.submissions import Submission
+from project.models.project import Project
+from project.models.submission import Submission
 
 class TestProjectAndSubmissionModel: # pylint: disable=too-few-public-methods
     """Test class for the database models of projects and submissions"""

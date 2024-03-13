@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from sqlalchemy import Integer, Column, ForeignKey, String
-from project import db
+from project.db_in import db
 
 @dataclass
 class Course(db.Model):
