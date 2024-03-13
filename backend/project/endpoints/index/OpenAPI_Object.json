@@ -58,7 +58,7 @@
                       "project_id": {
                         "type": "int"
                       },
-                      "": {
+                      "description": {
                         "type": "string"
                       },
                       "title": {
