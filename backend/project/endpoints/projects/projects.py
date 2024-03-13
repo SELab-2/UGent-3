@@ -11,7 +11,7 @@ from flask_restful import Resource
 
 from project.models.project import Project
 from project.utils.query_agent import query_selected_from_model, insert_into_model
-from project.utils.authentication import login_required, authorize_teacher
+from project.utils.authentication import authorize_teacher
 
 from project.endpoints.projects.endpoint_parser import parse_project_params
 
@@ -25,7 +25,6 @@ class ProjectsEndpoint(Resource):
     for implementing get method
     """
 
-    @login_required
     @authorize_teacher
     def get(self):
         """
@@ -42,7 +41,6 @@ class ProjectsEndpoint(Resource):
             filters=request.args
         )
 
-    @login_required
     @authorize_teacher
     def post(self):
         """

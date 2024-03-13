@@ -8,7 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from project import db
 from project.models.user import User as userModel
-from project.utils.authentication import login_required, authorize_teacher, authorize_user, not_allowed
+from project.utils.authentication import login_required, authorize_user, not_allowed
 
 users_bp = Blueprint("users", __name__)
 users_api = Api(users_bp)
@@ -45,8 +45,7 @@ class Users(Resource):
             return {"message": "An error occurred while fetching the users",
                     "url": f"{API_URL}/users"}, 500
 
-    @login_required
-    @authorize_teacher
+    @not_allowed
     def post(self):
         """
         This function will respond to post requests made to /users.
@@ -137,8 +136,7 @@ class User(Resource):
                     "url": f"{API_URL}/users"}, 500
 
 
-    @login_required
-    @authorize_user # TODO users mogen enkel zichzelf verwijderen
+    @authorize_user
     def delete(self, user_id):
         """
         This function will respond to DELETE requests made to /users/<user_id>.
