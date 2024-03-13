@@ -25,7 +25,7 @@ class ProjectAssignmentFiles(Resource):
 
         project = Project.query.filter(getattr(Project, "project_id") == project_id).first()
 
-        file_url = urljoin(f"{UPLOAD_FOLDER}", f"{project_id}") + "/"
+        file_url = safe_join(f"{UPLOAD_FOLDER}", f"{project_id}")
 
         directory = safe_join(os.getcwd(), file_url)
 
