@@ -29,15 +29,7 @@ class CourseByCourseId(Resource):
 
     def get(self, course_id):
         """
-        This get function will return all the related projects of the course
-        in the following form:
-        {
-            course: course with course_id
-            projects: [
-                list of all projects that have course_id
-                where projects are jsons containing the title, deadline and project_id
-            ]
-        }
+        This function return the details of the course specified by the course_id
         """
         try:
             course_details = db.session.query(
@@ -77,7 +69,7 @@ class CourseByCourseId(Resource):
             }
 
             return {
-                "message": f"Succesfully retrieved course with course_id: {str(course_id)}",
+                "message": f"Succesfully retrieved course with course_id: {course_id}",
                 "data": result,
                 "url": urljoin(f"{RESPONSE_URL}/", str(course_id))
             }

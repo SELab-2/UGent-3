@@ -100,7 +100,7 @@ def abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant):
         HTTPException: If the current user is not authorized or
         if the UID of the person to be made an admin is missing in the request body.
     """
-    url = f"{API_URL}/courses/{str(course_id)}/admins"
+    url = f"{API_URL}/courses/{course_id}/admins"
     abort_if_uid_is_none(teacher, url)
 
     course = get_course_abort_if_not_found(course_id)
@@ -131,7 +131,7 @@ def abort_if_none_uid_student_uids_or_non_existant_course_id(
         403: If the user is not authorized to assign new students to the course.
         400: If the request body does not contain the required 'students' field.
     """
-    url = f"{API_URL}/courses/{str(course_id)}/students"
+    url = f"{API_URL}/courses/{course_id}/students"
     get_course_abort_if_not_found(course_id)
     abort_if_no_user_found_for_uid(uid, url)
     query = CourseAdmin.query.filter_by(uid=uid, course_id=course_id)
@@ -196,7 +196,7 @@ def get_admin_relation(uid, course_id):
     """
     return execute_query_abort_if_db_error(
         CourseAdmin.query.filter_by(uid=uid, course_id=course_id),
-        url=f"{API_URL}/courses/{str(course_id)}/admins",
+        url=f"{API_URL}/courses/{course_id}/admins",
     )
 
 

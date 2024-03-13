@@ -44,7 +44,7 @@ class CourseToAddStudents(Resource):
         to get all the users assigned to a course
         everyone can get this data so no need to have uid query in the link
         """
-        abort_url = f"{API_URL}/courses/{str(course_id)}/students"
+        abort_url = f"{API_URL}/courses/{course_id}/students"
         get_course_abort_if_not_found(course_id)
 
         return query_selected_from_model(
@@ -60,7 +60,7 @@ class CourseToAddStudents(Resource):
         Allows admins of a course to assign new students by posting to:
         /courses/course_id/students with a list of uid in the request body under key "students"
         """
-        abort_url = f"{API_URL}/courses/{str(course_id)}/students"
+        abort_url = f"{API_URL}/courses/{course_id}/students"
         uid = request.args.get("uid")
         data = request.get_json()
         student_uids = data.get("students")
@@ -91,7 +91,7 @@ class CourseToAddStudents(Resource):
         /courses/course_id/students with inside the request body
         a field "students" = [list of uids to unassign]
         """
-        abort_url = f"{API_URL}/courses/{str(course_id)}/students"
+        abort_url = f"{API_URL}/courses/{course_id}/students"
         uid = request.args.get("uid")
         data = request.get_json()
         student_uids = data.get("students")
@@ -107,5 +107,5 @@ class CourseToAddStudents(Resource):
         commit_abort_if_error(abort_url)
 
         response = json_message("Users were succesfully removed from the course")
-        response["url"] = f"{API_URL}/courses/{str(course_id)}/students"
+        response["url"] = f"{API_URL}/courses/{course_id}/students"
         return response
