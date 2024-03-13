@@ -2,7 +2,7 @@ FROM python:3.9
 RUN mkdir /auth-app
 WORKDIR /auth-app
 ADD ./test_auth_server /auth-app/
-COPY requirements.txt /auth-app/requirements.txt
+COPY auth_requirements.txt /auth-app/requirements.txt
 RUN pip3 install -r requirements.txt
 COPY . /auth-app
 ENTRYPOINT ["python"]
