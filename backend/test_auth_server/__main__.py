@@ -26,6 +26,14 @@ token_dict = {
     "student2":{
         "id":"student02",
         "jobCategory":None
+    },
+    "course_admin1":{
+        "id":"Rien",
+        "jobCategory":None
+    },
+    "del_user":{
+        "id":"del",
+        "jobCategory":None
     }
 }
 
