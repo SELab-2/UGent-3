@@ -63,7 +63,8 @@ class ProjectsEndpoint(Resource):
                     "visible_for_students",
                     "archived"]
             )
-        except SQLAlchemyError:
+        except SQLAlchemyError as e:
+            print(e)
             return jsonify({"error": "Something went wrong while inserting into the database.",
                             "url": f"{API_URL}/projects"}), 500
 

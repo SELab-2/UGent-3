@@ -1,6 +1,40 @@
 """Tests for project endpoints."""
 from project.models.project import Project
 
+def test_assignment_download(db_session, client, course_ad, course_teacher_ad, project_json):
+    """
+    Method for assignment download
+    """
+    db_session.add(course_teacher_ad)
+    db_session.commit()
+
+    db_session.add(course_ad)
+    db_session.commit()
+    project_json["course_id"] = course_ad.course_id
+
+    with open("testzip.zip", "rb") as zip_file:
+        project_json["assignment_file"] = zip_file
+        # post the project
+        response = client.post(
+            "/projects",
+            data=project_json,
+            content_type='multipart/form-data'
+        )
+
+    project_id = response.json["data"]["project_id"]
+    response = client.get(f"/projects/{project_id}/assignments")
+    # file downloaded succesfully
+    assert response.status_code == 200
+
+
+def test_not_found_download(db_session, client, project_json):
+    response = client.get("/projects")
+    # get an index that doesnt exist
+    project_id = len(response.data)+1
+    response = client.get(f"/projects/{project_id}/assignments")
+    assert response.status_code == 404
+
+
 def test_projects_home(client):
     """Test home project endpoint."""
     response = client.get("/projects")
@@ -60,8 +94,6 @@ def test_remove_project(db_session, client, course_ad, course_teacher_ad, projec
         response = client.post("/projects", data=project_json)
 
     # check if the project with the id is present
-    print("joink")
-    print(response)
     project_id = response.json["data"]["project_id"]
 
     response = client.delete(f"/projects/{project_id}")
