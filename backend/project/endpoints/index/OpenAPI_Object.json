@@ -56,7 +56,7 @@
                     "type": "object",
                     "properties": {
                       "project_id": {
-                        "type": "int"
+                        "type": "integer"
                       },
                       "description": {
                         "type": "string"
@@ -66,23 +66,112 @@
                       }
                     }
                   }
-                }
+                }, "example": [
+                  {
+                    "project_id": 1,
+                    "description": "Project 1 description",
+                    "title": "Project 1"
+                  },
+                  {
+                    "project_id": 2,
+                    "description": "Project 2 description",
+                    "title": "Project 2"
+                  }
+                ]
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       },
       "post": {
-        "description": "Upload a new project",
+        "description": "Post functionality for project using flask_restful parse lib",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "assignment_file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "course_id": {
+                    "type": "integer"
+                  },
+                  "visible_for_students": {
+                    "type": "boolean"
+                  },
+                  "archived": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["assignment_file", "title", "description", "course_id", "visible_for_students", "archived"]
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
-            "description": "Uploaded a new project succesfully",
+            "description": "Project created successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": "string"
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -91,55 +180,64 @@
         }
       }
     },
-    "/projects/{id}": {
+    "/projects/{project_id}": {
       "get": {
-        "description": "Return a project with corresponding id",
+        "description": "Get method for listing a specific project filtered by id of that specific project",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "ID of the specific project",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "A project with corresponding id",
+            "description": "Project details retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "archived": {
-                      "type": "bool"
-                    },
-                    "assignment_file": {
-                      "type": "string"
-                    },
-                    "course_id": {
-                      "type": "int"
-                    },
-                    "deadline": {
-                      "type": "date"
-                    },
-                    "description": {
-                      "type": "array",
-                      "items": {
-                        "description": "string"
-                      }
-                    },
                     "project_id": {
-                      "type": "int"
-                    },
-                    "regex_expressions": {
-                      "type": "array",
-                      "items": {
-                        "regex": "string"
-                      }
-                    },
-                    "script_name": {
-                      "type": "string"
-                    },
-                    "test_path": {
-                      "type": "string"
+                      "type": "integer"
                     },
                     "title": {
                       "type": "string"
                     },
+                    "description": {
+                      "type": "string"
+                    },
+                    "assignment_file": {
+                      "type": "string"
+                    },
+                    "deadline": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "course_id": {
+                      "type": "integer"
+                    },
                     "visible_for_students": {
-                      "type": "bool"
+                      "type": "boolean"
+                    },
+                    "archived": {
+                      "type": "boolean"
+                    },
+                    "test_path": {
+                      "type": "string"
+                    },
+                    "script_name": {
+                      "type": "string"
+                    },
+                    "regex_expressions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
                     }
                   }
                 }
@@ -147,13 +245,16 @@
             }
           },
           "404": {
-            "description": "An id that doesn't correspond to an existing project",
+            "description": "Project not found",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "url": {
                       "type": "string"
                     }
                   }
@@ -164,30 +265,126 @@
         }
       },
       "patch": {
-        "description": "Patch certain fields of a project",
-        "responses": {
-          "200": {
-            "description": "Patched a project succesfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": "string"
+        "description": "Update method for updating a specific project filtered by id of that specific project",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "ID of the specific project",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "assignment_file": {
+                    "type": "string"
+                  },
+                  "deadline": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "course_id": {
+                    "type": "integer"
+                  },
+                  "visible_for_students": {
+                    "type": "boolean"
+                  },
+                  "archived": {
+                    "type": "boolean"
+                  },
+                  "test_path": {
+                    "type": "string"
+                  },
+                  "script_name": {
+                    "type": "string"
+                  },
+                  "regex_expressions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   }
                 }
               }
             }
           },
-          "404": {
-            "description": "Tried to patch a project that is not present",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
+          "responses": {
+            "200": {
+              "description": "Project updated successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "project_id": {
+                        "type": "integer"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "assignment_file": {
+                        "type": "string"
+                      },
+                      "deadline": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "course_id": {
+                        "type": "integer"
+                      },
+                      "visible_for_students": {
+                        "type": "boolean"
+                      },
+                      "archived": {
+                        "type": "boolean"
+                      },
+                      "test_path": {
+                        "type": "string"
+                      },
+                      "script_name": {
+                        "type": "string"
+                      },
+                      "regex_expressions": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Project not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
                     }
                   }
                 }
@@ -197,33 +394,78 @@
         }
       },
       "delete": {
-        "description": "Delete a project with given id",
+        "description": "Delete a project and all of its submissions in cascade done by project id",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "ID of the specific project",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Removed a project succesfully",
+            "description": "Project deleted successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": "string"
+                    "message": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
                   }
                 }
               }
             }
           },
           "404": {
-            "description": "Tried to remove a project that is not present",
+            "description": "Project not found",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": "string"
+                    "error": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
                   }
                 }
               }
             }
+          }
+        }
+      }
+    },
+
+
+    "/projects/{id}/assignments": {
+      "get": {
+        "description": "Get the assignments file of project with given id",
+        "responses": {
+          "200": {
+            "description": "Successfully downloaded the assignment files of the project",
+            "content": {
+              "multipart/form-data": {
+                "schema": {
+                  "type": "file"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The project of which you wanted to get the assignments files of doesn't exist"
+          }, "500": {
+            "description": "Internal server error"
           }
         }
       }

@@ -54,14 +54,11 @@ def test_remove_project(db_session, client, course_ad, course_teacher_ad, projec
     project_json["course_id"] = course_ad.course_id
 
     # post the project
-    print(project_json)
     with open("testzip.zip", "rb") as zip_file:
         project_json["assignment_file"] = zip_file
         response = client.post("/projects", data=project_json)
 
     # check if the project with the id is present
-    print("joink")
-    print(response)
     project_id = response.json["data"]["project_id"]
 
     response = client.delete(f"/projects/{project_id}")
@@ -101,3 +98,33 @@ def test_patch_project(db_session, client, course_ad, course_teacher_ad, project
     assert response.status_code == 200
     assert updated_project.title == new_title
     assert updated_project.archived == new_archived
+
+
+def test_project_assignment(db_session, client, course_ad, course_teacher_ad, project, project_json):
+    """
+    test asignment of project
+    """
+    print("wetefek")
+    db_session.add(course_teacher_ad)
+    db_session.commit()
+
+    db_session.add(course_ad)
+    db_session.commit()
+    project_json["course_id"] = course_ad.course_id
+
+
+    # post the project
+    print("wtffff")
+    with open("testzip.zip", "rb") as zip_file:
+        project_json["assignment_file"] = zip_file
+        response = client.post("/projects", data=project_json)
+
+    # check if the project with the id is present
+    project_id = response.json
+    print("project id")
+    print(project_id)
+
+    response = client.get(f"/projects/{project_id}/assignments")
+    print("response")
+    print(response)
+    assert True

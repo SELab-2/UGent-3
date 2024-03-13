@@ -36,8 +36,8 @@ class ProjectAssignmentFiles(Resource):
                 "message": "Something went wrong querying the project",
                 "url": RESPONSE_URL
             }, 500
-        file_url = safe_join(UPLOAD_FOLDER, project_id)
 
+        file_url = safe_join(UPLOAD_FOLDER, f"{project_id}")
         directory = safe_join(os.getcwd(), file_url)
 
         return send_from_directory(directory, project.assignment_file, as_attachment=True)
