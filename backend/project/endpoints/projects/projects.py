@@ -26,7 +26,7 @@ class ProjectsEndpoint(Resource):
     """
 
     @authorize_teacher
-    def get(self):
+    def get(self, teacher_id=None):
         """
         Get method for listing all available projects
         that are currently in the API
@@ -42,7 +42,7 @@ class ProjectsEndpoint(Resource):
         )
 
     @authorize_teacher
-    def post(self):
+    def post(self, teacher_id=None):
         """
         Post functionality for project
         using flask_restfull parse lib

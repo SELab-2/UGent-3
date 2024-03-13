@@ -216,7 +216,7 @@ def authorize_teacher_of_course(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
-        if is_teacher_of_course(auth_user_id, request.args["course_id"]):
+        if is_teacher_of_course(auth_user_id, kwargs["course_id"]):
             return f(*args, **kwargs)
 
         abort_with_message(403)
@@ -232,27 +232,11 @@ def authorize_teacher_or_course_admin(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
-        course_id = request.args["course_id"]
+        course_id = kwargs["course_id"]
         if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
             return f(*args, **kwargs)
 
         abort_with_message(403, "You are not authorized to perfom this action, only teachers and course admins are authorized")
-    return wrap
-
-
-def authorize_student_of_course(f):
-    """
-    This function will check if the person sending a request to the API is logged in, 
-    and a student of the course in the request.
-    Returns 403: Not Authorized if either condition is false
-    """
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        auth_user_id = return_authenticated_user_id()
-        course_id = request.args["course_id"]
-        if is_student_of_course(auth_user_id, course_id):
-            return f(*args, **kwargs)
-        abort_with_message(403, "You are not authorized to perfom this action, you are not a student of this course")
     return wrap
 
 
@@ -282,7 +266,7 @@ def authorize_teacher_of_project(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
-        project_id = request.args["project_id"]
+        project_id = kwargs["project_id"]
         course_id = get_course_of_project(project_id)
         
         if is_teacher(auth_user_id, course_id):
@@ -301,7 +285,7 @@ def authorize_teacher_or_project_admin(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
-        project_id = request.args["project_id"]
+        project_id = kwargs["project_id"]
         course_id = get_course_of_project(project_id)
         if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
             return f(*args, **kwargs)
@@ -320,7 +304,7 @@ def authorize_project_visible(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
-        project_id = request.args["project_id"]
+        project_id = kwargs["project_id"]
         course_id = get_course_of_project(project_id)
         if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
             return f(*args, **kwargs)
@@ -339,7 +323,7 @@ def authorize_submissions_request(f):
         if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
             return f(*args, **kwargs)
         
-        if is_student_of_course(auth_user_id, course_id) and project_visible(project_id) and auth_user_id == request.form.get("uid"):
+        if is_student_of_course(auth_user_id, course_id) and project_visible(project_id) and auth_user_id == request.args.get("uid"):
             # TODO check whether it's request.form.get("uid") or request.args.get("uid")
             return f(*args, **kwargs)
         abort_with_message(403, "Uhhhh")
@@ -350,28 +334,11 @@ def authorize_student_submission(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
-        project_id = request.args["project_id"]
+        project_id = request.form["project_id"]
         course_id = get_course_of_project(project_id)
         if is_student_of_course(auth_user_id, course_id) and project_visible(project_id) and auth_user_id == request.form.get("uid"):
             return f(*args, **kwargs)
         abort_with_message(403, "Nah")
-    return wrap
-
-
-def authorize_submissions_request(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        auth_user_id = return_authenticated_user_id()
-        project_id = request.args["project_id"]
-        course_id = get_course_of_project(project_id)
-
-        if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
-            return f(*args, **kwargs)
-        
-        if is_student_of_course(auth_user_id, course_id) and project_visible(project_id) and auth_user_id == request.form.get("uid"):
-            # TODO check whether it's request.form.get("uid") or request.args.get("uid")
-            return f(*args, **kwargs)
-        abort_with_message(403, "Uhhhh")
     return wrap
 
 
@@ -380,7 +347,7 @@ def authorize_submission_author(f):
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
         try:
-            submission = db.session.get(Submission, request.args["submission_id"])
+            submission = db.session.get(Submission, kwargs["submission_id"])
         except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
@@ -397,7 +364,7 @@ def authorize_grader(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
-        course_id = get_course_of_submission(request.args["submission_id"])
+        course_id = get_course_of_submission(kwargs["submission_id"])
         if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
             return f(*args, **kwargs)
         abort_with_message(403, "")
@@ -410,7 +377,7 @@ def authorize_submission_request(f):
         # submission_author / grader mag hier aan
         auth_user_id = return_authenticated_user_id()
         try:
-            submission = db.session.get(Submission, request.args["submission_id"])
+            submission = db.session.get(Submission, kwargs["submission_id"])
         except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
