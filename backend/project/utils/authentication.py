@@ -201,6 +201,7 @@ def authorize_teacher(f):
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
         if is_teacher(auth_user_id):
+            kwargs["teacher_id"] = auth_user_id
             return f(*args, **kwargs)
         abort_with_message(403, "You are not authorized to perfom this action, only teachers are authorized")
     return wrap
@@ -264,8 +265,7 @@ def authorize_user(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
-        user_id = args["user_id"]
-
+        user_id = kwargs["user_id"]
         if auth_user_id == user_id:
             return f(*args, **kwargs)
         
