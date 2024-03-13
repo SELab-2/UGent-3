@@ -1,7 +1,5 @@
 """Main entry point for the application."""
-# import sys
 
-# sys.path.append(".")
 from dotenv import load_dotenv
 from project import create_app_with_db
 from project.db_in import url
