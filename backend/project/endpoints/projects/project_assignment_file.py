@@ -5,8 +5,9 @@ of a project
 import os
 from urllib.parse import urljoin
 
-from flask import send_from_directory, send_file
+from flask import send_from_directory
 from werkzeug.utils import safe_join
+from sqlalchemy.exc import SQLAlchemyError
 
 from flask_restful import Resource
 

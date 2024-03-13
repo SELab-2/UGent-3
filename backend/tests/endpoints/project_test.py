@@ -27,7 +27,10 @@ def test_assignment_download(db_session, client, course_ad, course_teacher_ad, p
     assert response.status_code == 200
 
 
-def test_not_found_download(db_session, client, project_json):
+def test_not_found_download(client):
+    """
+    Test a not present project download
+    """
     response = client.get("/projects")
     # get an index that doesnt exist
     project_id = len(response.data)+1
