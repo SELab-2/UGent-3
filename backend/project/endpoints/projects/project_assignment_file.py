@@ -24,9 +24,18 @@ class ProjectAssignmentFiles(Resource):
         """
         Get the assignment files of a project
         """
-
-        project = Project.query.filter(getattr(Project, "project_id") == project_id).first()
-
+        try:
+            project = Project.query.filter(getattr(Project, "project_id") == project_id).first()
+            if project is None:
+                return {
+                    "message": "Project not found",
+                    "url": RESPONSE_URL,
+                }, 404
+        except SQLAlchemyError:
+            return {
+                "message": "Something went wrong querying the project",
+                "url": RESPONSE_URL
+            }, 500
         file_url = safe_join(UPLOAD_FOLDER, project_id)
 
         directory = safe_join(os.getcwd(), file_url)
