@@ -17,7 +17,6 @@ from project.utils.query_agent import query_by_id_from_model, delete_by_id_from_
 API_URL = getenv('API_HOST')
 RESPONSE_URL = urljoin(API_URL, "projects")
 
-
 class ProjectDetail(Resource):
     """
     Class for projects/id endpoints
