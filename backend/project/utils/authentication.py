@@ -264,7 +264,7 @@ def authorize_user(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
-        user_id = request.args["user_id"]
+        user_id = args["user_id"]
 
         if auth_user_id == user_id:
             return f(*args, **kwargs)
