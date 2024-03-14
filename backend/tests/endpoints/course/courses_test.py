@@ -29,6 +29,14 @@ class TestCourseEndpoint:
             "/courses?uid=Bart", json=invalid_course
         )  # invalid course
         assert response.status_code == 400
+    
+    def test_post_no_name(self, client, course_empty_name):
+        """
+        Test posting a course with a blank name
+        """
+
+        response = client.post("/courses?uid=Bart", json=course_empty_name)
+        assert response.status_code == 400  
 
     def test_post_courses_course_id_students_and_admins(self, db_with_course, client):
         """

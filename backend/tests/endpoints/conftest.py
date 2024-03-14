@@ -257,6 +257,11 @@ def course_data():
     return {"name": "Sel2", "teacher": "Bart"}
 
 @pytest.fixture
+def course_empty_name():
+    """A course with an empty name"""
+    return {"name": "", "teacher": "Bart"}
+
+@pytest.fixture
 def invalid_course():
     """An invalid course for testing."""
     return {"invalid": "error"}
