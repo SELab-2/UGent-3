@@ -200,3 +200,21 @@ class TestCourseEndpoint:
         data = response.json
         assert response.status_code == 200
         assert data["data"]["name"] == "AD2"
+
+    def test_post_courses_not_allowed(self, courses_init_db, client, course_data, invalid_course):
+        """
+        Test posting a course to the /courses endpoint
+        """
+        response = client.post("/courses?uid=Bart", json=course_data)  
+        
+        for x in range(3, 10):
+            course = {"name": "Sel" + str(x), "teacher": "Bart"}
+            response = client.post("/courses?uid=Bart", json=course)  
+            assert response.status_code == 401
+        assert response.status_code == 401  # no authorization: 401
+
+        response = client.post(
+            "/courses?uid=Bart", json=invalid_course
+        )  # invalid course
+        assert response.status_code == 400 # not a teacher: 403
+    

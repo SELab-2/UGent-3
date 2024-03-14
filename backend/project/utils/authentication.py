@@ -113,7 +113,7 @@ def is_teacher_of_course(auth_user_id, course_id):
 def is_admin_of_course(auth_user_id, course_id):
     """This function checks whether the user with auth_user_id is an admin of the course: course_id"""
     try:
-        course_admin = db.session.get(CourseAdmin, course_id=course_id, uid=auth_user_id) # TODO check if this is correct primary key
+        course_admin = db.session.get(CourseAdmin, (course_id, auth_user_id)) # TODO check if this is correct primary key
     except SQLAlchemyError:
     # every exception should result in a rollback
         db.session.rollback()
@@ -129,7 +129,7 @@ def is_admin_of_course(auth_user_id, course_id):
 def is_student_of_course(auth_user_id, course_id):
     """This function checks whether the user with auth_user_id is a student of the course: course_id"""
     try:
-        course_student = db.session.get(CourseStudent, course_id=course_id, uid=auth_user_id) # TODO check if this is correct primary key
+        course_student = db.session.get(CourseStudent, (course_id, auth_user_id)) # TODO check if this is correct primary key
     except SQLAlchemyError:
         # every exception should result in a rollback
         db.session.rollback()
