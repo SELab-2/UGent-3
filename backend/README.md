@@ -1,6 +1,6 @@
 # Project pigeonhole backend
-![test](https://github.com/SELab-2/UGent-3/actions/workflows/ci-test-backend.yaml/badge.svg)
-![test](https://github.com/SELab-2/UGent-3/actions/workflows/ci-linter-backend.yaml/badge.svg)
+![tests](https://github.com/SELab-2/UGent-3/actions/workflows/ci-test-backend.yaml/badge.svg)
+![linter](https://github.com/SELab-2/UGent-3/actions/workflows/ci-linter-backend.yaml/badge.svg)
 ## Prerequisites
 **1. Clone the repo**
    ```sh
