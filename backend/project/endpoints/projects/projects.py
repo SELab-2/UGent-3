@@ -9,9 +9,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from flask import request, jsonify
 from flask_restful import Resource
 
-
 from project.models.project import Project
 from project.utils.query_agent import query_selected_from_model, create_model_instance
+from project.utils.authentication import authorize_teacher
 
 from project.endpoints.projects.endpoint_parser import parse_project_params
 
@@ -25,12 +25,12 @@ class ProjectsEndpoint(Resource):
     for implementing get method
     """
 
-    def get(self):
+    @authorize_teacher
+    def get(self, teacher_id=None):
         """
         Get method for listing all available projects
         that are currently in the API
         """
-
         response_url = urljoin(API_URL, "projects")
         return query_selected_from_model(
             Project,
@@ -40,7 +40,8 @@ class ProjectsEndpoint(Resource):
             filters=request.args
         )
 
-    def post(self):
+    @authorize_teacher
+    def post(self, teacher_id=None):
         """
         Post functionality for project
         using flask_restfull parse lib
@@ -48,7 +49,8 @@ class ProjectsEndpoint(Resource):
 
         file = request.files["assignment_file"]
         project_json = parse_project_params()
-        filename = os.path.split(file.filename)[1]
+        filename = os.path.basename(file.filename)
+        project_json["assignment_file"] = filename
 
         # save the file that is given with the request
         try:

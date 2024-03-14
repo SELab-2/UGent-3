@@ -12,8 +12,7 @@ from flask_restful import Resource
 from project.models.project import Project
 from project.utils.query_agent import query_by_id_from_model, delete_by_id_from_model, \
     patch_by_id_from_model
-
-
+from project.utils.authentication import authorize_teacher_or_project_admin, authorize_teacher_of_project, authorize_project_visible
 
 API_URL = getenv('API_HOST')
 RESPONSE_URL = urljoin(API_URL, "projects")
@@ -25,6 +24,7 @@ class ProjectDetail(Resource):
     for implementing get, delete and put methods
     """
 
+    @authorize_project_visible
     def get(self, project_id):
         """
         Get method for listing a specific project
@@ -38,6 +38,7 @@ class ProjectDetail(Resource):
             project_id,
             RESPONSE_URL)
 
+    @authorize_teacher_or_project_admin
     def patch(self, project_id):
         """
         Update method for updating a specific project
@@ -52,6 +53,7 @@ class ProjectDetail(Resource):
             request.json
         )
 
+    @authorize_teacher_of_project
     def delete(self, project_id):
         """
         Delete a project and all of its submissions in cascade

@@ -15,6 +15,16 @@ services:
       start_period: 5s
     volumes:
       - ./db_construct.sql:/docker-entrypoint-initdb.d/init.sql
+  auth-server:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_auth_test
+    environment:
+      API_HOST: http://auth-server
+    volumes:
+      - .:/auth-app
+    command: ["test_auth_server"]
+
 
   test-runner:
     build:
@@ -23,12 +33,15 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      auth-server:
+        condition: service_started
     environment:
       POSTGRES_HOST: postgres  # Use the service name defined in Docker Compose
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
       POSTGRES_DB: test_database
       API_HOST: http://api_is_here
+      AUTHENTICATION_URL: http://auth-server:5000 # Use the service name defined in Docker Compose
       UPLOAD_URL: /data/assignments
     volumes:
       - .:/app

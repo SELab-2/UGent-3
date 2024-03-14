@@ -14,6 +14,7 @@ from project.models.user import User
 from project.utils.files import filter_files, all_files_uploaded, zip_files
 from project.utils.user import is_valid_user
 from project.utils.project import is_valid_project
+from project.utils.authentication import authorize_submission_request, authorize_submissions_request, authorize_grader, authorize_student_submission, authorize_submission_author
 
 load_dotenv()
 API_HOST = getenv("API_HOST")
@@ -24,6 +25,7 @@ submissions_bp = Blueprint("submissions", __name__)
 class SubmissionsEndpoint(Resource):
     """API endpoint for the submissions"""
 
+    @authorize_submissions_request
     def get(self) -> dict[str, any]:
         """Get all the submissions from a user for a project
 
@@ -66,6 +68,7 @@ class SubmissionsEndpoint(Resource):
             data["message"] = "An error occurred while fetching the submissions"
             return data, 500
 
+    @authorize_student_submission
     def post(self) -> dict[str, any]:
         """Post a new submission to a project
 
@@ -142,6 +145,7 @@ class SubmissionsEndpoint(Resource):
 class SubmissionEndpoint(Resource):
     """API endpoint for the submission"""
 
+    @authorize_submission_request
     def get(self, submission_id: int) -> dict[str, any]:
         """Get the submission given an submission ID
 
@@ -180,6 +184,7 @@ class SubmissionEndpoint(Resource):
                 f"An error occurred while fetching the submission (submission_id={submission_id})"
             return data, 500
 
+    @authorize_grader
     def patch(self, submission_id:int) -> dict[str, any]:
         """Update some fields of a submission given a submission ID
 
@@ -232,6 +237,7 @@ class SubmissionEndpoint(Resource):
                 f"An error occurred while patching submission (submission_id={submission_id})"
             return data, 500
 
+    @authorize_submission_author
     def delete(self, submission_id: int) -> dict[str, any]:
         """Delete a submission given a submission ID
 
