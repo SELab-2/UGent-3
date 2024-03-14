@@ -1,3 +1,7 @@
+# Project pigeonhole backend
+![tests](https://github.com/SELab-2/UGent-3/actions/workflows/ci-test-frontend.yaml/badge.svg)
+![linter](https://github.com/SELab-2/UGent-3/actions/workflows/ci-linter-frontend.yaml/badge.svg)
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
