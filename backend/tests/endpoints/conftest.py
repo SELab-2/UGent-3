@@ -177,7 +177,7 @@ def course_ad(course_teacher_ad: User):
     return ad2
 
 @pytest.fixture
-def project(valid_course_entry):
+def valid_project_entry(session, valid_course_entry):
     """A project for testing, with the course as the course it belongs to"""
     date = datetime(2024, 2, 25, 12, 0, 0)
     project = Project(
@@ -191,22 +191,25 @@ def project(valid_course_entry):
         script_name="testscript",
         regex_expressions='r'
     )
+
+    session.add(project)
+    session.commit()
     return project
 
 @pytest.fixture
-def project_json(project: Project):
+def valid_project(valid_course_entry):
     """A function that return the json data of a project including the PK needed for testing"""
     data = {
-        "title": project.title,
-        "description": project.description,
-        "assignment_file": project.assignment_file,
-        "deadline": project.deadline,
-        "course_id": project.course_id,
-        "visible_for_students": project.visible_for_students,
-        "archived": project.archived,
-        "test_path": project.test_path,
-        "script_name": project.script_name,
-        "regex_expressions": project.regex_expressions
+        "title": "Project",
+        "description": "Test project",
+        "assignment_file": "testfile",
+        "deadline": "2024-02-25T12:00:00",
+        "course_id": valid_course_entry.course_id,
+        "visible_for_students": True,
+        "archived": False,
+        "test_path": "tests",
+        "script_name": "script.sh",
+        "regex_expressions": ["*.pdf", "*.txt"]
     }
     return data
 
