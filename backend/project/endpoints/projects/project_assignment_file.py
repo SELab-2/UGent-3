@@ -7,7 +7,6 @@ from urllib.parse import urljoin
 
 from flask import send_from_directory
 from werkzeug.utils import safe_join
-from sqlalchemy.exc import SQLAlchemyError
 
 from flask_restful import Resource
 
@@ -26,7 +25,12 @@ class ProjectAssignmentFiles(Resource):
         """
         Get the assignment files of a project
         """
-        json, status_code = query_by_id_from_model(Project, "project_id", project_id, f"RESPONSE_URL")
+        json, status_code = query_by_id_from_model(
+            Project,
+            "project_id",
+            project_id,
+            "RESPONSE_URL"
+        )
 
         if status_code != 200:
             return json, status_code
