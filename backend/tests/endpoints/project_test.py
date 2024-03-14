@@ -26,7 +26,7 @@ def test_not_found_download(client):
     """
     response = client.get("/projects")
     # get an index that doesnt exist
-    response = client.get(f"/projects/-1/assignments")
+    response = client.get("/projects/-1/assignments")
     assert response.status_code == 404
 
 
