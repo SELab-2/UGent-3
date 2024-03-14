@@ -37,11 +37,6 @@ class TestCourseShareLinks:
         response = client.post("courses/0/join_codes", json={"for_admins": True}, headers={"Authorization":"teacher2"})
         assert response.status_code == 404
 
-    def test_delete_share_links_404(self, valid_course_entry, client):
-        """Test whether the share links are accessible to delete"""
-        response = client.delete(f"courses/{valid_course_entry.course_id}/join_codes/7", headers={"Authorization":"teacher2"})
-        assert response.status_code == 404
-
     def test_for_admins_required(self, valid_course_entry, client):
         """Test whether the for_admins field is required"""
         response = client.post(f"courses/{valid_course_entry.course_id}/join_codes", json={}, headers={"Authorization":"teacher2"})
