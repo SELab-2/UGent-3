@@ -6,15 +6,16 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import pytest
 from sqlalchemy import create_engine
-
-from project.models.course import Course
+from project import create_app_with_db
+from project.db_in import db, url
 from project.models.user import User
-from project.models.project import Project
+from project.models.course import Course
 from project.models.course_relation import CourseStudent,CourseAdmin
 from project.models.course_share_code import CourseShareCode
 from project import create_app_with_db
 from project.db_in import url, db
 from project.models.submission import Submission
+from project.models.project import Project
 
 
 @pytest.fixture
@@ -205,24 +206,6 @@ def files():
     with open(name01, "rb") as temp01:
         with open(name02, "rb") as temp02:
             yield [(temp01, name01), (temp02, name02)]
-
-@pytest.fixture
-def session(db_session):
-    """Create a database session for the tests"""
-    # Populate the database
-    db_session.add_all(users())
-    db_session.commit()
-    db_session.add_all(courses())
-    db_session.commit()
-    db_session.add_all(course_relations(db_session))
-    db_session.commit()
-    db_session.add_all(projects(db_session))
-    db_session.commit()
-    db_session.add_all(submissions(db_session))
-    db_session.commit()
-
-    # Tests can now use a populated database
-    yield db_session
 
 @pytest.fixture
 def app():
