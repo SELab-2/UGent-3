@@ -37,7 +37,14 @@ class ProjectAssignmentFiles(Resource):
                 "message": "Something went wrong querying the project",
                 "url": RESPONSE_URL
             }, 500
+
         file_url = safe_join(UPLOAD_FOLDER, f"{project_id}")
 
-        # return send_from_directory(directory, project.assignment_file, as_attachment=True)
+        if not os.path.isfile(file_url):
+            # no file is found so return 404
+            return {
+                "message": "No assignment file found for this project",
+                "url": file_url
+            }, 404
+
         return send_from_directory(file_url,project.assignment_file)
