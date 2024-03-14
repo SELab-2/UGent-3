@@ -41,8 +41,6 @@ class CourseForUser(Resource):
         This function will create a new course
         if the body of the post contains a name and uid is an admin or teacher
         """
-        if not request.json.get("name"):
-            return {"error": "Course name cannot be empty","url":RESPONSE_URL}, 400
         
         return insert_into_model(
             Course,

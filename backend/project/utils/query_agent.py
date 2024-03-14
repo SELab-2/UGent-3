@@ -67,6 +67,13 @@ def create_model_instance(model: DeclarativeMeta,
         return {"error": f"Missing required fields: {', '.join(missing_fields)}",
                 "url": response_url_base}, 400
 
+    # Check if any field in data is an empty string
+    empty_fields = [field for field in data if data[field] == '']
+
+    if empty_fields:
+        return {"error": f"Fields cannot be blank: {', '.join(empty_fields)}",
+                "url": response_url_base}, 400
+
     filtered_data = filter_model_fields(model, data)
     new_instance: DeclarativeMeta = model(**filtered_data)
     db.session.add(new_instance)
