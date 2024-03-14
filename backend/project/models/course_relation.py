@@ -1,5 +1,6 @@
-"""Models for relation between users and courses"""
-from sqlalchemy import Integer, Column, ForeignKey, PrimaryKeyConstraint, String
+"""Course relation model"""
+
+from sqlalchemy import Integer, Column, ForeignKey, String
 from project.db_in import db
 
 class BaseCourseRelation(db.Model):
@@ -10,11 +11,8 @@ class BaseCourseRelation(db.Model):
 
     __abstract__ = True
 
-    course_id = Column(Integer, ForeignKey('courses.course_id'), nullable=False)
-    uid = Column(String(255), ForeignKey("users.uid"), nullable=False)
-    __table_args__ = (
-        PrimaryKeyConstraint("course_id", "uid"),
-    )
+    course_id = Column(Integer, ForeignKey('courses.course_id'), primary_key=True)
+    uid = Column(String(255), ForeignKey("users.uid"), primary_key=True)
 
 class CourseAdmin(BaseCourseRelation):
     """Admin to course relation model"""

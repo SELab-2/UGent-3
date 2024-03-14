@@ -10,7 +10,7 @@ CREATE TABLE courses (
 	name VARCHAR(50) NOT NULL,
 	ufora_id VARCHAR(50),
 	teacher VARCHAR(255) NOT NULL,
-	CONSTRAINT fk_teacher FOREIGN KEY(teacher) REFERENCES users(uid),
+	CONSTRAINT fk_teacher FOREIGN KEY(teacher) REFERENCES users(uid) ON DELETE CASCADE,
 	PRIMARY KEY(course_id)
 );
 
@@ -61,7 +61,7 @@ CREATE TABLE submissions (
 	submission_status BOOLEAN NOT NULL,
 	PRIMARY KEY(submission_id),
 	CONSTRAINT fk_project FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE,
-	CONSTRAINT fk_user FOREIGN KEY(uid) REFERENCES users(uid)
+	CONSTRAINT fk_user FOREIGN KEY(uid) REFERENCES users(uid) ON DELETE CASCADE
 );
 
 CREATE OR REPLACE FUNCTION remove_expired_codes()
