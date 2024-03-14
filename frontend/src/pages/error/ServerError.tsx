@@ -18,5 +18,5 @@ export function ServerError() {
       </Typography>
       <Box component="img" src="/error_pigeon.png" alt="icon" />
     </Box>
-    );
+  );
 }
