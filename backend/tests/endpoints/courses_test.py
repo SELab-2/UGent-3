@@ -9,24 +9,22 @@ from project.models.course import Course
 class TestCourseEndpoint:
     """Class for testing the courses endpoint"""
 
-    def test_post_courses(self, courses_init_db, client, course_data, invalid_course):
+    def test_post_course(self, courses_init_db, client):
         """
         Test posting a course to the /courses endpoint
         """
-        response = client.post("/courses?uid=Bart", json=course_data)  # valid user
 
-        for x in range(3, 10):
-            course = {"name": "Sel" + str(x), "teacher": "Bart"}
-            response = client.post("/courses?uid=Bart", json=course)  # valid user
-            assert response.status_code == 201
+        course = {"name": "Sel7"}
+        response = client.post("/courses", json=course, headers={"Authorization":"teacher2"}) 
         assert response.status_code == 201  # succes post = 201
 
-        course = courses_init_db.query(Course).filter_by(name="Sel2").first()
+        course = courses_init_db.query(Course).filter_by(name="Sel7").first()
         assert course is not None
         assert course.teacher == "Bart"
 
+    def test_post_invalid_course(self, client, invalid_course):
         response = client.post(
-            "/courses?uid=Bart", json=invalid_course
+            "/courses", json=invalid_course, headers={"Authorization":"teacher2"}
         )  # invalid course
         assert response.status_code == 400
 
@@ -43,15 +41,17 @@ class TestCourseEndpoint:
         sel2_students_link = "/courses/" + str(course.course_id)
 
         response = client.post(
-            sel2_students_link + "/students?uid=student_sel2_0",
+            sel2_students_link + "/students",
             json=valid_students,  # unauthorized user
+            headers={"Authorization":"student1"}
         )
         assert response.status_code == 403
 
         assert course.teacher == "Bart"
         response = client.post(
-            sel2_students_link + "/students?uid=Bart",
+            sel2_students_link + "/students",
             json=valid_students,  # authorized user
+            headers={"Authorization":"teacher2"}
         )
 
         assert response.status_code == 201  # succes post = 201
@@ -62,18 +62,20 @@ class TestCourseEndpoint:
         assert users == valid_students["students"]
 
         response = client.post(
-            sel2_students_link + "/students?uid=Bart",
+            sel2_students_link + "/students",
             json=valid_students,  # already added students
+            headers={"Authorization":"teacher2"}
         )
         assert response.status_code == 400
 
         response = client.post(
-            sel2_students_link + "/students?uid=Bart",
+            sel2_students_link + "/students",
             json=bad_students,  # bad request
+            headers={"Authorization":"teacher2"}
         )
         assert response.status_code == 400
 
-        sel2_admins_link = "/courses/" + str(course.course_id) + "/admins"
+        sel2_admins_link = f"/courses/{course.course_id}/admins"
 
         course_admins = [
             s.uid
@@ -82,14 +84,16 @@ class TestCourseEndpoint:
         assert course_admins == ["Bart"]
 
         response = client.post(
-            sel2_admins_link + "?uid=Bart",  # authorized user
-            json={"admin_uid": "Rin"},  # non existent user
+            sel2_admins_link,  # authorized user
+            json={"admin_uid": "Rin"},  # non existant user
+            headers={"Authorization":"teacher2"}
         )
         assert response.status_code == 404
 
         response = client.post(
-            sel2_admins_link + "?uid=Bart",  # authorized user
+            sel2_admins_link,  # authorized user
             json={"admin_uid": "Rien"},  # existing user
+            headers={"Authorization":"teacher2"}
         )
         admins = [
             s.uid
@@ -102,15 +106,14 @@ class TestCourseEndpoint:
         Test all the getters for the courses endpoint
         """
         course = courses_get_db.query(Course).filter_by(name="Sel2").first()
-        sel2_students_link = "/courses/" + str(course.course_id)
+        sel2_students_link = f"/courses/{course.course_id}"
 
-        for x in range(3, 10):
-            response = client.get(f"/courses?name=Sel{str(x)}")
-            assert response.status_code == 200
-            link = response.json["url"]
-            assert len(link) == len(f"{api_url}/courses")
-            response = client.get(link + "?uid=Bart")
-            assert response.status_code == 200
+        response = client.get(f"/courses?name=Sel2", headers={"Authorization":"teacher2"})
+        assert response.status_code == 200
+        link = response.json["url"]
+        assert len(link) == len(f"{api_url}/courses")
+        response = client.get(link + "?uid=Bart")
+        assert response.status_code == 200
 
         sel2_students = [
             {"uid": f"{api_url}/users/" + s.uid}
@@ -214,7 +217,7 @@ class TestCourseEndpoint:
         assert response.status_code == 401  # no authorization: 401
 
         response = client.post(
-            "/courses?uid=Bart", json=invalid_course
+            "/courses?uid=Bart", json=invalid_course, headers={"Authorization":"student1"}
         )  # invalid course
-        assert response.status_code == 400 # not a teacher: 403
+        assert response.status_code == 403 # not a teacher: 403
     

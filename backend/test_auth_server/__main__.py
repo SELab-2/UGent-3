@@ -16,7 +16,7 @@ token_dict = {
         "jobTitle":"teacher"
     },
     "teacher2":{
-        "id":"laermans",
+        "id":"Bart",
         "jobTitle":"teacher"
     },
     "student1":{

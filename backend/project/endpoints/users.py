@@ -16,6 +16,7 @@ users_api = Api(users_bp)
 load_dotenv()
 API_URL = getenv("API_HOST")
 
+
 class Users(Resource):
     """Api endpoint for the /users route"""
 
@@ -47,6 +48,7 @@ class Users(Resource):
 
     @not_allowed
     def post(self):
+        # TODO make it so this just creates a user for yourself
         """
         This function will respond to post requests made to /users.
         It should create a new user and return a success message.
@@ -81,7 +83,6 @@ class Users(Resource):
             db.session.rollback()
             return {"message": "An error occurred while creating the user",
                     "url": f"{API_URL}/users"}, 500
-
 
 
 class User(Resource):

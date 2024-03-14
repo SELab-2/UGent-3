@@ -28,11 +28,6 @@ def test_getting_all_projects_not_authorized(client):
 
 def test_post_project(db_session, client, course_ad, course_teacher_ad, project_json):
     """Test posting a project to the database and testing if it's present"""
-    db_session.add(course_teacher_ad)
-    db_session.commit()
-
-    db_session.add(course_ad)
-    db_session.commit()
 
     project_json["course_id"] = course_ad.course_id
     # cant be done with 'with' because it autocloses then
@@ -113,7 +108,6 @@ def test_remove_project(db_session, client, course_ad, course_teacher_ad, projec
     project_json["course_id"] = course_ad.course_id
 
     # post the project
-    print(project_json)
     with open("testzip.zip", "rb") as zip_file:
         project_json["assignment_file"] = zip_file
         response = client.post("/projects", data=project_json, headers={"Authorization":"teacher1"})
@@ -325,7 +319,7 @@ def test_patch_project_student(db_session, client, course_ad, course_teacher_ad,
     db_session.commit()
     updated_project = db_session.get(Project, {"project_id": project.project_id})
 
-    assert response.status_code == 200
+    assert response.status_code == 403
     assert updated_project.title == project.title
     assert updated_project.archived == project.archived
 
@@ -357,6 +351,6 @@ def test_patch_project_wrong_teacher(db_session, client, course_ad, course_teach
     db_session.commit()
     updated_project = db_session.get(Project, {"project_id": project.project_id})
 
-    assert response.status_code == 200
+    assert response.status_code == 403
     assert updated_project.title == project.title
     assert updated_project.archived == project.archived
