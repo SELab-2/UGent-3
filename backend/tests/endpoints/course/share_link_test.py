@@ -2,8 +2,6 @@
 This file contains the tests for the share link endpoints of the course resource.
 """
 
-from project.models.course import Course
-
 class TestCourseShareLinks:
     """
     Class that will respond to the /courses/course_id/students link
