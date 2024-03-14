@@ -1,11 +1,9 @@
 """Main entry point for the application."""
-
 from dotenv import load_dotenv
 from flask import Flask
-
-"""Index api point"""
 from flask import Blueprint, request
 from flask_restful import Resource, Api
+
 
 index_bp = Blueprint("index", __name__)
 index_endpoint = Api(index_bp)
@@ -55,15 +53,15 @@ class Index(Resource):
         if auth in token_dict.keys():
             return token_dict[auth], 200
         return {"error":"Wrong address"}, 401
-        
+
 
 index_bp.add_url_rule("/", view_func=Index.as_view("index"))
 
 if __name__ == "__main__":
+    """Startpoint application"""
     load_dotenv()
 
     app = Flask(__name__)
     app.register_blueprint(index_bp)
 
     app.run(debug=True, host='0.0.0.0')
-
