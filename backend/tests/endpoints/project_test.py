@@ -17,7 +17,7 @@ def test_getting_all_projects(client):
 def test_post_project(client, valid_project):
     """Test posting a project to the database and testing if it's present"""
 
-    with open("testzip.zip", "rb") as zip_file:
+    with open("tests/resources/testzip.zip", "rb") as zip_file:
         valid_project["assignment_file"] = zip_file
         # post the project
         response = client.post(
