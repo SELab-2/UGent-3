@@ -23,7 +23,7 @@ export default function Login_page() {
                 <Box textAlign="center">
                 <Button variant="contained" size="large"
                 onClick={() => {
-                    alert('clicked');
+                    
                 }}>
                 Log in!</Button>
                 </Box> 
