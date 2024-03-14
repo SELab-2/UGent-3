@@ -16,6 +16,10 @@ jobs:
           path: ~/.npm
           key: npm-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
+          
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm i eslint
       
       - name: Run linting
         working-directory: ./frontend
