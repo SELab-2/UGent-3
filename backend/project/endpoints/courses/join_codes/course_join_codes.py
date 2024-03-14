@@ -11,6 +11,7 @@ from flask import request
 from project.utils.query_agent import query_selected_from_model, insert_into_model
 from project.models.course_share_code import CourseShareCode
 from project.endpoints.courses.courses_utils import get_course_abort_if_not_found
+from project.utils.authentication import login_required, authorize_teacher_of_course
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -22,6 +23,7 @@ class CourseJoinCodes(Resource):
     the /courses/course_id/join_codes url, only an admin of a course can do this
     """
 
+    @login_required
     def get(self, course_id):
         """
         This function will return all the join codes of a course
@@ -36,6 +38,7 @@ class CourseJoinCodes(Resource):
             filters={"course_id": course_id}
         )
 
+    @authorize_teacher_of_course
     def post(self, course_id):
         """
         Api endpoint for adding new join codes to a course, can only be done by the teacher

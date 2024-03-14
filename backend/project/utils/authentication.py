@@ -21,7 +21,6 @@ from sqlalchemy.exc import SQLAlchemyError
 load_dotenv()
 API_URL = getenv("API_HOST")
 AUTHENTICATION_URL = getenv("AUTHENTICATION_URL")
-# maybe https://graph.microsoft.com/oidc/userinfo -> this returns less data
 
 
 def abort_with_message(code: int, message: str):
@@ -47,8 +46,10 @@ def return_authenticated_user_id():
         
     auth_header = {"Authorization": authentication}
     response = requests.get(AUTHENTICATION_URL, headers=auth_header)
+    if not response:
+        abort_with_message(401, "An error occured while trying to authenticate your access token")
     if response.status_code != 200:
-          abort_with_message(401, response.json()["error"])
+        abort_with_message(401, response.json()["error"])
 
     user_info = response.json()
     auth_user_id = user_info["id"]
@@ -62,7 +63,7 @@ def return_authenticated_user_id():
     if user:
         return auth_user_id
     is_teacher = False
-    if user_info["jobTitle"] != None: # TODO check what this is for an actual teacher
+    if user_info["jobTitle"] != None:
         is_teacher = True
     
     # add user if not yet in database
@@ -73,7 +74,7 @@ def return_authenticated_user_id():
     except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
-            return abort_with_message(500, "An unexpected database error occured while creating the user")
+            return abort_with_message(500, "An unexpected database error occured while creating the user during authentication")
     return auth_user_id
     
 
@@ -87,7 +88,7 @@ def is_teacher(auth_user_id):
         return {"message": "An error occurred while fetching the user",
                         "url": f"{API_URL}/users"}, 500
     if not user: # should realistically never happen
-            abort(500)
+            abort(500, "A database error occured")
     if user.is_teacher:
         return True
     return False
@@ -113,7 +114,7 @@ def is_teacher_of_course(auth_user_id, course_id):
 def is_admin_of_course(auth_user_id, course_id):
     """This function checks whether the user with auth_user_id is an admin of the course: course_id"""
     try:
-        course_admin = db.session.get(CourseAdmin, (course_id, auth_user_id)) # TODO check if this is correct primary key
+        course_admin = db.session.get(CourseAdmin, (course_id, auth_user_id))
     except SQLAlchemyError:
     # every exception should result in a rollback
         db.session.rollback()
@@ -129,7 +130,7 @@ def is_admin_of_course(auth_user_id, course_id):
 def is_student_of_course(auth_user_id, course_id):
     """This function checks whether the user with auth_user_id is a student of the course: course_id"""
     try:
-        course_student = db.session.get(CourseStudent, (course_id, auth_user_id)) # TODO check if this is correct primary key
+        course_student = db.session.get(CourseStudent, (course_id, auth_user_id))
     except SQLAlchemyError:
         # every exception should result in a rollback
         db.session.rollback()
@@ -219,7 +220,7 @@ def authorize_teacher_of_course(f):
         if is_teacher_of_course(auth_user_id, kwargs["course_id"]):
             return f(*args, **kwargs)
 
-        abort_with_message(403)
+        abort_with_message(403, "You're not authorized to perform this action")
     return wrap
 
 
@@ -310,7 +311,7 @@ def authorize_project_visible(f):
             return f(*args, **kwargs)
         if is_student_of_course(auth_user_id, course_id) and project_visible(project_id):
             return f(*args, **kwargs)
-        abort_with_message(403, "What project?")
+        abort_with_message(403, "You're not authorized to perform this action")
     return wrap
 
 def authorize_submissions_request(f):
@@ -325,7 +326,7 @@ def authorize_submissions_request(f):
         
         if is_student_of_course(auth_user_id, course_id) and project_visible(project_id) and auth_user_id == request.args.get("uid"):
             return f(*args, **kwargs)
-        abort_with_message(403, "Uhhhh")
+        abort_with_message(403, "You're not authorized to perform this action")
     return wrap
 
 
@@ -337,7 +338,7 @@ def authorize_student_submission(f):
         course_id = get_course_of_project(project_id)
         if is_student_of_course(auth_user_id, course_id) and project_visible(project_id) and auth_user_id == request.form.get("uid"):
             return f(*args, **kwargs)
-        abort_with_message(403, "Nah")
+        abort_with_message(403, "You're not authorized to perform this action")
     return wrap
 
 
@@ -356,7 +357,7 @@ def authorize_submission_author(f):
             abort_with_message(404, f"Submission with id: {submission_id} not found")
         if submission.uid == auth_user_id:
             return f(*args, **kwargs)
-        abort_with_message(403, "")
+        abort_with_message(403, "You're not authorized to perform this action")
     return wrap
 
 
@@ -367,7 +368,7 @@ def authorize_grader(f):
         course_id = get_course_of_submission(kwargs["submission_id"])
         if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
             return f(*args, **kwargs)
-        abort_with_message(403, "")
+        abort_with_message(403, "You're not authorized to perform this action")
     return wrap
 
 
@@ -390,5 +391,5 @@ def authorize_submission_request(f):
         course_id = get_course_of_project(submission.project_id)
         if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
             return f(*args, **kwargs)
-        abort_with_message(403, "")
+        abort_with_message(403, "You're not authorized to perform this action")
     return wrap

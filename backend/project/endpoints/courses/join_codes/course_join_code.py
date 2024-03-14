@@ -10,7 +10,7 @@ from flask_restful import Resource
 from project.utils.query_agent import query_by_id_from_model, delete_by_id_from_model
 from project.models.course_share_code import CourseShareCode
 from project.endpoints.courses.join_codes.join_codes_utils import check_course_exists
-from project.utils.authentication import authorize_teacher_or_course_admin
+from project.utils.authentication import authorize_teacher_of_course
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -36,7 +36,7 @@ class CourseJoinCode(Resource):
         )
 
     @check_course_exists
-    @authorize_teacher_or_course_admin
+    @authorize_teacher_of_course
     def delete(self, course_id, join_code):
         """
         Api endpoint for deleting join codes from a course, can only be done by the teacher

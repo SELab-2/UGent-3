@@ -15,7 +15,7 @@ class TestCourseEndpoint:
         assert data["data"]["teacher"] == valid_course["teacher"]
 
         # Is reachable using the API
-        get_response = client.get(f"/courses/{data['data']['course_id']}", headers={"Authorization":"teacher1"})
+        get_response = client.get(f"/courses/{data['data']['course_id']}", headers={"Authorization":"teacher2"})
         assert get_response.status_code == 200
 
 
@@ -32,7 +32,7 @@ class TestCourseEndpoint:
 
         response = client.post(
             sel2_students_link + f"/students?uid={valid_course_entry.teacher}",
-            json={"students": valid_students},
+            json={"students": valid_students}, headers={"Authorization":"teacher2"}
         )
 
         assert response.status_code == 403
@@ -43,7 +43,7 @@ class TestCourseEndpoint:
         Test all the getters for the courses endpoint
         """
 
-        response = client.get("/courses")
+        response = client.get("/courses", headers={"Authorization":"teacher1"})
         assert response.status_code == 200
         data = response.json
         for course in valid_course_entries:
@@ -53,12 +53,12 @@ class TestCourseEndpoint:
         """Test all course endpoint related delete functionality"""
 
         response = client.delete(
-            "/courses/" + str(valid_course_entry.course_id),
+            "/courses/" + str(valid_course_entry.course_id), headers={"Authorization":"teacher2"}
         )
         assert response.status_code == 200
 
         # Is not reachable using the API
-        get_response = client.get(f"/courses/{valid_course_entry.course_id}")
+        get_response = client.get(f"/courses/{valid_course_entry.course_id}", headers={"Authorization":"teacher2"})
         assert get_response.status_code == 404
 
     def test_course_patch(self, valid_course_entry, client):
@@ -67,7 +67,7 @@ class TestCourseEndpoint:
         """
         response = client.patch(f"/courses/{valid_course_entry.course_id}", json={
             "name": "TestTest"
-        })
+        }, headers={"Authorization":"teacher2"})
         data = response.json
         assert response.status_code == 200
         assert data["data"]["name"] == "TestTest"

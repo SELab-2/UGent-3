@@ -53,14 +53,14 @@ def test_post_project(client, valid_project):
         response = client.post(
             "/projects",
             data=valid_project,
-            content_type='multipart/form-data'
+            content_type='multipart/form-data', headers={"Authorization":"teacher2"}
         )
 
     assert response.status_code == 401
 
     # check if the project with the id is present
     project_id = response.json["data"]["project_id"]
-    response = client.get(f"/projects/{project_id}")
+    response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
 
     assert response.status_code == 200
 
@@ -68,16 +68,16 @@ def test_remove_project(client, valid_project_entry):
     """Test removing a project to the datab and fetching it, testing if it's not present anymore"""
 
     project_id = valid_project_entry.project_id
-    response = client.delete(f"/projects/{project_id}")
+    response = client.delete(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
     assert response.status_code == 200
 
     # check if the project isn't present anymore and the delete indeed went through
-    response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher1"})
+    response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
     assert response.status_code == 404
 
 def test_patch_project(client, valid_project_entry):
     """
-    Test functionality of the PUT method for projects
+    Test functionality of the PATCH method for projects
     """
 
     project_id = valid_project_entry.project_id
@@ -87,6 +87,6 @@ def test_patch_project(client, valid_project_entry):
 
     response = client.patch(f"/projects/{project_id}", json={
         "title": new_title, "archived": new_archived
-    })
+    }, headers={"Authorization":"teacher2"})
 
     assert response.status_code == 200
