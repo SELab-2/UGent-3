@@ -14,6 +14,39 @@ from project.models.project import Project
 from project.models.course_relation import CourseStudent,CourseAdmin
 from project.models.submission import Submission
 
+
+@pytest.fixture
+def valid_user():
+    return {
+        "uid": "w_student",
+        "is_teacher": False
+    }
+
+@pytest.fixture
+def valid_user_entry(session, valid_user):
+    user = User(**valid_user)
+    session.add(user)
+    session.commit()
+    return user
+
+@pytest.fixture
+def user_invalid_field(valid_user):
+    valid_user["is_student"] = True
+    return valid_user
+
+@pytest.fixture
+def valid_user_entries(session):
+    users = [
+        User(uid="del", is_admin=False, is_teacher=True),
+        User(uid="pat", is_admin=False, is_teacher=True),
+        User(uid="u_get", is_admin=False, is_teacher=True),
+        User(uid="query_user", is_admin=True, is_teacher=False)]
+    
+    session.add_all(users)
+    session.commit()
+
+    return users
+
 def users():
     """Return a list of users to populate the database"""
     return [
