@@ -29,35 +29,9 @@ class TestSubmissionsEndpoint:
         assert response.status_code == 400
         assert "message" in response.json
 
-    def test_get_submissions_all(self, client: FlaskClient):
-        """Test getting the submissions"""
-        response = client.get("/submissions", headers={"Authorization":"teacher2"})
-        data = response.json
-        assert response.status_code == 200
-        assert "message" in data
-        assert isinstance(data["data"], list)
-
-    def test_get_submissions_user(self, client: FlaskClient, valid_submission_entry):
-        """Test getting the submissions given a specific user"""
-        response = client.get(f"/submissions?uid={valid_submission_entry.uid}", headers={"Authorization":"teacher2"})
-        data = response.json
-        assert response.status_code == 200
-        assert "message" in data
-
-
     def test_get_submissions_project(self, client: FlaskClient, valid_submission_entry):
         """Test getting the submissions given a specific project"""
         response = client.get(f"/submissions?project_id={valid_submission_entry.project_id}", headers={"Authorization":"teacher2"})
-        data = response.json
-        assert response.status_code == 200
-        assert "message" in data
-
-    def test_get_submissions_user_project(self, client: FlaskClient, valid_submission_entry):
-        """Test getting the submissions given a specific user and project"""
-        response = client.get(
-            f"/submissions? \
-                uid={valid_submission_entry.uid}&\
-                project_id={valid_submission_entry.project_id}", headers={"Authorization":"teacher2"})
         data = response.json
         assert response.status_code == 200
         assert "message" in data

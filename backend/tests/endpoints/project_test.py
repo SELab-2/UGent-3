@@ -12,11 +12,11 @@ def test_assignment_download(client, valid_project):
             "/projects",
             data=valid_project,
             content_type='multipart/form-data',
-            headers={"Authorization":"teacher1"}
+            headers={"Authorization":"teacher2"}
         )
     assert response.status_code == 201
     project_id = response.json["data"]["project_id"]
-    response = client.get(f"/projects/{project_id}/assignments", headers={"Authorization":"teacher1"})
+    response = client.get(f"/projects/{project_id}/assignments", headers={"Authorization":"teacher2"})
     # file downloaded succesfully
     assert response.status_code == 200
 
@@ -56,7 +56,7 @@ def test_post_project(client, valid_project):
             content_type='multipart/form-data', headers={"Authorization":"teacher2"}
         )
 
-    assert response.status_code == 401
+    assert response.status_code == 201
 
     # check if the project with the id is present
     project_id = response.json["data"]["project_id"]

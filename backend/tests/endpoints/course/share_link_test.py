@@ -39,7 +39,7 @@ class TestCourseShareLinks:
 
     def test_delete_share_links_404(self, valid_course_entry, client):
         """Test whether the share links are accessible to delete"""
-        response = client.delete(f"courses/{valid_course_entry.course_id}/join_codes/0", headers={"Authorization":"teacher2"})
+        response = client.delete(f"courses/{valid_course_entry.course_id}/join_codes/7", headers={"Authorization":"teacher2"})
         assert response.status_code == 404
 
     def test_for_admins_required(self, valid_course_entry, client):

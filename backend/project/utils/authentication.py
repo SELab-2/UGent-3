@@ -270,7 +270,7 @@ def authorize_teacher_of_project(f):
         project_id = kwargs["project_id"]
         course_id = get_course_of_project(project_id)
         
-        if is_teacher(auth_user_id, course_id):
+        if is_teacher_of_course(auth_user_id, course_id):
             return f(*args, **kwargs)
 
         abort_with_message(403, "You are not authorized to perfom this action, you are not the teacher of this project")
