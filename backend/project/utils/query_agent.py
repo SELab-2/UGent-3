@@ -191,10 +191,10 @@ def query_by_id_from_model(model: DeclarativeMeta,
         result: Query = model.query.filter(getattr(model, column_name) == column_id).first()
         if not result:
             return {"message": "Resource not found", "url": base_url}, 404
-        return jsonify({
+        return {
             "data": result,
             "message": "Resource fetched correctly",
-            "url": urljoin(f"{base_url}/", str(column_id))}), 200
+            "url": urljoin(f"{base_url}/", str(column_id))}, 200
     except SQLAlchemyError:
         return {
             "error": "Something went wrong while querying the database.",

@@ -1,5 +1,35 @@
 """Tests for project endpoints."""
 
+def test_assignment_download(client, valid_project):
+    """
+    Method for assignment download
+    """
+
+    with open("tests/resources/testzip.zip", "rb") as zip_file:
+        valid_project["assignment_file"] = zip_file
+        # post the project
+        response = client.post(
+            "/projects",
+            data=valid_project,
+            content_type='multipart/form-data'
+        )
+    assert response.status_code == 201
+    project_id = response.json["data"]["project_id"]
+    response = client.get(f"/projects/{project_id}/assignments")
+    # file downloaded succesfully
+    assert response.status_code == 200
+
+
+def test_not_found_download(client):
+    """
+    Test a not present project download
+    """
+    response = client.get("/projects")
+    # get an index that doesnt exist
+    response = client.get(f"/projects/-1/assignments")
+    assert response.status_code == 404
+
+
 def test_projects_home(client):
     """Test home project endpoint."""
     response = client.get("/projects")
