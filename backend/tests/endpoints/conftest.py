@@ -248,7 +248,7 @@ def course_ad(course_teacher_ad: User):
     return ad2
 
 @pytest.fixture
-def valid_project_entry(session, valid_course_entry):
+def valid_project_entry(session, valid_project, valid_course_entry):
     """A project for testing, with the course as the course it belongs to"""
     date = datetime(2024, 2, 25, 12, 0, 0)
     project = Project(
@@ -269,7 +269,7 @@ def valid_project_entry(session, valid_course_entry):
 
 @pytest.fixture
 def valid_project(valid_course_entry):
-    """A function that return the json data of a project including the PK needed for testing"""
+    """A function that return the json form data of a project"""
     data = {
         "title": "Project",
         "description": "Test project",
@@ -306,7 +306,7 @@ def valid_teacher_entry(session):
 
 @pytest.fixture
 def valid_course(valid_teacher_entry):
-    """A valid course for testing that's already in the db"""
+    """A valid course json form"""
     return {"name": "Sel", "teacher": valid_teacher_entry.uid}
 
 @pytest.fixture
