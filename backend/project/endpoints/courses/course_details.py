@@ -88,7 +88,6 @@ class CourseByCourseId(Resource):
                 "error": "Something went wrong while querying the database.",
                 "url": RESPONSE_URL}, 500
 
-    @login_required
     @authorize_teacher_of_course
     def delete(self, course_id):
         """
@@ -101,7 +100,6 @@ class CourseByCourseId(Resource):
             RESPONSE_URL
         )
 
-    @login_required
     @authorize_teacher_of_course
     def patch(self, course_id):
         """

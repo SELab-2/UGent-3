@@ -46,7 +46,7 @@ class CourseToAddStudents(Resource):
         to get all the users assigned to a course
         everyone can get this data so no need to have uid query in the link
         """
-        abort_url = f"{API_URL}/courses/{str(course_id)}/students"
+        abort_url = f"{API_URL}/courses/{course_id}/students"
         get_course_abort_if_not_found(course_id)
 
         return query_selected_from_model(
@@ -57,14 +57,13 @@ class CourseToAddStudents(Resource):
             filters={"course_id": course_id}
         )
 
-    @login_required
     @authorize_teacher_or_course_admin
     def post(self, course_id):
         """
         Allows admins of a course to assign new students by posting to:
         /courses/course_id/students with a list of uid in the request body under key "students"
         """
-        abort_url = f"{API_URL}/courses/{str(course_id)}/students"
+        abort_url = f"{API_URL}/courses/{course_id}/students"
         uid = request.args.get("uid")
         data = request.get_json()
         student_uids = data.get("students")
@@ -89,7 +88,6 @@ class CourseToAddStudents(Resource):
         response["data"] = data
         return response, 201
 
-    @login_required
     @authorize_teacher_or_course_admin
     def delete(self, course_id):
         """

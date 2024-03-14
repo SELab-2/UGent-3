@@ -32,7 +32,7 @@ class CourseForAdmins(Resource):
     This class will handle post and delete queries to
     the /courses/course_id/admins url, only the teacher of a course can do this
     """
-    @login_required
+
     @authorize_teacher_or_course_admin
     def get(self, course_id):
         """
@@ -49,7 +49,6 @@ class CourseForAdmins(Resource):
             filters={"course_id": course_id},
         )
 
-    @login_required
     @authorize_teacher_of_course
     def post(self, course_id):
         """
@@ -76,7 +75,6 @@ class CourseForAdmins(Resource):
             "uid"
         )
 
-    @login_required
     @authorize_teacher_of_course
     def delete(self, course_id):
         """
