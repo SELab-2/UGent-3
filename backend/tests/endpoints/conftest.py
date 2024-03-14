@@ -6,12 +6,14 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import pytest
 from sqlalchemy import create_engine
-from project import create_app_with_db
-from project.db_in import url, db
+
 from project.models.course import Course
 from project.models.user import User
 from project.models.project import Project
 from project.models.course_relation import CourseStudent,CourseAdmin
+from project.models.course_share_code import CourseShareCode
+from project import create_app_with_db
+from project.db_in import url, db
 from project.models.submission import Submission
 
 
@@ -338,3 +340,11 @@ def valid_course_entries(session, valid_teacher_entry):
     session.add_all(courses)
     session.commit()
     return courses
+
+@pytest.fixture
+def share_code_admin(session, valid_course_entry):
+    """A course with share codes for testing."""
+    share_code = CourseShareCode(course_id=valid_course_entry.course_id, for_admins=True)
+    session.add(share_code)
+    session.commit()
+    return share_code
