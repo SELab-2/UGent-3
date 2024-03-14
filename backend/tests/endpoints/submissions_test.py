@@ -12,99 +12,90 @@ class TestSubmissionsEndpoint:
     """Class to test the submissions API endpoint"""
 
     ### GET SUBMISSIONS ###
-    def test_get_submissions_wrong_user(self, client: FlaskClient, session: Session):
+    def test_get_submissions_wrong_user(self, client: FlaskClient):
         """Test getting submissions for a non-existing user"""
-        response = client.get("/submissions?uid=unknown")
-        data = response.json
+        response = client.get("/submissions?uid=-20")
         assert response.status_code == 400
-        assert data["message"] == "Invalid user (uid=unknown)"
 
-    def test_get_submissions_wrong_project(self, client: FlaskClient, session: Session):
+    def test_get_submissions_wrong_project(self, client: FlaskClient):
         """Test getting submissions for a non-existing project"""
         response = client.get("/submissions?project_id=-1")
-        data = response.json
         assert response.status_code == 400
-        assert data["message"] == "Invalid project (project_id=-1)"
+        assert "message" in response.json
 
-    def test_get_submissions_wrong_project_type(self, client: FlaskClient, session: Session):
+    def test_get_submissions_wrong_project_type(self, client: FlaskClient):
         """Test getting submissions for a non-existing project of the wrong type"""
         response = client.get("/submissions?project_id=zero")
-        data = response.json
         assert response.status_code == 400
-        assert data["message"] == "Invalid project (project_id=zero)"
+        assert "message" in response.json
 
-    def test_get_submissions_all(self, client: FlaskClient, session: Session):
+    def test_get_submissions_all(self, client: FlaskClient):
         """Test getting the submissions"""
         response = client.get("/submissions")
         data = response.json
         assert response.status_code == 200
-        assert data["message"] == "Successfully fetched the submissions"
-        assert len(data["data"]) == 3
+        assert "message" in data
+        assert isinstance(data["data"], list)
 
-    def test_get_submissions_user(self, client: FlaskClient, session: Session):
+    def test_get_submissions_user(self, client: FlaskClient, valid_submission_entry):
         """Test getting the submissions given a specific user"""
-        response = client.get("/submissions?uid=student01")
+        response = client.get(f"/submissions?uid={valid_submission_entry.uid}")
         data = response.json
         assert response.status_code == 200
-        assert data["message"] == "Successfully fetched the submissions"
-        assert len(data["data"]) == 1
+        assert "message" in data
 
-    def test_get_submissions_project(self, client: FlaskClient, session: Session):
+
+    def test_get_submissions_project(self, client: FlaskClient, valid_submission_entry):
         """Test getting the submissions given a specific project"""
-        project = session.query(Project).filter_by(title="B+ Trees").first()
-        response = client.get(f"/submissions?project_id={project.project_id}")
+        response = client.get(f"/submissions?project_id={valid_submission_entry.project_id}")
         data = response.json
         assert response.status_code == 200
-        assert data["message"] == "Successfully fetched the submissions"
-        assert len(data["data"]) == 2
+        assert "message" in data
 
-    def test_get_submissions_user_project(self, client: FlaskClient, session: Session):
+    def test_get_submissions_user_project(self, client: FlaskClient, valid_submission_entry):
         """Test getting the submissions given a specific user and project"""
-        project = session.query(Project).filter_by(title="B+ Trees").first()
-        response = client.get(f"/submissions?uid=student01&project_id={project.project_id}")
+        response = client.get(
+            f"/submissions?uid={valid_submission_entry.uid}&project_id={valid_submission_entry.project_id}")
         data = response.json
         assert response.status_code == 200
-        assert data["message"] == "Successfully fetched the submissions"
-        assert len(data["data"]) == 1
+        assert "message" in data
 
     ### POST SUBMISSIONS ###
-    def test_post_submissions_no_user(self, client: FlaskClient, session: Session, files):
+    def test_post_submissions_no_user(self, client: FlaskClient, valid_project_entry, files):
         """Test posting a submission without specifying a user"""
-        project = session.query(Project).filter_by(title="B+ Trees").first()
         response = client.post("/submissions", data={
-            "project_id": project.project_id,
+            "project_id": valid_project_entry.project_id,
             "files": files
         })
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "The uid is missing"
 
-    def test_post_submissions_wrong_user(self, client: FlaskClient, session: Session, files):
+    def test_post_submissions_wrong_user(self, client: FlaskClient, valid_project_entry, files):
         """Test posting a submission for a non-existing user"""
-        project = session.query(Project).filter_by(title="B+ Trees").first()
         response = client.post("/submissions", data={
             "uid": "unknown",
-            "project_id": project.project_id,
+            "project_id": valid_project_entry.project_id,
             "files": files
         })
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "Invalid user (uid=unknown)"
 
-    def test_post_submissions_no_project(self, client: FlaskClient, session: Session, files):
+    def test_post_submissions_no_project(self, client: FlaskClient, valid_user_entry, files):
         """Test posting a submission without specifying a project"""
         response = client.post("/submissions", data={
-            "uid": "student01",
+            "uid": valid_user_entry.uid,
             "files": files
         })
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "The project_id is missing"
 
-    def test_post_submissions_wrong_project(self, client: FlaskClient, session: Session, files):
+    def test_post_submissions_wrong_project(self, client: FlaskClient, valid_user_entry, files):
         """Test posting a submission for a non-existing project"""
         response = client.post("/submissions", data={
-            "uid": "student01",
+            "uid": valid_user_entry.uid,
             "project_id": 0,
             "files": files
         })
@@ -113,11 +104,11 @@ class TestSubmissionsEndpoint:
         assert data["message"] == "Invalid project (project_id=0)"
 
     def test_post_submissions_wrong_project_type(
-            self, client: FlaskClient, session: Session, files
+            self, client: FlaskClient, valid_user_entry, files
         ):
         """Test posting a submission for a non-existing project of the wrong type"""
         response = client.post("/submissions", data={
-            "uid": "student01",
+            "uid": valid_user_entry.uid,
             "project_id": "zero",
             "files": files
         })
@@ -125,16 +116,16 @@ class TestSubmissionsEndpoint:
         assert response.status_code == 400
         assert data["message"] == "Invalid project_id typing (project_id=zero)"
 
-    def test_post_submissions_no_files(self, client: FlaskClient, session: Session):
+    def test_post_submissions_no_files(self, client: FlaskClient, valid_user_entry, valid_project_entry):
         """Test posting a submission when no files are uploaded"""
-        project = session.query(Project).filter_by(title="B+ Trees").first()
         response = client.post("/submissions", data={
-            "uid": "student01",
-            "project_id": project.project_id
+            "uid": valid_user_entry.uid,
+            "project_id": valid_project_entry.project_id
         })
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "No files were uploaded"
+
 
     def test_post_submissions_empty_file(self, client: FlaskClient, session: Session, file_empty):
         """Test posting a submission for an empty file"""

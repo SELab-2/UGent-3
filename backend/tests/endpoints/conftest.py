@@ -16,6 +16,24 @@ from project.models.submission import Submission
 
 
 @pytest.fixture
+def valid_submission(valid_user_entry, valid_project_entry):
+    return {
+        "uid": valid_user_entry.uid,
+        "project_id": valid_project_entry.project_id,
+        "grading": 16,
+        "submission_time": datetime(2024,3,14,12,0,0,tzinfo=ZoneInfo("GMT")),
+        "submission_path": "/submission/1",
+        "submission_status": True
+    }
+
+@pytest.fixture
+def valid_submission_entry(session, valid_submission):
+    submission = Submission(**valid_submission)
+    session.add(submission)
+    session.commit()
+    return submission
+
+@pytest.fixture
 def valid_user():
     return {
         "uid": "w_student",
