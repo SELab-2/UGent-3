@@ -1,4 +1,4 @@
-name: UGent-3-backend
+name: UGent-3-backend-test
 run-name: ${{ github.actor }} is running backend tests 🚀
 on: [pull_request]
 jobs:
