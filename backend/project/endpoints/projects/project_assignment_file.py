@@ -26,26 +26,13 @@ class ProjectAssignmentFiles(Resource):
         """
         Get the assignment files of a project
         """
-        '''try:
-            # project = Project.query.filter(getattr(Project, "project_id") == project_id).first()
-            project = query_by_id_from_mode(Project, "project_id", project_id, f"RESPONSE_URL/{project_id}/assignments")
-            if project is None:
-                return {
-                    "message": "Project not found",
-                    "url": RESPONSE_URL,
-                }, 404
-        except SQLAlchemyError:
-            return {
-                "message": "Something went wrong querying the project",
-                "url": RESPONSE_URL
-            }, 500'''
         json, status_code = query_by_id_from_model(Project, "project_id", project_id, f"RESPONSE_URL")
 
         if status_code != 200:
             return json, status_code
 
         project = json["data"]
-        file_url = safe_join(UPLOAD_FOLDER, f"{project_id}")
+        file_url = safe_join(UPLOAD_FOLDER, str(project_id))
 
         if not os.path.isfile(safe_join(file_url, project.assignment_file)):
             # no file is found so return 404
