@@ -18,7 +18,7 @@ RESPONSE_URL = urljoin(f"{API_URL}/", "courses")
 
 class CourseJoinCodes(Resource):
     """
-    This class will handle post and delete queries to
+    This class will handle get and post queries to
     the /courses/course_id/join_codes url, only an admin of a course can do this
     """
 

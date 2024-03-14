@@ -18,11 +18,12 @@ def test_assignment_download(db_session, client, course_ad, course_teacher_ad, p
         response = client.post(
             "/projects",
             data=project_json,
-            content_type='multipart/form-data'
+            content_type='multipart/form-data',
+            headers={"Authorization":"teacher1"}
         )
 
     project_id = response.json["data"]["project_id"]
-    response = client.get(f"/projects/{project_id}/assignments")
+    response = client.get(f"/projects/{project_id}/assignments", headers={"Authorization":"teacher1"})
     # file downloaded succesfully
     assert response.status_code == 200
 
@@ -34,7 +35,7 @@ def test_not_found_download(client):
     response = client.get("/projects")
     # get an index that doesnt exist
     project_id = len(response.data)+1
-    response = client.get(f"/projects/{project_id}/assignments")
+    response = client.get(f"/projects/{project_id}/assignments", headers={"Authorization":"teacher2"})
     assert response.status_code == 404
 
 
@@ -63,7 +64,7 @@ def test_getting_all_projects_not_authorized(client):
     assert response.status_code == 403
 
 
-def test_post_project(db_session, client, course_ad, course_teacher_ad, project_json):
+def test_post_project(client, course_ad, project_json):
     """Test posting a project to the database and testing if it's present"""
 
     project_json["course_id"] = course_ad.course_id
@@ -89,11 +90,6 @@ def test_post_project(db_session, client, course_ad, course_teacher_ad, project_
 
 def test_post_project_not_authorized(db_session, client, course_ad, course_teacher_ad, project_json):
     """Test posting a project to the database and testing if it's not present"""
-    db_session.add(course_teacher_ad)
-    db_session.commit()
-
-    db_session.add(course_ad)
-    db_session.commit()
 
     project_json["course_id"] = course_ad.course_id
     # cant be done with 'with' because it autocloses then

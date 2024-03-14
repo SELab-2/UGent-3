@@ -14,14 +14,14 @@ class TestSubmissionsEndpoint:
     ### GET SUBMISSIONS ###
     def test_get_submissions_wrong_user(self, client: FlaskClient, session: Session):
         """Test getting submissions for a non-existing user"""
-        response = client.get("/submissions?uid=unknown")
+        response = client.get("/submissions?uid=unknown", headers={"Authorization":"teacher2"})
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "Invalid user (uid=unknown)"
 
     def test_get_submissions_wrong_project(self, client: FlaskClient, session: Session):
         """Test getting submissions for a non-existing project"""
-        response = client.get("/submissions?project_id=-1")
+        response = client.get("/submissions?project_id=-1", headers={"Authorization":"teacher2"})
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "Invalid project (project_id=-1)"

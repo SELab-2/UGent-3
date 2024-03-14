@@ -13,7 +13,6 @@ class TestCourseEndpoint:
         """
         Test posting a course to the /courses endpoint
         """
-
         course = {"name": "Sel7"}
         response = client.post("/courses", json=course, headers={"Authorization":"teacher2"}) 
         assert response.status_code == 201  # succes post = 201
@@ -27,6 +26,20 @@ class TestCourseEndpoint:
             "/courses", json=invalid_course, headers={"Authorization":"teacher2"}
         )  # invalid course
         assert response.status_code == 400
+
+    def test_post_courses_not_allowed(self, client):
+        """
+        Test posting a course to the /courses endpoint once without authentication and once with
+        no authorization
+        """
+        course = {"name": "Sel7"}
+        response = client.post("/courses", json=course)  
+        assert response.status_code == 401  # no authentication: 401
+
+        response = client.post(
+            "/courses", json=course, headers={"Authorization":"student1"}
+        )  
+        assert response.status_code == 403 # not a teacher: 403
 
     def test_post_courses_course_id_students_and_admins(self, db_with_course, client):
         """
@@ -42,16 +55,16 @@ class TestCourseEndpoint:
 
         response = client.post(
             sel2_students_link + "/students",
-            json=valid_students,  # unauthorized user
-            headers={"Authorization":"student1"}
+            json=valid_students,  
+            headers={"Authorization":"student1"} # unauthorized user
         )
         assert response.status_code == 403
 
         assert course.teacher == "Bart"
         response = client.post(
             sel2_students_link + "/students",
-            json=valid_students,  # authorized user
-            headers={"Authorization":"teacher2"}
+            json=valid_students,  
+            headers={"Authorization":"teacher2"} # authorized user
         )
 
         assert response.status_code == 201  # succes post = 201
@@ -101,7 +114,7 @@ class TestCourseEndpoint:
         ]
         assert admins == ["Bart", "Rien"]
 
-    def test_get_courses(self, courses_get_db, client, api_url):
+    def test_get_courses_teacher(self, courses_get_db, client, api_url):
         """
         Test all the getters for the courses endpoint
         """
@@ -204,20 +217,4 @@ class TestCourseEndpoint:
         assert response.status_code == 200
         assert data["data"]["name"] == "AD2"
 
-    def test_post_courses_not_allowed(self, courses_init_db, client, course_data, invalid_course):
-        """
-        Test posting a course to the /courses endpoint
-        """
-        response = client.post("/courses?uid=Bart", json=course_data)  
-        
-        for x in range(3, 10):
-            course = {"name": "Sel" + str(x), "teacher": "Bart"}
-            response = client.post("/courses?uid=Bart", json=course)  
-            assert response.status_code == 401
-        assert response.status_code == 401  # no authorization: 401
-
-        response = client.post(
-            "/courses?uid=Bart", json=invalid_course, headers={"Authorization":"student1"}
-        )  # invalid course
-        assert response.status_code == 403 # not a teacher: 403
     
