@@ -3,7 +3,7 @@
 class TestCourseEndpoint:
     """Class for testing the courses endpoint"""
 
-    def test_post_courses(self, client, valid_course):
+    def test_post_courses(self, client, valid_course,invalid_course):
         """
         Test posting a course to the /courses endpoint
         """
@@ -18,7 +18,6 @@ class TestCourseEndpoint:
         get_response = client.get(f"/courses/{data['data']['course_id']}", headers={"Authorization":"teacher2"})
         assert get_response.status_code == 200
 
-<<<<<<< HEAD
         response = client.post(
             "/courses?uid=Bart", json=invalid_course
         )  # invalid course
@@ -31,8 +30,6 @@ class TestCourseEndpoint:
 
         response = client.post("/courses?uid=Bart", json=course_empty_name)
         assert response.status_code == 400  
-=======
->>>>>>> development
 
     def test_post_courses_course_id_students_and_admins(
             self, client, valid_course_entry, valid_students_entries):
