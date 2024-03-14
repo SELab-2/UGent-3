@@ -10,7 +10,7 @@ from flask import request, jsonify
 from flask_restful import Resource
 
 from project.models.project import Project
-from project.utils.query_agent import query_selected_from_model, insert_into_model
+from project.utils.query_agent import query_selected_from_model, create_model_instance
 from project.utils.authentication import authorize_teacher
 
 from project.endpoints.projects.endpoint_parser import parse_project_params
@@ -54,7 +54,7 @@ class ProjectsEndpoint(Resource):
 
         # save the file that is given with the request
         try:
-            new_project, status_code = insert_into_model(
+            new_project, status_code = create_model_instance(
                 Project,
                 project_json,
                 urljoin(f"{API_URL}/", "/projects"),

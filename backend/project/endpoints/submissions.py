@@ -42,12 +42,13 @@ class SubmissionsEndpoint(Resource):
 
                 # Filter by uid
                 uid = request.args.get("uid")
-                if uid:
-                    if session.get(User, uid):
+                if uid is not None:
+                    if session.get(User, uid) is not None:
+                        query = query.filter_by(uid=uid)
+                    else:
                         data["message"] = f"Invalid user (uid={uid})"
                         return data, 400
-                    else:
-                        query = query.filter_by(uid=uid)
+
                 # Filter by project_id
                 project_id = request.args.get("project_id")
                 if project_id is not None:
@@ -146,7 +147,7 @@ class SubmissionEndpoint(Resource):
 
     @authorize_submission_request
     def get(self, submission_id: int) -> dict[str, any]:
-        """Get the submission given a submission ID
+        """Get the submission given an submission ID
 
         Args:
             submission_id (int): Submission ID

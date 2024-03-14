@@ -44,7 +44,6 @@ class CourseForUser(Resource):
         This function will create a new course
         if the body of the post contains a name and uid is an admin or teacher
         """
-        # TODO add teacher_id in request
         req = request.json
         req["teacher"] = teacher_id
         return insert_into_model(
