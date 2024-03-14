@@ -1,5 +1,5 @@
 name: UGent-3-frontend-test
-run-name: ${{ github.actor }} is running tests 🚀
+run-name: ${{ github.actor }} is running frontend tests 🚀
 on: [pull_request]
 jobs:
   Frontend-tests:
