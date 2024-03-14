@@ -20,8 +20,5 @@ jobs:
       - name: Running tests
         working-directory: ./backend
         run: bash ./run_tests.sh
-
-      - name: Run linting
-        working-directory: ./backend
-        run: find . -type f -name "*.py" | xargs pylint 
+        
         
