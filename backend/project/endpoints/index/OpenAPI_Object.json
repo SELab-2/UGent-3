@@ -1818,13 +1818,10 @@
                       "type": "string"
                     },
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "submissions": "array",
-                        "items": {
-                          "type": "string",
-                          "format": "uri"
-                        }
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "format": "uri"
                       }
                     }
                   }
@@ -1882,20 +1879,19 @@
                 "type": "object",
                 "properties": {
                   "uid": {
-                    "type": "string",
-                    "required": true
+                    "type": "string"
                   },
                   "project_id": {
-                    "type": "integer",
-                    "required": true
+                    "type": "integer"
                   },
                   "files": {
                     "type": "array",
                     "items": {
-                      "type": "file"
+                      "type": "object"
                     }
                   }
-                }
+                },
+                "required": ["uid", "project_id"]
               }
             }
           }
@@ -2011,35 +2007,30 @@
                     "data": {
                       "type": "object",
                       "properties": {
-                        "submission": {
-                          "type": "object",
-                          "properties": {
-                            "submission_id": {
-                              "type": "integer"
-                            },
-                            "user": {
-                              "type": "string",
-                              "format": "uri"
-                            },
-                            "project": {
-                              "type": "string",
-                              "format": "uri"
-                            },
-                            "grading": {
-                              "type": "integer",
-                              "nullable": true
-                            },
-                            "time": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "path": {
-                              "type": "string"
-                            },
-                            "status": {
-                              "type": "boolean"
-                            }
-                          }
+                        "submission_id": {
+                          "type": "integer"
+                        },
+                        "user": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "project": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "grading": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "time": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "boolean"
                         }
                       }
                     }
