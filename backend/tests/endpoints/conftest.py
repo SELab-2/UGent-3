@@ -17,6 +17,9 @@ from project.models.submission import Submission
 
 @pytest.fixture
 def valid_submission(valid_user_entry, valid_project_entry):
+    """
+    Returns a valid submission form
+    """
     return {
         "uid": valid_user_entry.uid,
         "project_id": valid_project_entry.project_id,
@@ -28,6 +31,9 @@ def valid_submission(valid_user_entry, valid_project_entry):
 
 @pytest.fixture
 def valid_submission_entry(session, valid_submission):
+    """
+    Returns a submission that is in the database
+    """
     submission = Submission(**valid_submission)
     session.add(submission)
     session.commit()
@@ -35,6 +41,9 @@ def valid_submission_entry(session, valid_submission):
 
 @pytest.fixture
 def valid_user():
+    """
+    Returns a valid user form
+    """
     return {
         "uid": "w_student",
         "is_teacher": False
@@ -42,6 +51,9 @@ def valid_user():
 
 @pytest.fixture
 def valid_user_entry(session, valid_user):
+    """
+    Returns a user that is in the database
+    """
     user = User(**valid_user)
     session.add(user)
     session.commit()
@@ -49,17 +61,23 @@ def valid_user_entry(session, valid_user):
 
 @pytest.fixture
 def user_invalid_field(valid_user):
+    """
+    Returns a user form with an invalid field
+    """
     valid_user["is_student"] = True
     return valid_user
 
 @pytest.fixture
 def valid_user_entries(session):
+    """
+    Returns a list of users that are in the database
+    """
     users = [
         User(uid="del", is_admin=False, is_teacher=True),
         User(uid="pat", is_admin=False, is_teacher=True),
         User(uid="u_get", is_admin=False, is_teacher=True),
         User(uid="query_user", is_admin=True, is_teacher=False)]
-    
+
     session.add_all(users)
     session.commit()
 

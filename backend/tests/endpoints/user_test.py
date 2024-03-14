@@ -120,6 +120,5 @@ class TestUserEndpoint:
         # Check that the response contains only the user that matches the query
         users = response.json["data"]
         for user in users:
-            assert user["is_admin"] == True
-            assert user["is_teacher"] == False
-
+            assert user["is_admin"] is True
+            assert user["is_teacher"] is False

@@ -55,7 +55,9 @@ class TestSubmissionsEndpoint:
     def test_get_submissions_user_project(self, client: FlaskClient, valid_submission_entry):
         """Test getting the submissions given a specific user and project"""
         response = client.get(
-            f"/submissions?uid={valid_submission_entry.uid}&project_id={valid_submission_entry.project_id}")
+            f"/submissions? \
+                uid={valid_submission_entry.uid}&\
+                project_id={valid_submission_entry.project_id}")
         data = response.json
         assert response.status_code == 200
         assert "message" in data
@@ -116,7 +118,8 @@ class TestSubmissionsEndpoint:
         assert response.status_code == 400
         assert data["message"] == "Invalid project_id typing (project_id=zero)"
 
-    def test_post_submissions_no_files(self, client: FlaskClient, valid_user_entry, valid_project_entry):
+    def test_post_submissions_no_files(
+            self, client: FlaskClient, valid_user_entry, valid_project_entry):
         """Test posting a submission when no files are uploaded"""
         response = client.post("/submissions", data={
             "uid": valid_user_entry.uid,

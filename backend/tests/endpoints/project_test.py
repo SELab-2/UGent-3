@@ -1,5 +1,4 @@
 """Tests for project endpoints."""
-from project.models.project import Project
 
 def test_projects_home(client):
     """Test home project endpoint."""
@@ -60,4 +59,3 @@ def test_patch_project(client, valid_project_entry):
     })
 
     assert response.status_code == 200
-

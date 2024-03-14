@@ -1,10 +1,5 @@
 """Here we will test all the courses endpoint related functionality"""
 
-from project.models.course_relation import CourseStudent, CourseAdmin
-
-from project.models.course import Course
-
-
 class TestCourseEndpoint:
     """Class for testing the courses endpoint"""
 
@@ -13,7 +8,7 @@ class TestCourseEndpoint:
         Test posting a course to the /courses endpoint
         """
 
-        response = client.post("/courses", json=valid_course) 
+        response = client.post("/courses", json=valid_course)
         assert response.status_code == 201
         data = response.json
         assert data["data"]["name"] == "Sel"
@@ -24,7 +19,8 @@ class TestCourseEndpoint:
         assert get_response.status_code == 200
 
 
-    def test_post_courses_course_id_students_and_admins(self, client, valid_course_entry, valid_students_entries):
+    def test_post_courses_course_id_students_and_admins(
+            self, client, valid_course_entry, valid_students_entries):
         """
         Test posting to courses/course_id/students and admins
         """
