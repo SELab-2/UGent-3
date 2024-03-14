@@ -12,6 +12,7 @@ from flask_restful import Resource
 
 from project.models.project import Project
 from project.utils.query_agent import query_by_id_from_model
+from project.utils.authentication import authorize_project_visible
 
 API_URL = os.getenv('API_HOST')
 RESPONSE_URL = urljoin(API_URL, "projects")
@@ -21,6 +22,8 @@ class ProjectAssignmentFiles(Resource):
     """
     Class for getting the assignment files of a project
     """
+
+    @authorize_project_visible
     def get(self, project_id):
         """
         Get the assignment files of a project

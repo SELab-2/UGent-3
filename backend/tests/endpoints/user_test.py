@@ -37,48 +37,82 @@ def user_db_session():
     for table in reversed(db.metadata.sorted_tables):
         session.execute(table.delete())
     session.commit()
+
 class TestUserEndpoint:
     """Class to test user management endpoints."""
 
     def test_delete_user(self, client, valid_user_entry):
         """Test deleting a user."""
         # Delete the user
-        response = client.delete(f"/users/{valid_user_entry.uid}")
+        response = client.delete(f"/users/{valid_user_entry.uid}", headers={"Authorization":"student1"})
         assert response.status_code == 200
 
-        get_response = client.get(f"/users/{valid_user_entry.uid}")
+        # If student 1 sends this request, he would get added again
+        get_response = client.get(f"/users/{valid_user_entry.uid}", headers={"Authorization":"teacher1"}) 
+        
         assert get_response.status_code == 404
+    
+    def test_delete_user_not_yourself(self, client, valid_user_entry):
+        """Test deleting a user that is not the user the authentication belongs to."""
+        # Delete the user
+        response = client.delete(f"/users/{valid_user_entry.uid}", headers={"Authorization":"teacher1"})
+        assert response.status_code == 403
+
+        # If student 1 sends this request, he would get added again
+        get_response = client.get(f"/users/{valid_user_entry.uid}", headers={"Authorization":"teacher1"}) 
+        
+        assert get_response.status_code == 200
 
     def test_delete_not_present(self, client):
         """Test deleting a user that does not exist."""
-        response = client.delete("/users/-20")
-        assert response.status_code == 404
+        response = client.delete("/users/-20", headers={"Authorization":"student1"})
+        assert response.status_code == 403 # User does not exist, so you are not the user
 
-    def test_wrong_form_post(self, client, user_invalid_field):
-        """Test posting with a wrong form."""
+    def test_post_no_authentication(self, client, user_invalid_field):
+        """Test posting without authentication."""
         response = client.post("/users", json=user_invalid_field)
-        assert response.status_code == 400
+        assert response.status_code == 403 # POST to /users is not allowed
 
-    def test_wrong_datatype_post(self, client, valid_user):
-        """Test posting with a wrong content type."""
-        response = client.post("/users", data=valid_user)
-        assert response.status_code == 415
+    def test_post_authenticated(self, client, valid_user):
+        """Test posting with wrong authentication."""
+        response = client.post("/users", data=valid_user, headers={"Authorization":"teacher1"})
+        assert response.status_code == 403 # POST to /users is not allowed
 
     def test_get_all_users(self, client, valid_user_entries):
         """Test getting all users."""
-        response = client.get("/users")
+        response = client.get("/users", headers={"Authorization":"teacher1"})
         assert response.status_code == 200
         # Check that the response is a list (even if it's empty)
         assert isinstance(response.json["data"], list)
         for valid_user in valid_user_entries:
             assert valid_user.uid in \
                 [user["uid"] for user in response.json["data"]]
+            
+    def test_get_all_users_no_authentication(self, client):
+        """Test getting all users without authentication."""
+        response = client.get("/users")
+        assert response.status_code == 401
+    
+    def test_get_all_users_wrong_authentication(self, client):
+        """Test getting all users with wrong authentication."""
+        response = client.get("/users", headers={"Authorization":"wrong"})
+        assert response.status_code == 401
 
     def test_get_one_user(self, client, valid_user_entry):
         """Test getting a single user."""
-        response = client.get(f"users/{valid_user_entry.uid}")
+        response = client.get(f"users/{valid_user_entry.uid}", headers={"Authorization":"teacher1"})
         assert response.status_code == 200
         assert "data" in response.json
+    
+    def test_get_one_user_no_authentication(self, client, valid_user_entry):
+        """Test getting a single user without authentication."""
+        response = client.get(f"users/{valid_user_entry.uid}")
+        assert response.status_code == 401
+    
+    def test_get_one_user_wrong_authentication(self, client, valid_user_entry):
+        """Test getting a single user with wrong authentication."""
+        response = client.get(f"users/{valid_user_entry.uid}", headers={"Authorization":"wrong"})
+        assert response.status_code == 401
 
     def test_patch_user(self, client, valid_user_entry):
         """Test updating a user."""
@@ -89,12 +123,7 @@ class TestUserEndpoint:
             'is_teacher': new_is_teacher,
             'is_admin': not valid_user_entry.is_admin
         })
-        assert response.status_code == 200
-        assert response.json["message"] == "User updated successfully!"
-
-        get_response = client.get(f"/users/{valid_user_entry.uid}")
-        assert get_response.status_code == 200
-        assert get_response.json["data"]["is_teacher"] == new_is_teacher
+        assert response.status_code == 403 # Patching a user is never necessary and thus not allowed
 
     def test_patch_non_existent(self, client):
         """Test updating a non-existent user."""
@@ -102,19 +131,19 @@ class TestUserEndpoint:
             'is_teacher': False,
             'is_admin': True
         })
-        assert response.status_code == 404
+        assert response.status_code == 403 # Patching is not allowed
 
     def test_patch_non_json(self, client, valid_user_entry):
         """Test sending a non-JSON patch request."""
         valid_user_form = asdict(valid_user_entry)
         valid_user_form["is_teacher"] = not valid_user_form["is_teacher"]
         response = client.patch(f"/users/{valid_user_form['uid']}", data=valid_user_form)
-        assert response.status_code == 415
+        assert response.status_code == 403 # Patching is not allowed
 
     def test_get_users_with_query(self, client, valid_user_entries):
         """Test getting users with a query."""
         # Send a GET request with query parameters, this is a nonsense entry but good for testing
-        response = client.get("/users?is_admin=true&is_teacher=false")
+        response = client.get("/users?is_admin=true&is_teacher=false", headers={"Authorization":"teacher1"})
         assert response.status_code == 200
 
         # Check that the response contains only the user that matches the query
