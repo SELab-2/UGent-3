@@ -18,8 +18,8 @@ After this you can run the development or the production build with one of the f
   ```sh
    npm run build
    ```
-After running this command the build can be found in the ```dist``` directory.
-You can choose your own preferred webserver like for example ```nginx```, ```serve``` or something else.
+After running this command the build can be found in the `dist` directory.
+You can choose your own preferred webserver like for example `nginx`, `serve` or something else.
   
   - Development
    ```sh
