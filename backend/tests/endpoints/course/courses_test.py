@@ -8,14 +8,14 @@ class TestCourseEndpoint:
         Test posting a course to the /courses endpoint
         """
 
-        response = client.post("/courses", json=valid_course)
+        response = client.post("/courses", json=valid_course, headers={"Authorization":"teacher2"})
         assert response.status_code == 201
         data = response.json
         assert data["data"]["name"] == "Sel"
         assert data["data"]["teacher"] == valid_course["teacher"]
 
         # Is reachable using the API
-        get_response = client.get(f"/courses/{data['data']['course_id']}")
+        get_response = client.get(f"/courses/{data['data']['course_id']}", headers={"Authorization":"teacher1"})
         assert get_response.status_code == 200
 
 

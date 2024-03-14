@@ -104,7 +104,7 @@ def is_teacher_of_course(auth_user_id, course_id):
                     "url": f"{API_URL}/users"}, 500
 
     if not course:
-        abort(404)
+        abort_with_message(404, f"Could not find course with id: {course_id}")
 
     if auth_user_id == course.teacher:
         return True
@@ -151,7 +151,7 @@ def get_course_of_project(project_id):
                     "url": f"{API_URL}/users"}, 500
 
     if not project:
-        abort(404)
+        abort_with_message(404, f"Could not find project with id: {project_id}")
 
     return project.course_id
 
@@ -176,7 +176,7 @@ def get_course_of_submission(submission_id):
         db.session.rollback()
         abort_with_message(500, "An error occurred while fetching the submission")
     if not submission:
-        abort_with_message(404, "Submission with given id not found")
+        abort_with_message(404, f"Submission with id: {submission_id} not found")
     return get_course_of_project(submission.project_id)
 
 
@@ -345,14 +345,15 @@ def authorize_submission_author(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
+        submission_id = kwargs["submission_id"]
         try:
-            submission = db.session.get(Submission, kwargs["submission_id"])
+            submission = db.session.get(Submission, submission_id)
         except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
             abort_with_message(500, "An error occurred while fetching the submission")
         if not submission:
-            abort_with_message(404, "Submission with given id not found")
+            abort_with_message(404, f"Submission with id: {submission_id} not found")
         if submission.uid == auth_user_id:
             return f(*args, **kwargs)
         abort_with_message(403, "")
@@ -375,14 +376,15 @@ def authorize_submission_request(f):
     def wrap(*args, **kwargs):
         # submission_author / grader mag hier aan
         auth_user_id = return_authenticated_user_id()
+        submission_id = kwargs["submission_id"]
         try:
-            submission = db.session.get(Submission, kwargs["submission_id"])
+            submission = db.session.get(Submission, submission_id)
         except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
             abort_with_message(500, "An error occurred while fetching the submission")
         if not submission:
-            abort_with_message(404, "Submission with given id not found")
+            abort_with_message(404, f"Submission with id: {submission_id} not found")
         if submission.uid == auth_user_id:
             return f(*args, **kwargs)
         course_id = get_course_of_project(submission.project_id)

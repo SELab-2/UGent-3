@@ -23,8 +23,8 @@ token_dict = {
         "id":"w_student",
         "jobTitle":None
     },
-    "student2":{
-        "id":"student02",
+    "student01":{
+        "id":"student01",
         "jobTitle":None
     },
     "course_admin1":{
@@ -34,7 +34,15 @@ token_dict = {
     "del_user":{
         "id":"del",
         "jobTitle":None
-    }
+    },
+    "ad3_teacher":{
+        "id":"brinkmann",
+        "jobTitle0":"teacher"
+    },
+    "student02":{
+        "id":"student02",
+        "jobTitle":None
+    },
 }
 
 class Index(Resource):
