@@ -446,8 +446,6 @@
         }
       }
     },
-
-
     "/projects/{id}/assignments": {
       "get": {
         "description": "Get the assignments file of project with given id",
@@ -687,7 +685,8 @@
             }
           }
         }
-      }},
+      }
+    },
     "/courses/{course_id}" : {
       "get": {
         "description": "Get a course by its ID.",
@@ -1781,7 +1780,6 @@
             }
           }
         }
-      }
     },
     "/submissions": {
       "get": {
@@ -2292,3 +2290,4 @@
       ]
     }
   }
+}
