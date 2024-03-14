@@ -10,6 +10,3 @@ COPY . /app
 RUN apt-get update 
 RUN apt-get install -y --no-install-recommends python3-pip
 RUN pip3 install --no-cache-dir -r requirements.txt -r dev-requirements.txt
-
-# Command to run the tests
-CMD ["pytest"]
