@@ -248,20 +248,9 @@ def course_ad(course_teacher_ad: User):
     return ad2
 
 @pytest.fixture
-def valid_project_entry(session, valid_project, valid_course_entry):
+def valid_project_entry(session, valid_project):
     """A project for testing, with the course as the course it belongs to"""
-    date = datetime(2024, 2, 25, 12, 0, 0)
-    project = Project(
-        title="Project",
-        description="Test project",
-        course_id=valid_course_entry.course_id,
-        deadline=date,
-        visible_for_students=True,
-        archived=False,
-        test_path="testpad",
-        script_name="testscript",
-        regex_expressions='r'
-    )
+    project = Project(**valid_project)
 
     session.add(project)
     session.commit()
@@ -315,9 +304,9 @@ def course_no_name(valid_teacher_entry):
     return {"name": "", "teacher": valid_teacher_entry.uid}
 
 @pytest.fixture
-def valid_course_entry(session, valid_teacher_entry):
+def valid_course_entry(session, valid_course):
     """A valid course for testing that's already in the db"""
-    course = Course(name="Sel", teacher=valid_teacher_entry.uid)
+    course = Course(**valid_course)
     session.add(course)
     session.commit()
     return course
