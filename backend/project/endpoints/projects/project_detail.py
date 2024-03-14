@@ -14,7 +14,6 @@ from project.utils.query_agent import query_by_id_from_model, delete_by_id_from_
     patch_by_id_from_model
 from project.utils.authentication import authorize_teacher_or_project_admin, authorize_teacher_of_project, authorize_project_visible
 
-
 API_URL = getenv('API_HOST')
 RESPONSE_URL = urljoin(API_URL, "projects")
 
