@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} is running frontend linter 🚀
 on:
   pull_request:
     paths:
-      - 'backend/**'
+      - 'frontend/**'
 jobs:
   Frontend-tests:
     runs-on: self-hosted
