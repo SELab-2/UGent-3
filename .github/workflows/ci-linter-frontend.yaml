@@ -1,9 +1,11 @@
 name: UGent-3-frontend-linter
 run-name: ${{ github.actor }} is running frontend linter 🚀
-on: [pull_request]
+on:
+  pull_request:
+    paths:
+      - 'backend/**'
 jobs:
   Frontend-tests:
-    if: contains(github.event.pull_request.changed_files.*.filename, 'frontend/')
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
