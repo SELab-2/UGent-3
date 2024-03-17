@@ -6,7 +6,7 @@
    ```sh
    git clone git@github.com:SELab-2/UGent-3.git
    ```
-
+**2. Installing required packages**
 
    If you want the development environment: run both commands. If you only need to deploy, run the deployment command.
 
