@@ -1,0 +1,5 @@
+.MuiTreeView-root {
+    height: 20rem;
+    width: 100%;
+    overflow: auto;
+}
