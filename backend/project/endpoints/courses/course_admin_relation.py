@@ -51,7 +51,7 @@ class CourseForAdmins(Resource):
         """
         Api endpoint for adding new admins to a course, can only be done by the teacher
         """
-        abort_url = urljoin(f"{RESPONSE_URL}/", f"{course_id}/", "admins")
+        abort_url = urljoin(f"{RESPONSE_URL}/", f"{course_id}/admins")
         teacher = request.args.get("uid")
         data = request.get_json()
         assistant = data.get("admin_uid")
@@ -76,7 +76,7 @@ class CourseForAdmins(Resource):
         """
         Api endpoint for removing admins of a course, can only be done by the teacher
         """
-        abort_url = urljoin(f"{RESPONSE_URL}/", f"{course_id}/", "admins")
+        abort_url = urljoin(f"{RESPONSE_URL}/", f"{course_id}/admins")
         teacher = request.args.get("uid")
         data = request.get_json()
         assistant = data.get("admin_uid")
