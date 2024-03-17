@@ -1,12 +1,12 @@
 # Project pigeonhole backend
-![tests](https://github.com/SELab-2/UGent-3/actions/workflows/ci-test-backend.yaml/badge.svg)
-![linter](https://github.com/SELab-2/UGent-3/actions/workflows/ci-linter-backend.yaml/badge.svg)
+![tests](https://github.com/SELab-2/UGent-3/actions/workflows/ci-test-backend.yaml/badge.svg?branch=development)
+![linter](https://github.com/SELab-2/UGent-3/actions/workflows/ci-linter-backend.yaml/badge.svg?branch=development)
 ## Prerequisites
 **1. Clone the repo**
    ```sh
    git clone git@github.com:SELab-2/UGent-3.git
    ```
-**2. Installing required packages**
+
 
    If you want the development environment: run both commands. If you only need to deploy, run the deployment command.
 
