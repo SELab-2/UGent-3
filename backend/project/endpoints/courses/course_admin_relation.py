@@ -7,7 +7,7 @@ from os import getenv
 from urllib.parse import urljoin
 from dotenv import load_dotenv
 
-from flask import request
+from flask import abort, request
 from flask_restful import Resource
 
 from project.models.course_relation import CourseAdmin

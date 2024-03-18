@@ -15,16 +15,20 @@ class TestSubmissionsEndpoint:
     def test_get_submissions_wrong_user(self, client: FlaskClient):
         """Test getting submissions for a non-existing user"""
         response = client.get("/submissions?uid=-20", headers={"Authorization":"teacher1"})
+        response = client.get("/submissions?uid=-20", headers={"Authorization":"teacher1"})
         assert response.status_code == 400
 
     def test_get_submissions_wrong_project(self, client: FlaskClient):
         """Test getting submissions for a non-existing project"""
         response = client.get("/submissions?project_id=-1", headers={"Authorization":"teacher1"})
         assert response.status_code == 404 # can't find course of project in authorization
+        response = client.get("/submissions?project_id=-1", headers={"Authorization":"teacher1"})
+        assert response.status_code == 404 # can't find course of project in authorization
         assert "message" in response.json
 
     def test_get_submissions_wrong_project_type(self, client: FlaskClient):
         """Test getting submissions for a non-existing project of the wrong type"""
+        response = client.get("/submissions?project_id=zero", headers={"Authorization":"teacher1"})
         response = client.get("/submissions?project_id=zero", headers={"Authorization":"teacher1"})
         assert response.status_code == 400
         assert "message" in response.json
@@ -42,8 +46,10 @@ class TestSubmissionsEndpoint:
     def test_get_submission_wrong_id(self, client: FlaskClient, session: Session):
         """Test getting a submission for a non-existing submission id"""
         response = client.get("/submissions/0", headers={"Authorization":"ad3_teacher"})
+        response = client.get("/submissions/0", headers={"Authorization":"ad3_teacher"})
         data = response.json
         assert response.status_code == 404
+        assert data["message"] == "Submission with id: 0 not found"
         assert data["message"] == "Submission with id: 0 not found"
 
     def test_get_submission_correct(self, client: FlaskClient, session: Session):
@@ -75,6 +81,7 @@ class TestSubmissionsEndpoint:
         data = response.json
         assert response.status_code == 404
         assert data["message"] == "Submission with id: 0 not found"
+        assert data["message"] == "Submission with id: 0 not found"
 
     def test_patch_submission_wrong_grading(self, client: FlaskClient, session: Session):
         """Test patching a submission with a wrong grading"""
@@ -103,6 +110,7 @@ class TestSubmissionsEndpoint:
         assert data["message"] == "Invalid grading (grading=0-20)"
 
     def test_patch_submission_correct_teacher(self, client: FlaskClient, session: Session):
+    def test_patch_submission_correct_teacher(self, client: FlaskClient, session: Session):
         """Test patching a submission"""
         project = session.query(Project).filter_by(title="B+ Trees").first()
         submission = session.query(Submission).filter_by(
@@ -124,13 +132,17 @@ class TestSubmissionsEndpoint:
             "path": "/submissions/2",
             "status": False
         }
+    
+    # TODO test course admin (allowed) and student (not allowed) patch 
 
     ### DELETE SUBMISSION ###
     def test_delete_submission_wrong_id(self, client: FlaskClient, session: Session):
         """Test deleting a submission for a non-existing submission id"""
         response = client.delete("submissions/0", headers={"Authorization":"student01"})
+        response = client.delete("submissions/0", headers={"Authorization":"student01"})
         data = response.json
         assert response.status_code == 404
+        assert data["message"] == "Submission with id: 0 not found"
         assert data["message"] == "Submission with id: 0 not found"
 
     def test_delete_submission_correct(self, client: FlaskClient, session: Session):
