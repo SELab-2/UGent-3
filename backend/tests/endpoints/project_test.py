@@ -16,7 +16,8 @@ def test_assignment_download(client, valid_project):
         )
     assert response.status_code == 201
     project_id = response.json["data"]["project_id"]
-    response = client.get(f"/projects/{project_id}/assignments", headers={"Authorization":"teacher2"})
+    response = client.get(f"/projects/{project_id}/assignments",
+                          headers={"Authorization":"teacher2"})
     # file downloaded succesfully
     assert response.status_code == 200
 

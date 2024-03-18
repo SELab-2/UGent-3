@@ -48,7 +48,6 @@ class Users(Resource):
 
     @not_allowed
     def post(self):
-        # TODO make it so this just creates a user for yourself
         """
         This function will respond to post requests made to /users.
         It should create a new user and return a success message.

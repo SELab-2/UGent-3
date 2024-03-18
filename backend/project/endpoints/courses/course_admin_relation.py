@@ -21,7 +21,8 @@ from project.endpoints.courses.courses_utils import (
     json_message
 )
 from project.utils.query_agent import query_selected_from_model, insert_into_model
-from project.utils.authentication import login_required, authorize_teacher_of_course, authorize_teacher_or_course_admin
+from project.utils.authentication import authorize_teacher_of_course, \
+      authorize_teacher_or_course_admin
 
 load_dotenv()
 API_URL = getenv("API_HOST")

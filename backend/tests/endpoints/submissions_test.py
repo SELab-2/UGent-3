@@ -31,7 +31,8 @@ class TestSubmissionsEndpoint:
 
     def test_get_submissions_project(self, client: FlaskClient, valid_submission_entry):
         """Test getting the submissions given a specific project"""
-        response = client.get(f"/submissions?project_id={valid_submission_entry.project_id}", headers={"Authorization":"teacher2"})
+        response = client.get(f"/submissions?project_id={valid_submission_entry.project_id}",
+                              headers={"Authorization":"teacher2"})
         data = response.json
         assert response.status_code == 200
         assert "message" in data
@@ -51,7 +52,8 @@ class TestSubmissionsEndpoint:
         submission = session.query(Submission).filter_by(
             uid="student01", project_id=project.project_id
         ).first()
-        response = client.get(f"/submissions/{submission.submission_id}", headers={"Authorization":"ad3_teacher"})
+        response = client.get(f"/submissions/{submission.submission_id}",
+                              headers={"Authorization":"ad3_teacher"})
         data = response.json
         assert response.status_code == 200
         assert data["message"] == "Successfully fetched the submission"
@@ -68,7 +70,8 @@ class TestSubmissionsEndpoint:
     ### PATCH SUBMISSION ###
     def test_patch_submission_wrong_id(self, client: FlaskClient, session: Session):
         """Test patching a submission for a non-existing submission id"""
-        response = client.patch("/submissions/0", data={"grading": 20}, headers={"Authorization":"ad3_teacher"})
+        response = client.patch("/submissions/0", data={"grading": 20},
+                                headers={"Authorization":"ad3_teacher"})
         data = response.json
         assert response.status_code == 404
         assert data["message"] == "Submission with id: 0 not found"
@@ -79,7 +82,9 @@ class TestSubmissionsEndpoint:
         submission = session.query(Submission).filter_by(
             uid="student02", project_id=project.project_id
         ).first()
-        response = client.patch(f"/submissions/{submission.submission_id}", data={"grading": 100}, headers={"Authorization":"ad3_teacher"})
+        response = client.patch(f"/submissions/{submission.submission_id}",
+                                data={"grading": 100},
+                                headers={"Authorization":"ad3_teacher"})
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "Invalid grading (grading=0-20)"
@@ -90,7 +95,9 @@ class TestSubmissionsEndpoint:
         submission = session.query(Submission).filter_by(
             uid="student02", project_id=project.project_id
         ).first()
-        response = client.patch(f"/submissions/{submission.submission_id}",data={"grading": "zero"}, headers={"Authorization":"ad3_teacher"})
+        response = client.patch(f"/submissions/{submission.submission_id}",
+                                data={"grading": "zero"},
+                                headers={"Authorization":"ad3_teacher"})
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "Invalid grading (grading=0-20)"
@@ -101,7 +108,9 @@ class TestSubmissionsEndpoint:
         submission = session.query(Submission).filter_by(
             uid="student02", project_id=project.project_id
         ).first()
-        response = client.patch(f"/submissions/{submission.submission_id}", data={"grading": 20}, headers={"Authorization":"ad3_teacher"})
+        response = client.patch(f"/submissions/{submission.submission_id}",
+                                data={"grading": 20},
+                                headers={"Authorization":"ad3_teacher"})
         data = response.json
         assert response.status_code == 200
         assert data["message"] == f"Submission (submission_id={submission.submission_id}) patched"
@@ -115,8 +124,6 @@ class TestSubmissionsEndpoint:
             "path": "/submissions/2",
             "status": False
         }
-    
-    # TODO test course admin (allowed) and student (not allowed) patch 
 
     ### DELETE SUBMISSION ###
     def test_delete_submission_wrong_id(self, client: FlaskClient, session: Session):
@@ -132,7 +139,8 @@ class TestSubmissionsEndpoint:
         submission = session.query(Submission).filter_by(
             uid="student01", project_id=project.project_id
         ).first()
-        response = client.delete(f"submissions/{submission.submission_id}", headers={"Authorization":"student01"})
+        response = client.delete(f"submissions/{submission.submission_id}",
+                                 headers={"Authorization":"student01"})
         data = response.json
         assert response.status_code == 200
         assert data["message"] == f"Submission (submission_id={submission.submission_id}) deleted"

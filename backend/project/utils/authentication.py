@@ -3,11 +3,13 @@ This module contains the functions to authenticate API calls.
 """
 from os import getenv
 
+from functools import wraps
+
 from dotenv import load_dotenv
 
-from functools import wraps
 from flask import abort, request, make_response
 import requests
+from sqlalchemy.exc import SQLAlchemyError
 
 from project import db
 
@@ -16,7 +18,6 @@ from project.models.course import Course
 from project.models.project import Project
 from project.models.submission import Submission
 from project.models.course_relation import CourseAdmin, CourseStudent
-from sqlalchemy.exc import SQLAlchemyError
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -43,9 +44,12 @@ def return_authenticated_user_id():
     authentication = request.headers.get("Authorization")
     if not authentication:
         abort_with_message(401, "No authorization given, you need an access token to use this API")
-        
+
     auth_header = {"Authorization": authentication}
-    response = requests.get(AUTHENTICATION_URL, headers=auth_header)
+    try:
+        response = requests.get(AUTHENTICATION_URL, headers=auth_header, timeout=5)
+    except TimeoutError:
+        abort_with_message(500, "Request to Microsoft timed out")
     if not response:
         abort_with_message(401, "An error occured while trying to authenticate your access token")
     if response.status_code != 200:
@@ -58,25 +62,28 @@ def return_authenticated_user_id():
     except SQLAlchemyError:
         # every exception should result in a rollback
         db.session.rollback()
-        return abort_with_message(500, "An unexpected database error occured while fetching the user")
-    
+        return abort_with_message(500,
+                                  "An unexpected database error occured while fetching the user")
+
     if user:
         return auth_user_id
     is_teacher = False
-    if user_info["jobTitle"] != None:
+    if user_info["jobTitle"] is not None:
         is_teacher = True
-    
+
     # add user if not yet in database
     try:
         new_user = User(uid=auth_user_id, is_teacher=is_teacher, is_admin=False)
         db.session.add(new_user)
         db.session.commit()
     except SQLAlchemyError:
-            # every exception should result in a rollback
-            db.session.rollback()
-            return abort_with_message(500, "An unexpected database error occured while creating the user during authentication")
+        # every exception should result in a rollback
+        db.session.rollback()
+        return abort_with_message(500,
+                                  """An unexpected database error occured 
+                                  while creating the user during authentication""")
     return auth_user_id
-    
+
 
 def is_teacher(auth_user_id):
     """This function checks whether the user with auth_user_id is a teacher"""
@@ -88,14 +95,16 @@ def is_teacher(auth_user_id):
         return {"message": "An error occurred while fetching the user",
                         "url": f"{API_URL}/users"}, 500
     if not user: # should realistically never happen
-            abort(500, "A database error occured")
+        abort_with_message(500, "A database error occured")
     if user.is_teacher:
         return True
     return False
 
 
 def is_teacher_of_course(auth_user_id, course_id):
-    """This function checks whether the user with auth_user_id is the teacher of the course: course_id"""
+    """This function checks whether the user 
+    with auth_user_id is the teacher of the course: course_id
+    """
     try:
         course = db.session.get(Course, course_id)
     except SQLAlchemyError:
@@ -112,7 +121,9 @@ def is_teacher_of_course(auth_user_id, course_id):
 
 
 def is_admin_of_course(auth_user_id, course_id):
-    """This function checks whether the user with auth_user_id is an admin of the course: course_id"""
+    """This function checks whether the user 
+    with auth_user_id is an admin of the course: course_id
+    """
     try:
         course_admin = db.session.get(CourseAdmin, (course_id, auth_user_id))
     except SQLAlchemyError:
@@ -128,7 +139,9 @@ def is_admin_of_course(auth_user_id, course_id):
 
 
 def is_student_of_course(auth_user_id, course_id):
-    """This function checks whether the user with auth_user_id is a student of the course: course_id"""
+    """This function checks whether the user 
+    with auth_user_id is a student of the course: course_id
+    """
     try:
         course_student = db.session.get(CourseStudent, (course_id, auth_user_id))
     except SQLAlchemyError:
@@ -158,6 +171,7 @@ def get_course_of_project(project_id):
 
 
 def project_visible(project_id):
+    """Determine whether a project is visible for students"""
     try:
         project = db.session.get(Project, project_id)
     except SQLAlchemyError:
@@ -170,6 +184,7 @@ def project_visible(project_id):
 
 
 def get_course_of_submission(submission_id):
+    """Get the course linked to a given submission"""
     try:
         submission = db.session.get(Submission, submission_id)
     except SQLAlchemyError:
@@ -204,7 +219,9 @@ def authorize_teacher(f):
         if is_teacher(auth_user_id):
             kwargs["teacher_id"] = auth_user_id
             return f(*args, **kwargs)
-        abort_with_message(403, "You are not authorized to perfom this action, only teachers are authorized")
+        abort_with_message(403,
+                           """You are not authorized to perfom this action,
+                             only teachers are authorized""")
     return wrap
 
 
@@ -234,10 +251,12 @@ def authorize_teacher_or_course_admin(f):
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
         course_id = kwargs["course_id"]
-        if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
+        if (is_teacher_of_course(auth_user_id, course_id)
+            or is_admin_of_course(auth_user_id, course_id)):
             return f(*args, **kwargs)
 
-        abort_with_message(403, "You are not authorized to perfom this action, only teachers and course admins are authorized")
+        abort_with_message(403, """You are not authorized to perfom this action,
+                           only teachers and course admins are authorized""")
     return wrap
 
 
@@ -253,8 +272,9 @@ def authorize_user(f):
         user_id = kwargs["user_id"]
         if auth_user_id == user_id:
             return f(*args, **kwargs)
-        
-        abort_with_message(403, "You are not authorized to perfom this action, you are not this user")
+
+        abort_with_message(403, """You are not authorized to perfom this action,
+                            you are not this user""")
     return wrap
 
 
@@ -269,11 +289,12 @@ def authorize_teacher_of_project(f):
         auth_user_id = return_authenticated_user_id()
         project_id = kwargs["project_id"]
         course_id = get_course_of_project(project_id)
-        
+
         if is_teacher_of_course(auth_user_id, course_id):
             return f(*args, **kwargs)
 
-        abort_with_message(403, "You are not authorized to perfom this action, you are not the teacher of this project")
+        abort_with_message(403, """You are not authorized to perfom this action,
+                            you are not the teacher of this project""")
     return wrap
 
 
@@ -288,9 +309,10 @@ def authorize_teacher_or_project_admin(f):
         auth_user_id = return_authenticated_user_id()
         project_id = kwargs["project_id"]
         course_id = get_course_of_project(project_id)
-        if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
+        if (is_teacher_of_course(auth_user_id, course_id)
+            or is_admin_of_course(auth_user_id, course_id)):
             return f(*args, **kwargs)
-        abort_with_message(403, """You are not authorized to perfom this action, 
+        abort_with_message(403, """You are not authorized to perfom this action,
                            you are not the teacher or an admin of this project""")
     return wrap
 
@@ -299,7 +321,8 @@ def authorize_project_visible(f):
     """
     This function will check if the person sending a request to the API is logged in, 
     and the teacher of the course which the project in the request belongs to.
-    Or if the person is a student of this course, it will return the project if it is visible for students.
+    Or if the person is a student of this course, 
+    it will return the project if it is visible for students.
     Returns 403: Not Authorized if either condition is false
     """
     @wraps(f)
@@ -307,7 +330,8 @@ def authorize_project_visible(f):
         auth_user_id = return_authenticated_user_id()
         project_id = kwargs["project_id"]
         course_id = get_course_of_project(project_id)
-        if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
+        if (is_teacher_of_course(auth_user_id, course_id)
+            or is_admin_of_course(auth_user_id, course_id)):
             return f(*args, **kwargs)
         if is_student_of_course(auth_user_id, course_id) and project_visible(project_id):
             return f(*args, **kwargs)
@@ -315,34 +339,49 @@ def authorize_project_visible(f):
     return wrap
 
 def authorize_submissions_request(f):
+    """This function will check if the person sending a request to the API is logged in,
+    and either the teacher/admin of the course or the student
+    that the submission belongs to
+    """
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
         project_id = request.args["project_id"]
         course_id = get_course_of_project(project_id)
 
-        if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
+        if (is_teacher_of_course(auth_user_id, course_id)
+            or is_admin_of_course(auth_user_id, course_id)):
             return f(*args, **kwargs)
-        
-        if is_student_of_course(auth_user_id, course_id) and project_visible(project_id) and auth_user_id == request.args.get("uid"):
+
+        if (is_student_of_course(auth_user_id, course_id)
+            and project_visible(project_id)
+            and auth_user_id == request.args.get("uid")):
             return f(*args, **kwargs)
         abort_with_message(403, "You're not authorized to perform this action")
     return wrap
 
 
 def authorize_student_submission(f):
+    """This function will check if the person sending a request to the API is logged in,
+    and a student of the course they're trying to post a submission to
+    """
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
         project_id = request.form["project_id"]
         course_id = get_course_of_project(project_id)
-        if is_student_of_course(auth_user_id, course_id) and project_visible(project_id) and auth_user_id == request.form.get("uid"):
+        if (is_student_of_course(auth_user_id, course_id)
+            and project_visible(project_id)
+            and auth_user_id == request.form.get("uid")):
             return f(*args, **kwargs)
         abort_with_message(403, "You're not authorized to perform this action")
     return wrap
 
 
 def authorize_submission_author(f):
+    """This function will check if the person sending a request to the API is logged in,
+    and the original author of the submission
+    """
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
@@ -362,17 +401,25 @@ def authorize_submission_author(f):
 
 
 def authorize_grader(f):
+    """This function will check if the person sending a request to the API is logged in,
+    and either the teacher/admin of the course.
+    """
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
         course_id = get_course_of_submission(kwargs["submission_id"])
-        if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
+        if (is_teacher_of_course(auth_user_id, course_id)
+            or is_admin_of_course(auth_user_id, course_id)):
             return f(*args, **kwargs)
         abort_with_message(403, "You're not authorized to perform this action")
     return wrap
 
 
 def authorize_submission_request(f):
+    """This function will check if the person sending a request to the API is logged in,
+    and either the teacher/admin of the course or the student
+    that the submission belongs to
+    """
     @wraps(f)
     def wrap(*args, **kwargs):
         # submission_author / grader mag hier aan
@@ -389,7 +436,8 @@ def authorize_submission_request(f):
         if submission.uid == auth_user_id:
             return f(*args, **kwargs)
         course_id = get_course_of_project(submission.project_id)
-        if is_teacher_of_course(auth_user_id, course_id) or is_admin_of_course(auth_user_id, course_id):
+        if (is_teacher_of_course(auth_user_id, course_id)
+            or is_admin_of_course(auth_user_id, course_id)):
             return f(*args, **kwargs)
         abort_with_message(403, "You're not authorized to perform this action")
     return wrap
