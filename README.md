@@ -1,4 +1,8 @@
 # UGent-3 project peristerónas
+![tests](https://github.com/SELab-2/UGent-3/actions/workflows/ci-test-frontend.yaml/badge.svg?branch=development)
+![linter](https://github.com/SELab-2/UGent-3/actions/workflows/ci-linter-frontend.yaml/badge.svg?branch=development)
+![tests](https://github.com/SELab-2/UGent-3/actions/workflows/ci-test-backend.yaml/badge.svg?branch=development)
+![linter](https://github.com/SELab-2/UGent-3/actions/workflows/ci-linter-backend.yaml/badge.svg?branch=development)
 ## Introduction
 Project peristerónas was created to aid both students and teacher for achieving a
 clear overview for deadlines and projects that need to be submitted.
