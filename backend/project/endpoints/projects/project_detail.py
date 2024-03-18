@@ -28,7 +28,7 @@ class ProjectDetail(Resource):
     for implementing get, delete and put methods
     """
 
-    # @authorize_project_visible
+    @authorize_project_visible
     def get(self, project_id):
         """
         Get method for listing a specific project
@@ -42,7 +42,7 @@ class ProjectDetail(Resource):
             project_id,
             RESPONSE_URL)
 
-    # @authorize_teacher_or_project_admin
+    @authorize_teacher_or_project_admin
     def patch(self, project_id):
         """
         Update method for updating a specific project
