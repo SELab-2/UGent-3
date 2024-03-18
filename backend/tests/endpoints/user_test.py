@@ -77,8 +77,6 @@ class TestUserEndpoint:
 
     def test_post_no_authentication(self, client, user_invalid_field):
         """Test posting without authentication."""
-    def test_post_no_authentication(self, client, user_invalid_field):
-        """Test posting without authentication."""
         response = client.post("/users", json=user_invalid_field)
         assert response.status_code == 403 # POST to /users is not allowed
         assert response.status_code == 403 # POST to /users is not allowed

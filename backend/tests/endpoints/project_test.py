@@ -13,8 +13,6 @@ def test_assignment_download(client, valid_project):
             data=valid_project,
             content_type='multipart/form-data',
             headers={"Authorization":"teacher2"}
-            content_type='multipart/form-data',
-            headers={"Authorization":"teacher2"}
         )
     assert response.status_code == 201
     project_id = response.json["data"]["project_id"]
@@ -31,20 +29,17 @@ def test_not_found_download(client):
     response = client.get("/projects")
     # get an index that doesnt exist
     response = client.get("/projects/-1/assignments", headers={"Authorization":"teacher2"})
-    response = client.get("/projects/-1/assignments", headers={"Authorization":"teacher2"})
     assert response.status_code == 404
 
 
 def test_projects_home(client):
     """Test home project endpoint."""
     response = client.get("/projects", headers={"Authorization":"teacher1"})
-    response = client.get("/projects", headers={"Authorization":"teacher1"})
     assert response.status_code == 200
 
 
 def test_getting_all_projects(client):
     """Test getting all projects"""
-    response = client.get("/projects", headers={"Authorization":"teacher1"})
     response = client.get("/projects", headers={"Authorization":"teacher1"})
     assert response.status_code == 200
     assert isinstance(response.json['data'], list)
@@ -60,14 +55,12 @@ def test_post_project(client, valid_project):
             "/projects",
             data=valid_project,
             content_type='multipart/form-data', headers={"Authorization":"teacher2"}
-            content_type='multipart/form-data', headers={"Authorization":"teacher2"}
         )
 
     assert response.status_code == 201
 
     # check if the project with the id is present
     project_id = response.json["data"]["project_id"]
-    response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
     response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
 
     assert response.status_code == 200
@@ -77,11 +70,9 @@ def test_remove_project(client, valid_project_entry):
 
     project_id = valid_project_entry.project_id
     response = client.delete(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
-    response = client.delete(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
     assert response.status_code == 200
 
     # check if the project isn't present anymore and the delete indeed went through
-    response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
     response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
     assert response.status_code == 404
 
@@ -98,7 +89,6 @@ def test_patch_project(client, valid_project_entry):
 
     response = client.patch(f"/projects/{project_id}", json={
         "title": new_title, "archived": new_archived
-    }, headers={"Authorization":"teacher2"})
     }, headers={"Authorization":"teacher2"})
 
     assert response.status_code == 200
