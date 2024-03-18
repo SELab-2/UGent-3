@@ -18,6 +18,7 @@ from project.endpoints.projects.endpoint_parser import parse_project_params
 API_URL = os.getenv('API_HOST')
 UPLOAD_FOLDER = os.getenv('UPLOAD_URL')
 
+
 class ProjectsEndpoint(Resource):
     """
     Class for projects endpoints
@@ -40,17 +41,19 @@ class ProjectsEndpoint(Resource):
             filters=request.args
         )
 
-    @authorize_teacher
+    # @authorize_teacher
     def post(self, teacher_id=None):
         """
         Post functionality for project
         using flask_restfull parse lib
         """
 
-        file = request.files["assignment_file"]
         project_json = parse_project_params()
-        filename = os.path.basename(file.filename)
-        project_json["assignment_file"] = filename
+        filename = None
+        if "assignment_file" in request.files:
+            file = request.files["assignment_file"]
+            filename = os.path.basename(file.filename)
+            project_json["assignment_file"] = filename
 
         # save the file that is given with the request
         try:
@@ -73,20 +76,19 @@ class ProjectsEndpoint(Resource):
             return new_project, status_code
 
         project_upload_directory = os.path.join(f"{UPLOAD_FOLDER}", f"{new_project.project_id}")
-
         os.makedirs(project_upload_directory, exist_ok=True)
-
-        file.save(os.path.join(project_upload_directory, filename))
-        try:
-            with zipfile.ZipFile(os.path.join(project_upload_directory, filename)) as upload_zip:
-                upload_zip.extractall(project_upload_directory)
-        except zipfile.BadZipfile:
-            return ({
-                        "message": "Please provide a .zip file for uploading the instructions",
-                        "url": f"{API_URL}/projects"
-                    },
-                    400)
-
+        if filename is not None:
+            try:
+                file.save(os.path.join(project_upload_directory, filename))
+                with zipfile.ZipFile(os.path.join(project_upload_directory, filename)) as upload_zip:
+                    upload_zip.extractall(project_upload_directory)
+            except zipfile.BadZipfile:
+                os.remove(os.path.join(project_upload_directory, filename))
+                return ({
+                            "message": "Please provide a .zip file for uploading the instructions",
+                            "url": f"{API_URL}/projects"
+                        },
+                        400)
         return {
             "message": "Project created succesfully",
             "data": new_project,
