@@ -1,4 +1,4 @@
-"""Model for submissions"""
+"""Submission model"""
 
 from dataclasses import dataclass
 from sqlalchemy import Column, String, ForeignKey, Integer, CheckConstraint, DateTime, Boolean

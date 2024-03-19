@@ -14,6 +14,7 @@ from flask_restful import Resource
 
 from project.models.course import Course
 from project.utils.query_agent import query_selected_from_model, insert_into_model
+from project.utils.authentication import login_required, authorize_teacher
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -22,6 +23,7 @@ RESPONSE_URL = urljoin(API_URL + "/", "courses")
 class CourseForUser(Resource):
     """Api endpoint for the /courses link"""
 
+    @login_required
     def get(self):
         """ "
         Get function for /courses this will be the main endpoint
@@ -36,15 +38,17 @@ class CourseForUser(Resource):
             filters=request.args
         )
 
-    def post(self):
+    @authorize_teacher
+    def post(self, teacher_id=None):
         """
         This function will create a new course
         if the body of the post contains a name and uid is an admin or teacher
         """
-
+        req = request.json
+        req["teacher"] = teacher_id
         return insert_into_model(
             Course,
-            request.json,
+            req,
             RESPONSE_URL,
             "course_id",
             required_fields=["name", "teacher"]

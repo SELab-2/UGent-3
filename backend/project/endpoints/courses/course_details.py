@@ -19,6 +19,7 @@ from project.models.course_relation import CourseAdmin, CourseStudent
 
 from project.db_in import db
 from project.utils.query_agent import delete_by_id_from_model, patch_by_id_from_model
+from project.utils.authentication import login_required, authorize_teacher_of_course
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -27,6 +28,7 @@ RESPONSE_URL = urljoin(API_URL + "/", "courses")
 class CourseByCourseId(Resource):
     """Api endpoint for the /courses/course_id link"""
 
+    @login_required
     def get(self, course_id):
         """
         This get function will return all the related projects of the course
@@ -86,6 +88,7 @@ class CourseByCourseId(Resource):
                 "error": "Something went wrong while querying the database.",
                 "url": RESPONSE_URL}, 500
 
+    @authorize_teacher_of_course
     def delete(self, course_id):
         """
         This function will delete the course with course_id
@@ -97,6 +100,7 @@ class CourseByCourseId(Resource):
             RESPONSE_URL
         )
 
+    @authorize_teacher_of_course
     def patch(self, course_id):
         """
         This function will update the course with course_id

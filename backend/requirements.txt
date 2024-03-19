@@ -5,3 +5,4 @@ python-dotenv~=1.0.1
 psycopg2-binary
 pytest~=8.0.1
 SQLAlchemy~=2.0.27
+requests~=2.25.1

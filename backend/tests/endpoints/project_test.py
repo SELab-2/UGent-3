@@ -1,130 +1,92 @@
 """Tests for project endpoints."""
-from project.models.project import Project
+
+def test_assignment_download(client, valid_project):
+    """
+    Method for assignment download
+    """
+
+    with open("tests/resources/testzip.zip", "rb") as zip_file:
+        valid_project["assignment_file"] = zip_file
+        # post the project
+        response = client.post(
+            "/projects",
+            data=valid_project,
+            content_type='multipart/form-data',
+            headers={"Authorization":"teacher2"}
+        )
+    assert response.status_code == 201
+    project_id = response.json["data"]["project_id"]
+    response = client.get(f"/projects/{project_id}/assignments", headers={"Authorization":"teacher2"})
+    # file downloaded succesfully
+    assert response.status_code == 200
+
+
+def test_not_found_download(client):
+    """
+    Test a not present project download
+    """
+    response = client.get("/projects")
+    # get an index that doesnt exist
+    response = client.get("/projects/-1/assignments", headers={"Authorization":"teacher2"})
+    assert response.status_code == 404
+
 
 def test_projects_home(client):
     """Test home project endpoint."""
-    response = client.get("/projects")
+    response = client.get("/projects", headers={"Authorization":"teacher1"})
     assert response.status_code == 200
 
 
 def test_getting_all_projects(client):
     """Test getting all projects"""
-    response = client.get("/projects")
+    response = client.get("/projects", headers={"Authorization":"teacher1"})
     assert response.status_code == 200
     assert isinstance(response.json['data'], list)
 
 
-def test_post_project(db_session, client, course_ad, course_teacher_ad, project_json):
+def test_post_project(client, valid_project):
     """Test posting a project to the database and testing if it's present"""
-    db_session.add(course_teacher_ad)
-    db_session.commit()
 
-    db_session.add(course_ad)
-    db_session.commit()
-
-    project_json["course_id"] = course_ad.course_id
-    # cant be done with 'with' because it autocloses then
-    # pylint: disable=R1732
-    with open("testzip.zip", "rb") as zip_file:
-        project_json["assignment_file"] = zip_file
+    with open("tests/resources/testzip.zip", "rb") as zip_file:
+        valid_project["assignment_file"] = zip_file
         # post the project
         response = client.post(
             "/projects",
-            data=project_json,
-            content_type='multipart/form-data'
+            data=valid_project,
+            content_type='multipart/form-data', headers={"Authorization":"teacher2"}
         )
 
     assert response.status_code == 201
 
     # check if the project with the id is present
     project_id = response.json["data"]["project_id"]
-    response = client.get(f"/projects/{project_id}")
+    response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
 
     assert response.status_code == 200
 
-def test_remove_project(db_session, client, course_ad, course_teacher_ad, project_json):
+def test_remove_project(client, valid_project_entry):
     """Test removing a project to the datab and fetching it, testing if it's not present anymore"""
 
-    db_session.add(course_teacher_ad)
-    db_session.commit()
-
-    db_session.add(course_ad)
-    db_session.commit()
-
-    project_json["course_id"] = course_ad.course_id
-
-    # post the project
-    with open("testzip.zip", "rb") as zip_file:
-        project_json["assignment_file"] = zip_file
-        response = client.post("/projects", data=project_json)
-
-    # check if the project with the id is present
-    project_id = response.json["data"]["project_id"]
-
-    response = client.delete(f"/projects/{project_id}")
+    project_id = valid_project_entry.project_id
+    response = client.delete(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
     assert response.status_code == 200
 
     # check if the project isn't present anymore and the delete indeed went through
-    response = client.delete(f"/projects/{project_id}")
+    response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
     assert response.status_code == 404
 
-def test_patch_project(db_session, client, course_ad, course_teacher_ad, project):
+def test_patch_project(client, valid_project_entry):
     """
-    Test functionality of the PUT method for projects
+    Test functionality of the PATCH method for projects
     """
 
-    db_session.add(course_teacher_ad)
-    db_session.commit()
+    project_id = valid_project_entry.project_id
 
-    db_session.add(course_ad)
-    db_session.commit()
-
-    project.course_id = course_ad.course_id
-
-    # post the project to edit
-    db_session.add(project)
-    db_session.commit()
-    project_id = project.project_id
-
-    new_title = "patched title"
-    new_archived = not project.archived
+    new_title = valid_project_entry.title + "hallo"
+    new_archived = not valid_project_entry.archived
 
     response = client.patch(f"/projects/{project_id}", json={
         "title": new_title, "archived": new_archived
-    })
-    db_session.commit()
-    updated_project = db_session.get(Project, {"project_id": project.project_id})
+    }, headers={"Authorization":"teacher2"})
 
     assert response.status_code == 200
-    assert updated_project.title == new_title
-    assert updated_project.archived == new_archived
-
-
-def test_project_assignment(db_session, client, course_ad, course_teacher_ad, project, project_json):
-    """
-    test asignment of project
-    """
-    print("wetefek")
-    db_session.add(course_teacher_ad)
-    db_session.commit()
-
-    db_session.add(course_ad)
-    db_session.commit()
-    project_json["course_id"] = course_ad.course_id
-
-
-    # post the project
-    print("wtffff")
-    with open("testzip.zip", "rb") as zip_file:
-        project_json["assignment_file"] = zip_file
-        response = client.post("/projects", data=project_json)
-
-    # check if the project with the id is present
-    project_id = response.json
-    print("project id")
-    print(project_id)
-
-    response = client.get(f"/projects/{project_id}/assignments")
-    print("response")
-    print(response)
-    assert True

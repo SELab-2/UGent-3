@@ -11,6 +11,8 @@ from werkzeug.utils import safe_join
 from flask_restful import Resource
 
 from project.models.project import Project
+from project.utils.query_agent import query_by_id_from_model
+from project.utils.authentication import authorize_project_visible
 
 API_URL = os.getenv('API_HOST')
 RESPONSE_URL = urljoin(API_URL, "projects")
@@ -20,24 +22,30 @@ class ProjectAssignmentFiles(Resource):
     """
     Class for getting the assignment files of a project
     """
+
+    @authorize_project_visible
     def get(self, project_id):
         """
         Get the assignment files of a project
         """
-        try:
-            project = Project.query.filter(getattr(Project, "project_id") == project_id).first()
-            if project is None:
-                return {
-                    "message": "Project not found",
-                    "url": RESPONSE_URL,
-                }, 404
-        except SQLAlchemyError:
+        json, status_code = query_by_id_from_model(
+            Project,
+            "project_id",
+            project_id,
+            "RESPONSE_URL"
+        )
+
+        if status_code != 200:
+            return json, status_code
+
+        project = json["data"]
+        file_url = safe_join(UPLOAD_FOLDER, str(project_id))
+
+        if not os.path.isfile(safe_join(file_url, project.assignment_file)):
+            # no file is found so return 404
             return {
-                "message": "Something went wrong querying the project",
-                "url": RESPONSE_URL
-            }, 500
+                "message": "No assignment file found for this project",
+                "url": file_url
+            }, 404
 
-        file_url = safe_join(UPLOAD_FOLDER, f"{project_id}")
-        directory = safe_join(os.getcwd(), file_url)
-
-        return send_from_directory(directory, project.assignment_file, as_attachment=True)
+        return send_from_directory(file_url, project.assignment_file)

@@ -1,10 +1,10 @@
-"""Model for projects"""
-import dataclasses
+"""Project model"""
 
+from dataclasses import dataclass
 from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from project.db_in import db
 
-@dataclasses.dataclass
+@dataclass
 class Project(db.Model): # pylint: disable=too-many-instance-attributes
     """This class describes the projects table,
     a projects has an id, a title, a description, 
