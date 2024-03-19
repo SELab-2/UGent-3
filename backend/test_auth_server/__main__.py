@@ -41,6 +41,10 @@ token_dict = {
         "id":"student02",
         "jobTitle":None
     },
+    "admin1":{
+        "id":"admin_person",
+        "jobTitle":"admin"
+    }
 }
 
 class Index(Resource):
@@ -51,7 +55,7 @@ class Index(Resource):
         auth = request.headers.get("Authorization")
         if not auth:
             return {"error":"Please give authorization"}, 401
-        if token_dict.get(auth):
+        if token_dict.get(auth, None):
             return token_dict[auth], 200
         return {"error":"Wrong address"}, 401
 

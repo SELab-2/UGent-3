@@ -8,7 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from project import db
 from project.models.user import User as userModel
-from project.utils.authentication import login_required, authorize_user, not_allowed
+from project.utils.authentication import login_required, authorize_user, authorize_admin, not_allowed
 
 users_bp = Blueprint("users", __name__)
 users_api = Api(users_bp)
@@ -104,7 +104,7 @@ class User(Resource):
             return {"message": "An error occurred while fetching the user",
                     "url": f"{API_URL}/users"}, 500
 
-    @not_allowed
+    @authorize_admin
     def patch(self, user_id):
         """
         Update the user's information.

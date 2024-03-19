@@ -60,6 +60,27 @@ def valid_user_entry(session, valid_user):
     return user
 
 @pytest.fixture
+def valid_admin():
+    """
+    Returns a valid admin user form
+    """
+    return {
+        "uid": "admin_person",
+        "is_teacher": False,
+        "is_admin":True
+    }
+
+@pytest.fixture
+def valid_admin_entry(session, valid_admin):
+    """
+    Returns an admin user that is in the database
+    """
+    user = User(**valid_admin)
+    session.add(user)
+    session.commit()
+    return user
+
+@pytest.fixture
 def user_invalid_field(valid_user):
     """
     Returns a user form with an invalid field
