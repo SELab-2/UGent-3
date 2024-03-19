@@ -12,7 +12,7 @@ import MenuIcon from "@mui/icons-material/Menu";
  * The header component for the application that will be rendered at the top of the page.
  * @returns - The header component
  */
-export function Header(): JSX.Element {
+export function Header({ headerText }): JSX.Element {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky">
@@ -21,7 +21,7 @@ export function Header(): JSX.Element {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Home
+            {headerText}
           </Typography>
           <Button color="inherit">Login</Button>
         </Toolbar>
