@@ -1374,14 +1374,11 @@
                       "uid": {
                         "type": "string"
                       },
-                      "is_teacher": {
-                        "type": "boolean"
-                      },
-                      "is_admin": {
-                        "type": "boolean"
+                      "role": {
+                        "type": "enum"
                       }
                     },
-                    "required": ["uid", "is_teacher", "is_admin"]
+                    "required": ["uid", "role"]
                   }
                 }
               }
@@ -1399,14 +1396,11 @@
                       "uid": {
                         "type": "string"
                       },
-                      "is_teacher": {
-                        "type": "boolean"
-                      },
-                      "is_admin": {
-                        "type": "boolean"
+                      "role": {
+                        "type": "enum"
                       }
                     },
-                    "required": ["uid", "is_teacher", "is_admin"]
+                    "required": ["uid", "role"]
                   }
                 }
               }
@@ -1451,14 +1445,11 @@
                         "uid": {
                           "type": "string"
                         },
-                        "is_teacher": {
-                          "type": "boolean"
-                        },
-                        "is_admin": {
-                          "type": "boolean"
+                        "role": {
+                          "type": "enum"
                         }
                       },
-                      "required": ["uid", "is_teacher", "is_admin"]
+                      "required": ["uid", "role"]
                     }
                   }
                 }
@@ -1487,14 +1478,11 @@
                   "schema": {
                     "type": "object",
                     "properties": {
-                      "is_teacher": {
-                        "type": "boolean"
-                      },
-                      "is_admin": {
-                        "type": "boolean"
+                      "role": {
+                        "type": "role"
                       }
                     },
-                    "required": ["is_teacher", "is_admin"]
+                    "required": ["role"]
                   }
                 }
               }

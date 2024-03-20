@@ -1,7 +1,6 @@
 CREATE TABLE users (
 	uid VARCHAR(255),
-	is_teacher BOOLEAN,
-	is_admin BOOLEAN,
+	role ENUM('student', 'teacher', 'admin') NOT NULL,
 	PRIMARY KEY(uid)
 );
 

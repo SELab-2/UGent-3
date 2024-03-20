@@ -62,13 +62,13 @@ def return_authenticated_user_id():
     
     if user:
         return auth_user_id
-    is_teacher = False
+    role = 'student'
     if user_info["jobTitle"] != None:
-        is_teacher = True
+        role = 'teacher'
     
     # add user if not yet in database
     try:
-        new_user = User(uid=auth_user_id, is_teacher=is_teacher, is_admin=False)
+        new_user = User(uid=auth_user_id, role=role)
         db.session.add(new_user)
         db.session.commit()
     except SQLAlchemyError:
@@ -89,7 +89,7 @@ def is_teacher(auth_user_id):
                         "url": f"{API_URL}/users"}, 500
     if not user: # should realistically never happen
             abort(500, "A database error occured")
-    if user.is_teacher:
+    if user.role == 'teacher':
         return True
     return False
 

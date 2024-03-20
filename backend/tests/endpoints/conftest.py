@@ -46,7 +46,7 @@ def valid_user():
     """
     return {
         "uid": "w_student",
-        "is_teacher": False
+        "role": 'student'
     }
 
 @pytest.fixture
@@ -73,10 +73,10 @@ def valid_user_entries(session):
     Returns a list of users that are in the database
     """
     users = [
-        User(uid="del", is_admin=False, is_teacher=True),
-        User(uid="pat", is_admin=False, is_teacher=True),
-        User(uid="u_get", is_admin=False, is_teacher=True),
-        User(uid="query_user", is_admin=True, is_teacher=False)]
+        User(uid="del", role='teacher'),
+        User(uid="pat", role='teacher'),
+        User(uid="u_get", role='teacher'),
+        User(uid="query_user", role='admin')]
 
     session.add_all(users)
     session.commit()
@@ -127,7 +127,7 @@ def app():
 @pytest.fixture
 def course_teacher_ad():
     """A user that's a teacher for testing"""
-    ad_teacher = User(uid="Gunnar", is_teacher=True, is_admin=True)
+    ad_teacher = User(uid="Gunnar", role='teacher')
     return ad_teacher
 
 @pytest.fixture
@@ -177,7 +177,7 @@ def client(app):
 @pytest.fixture
 def valid_teacher_entry(session):
     """A valid teacher for testing that's already in the db"""
-    teacher = User(uid="Bart", is_teacher=True)
+    teacher = User(uid="Bart", role='teacher')
     session.add(teacher)
     session.commit()
     return teacher
@@ -204,7 +204,7 @@ def valid_course_entry(session, valid_course):
 def valid_students_entries(session):
     """Valid students for testing that are already in the db"""
     students = [
-        User(uid=f"student_sel2_{i}", is_teacher=False)
+        User(uid=f"student_sel2_{i}", role='student')
         for i in range(3)
     ]
     session.add_all(students)

@@ -34,10 +34,10 @@ def db_session():
 def users():
     """Return a list of users to populate the database"""
     return [
-        User(uid="brinkmann", is_admin=True, is_teacher=True),
-        User(uid="laermans", is_admin=True, is_teacher=True),
-        User(uid="student01", is_admin=False, is_teacher=False),
-        User(uid="student02", is_admin=False, is_teacher=False)
+        User(uid="brinkmann", role='admin'),
+        User(uid="laermans", role='admin'),
+        User(uid="student01", role='student'),
+        User(uid="student02", role='student')
     ]
 
 def courses():

@@ -28,14 +28,10 @@ class Users(Resource):
         """
         try:
             query = userModel.query
-            is_teacher = request.args.get('is_teacher')
-            is_admin = request.args.get('is_admin')
+            role = request.args.get("role")
 
-            if is_teacher is not None:
-                query = query.filter(userModel.is_teacher == (is_teacher.lower() == 'true'))
-
-            if is_admin is not None:
-                query = query.filter(userModel.is_admin == (is_admin.lower() == 'true'))
+            if role is not None:
+                query = query.filter(userModel.role == role.lower())
 
             users = query.all()
 
@@ -54,16 +50,14 @@ class Users(Resource):
         It should create a new user and return a success message.
         """
         uid = request.json.get('uid')
-        is_teacher = request.json.get('is_teacher')
-        is_admin = request.json.get('is_admin')
+        role = request.args.get("role")
 
-        if is_teacher is None or is_admin is None or uid is None:
+        if role is None or uid is None:
             return {
                 "message": "Invalid request data!",
                 "correct_format": {
                     "uid": "User ID (string)",
-                    "is_teacher": "Teacher status (boolean)",
-                    "is_admin": "Admin status (boolean)"
+                    "role": "User role (string)"
                 },"url": f"{API_URL}/users"
             }, 400
         try:
@@ -71,8 +65,8 @@ class Users(Resource):
             if user is not None:
                 # bad request, error code could be 409 but is rarely used
                 return {"message": f"User {uid} already exists"}, 400
-            # Code to create a new user in the database using the uid, is_teacher, and is_admin
-            new_user = userModel(uid=uid, is_teacher=is_teacher, is_admin=is_admin)
+            # Code to create a new user in the database using the uid and role
+            new_user = userModel(uid=uid, role=role)
             db.session.add(new_user)
             db.session.commit()
             return jsonify({"message": "User created successfully!",
@@ -114,17 +108,14 @@ class User(Resource):
             dict: A dictionary containing the message indicating the success
              or failure of the update.
         """
-        is_teacher = request.json.get('is_teacher')
-        is_admin = request.json.get('is_admin')
+        role = request.args.get("role")
         try:
             user = db.session.get(userModel, user_id)
             if user is None:
                 return {"message": "User not found!","url": f"{API_URL}/users"}, 404
 
-            if is_teacher is not None:
-                user.is_teacher = is_teacher
-            if is_admin is not None:
-                user.is_admin = is_admin
+            if role is not None:
+                user.role = role
 
             # Save the changes to the database
             db.session.commit()

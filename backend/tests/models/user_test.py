@@ -10,7 +10,7 @@ class TestUserModel:
 
     def test_create_user(self, session: Session):
         """Test if a user can be created"""
-        user = User(uid="user01", is_teacher=False, is_admin=False)
+        user = User(uid="user01", role='student')
         session.add(user)
         session.commit()
         assert session.get(User, "user01") is not None
@@ -21,7 +21,7 @@ class TestUserModel:
         assert session.query(User).count() == 4
         teacher = session.query(User).filter_by(uid="brinkmann").first()
         assert teacher is not None
-        assert teacher.is_teacher
+        assert teacher.role == 'teacher'
 
     def test_update_user(self, session: Session):
         """Test if a user can be updated"""

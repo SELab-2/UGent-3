@@ -24,10 +24,10 @@ def user_db_session():
     db.metadata.create_all(engine)
     session = Session()
     session.add_all(
-            [User(uid="del", is_admin=False, is_teacher=True),
-             User(uid="pat", is_admin=False, is_teacher=True),
-             User(uid="u_get", is_admin=False, is_teacher=True),
-             User(uid="query_user", is_admin=True, is_teacher=False)
+            [User(uid="del", role='teacher'),
+             User(uid="pat", role='teacher'),
+             User(uid="u_get", role='teacher'),
+             User(uid="query_user", role='admin')
              ]
         )
     session.commit()
@@ -117,37 +117,42 @@ class TestUserEndpoint:
     def test_patch_user(self, client, valid_user_entry):
         """Test updating a user."""
 
-        new_is_teacher = not valid_user_entry.is_teacher
+        if valid_user_entry.role == 'teacher':
+            new_role = 'admin'
+        if valid_user_entry.role == 'admin':
+            new_role = 'student'
+        else:
+            new_role = 'teacher'
 
         response = client.patch(f"/users/{valid_user_entry.uid}", json={
-            'is_teacher': new_is_teacher,
-            'is_admin': not valid_user_entry.is_admin
+            'role': new_role
         })
         assert response.status_code == 403 # Patching a user is never necessary and thus not allowed
 
     def test_patch_non_existent(self, client):
         """Test updating a non-existent user."""
         response = client.patch("/users/-20", json={
-            'is_teacher': False,
-            'is_admin': True
+            'role': 'teacher'
         })
         assert response.status_code == 403 # Patching is not allowed
 
     def test_patch_non_json(self, client, valid_user_entry):
         """Test sending a non-JSON patch request."""
         valid_user_form = asdict(valid_user_entry)
-        valid_user_form["is_teacher"] = not valid_user_form["is_teacher"]
+        if valid_user_form["role"] == 'teacher':
+            valid_user_form["role"] = 'student'
+        else:
+            valid_user_form["role"] = 'teacher'
         response = client.patch(f"/users/{valid_user_form['uid']}", data=valid_user_form)
         assert response.status_code == 403 # Patching is not allowed
 
     def test_get_users_with_query(self, client, valid_user_entries):
         """Test getting users with a query."""
         # Send a GET request with query parameters, this is a nonsense entry but good for testing
-        response = client.get("/users?is_admin=true&is_teacher=false", headers={"Authorization":"teacher1"})
+        response = client.get("/users?role=admin", headers={"Authorization":"teacher1"})
         assert response.status_code == 200
 
         # Check that the response contains only the user that matches the query
         users = response.json["data"]
         for user in users:
-            assert user["is_admin"] is True
-            assert user["is_teacher"] is False
+            assert user["role"] == 'admin'
