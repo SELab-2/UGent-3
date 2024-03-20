@@ -62,7 +62,7 @@ class TestSubmissionsEndpoint:
             "grading": 16,
             "time": "Thu, 14 Mar 2024 12:00:00 GMT",
             "path": "/submissions/1",
-            "status": True
+            "status": 'SUCCESS'
         }
 
     ### PATCH SUBMISSION ###
@@ -113,7 +113,7 @@ class TestSubmissionsEndpoint:
             "grading": 20,
             "time": 'Thu, 14 Mar 2024 23:59:59 GMT',
             "path": "/submissions/2",
-            "status": False
+            "status": 'FAIL'
         }
     
     # TODO test course admin (allowed) and student (not allowed) patch 

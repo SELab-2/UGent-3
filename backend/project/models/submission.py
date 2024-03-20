@@ -1,8 +1,16 @@
 """Submission model"""
 
 from dataclasses import dataclass
-from sqlalchemy import Column, String, ForeignKey, Integer, CheckConstraint, DateTime, Boolean
+from enum import Enum
+from sqlalchemy import Column, String, ForeignKey, Integer, CheckConstraint, DateTime, Enum as EnumField
 from project.db_in import db
+
+class Submission_Status(str, Enum):
+    """Enum for submission status"""
+    SUCCESS = 'SUCCESS'
+    LATE = 'LATE'
+    FAIL = 'FAIL'
+    RUNNING = 'RUNNING'
 
 @dataclass
 class Submission(db.Model):
@@ -23,4 +31,4 @@ class Submission(db.Model):
     grading: int = Column(Integer, CheckConstraint("grading >= 0 AND grading <= 20"))
     submission_time: DateTime = Column(DateTime(timezone=True), nullable=False)
     submission_path: str = Column(String(50), nullable=False)
-    submission_status: bool = Column(Boolean, nullable=False)
+    submission_status: Submission_Status = Column(EnumField(Submission_Status), nullable=False)

@@ -8,7 +8,7 @@ from flask import Blueprint, request
 from flask_restful import Resource
 from sqlalchemy import exc
 from project.db_in import db
-from project.models.submission import Submission
+from project.models.submission import Submission, Submission_Status
 from project.models.project import Project
 from project.models.user import User
 from project.utils.files import filter_files, all_files_uploaded, zip_files
@@ -119,7 +119,7 @@ class SubmissionsEndpoint(Resource):
                 zip_file.save(path.join(f"{UPLOAD_FOLDER}/", submission.submission_path))
 
                 # Submission status
-                submission.submission_status = False
+                submission.submission_status = Submission_Status.RUNNING
 
                 session.add(submission)
                 session.commit()

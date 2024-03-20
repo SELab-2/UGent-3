@@ -11,7 +11,7 @@ from project.models.course import Course
 from project.models.course_share_code import CourseShareCode
 from project import create_app_with_db
 from project.db_in import url, db
-from project.models.submission import Submission
+from project.models.submission import Submission, Submission_Status
 from project.models.project import Project
 
 
@@ -26,7 +26,7 @@ def valid_submission(valid_user_entry, valid_project_entry):
         "grading": 16,
         "submission_time": datetime(2024,3,14,12,0,0,tzinfo=ZoneInfo("GMT")),
         "submission_path": "/submission/1",
-        "submission_status": True
+        "submission_status": Submission_Status.SUCCESS
     }
 
 @pytest.fixture
