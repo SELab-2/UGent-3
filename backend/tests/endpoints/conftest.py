@@ -6,6 +6,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import pytest
 from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
 from project.models.user import User
 from project.models.course import Course
 from project.models.course_share_code import CourseShareCode
@@ -13,7 +14,6 @@ from project import create_app_with_db
 from project.db_in import url, db
 from project.models.submission import Submission
 from project.models.project import Project
-from sqlalchemy.exc import SQLAlchemyError
 
 
 @pytest.fixture
