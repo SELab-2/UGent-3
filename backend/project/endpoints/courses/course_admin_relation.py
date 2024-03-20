@@ -26,7 +26,7 @@ from project.utils.authentication import authorize_teacher_of_course, \
 
 load_dotenv()
 API_URL = getenv("API_HOST")
-RESPONSE_URL = urljoin(API_URL + "/", "courses")
+RESPONSE_URL = urljoin(f"{API_URL}/", "courses")
 
 class CourseForAdmins(Resource):
     """

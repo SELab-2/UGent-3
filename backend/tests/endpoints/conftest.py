@@ -198,9 +198,12 @@ def client(app):
 @pytest.fixture
 def valid_teacher_entry(session):
     """A valid teacher for testing that's already in the db"""
-    teacher = User(uid="Bart", is_teacher=True)
+    teacher = User(uid="Bart", is_teacher=True, is_admin=False)
     session.add(teacher)
-    session.commit()
+    try:
+        session.commit()
+    except:
+        session.rollback()
     return teacher
 
 @pytest.fixture
