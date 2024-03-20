@@ -23,7 +23,7 @@ class ProjectAssignmentFiles(Resource):
     Class for getting the assignment files of a project
     """
 
-    # @authorize_project_visible
+    @authorize_project_visible
     def get(self, project_id):
         """
         Get the assignment files of a project

@@ -50,6 +50,16 @@ class ProjectDetail(Resource):
         """
         project_json = parse_project_params()
 
+        output, status_code = patch_by_id_from_model(
+            Project,
+            "project_id",
+            project_id,
+            RESPONSE_URL,
+            project_json
+        )
+        if status_code != 200:
+            return output, status_code
+
         if "assignment_file" in request.files:
             file = request.files["assignment_file"]
             filename = os.path.basename(file.filename)
@@ -81,13 +91,7 @@ class ProjectDetail(Resource):
                         },
                         400)
 
-        return patch_by_id_from_model(
-            Project,
-            "project_id",
-            project_id,
-            RESPONSE_URL,
-            project_json
-        )
+        return output, status_code
 
     @authorize_teacher_of_project
     def delete(self, project_id):

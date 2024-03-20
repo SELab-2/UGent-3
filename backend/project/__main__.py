@@ -7,4 +7,4 @@ from project.db_in import url
 if __name__ == "__main__":
     load_dotenv()
     app = create_app_with_db(url)
-    app.run(debug=True, host='0.0.0.0', port=4000)
+    app.run(debug=True, host='0.0.0.0')
