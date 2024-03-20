@@ -10,14 +10,14 @@ in the submission output folder.
 """
 from os import path
 import docker
-from project.models.projects import Projects
-from project.models.submissions import Submissions
+from project.models.project import Project
+from project.models.submission import Submission
 
 DOCKER_IMAGE_MAPPER = {
     "python": path.join(path.dirname(__file__), "evaluators", "python"),
 }
 
-def evaluate(submission: Submissions, project: Projects, evaluator: str) -> int:
+def evaluate(submission: Submission, project: Project, evaluator: str) -> int:
     """
     Evaluate a submission using the evaluator.
 
@@ -81,6 +81,7 @@ def create_and_run_evaluator(docker_image: str,
     """
     client = docker.from_env()
     image, _ = client.images.build(path=docker_image, tag=f"submission_{submission_id}")
+
 
     container = client.containers.run(
         image.id,

@@ -2,12 +2,12 @@
 This file contains tests for the python submission evaluator.
 """
 
-from os import path
+from os import path, listdir
 import pytest
 from project.utils.submissions.evaluator import evaluate
 from project.utils.submissions.file_handling import create_submission_folder
-from project.models.submissions import Submissions
-from project.models.projects import Projects
+from project.models.submission import Submission
+from project.models.project import Project
 from .conftest import prep_submission, cleanup_after_test
 
 @pytest.fixture
@@ -15,18 +15,19 @@ def project_path_succes():
     """
     Return the path to a project with a succesful test case.
     """
+    print(listdir(path.dirname(__file__)))
     return path.join(path.dirname(__file__), "resources", "python", "tc_1/assignment")
 
 @pytest.fixture
 def evaluate_python(submission_root, project_path_succes):
     """Evaluate a python submission with a succesful test case."""
     project_id = 1
-    submission = Submissions(submission_id=1, project_id=project_id)
+    submission = Submission(submission_id=1, project_id=project_id)
     submission.submission_path = create_submission_folder(submission_root, project_id)
-    project = Projects(project_id=project_id, test_path=project_path_succes)
+    project = Project(project_id=project_id, test_path=project_path_succes)
     return evaluate(submission, project, "python"), submission.submission_path
 
-def prep_submission_and_clear_after_py(tc_folder: str) -> tuple[Submissions, Projects]:
+def prep_submission_and_clear_after_py(tc_folder: str) -> tuple[Submission, Project]:
     """
     Prepare a submission for testing by creating the appropriate files and
     submission and project model objects.

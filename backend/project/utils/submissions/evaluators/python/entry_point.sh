@@ -36,5 +36,5 @@ else
 fi
 
 echo "Running tests..."
-
+ls /submission
 bash /tests/run_test.sh

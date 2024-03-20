@@ -45,4 +45,5 @@ services:
       UPLOAD_URL: /data/assignments
     volumes:
       - .:/app
-    command: ["pytest", "--ignore", "tests/utils"]
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ["pytest"]
