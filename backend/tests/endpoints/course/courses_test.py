@@ -18,6 +18,13 @@ class TestCourseEndpoint:
         get_response = client.get(f"/courses/{data['data']['course_id']}", headers={"Authorization":"teacher2"})
         assert get_response.status_code == 200
 
+    def test_post_with_invalid_fields(self, client, course_invalid_field):
+        """
+        Test posting a course with invalid fields
+        """
+
+        response = client.post("/courses", course_invalid_field)
+        assert response.status_code == 201
 
     def test_post_courses_course_id_students_and_admins(
             self, client, valid_course_entry, valid_students_entries):
