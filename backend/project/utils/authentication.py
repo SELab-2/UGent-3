@@ -14,9 +14,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from project import db
 
 from project.models.user import User
-from project.models.course import Course
-from project.models.project import Project
-from project.models.submission import Submission
 from project.models.course_relation import CourseAdmin, CourseStudent
 from project.utils.models import get_course, get_project, \
     get_submission, get_user
