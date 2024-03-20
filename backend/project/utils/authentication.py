@@ -18,6 +18,8 @@ from project.models.course import Course
 from project.models.project import Project
 from project.models.submission import Submission
 from project.models.course_relation import CourseAdmin, CourseStudent
+from project.utils.models import get_course, get_project, \
+    get_submission, get_user
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -48,21 +50,16 @@ def return_authenticated_user_id():
     except TimeoutError:
         abort(make_response(({"message":"Request to Microsoft timed out"}
                              , 500)))
-    if not response:
+    if not response or response.status_code != 200:
         abort(make_response(({"message":
                               "An error occured while trying to authenticate your access token"}
                              , 401)))
-    if response.status_code != 200:
-        abort(make_response(({"message":
-                              response.json()["error"]}
-                              , 401)))
 
     user_info = response.json()
     auth_user_id = user_info["id"]
     try:
         user = db.session.get(User, auth_user_id)
     except SQLAlchemyError:
-        # every exception should result in a rollback
         db.session.rollback()
         abort(make_response(({"message":
                 "An unexpected database error occured while fetching the user"}, 500)))
@@ -79,76 +76,11 @@ def return_authenticated_user_id():
         db.session.add(new_user)
         db.session.commit()
     except SQLAlchemyError:
-        # every exception should result in a rollback
         db.session.rollback()
         abort(make_response(({"message":
                         """An unexpected database error occured 
                         while creating the user during authentication"""}, 500)))
     return auth_user_id
-
-
-def get_course(course_id):
-    """Returns the course associated with course_id or the appropriate error"""
-    try:
-        course = db.session.get(Course, course_id)
-    except SQLAlchemyError:
-    # every exception should result in a rollback
-        db.session.rollback()
-        abort(make_response(({"message": "An error occurred while fetching the user",
-                    "url": f"{API_URL}/users"}, 500)))
-
-    if not course:
-        abort(make_response(({"message":f"Course with id: {course_id} not found"}, 404)))
-    return course
-
-
-def get_project(project_id):
-    """Returns the project associated with project_id or the appropriate error"""
-    try:
-        project = db.session.get(Project, project_id)
-    except SQLAlchemyError as e:
-    # every exception should result in a rollback
-        db.session.rollback()
-        if e.code == "9h9h": # InvalidTextRepresentation error
-            abort(make_response(({"message": f"{project_id} is not a valid project id"}
-                             , 400)))
-        abort(make_response(({"message": "An error occurred while fetching the project"}
-                             , 500)))
-
-    if not project:
-        abort(make_response(({"message":f"Project with id: {project_id} not found"}, 404)))
-
-    return project
-
-
-def get_submission(submission_id):
-    """Returns the submission associated with submission_id or the appropriate error"""
-    try:
-        submission = db.session.get(Submission, submission_id)
-    except SQLAlchemyError:
-    # every exception should result in a rollback
-        db.session.rollback()
-        abort(make_response(({"message":"An error occurred while fetching the submission"}, 500)))
-
-    if not submission:
-        abort(make_response(({"message":f"Submission with id: {submission_id} not found"}, 404)))
-
-    return submission
-
-
-def get_user(user_id):
-    """Returns the user associated with user_id or the appropriate error"""
-    try:
-        user = db.session.get(User, user_id)
-    except SQLAlchemyError:
-        # every exception should result in a rollback
-        db.session.rollback()
-        abort(make_response(({"message": "An error occurred while fetching the user"}
-                            , 500)))
-    if not user: # should realistically never happen
-        abort(make_response(({"message":f"User with id: {user_id} not found"}, 404)))
-    return user
-
 
 def is_teacher(auth_user_id):
     """This function checks whether the user with auth_user_id is a teacher"""
@@ -458,7 +390,6 @@ def authorize_submission_request(f):
     """
     @wraps(f)
     def wrap(*args, **kwargs):
-        # submission_author / grader mag hier aan
         auth_user_id = return_authenticated_user_id()
         submission_id = kwargs["submission_id"]
         submission = get_submission(submission_id)
