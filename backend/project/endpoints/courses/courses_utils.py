@@ -36,7 +36,7 @@ def execute_query_abort_if_db_error(query, url, query_all=False):
         else:
             result = query.first()
     except SQLAlchemyError as e:
-        response = json_message(str(e))
+        response = json_message("Database error occurred while executing query")
         response["url"] = url
         abort(500, description=response)
     return result
@@ -54,7 +54,7 @@ def add_abort_if_error(to_add, url):
         db.session.add(to_add)
     except SQLAlchemyError as e:
         db.session.rollback()
-        response = json_message(str(e))
+        response = json_message("Database error occurred while adding object")
         response["url"] = url
         abort(500, description=response)
 
@@ -71,7 +71,7 @@ def delete_abort_if_error(to_delete, url):
         db.session.delete(to_delete)
     except SQLAlchemyError as e:
         db.session.rollback()
-        response = json_message(str(e))
+        response = json_message("Database error occurred while deleting object")
         response["url"] = url
         abort(500, description=response)
 
@@ -84,7 +84,7 @@ def commit_abort_if_error(url):
         db.session.commit()
     except SQLAlchemyError as e:
         db.session.rollback()
-        response = json_message(str(e))
+        response = json_message("Database error occurred while committing changes")
         response["url"] = url
         abort(500, description=response)
 
