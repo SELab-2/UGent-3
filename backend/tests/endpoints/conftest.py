@@ -200,8 +200,8 @@ def client(app):
 def valid_teacher_entry(session):
     """A valid teacher for testing that's already in the db"""
     teacher = User(uid="Bart", is_teacher=True, is_admin=False)
-    session.add(teacher)
     try:
+        session.add(teacher)
         session.commit()
     except SQLAlchemyError:
         session.rollback()

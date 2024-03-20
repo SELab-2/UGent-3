@@ -56,6 +56,7 @@ class Users(Resource):
         uid = request.json.get('uid')
         is_teacher = request.json.get('is_teacher')
         is_admin = request.json.get('is_admin')
+        url = f"{API_URL}/users"
 
         if is_teacher is None or is_admin is None or uid is None:
             return {
@@ -64,7 +65,7 @@ class Users(Resource):
                     "uid": "User ID (string)",
                     "is_teacher": "Teacher status (boolean)",
                     "is_admin": "Admin status (boolean)"
-                },"url": f"{API_URL}/users"
+                },"url": url
             }, 400
         try:
             user = db.session.get(userModel, uid)
@@ -76,13 +77,13 @@ class Users(Resource):
             db.session.add(new_user)
             db.session.commit()
             return jsonify({"message": "User created successfully!",
-                    "data": user, "url": f"{API_URL}/users/{user.uid}", "status_code": 201})
+                    "data": user, "url": f"{url}/{user.uid}", "status_code": 201})
 
         except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
             return {"message": "An error occurred while creating the user",
-                    "url": f"{API_URL}/users"}, 500
+                    "url": url}, 500
 
 
 class User(Resource):

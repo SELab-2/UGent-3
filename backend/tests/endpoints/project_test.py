@@ -77,10 +77,7 @@ def test_remove_project(client, valid_project_entry):
     assert response.status_code == 404
 
 def test_patch_project(client, valid_project_entry):
-    """
-    Test functionality of the PATCH method for projects
-    Test functionality of the PATCH method for projects
-    """
+    """Test functionality of the PATCH method for projects"""
 
     project_id = valid_project_entry.project_id
 
