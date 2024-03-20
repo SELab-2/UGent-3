@@ -14,9 +14,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from project import db
 
 from project.models.user import User
-from project.models.course_relation import CourseAdmin, CourseStudent
-from project.utils.models import get_course, get_project, \
-    get_submission, get_user
+from project.utils.models.course_utils import is_admin_of_course, \
+    is_student_of_course, is_teacher_of_course
+from project.utils.models.project_utils import get_course_of_project, project_visible
+from project.utils.models.submission_utils import get_submission, get_course_of_submission
+from project.utils.models.user_utils import is_admin, is_teacher
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -78,79 +80,6 @@ def return_authenticated_user_id():
                         """An unexpected database error occured 
                         while creating the user during authentication"""}, 500)))
     return auth_user_id
-
-def is_teacher(auth_user_id):
-    """This function checks whether the user with auth_user_id is a teacher"""
-    user = get_user(auth_user_id)
-    return user.is_teacher
-
-
-def is_admin(auth_user_id):
-    """This function checks whether the user with auth_user_id is a teacher"""
-    user = get_user(auth_user_id)
-    return user.is_admin
-
-
-def is_teacher_of_course(auth_user_id, course_id):
-    """This function checks whether the user 
-    with auth_user_id is the teacher of the course: course_id
-    """
-    course = get_course(course_id)
-    if auth_user_id == course.teacher:
-        return True
-    return False
-
-
-def is_admin_of_course(auth_user_id, course_id):
-    """This function checks whether the user 
-    with auth_user_id is an admin of the course: course_id
-    """
-    try:
-        course_admin = db.session.get(CourseAdmin, (course_id, auth_user_id))
-    except SQLAlchemyError:
-    # every exception should result in a rollback
-        db.session.rollback()
-        abort(make_response(({"message": "An error occurred while fetching the user",
-                    "url": f"{API_URL}/users"}, 500)))
-
-    if course_admin:
-        return True
-    return False
-
-
-def is_student_of_course(auth_user_id, course_id):
-    """This function checks whether the user 
-    with auth_user_id is a student of the course: course_id
-    """
-    try:
-        course_student = db.session.get(CourseStudent, (course_id, auth_user_id))
-    except SQLAlchemyError:
-        # every exception should result in a rollback
-        db.session.rollback()
-        abort(make_response(({"message": "An error occurred while fetching the user",
-                    "url": f"{API_URL}/users"}, 500)))
-    if course_student:
-        return True
-    return False
-
-
-def get_course_of_project(project_id):
-    """This function returns the course_id of the course associated with the project: project_id"""
-    project = get_project(project_id)
-    return project.course_id
-
-
-def project_visible(project_id):
-    """Determine whether a project is visible for students"""
-    project = get_project(project_id)
-    return project.visible_for_students
-
-
-def get_course_of_submission(submission_id):
-    """Get the course linked to a given submission"""
-    submission = get_submission(submission_id)
-    return get_course_of_project(submission.project_id)
-
 
 def login_required(f):
     """

@@ -70,7 +70,7 @@ class Users(Resource):
         try:
             user = db.session.get(userModel, uid)
             if user is not None:
-                # bad request, error code could be 409 but is rarely used
+                # Bad request, error code could be 409 but is rarely used
                 return {"message": f"User {uid} already exists"}, 400
             # Code to create a new user in the database using the uid, is_teacher, and is_admin
             new_user = userModel(uid=uid, is_teacher=is_teacher, is_admin=is_admin)
@@ -80,7 +80,6 @@ class Users(Resource):
                     "data": user, "url": f"{url}/{user.uid}", "status_code": 201})
 
         except SQLAlchemyError:
-            # every exception should result in a rollback
             db.session.rollback()
             return {"message": "An error occurred while creating the user",
                     "url": url}, 500
