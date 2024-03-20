@@ -13,6 +13,7 @@ from project import create_app_with_db
 from project.db_in import url, db
 from project.models.submission import Submission
 from project.models.project import Project
+from sqlalchemy.exc import SQLAlchemyError
 
 
 @pytest.fixture
@@ -202,7 +203,7 @@ def valid_teacher_entry(session):
     session.add(teacher)
     try:
         session.commit()
-    except:
+    except SQLAlchemyError:
         session.rollback()
     return teacher
 

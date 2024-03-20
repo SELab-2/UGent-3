@@ -8,7 +8,8 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from project import db
 from project.models.user import User as userModel
-from project.utils.authentication import login_required, authorize_user, authorize_admin, not_allowed
+from project.utils.authentication import login_required, authorize_user, \
+    authorize_admin, not_allowed
 
 users_bp = Blueprint("users", __name__)
 users_api = Api(users_bp)
