@@ -18,7 +18,7 @@ from project.models.course import Course
 load_dotenv()
 API_URL = getenv("API_HOST")
 RESPONSE_URL = urljoin(API_URL + "/", "courses")
-
+BASE_DB_ERROR = "Database error occurred while"
 def execute_query_abort_if_db_error(query, url, query_all=False):
     """
     Execute the given SQLAlchemy query and handle any SQLAlchemyError that might occur.
@@ -35,8 +35,8 @@ def execute_query_abort_if_db_error(query, url, query_all=False):
             result = query.all()
         else:
             result = query.first()
-    except SQLAlchemyError as e:
-        response = json_message("Database error occurred while executing query")
+    except SQLAlchemyError:
+        response = json_message(f"{BASE_DB_ERROR} executing query")
         response["url"] = url
         abort(500, description=response)
     return result
@@ -52,9 +52,9 @@ def add_abort_if_error(to_add, url):
     """
     try:
         db.session.add(to_add)
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         db.session.rollback()
-        response = json_message("Database error occurred while adding object")
+        response = json_message(f"{BASE_DB_ERROR} adding object")
         response["url"] = url
         abort(500, description=response)
 
@@ -69,9 +69,9 @@ def delete_abort_if_error(to_delete, url):
     """
     try:
         db.session.delete(to_delete)
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         db.session.rollback()
-        response = json_message("Database error occurred while deleting object")
+        response = json_message(f"{BASE_DB_ERROR} deleting object")
         response["url"] = url
         abort(500, description=response)
 
@@ -82,9 +82,9 @@ def commit_abort_if_error(url):
     """
     try:
         db.session.commit()
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         db.session.rollback()
-        response = json_message("Database error occurred while committing changes")
+        response = json_message(f"{BASE_DB_ERROR} committing changes")
         response["url"] = url
         abort(500, description=response)
 
