@@ -1,0 +1,24 @@
+name: UGent-3-backend-test
+run-name: ${{ github.actor }} is running backend tests 🚀
+on: [pull_request]
+jobs:
+  Backend-tests:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          cache: 'pip'
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt
+      
+      - name: Running tests
+        working-directory: ./backend
+        run: bash ./run_tests.sh
+        
+        
