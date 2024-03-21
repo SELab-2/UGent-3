@@ -43,6 +43,8 @@ services:
       API_HOST: http://api_is_here
       AUTHENTICATION_URL: http://auth-server:5000 # Use the service name defined in Docker Compose
       UPLOAD_URL: /data/assignments
+      DOCS_JSON_PATH: /static/OpenAPI_Object.json
+      DOCS_URL: /docs
     volumes:
       - .:/app
     command: ["pytest"]
