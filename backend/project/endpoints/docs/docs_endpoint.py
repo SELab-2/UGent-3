@@ -10,7 +10,7 @@ API_URL = getenv("DOCS_JSON_PATH")
 
 swagger_ui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
-    API_URL,
+    f"/{API_URL}",
     config={
         'app_name': 'Pigeonhole API'
     }
