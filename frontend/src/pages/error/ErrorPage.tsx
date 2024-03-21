@@ -4,7 +4,10 @@ import { useTranslation } from "react-i18next";
 
 /**
  * This component will be rendered when an error occurs.
- * @returns - The ErrorPage component
+ * @param statusCode The status code of the error.
+ * @param statusTitle The name of the error.
+ * @param message Additional information about the error.
+ * @returns The ErrorPage component
  */
 export function ErrorPage(
   { statusCode, statusTitle, message }: { statusCode: string, statusTitle: string, message: string}
