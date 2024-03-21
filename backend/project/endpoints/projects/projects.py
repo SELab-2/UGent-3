@@ -9,6 +9,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from flask import request, jsonify
 from flask_restful import Resource
 
+from project.db_in import db
+
 from project.models.project import Project
 from project.utils.query_agent import query_selected_from_model, create_model_instance
 from project.utils.authentication import authorize_teacher
@@ -85,6 +87,7 @@ class ProjectsEndpoint(Resource):
                     upload_zip.extractall(project_upload_directory)
             except zipfile.BadZipfile:
                 os.remove(os.path.join(project_upload_directory, filename))
+                db.session.rollback()
                 return ({
                             "message": "Please provide a .zip file for uploading the instructions",
                             "url": f"{API_URL}/projects"
