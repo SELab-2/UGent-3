@@ -1,8 +1,8 @@
-CREATE TYPE role_options AS ENUM ('student', 'teacher', 'admin');
+CREATE TYPE role AS ENUM ('STUDENT', 'TEACHER', 'ADMIN');
 
 CREATE TABLE users (
 	uid VARCHAR(255),
-	role role_options NOT NULL,
+	role role NOT NULL,
 	PRIMARY KEY(uid)
 );
 

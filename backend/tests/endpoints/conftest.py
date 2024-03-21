@@ -6,7 +6,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import pytest
 from sqlalchemy import create_engine
-from project.models.user import User
+from project.models.user import User,Role
 from project.models.course import Course
 from project.models.course_share_code import CourseShareCode
 from project import create_app_with_db
@@ -46,7 +46,7 @@ def valid_user():
     """
     return {
         "uid": "w_student",
-        "role": 'student'
+        "role": Role.STUDENT
     }
 
 @pytest.fixture
@@ -73,10 +73,10 @@ def valid_user_entries(session):
     Returns a list of users that are in the database
     """
     users = [
-        User(uid="del", role='teacher'),
-        User(uid="pat", role='teacher'),
-        User(uid="u_get", role='teacher'),
-        User(uid="query_user", role='admin')]
+        User(uid="del", role=Role.TEACHER),
+        User(uid="pat", role=Role.TEACHER),
+        User(uid="u_get", role=Role.TEACHER),
+        User(uid="query_user", role=Role.ADMIN)]
 
     session.add_all(users)
     session.commit()
@@ -127,7 +127,7 @@ def app():
 @pytest.fixture
 def course_teacher_ad():
     """A user that's a teacher for testing"""
-    ad_teacher = User(uid="Gunnar", role='teacher')
+    ad_teacher = User(uid="Gunnar", role=Role.TEACHER)
     return ad_teacher
 
 @pytest.fixture
@@ -177,7 +177,7 @@ def client(app):
 @pytest.fixture
 def valid_teacher_entry(session):
     """A valid teacher for testing that's already in the db"""
-    teacher = User(uid="Bart", role='teacher')
+    teacher = User(uid="Bart", role=Role.TEACHER)
     session.add(teacher)
     session.commit()
     return teacher
@@ -204,7 +204,7 @@ def valid_course_entry(session, valid_course):
 def valid_students_entries(session):
     """Valid students for testing that are already in the db"""
     students = [
-        User(uid=f"student_sel2_{i}", role='student')
+        User(uid=f"student_sel2_{i}", role=Role.STUDENT)
         for i in range(3)
     ]
     session.add_all(students)

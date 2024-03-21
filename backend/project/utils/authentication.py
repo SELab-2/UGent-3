@@ -11,7 +11,7 @@ import requests
 
 from project import db
 
-from project.models.user import User
+from project.models.user import User,Role
 from project.models.course import Course
 from project.models.project import Project
 from project.models.submission import Submission
@@ -62,9 +62,11 @@ def return_authenticated_user_id():
     
     if user:
         return auth_user_id
-    role = 'student'
+    
+    # Use the Enum here
+    role = Role.STUDENT
     if user_info["jobTitle"] != None:
-        role = 'teacher'
+        role = Role.TEACHER
     
     # add user if not yet in database
     try:
@@ -89,7 +91,7 @@ def is_teacher(auth_user_id):
                         "url": f"{API_URL}/users"}, 500
     if not user: # should realistically never happen
             abort(500, "A database error occured")
-    if user.role == 'teacher':
+    if user.role == Role.TEACHER:
         return True
     return False
 

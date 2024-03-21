@@ -3,14 +3,14 @@
 from pytest import raises, mark
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from project.models.user import User
+from project.models.user import User,Role
 
 class TestUserModel:
     """Class to test the User model"""
 
     def test_create_user(self, session: Session):
         """Test if a user can be created"""
-        user = User(uid="user01", role='student')
+        user = User(uid="user01", role=Role.STUDENT)
         session.add(user)
         session.commit()
         assert session.get(User, "user01") is not None
@@ -21,14 +21,14 @@ class TestUserModel:
         assert session.query(User).count() == 4
         teacher = session.query(User).filter_by(uid="brinkmann").first()
         assert teacher is not None
-        assert teacher.role == 'teacher'
+        assert teacher.role == Role.TEACHER
 
     def test_update_user(self, session: Session):
         """Test if a user can be updated"""
         student = session.query(User).filter_by(uid="student01").first()
-        student.is_admin = True
+        student.role = Role.ADMIN
         session.commit()
-        assert session.get(User, "student01").is_admin
+        assert session.get(User, "student01").role == Role.ADMIN
 
     def test_delete_user(self, session: Session):
         """Test if a user can be deleted"""

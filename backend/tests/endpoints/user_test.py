@@ -11,7 +11,7 @@ from dataclasses import asdict
 import pytest
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from project.models.user import User
+from project.models.user import User,Role
 from project.db_in import db
 from tests import db_url
 
@@ -24,12 +24,12 @@ def user_db_session():
     db.metadata.create_all(engine)
     session = Session()
     session.add_all(
-            [User(uid="del", role='teacher'),
-             User(uid="pat", role='teacher'),
-             User(uid="u_get", role='teacher'),
-             User(uid="query_user", role='admin')
-             ]
-        )
+        [User(uid="del", role=Role.TEACHER),
+         User(uid="pat", role=Role.TEACHER),
+         User(uid="u_get", role=Role.TEACHER),
+         User(uid="query_user", role=Role.ADMIN)
+         ]
+    )
     session.commit()
     yield session
     session.rollback()
@@ -117,12 +117,12 @@ class TestUserEndpoint:
     def test_patch_user(self, client, valid_user_entry):
         """Test updating a user."""
 
-        if valid_user_entry.role == 'teacher':
-            new_role = 'admin'
-        if valid_user_entry.role == 'admin':
-            new_role = 'student'
+        if valid_user_entry.role == Role.TEACHER:
+            new_role = Role.ADMIN
+        if valid_user_entry.role == Role.ADMIN:
+            new_role = Role.STUDENT
         else:
-            new_role = 'teacher'
+            new_role = Role.TEACHER
 
         response = client.patch(f"/users/{valid_user_entry.uid}", json={
             'role': new_role
@@ -132,17 +132,17 @@ class TestUserEndpoint:
     def test_patch_non_existent(self, client):
         """Test updating a non-existent user."""
         response = client.patch("/users/-20", json={
-            'role': 'teacher'
+            'role': Role.TEACHER
         })
         assert response.status_code == 403 # Patching is not allowed
 
     def test_patch_non_json(self, client, valid_user_entry):
         """Test sending a non-JSON patch request."""
         valid_user_form = asdict(valid_user_entry)
-        if valid_user_form["role"] == 'teacher':
-            valid_user_form["role"] = 'student'
+        if valid_user_form["role"] == Role.TEACHER:
+            valid_user_form["role"] = Role.STUDENT
         else:
-            valid_user_form["role"] = 'teacher'
+            valid_user_form["role"] = Role.TEACHER
         response = client.patch(f"/users/{valid_user_form['uid']}", data=valid_user_form)
         assert response.status_code == 403 # Patching is not allowed
 
@@ -155,4 +155,4 @@ class TestUserEndpoint:
         # Check that the response contains only the user that matches the query
         users = response.json["data"]
         for user in users:
-            assert user["role"] == 'admin'
+            assert user["role"] == Role.ADMIN

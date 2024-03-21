@@ -6,7 +6,7 @@ import pytest
 from project.sessionmaker import engine, Session
 from project.db_in import db
 from project.models.course import Course
-from project.models.user import User
+from project.models.user import User,Role
 from project.models.project import Project
 from project.models.course_relation import CourseStudent,CourseAdmin
 from project.models.submission import Submission
@@ -34,10 +34,10 @@ def db_session():
 def users():
     """Return a list of users to populate the database"""
     return [
-        User(uid="brinkmann", role='admin'),
-        User(uid="laermans", role='admin'),
-        User(uid="student01", role='student'),
-        User(uid="student02", role='student')
+        User(uid="brinkmann", role=Role.ADMIN),
+        User(uid="laermans", role=Role.ADMIN),
+        User(uid="student01", role=Role.STUDENT),
+        User(uid="student02", role=Role.STUDENT)
     ]
 
 def courses():

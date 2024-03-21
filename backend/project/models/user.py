@@ -19,4 +19,4 @@ class User(db.Model):
 
     __tablename__ = "users"
     uid: str = Column(String(255), primary_key=True)
-    role: Role = Column(EnumField(Role))
+    role: Role = Column(EnumField(Role), nullable=False)
