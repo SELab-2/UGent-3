@@ -18,7 +18,7 @@ services:
   auth-server:
     build:
       context: .
-      dockerfile: ./Dockerfile_auth_test
+      dockerfile: Dockerfile_auth_test
     environment:
       API_HOST: http://auth-server
     volumes:
