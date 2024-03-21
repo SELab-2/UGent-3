@@ -14,7 +14,9 @@ from project.models.user import User
 from project.utils.files import filter_files, all_files_uploaded, zip_files
 from project.utils.user import is_valid_user
 from project.utils.project import is_valid_project
-from project.utils.authentication import authorize_submission_request, authorize_submissions_request, authorize_grader, authorize_student_submission, authorize_submission_author
+from project.utils.authentication import authorize_submission_request, \
+    authorize_submissions_request, authorize_grader, \
+        authorize_student_submission, authorize_submission_author
 
 load_dotenv()
 API_HOST = getenv("API_HOST")
