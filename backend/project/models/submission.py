@@ -9,6 +9,7 @@ from sqlalchemy import (
     Integer,
     CheckConstraint,
     DateTime,
+    Float,
     Enum as EnumField)
 from project.db_in import db
 
@@ -35,7 +36,7 @@ class Submission(db.Model):
     submission_id: int = Column(Integer, primary_key=True)
     uid: str = Column(String(255), ForeignKey("users.uid"), nullable=False)
     project_id: int = Column(Integer, ForeignKey("projects.project_id"), nullable=False)
-    grading: int = Column(Integer, CheckConstraint("grading >= 0 AND grading <= 20"))
+    grading: float = Column(Float, CheckConstraint("grading >= 0 AND grading <= 20"))
     submission_time: DateTime = Column(DateTime(timezone=True), nullable=False)
     submission_path: str = Column(String(50), nullable=False)
     submission_status: SubmissionStatus = Column(

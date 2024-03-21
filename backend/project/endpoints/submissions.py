@@ -212,10 +212,16 @@ class SubmissionEndpoint(Resource):
                 # Update the grading field
                 grading = request.form.get("grading")
                 if grading is not None:
-                    if not (grading.isdigit() and 0 <= int(grading) <= 20):
-                        data["message"] = "Invalid grading (grading=0-20)"
+                    try:
+                        grading_float = float(grading)
+                        if 0 <= grading_float <= 20:
+                            submission.grading = grading_float
+                        else:
+                            data["message"] = "Invalid grading (grading=0-20)"
+                            return data, 400
+                    except ValueError:
+                        data["message"] = "Invalid grading (not a valid float)"
                         return data, 400
-                    submission.grading = int(grading)
 
                 # Save the submission
                 session.commit()
