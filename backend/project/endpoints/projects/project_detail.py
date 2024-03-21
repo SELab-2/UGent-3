@@ -22,6 +22,7 @@ API_URL = os.getenv('API_HOST')
 RESPONSE_URL = urljoin(API_URL, "projects")
 UPLOAD_FOLDER = os.getenv('UPLOAD_URL')
 
+
 class ProjectDetail(Resource):
     """
     Class for projects/id endpoints
@@ -82,12 +83,14 @@ class ProjectDetail(Resource):
 
                 # removed all files now upload the new files
                 file.save(os.path.join(project_upload_directory, filename))
-                with zipfile.ZipFile(os.path.join(project_upload_directory, filename)) as upload_zip:
+                zip_location = os.path.join(project_upload_directory, filename)
+                with zipfile.ZipFile(zip_location) as upload_zip:
                     upload_zip.extractall(project_upload_directory)
                 project_json["assignment_file"] = filename
             except zipfile.BadZipfile:
                 return ({
-                            "message": "Please provide a valid .zip file for updating the instructions",
+                            "message":
+                                "Please provide a valid .zip file for updating the instructions",
                             "url": f"{API_URL}/projects/{project_id}"
                         },
                         400)

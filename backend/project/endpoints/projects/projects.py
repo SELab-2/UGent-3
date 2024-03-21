@@ -80,7 +80,8 @@ class ProjectsEndpoint(Resource):
         if filename is not None:
             try:
                 file.save(os.path.join(project_upload_directory, filename))
-                with zipfile.ZipFile(os.path.join(project_upload_directory, filename)) as upload_zip:
+                zip_location = os.path.join(project_upload_directory, filename)
+                with zipfile.ZipFile(zip_location) as upload_zip:
                     upload_zip.extractall(project_upload_directory)
             except zipfile.BadZipfile:
                 os.remove(os.path.join(project_upload_directory, filename))
