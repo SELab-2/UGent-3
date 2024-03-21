@@ -10,6 +10,8 @@ from urllib.parse import urljoin
 from flask import request
 from flask_restful import Resource
 
+from project.db_in import db
+
 from project.models.project import Project
 from project.utils.query_agent import query_by_id_from_model, delete_by_id_from_model, \
     patch_by_id_from_model
@@ -76,6 +78,7 @@ class ProjectDetail(Resource):
                         if os.path.isfile(to_rem_file_path):
                             os.remove(to_rem_file_path)
                 except FileNotFoundError:
+                    db.session.rollback()
                     return ({
                         "message": "Something went wrong deleting the old project files",
                         "url": f"{API_URL}/projects/{project_id}"
@@ -88,6 +91,7 @@ class ProjectDetail(Resource):
                     upload_zip.extractall(project_upload_directory)
                 project_json["assignment_file"] = filename
             except zipfile.BadZipfile:
+                db.session.rollback()
                 return ({
                             "message":
                                 "Please provide a valid .zip file for updating the instructions",
