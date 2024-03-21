@@ -6,3 +6,5 @@ psycopg2-binary
 pytest~=8.0.1
 SQLAlchemy~=2.0.27
 requests>=2.31.0
+
+waitress

@@ -1,6 +1,9 @@
 name: UGent-3-frontend-linter
 run-name: ${{ github.actor }} is running frontend linter 🚀
-on: [pull_request]
+on:
+  pull_request:
+    paths:
+      - 'frontend/**'
 jobs:
   Frontend-tests:
     runs-on: self-hosted

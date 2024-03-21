@@ -1,6 +1,9 @@
 name: UGent-3-backend-test
 run-name: ${{ github.actor }} is running backend tests 🚀
-on: [pull_request]
+on:
+  pull_request:
+    paths:
+      - 'backend/**'
 jobs:
   Backend-tests:
     runs-on: self-hosted
