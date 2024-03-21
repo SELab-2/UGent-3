@@ -17,7 +17,7 @@ from project.models.course import Course
 
 load_dotenv()
 API_URL = getenv("API_HOST")
-RESPONSE_URL = urljoin(API_URL + "/", "courses")
+RESPONSE_URL = urljoin(f"{API_URL}/", "courses")
 
 def execute_query_abort_if_db_error(query, url, query_all=False):
     """
