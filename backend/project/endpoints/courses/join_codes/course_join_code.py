@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 from flask_restful import Resource
 from project.utils.query_agent import query_by_id_from_model, delete_by_id_from_model
 from project.models.course_share_code import CourseShareCode
-from project.endpoints.courses.join_codes.join_codes_utils import check_course_exists
 from project.utils.authentication import authorize_teacher_of_course
 
 load_dotenv()
@@ -22,7 +21,7 @@ class CourseJoinCode(Resource):
     the /courses/course_id/join_codes/<join_code> url, only an admin of a course can do this
     """
 
-    @check_course_exists
+    @authorize_teacher_of_course
     def get(self, course_id, join_code):
         """
         This function will return all the join codes of a course
@@ -35,7 +34,6 @@ class CourseJoinCode(Resource):
             urljoin(f"{RESPONSE_URL}/", f"{str(course_id)}/", "join_codes")
         )
 
-    @check_course_exists
     @authorize_teacher_of_course
     def delete(self, course_id, join_code):
         """
