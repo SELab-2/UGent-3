@@ -1,22 +1,26 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Home from "./pages/home/Home";
-import { Header } from "./components/Header/Header";
-import { NotFound } from "./pages/error/NotFound";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import Home from "./pages/home/Home.tsx";
+import { Layout } from "./Layout.tsx";
+import { ErrorBoundary } from "./pages/error/ErrorBoundary.tsx";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    Component: Layout ,
+    errorElement: <ErrorBoundary />,
+    children: [
+      {
+        index: true,
+        Component: Home
+      }
+    ]
+  }
+]);
 
 /**
  * This component is the main application component that will be rendered by the ReactDOM. 
- * @returns - The main application component
+ * @returns The main application component
  */
-function App(): JSX.Element {
-  return (
-    <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route index element={<Home />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
-  );
+export default function App(): React.JSX.Element {
+  return <RouterProvider router={router} />;
 }
-
-export default App;
