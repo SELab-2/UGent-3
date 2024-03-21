@@ -5,7 +5,7 @@ from pytest import raises, mark
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from project.models.project import Project
-from project.models.submission import Submission, Submission_Status
+from project.models.submission import Submission, SubmissionStatus
 
 class TestSubmissionModel:
     """Class to test the Submission model"""
@@ -18,7 +18,7 @@ class TestSubmissionModel:
             project_id=project.project_id,
             submission_time=datetime(2023,3,15,13,0,0),
             submission_path="/submissions",
-            submission_status=Submission_Status.SUCCESS
+            submission_status=SubmissionStatus.SUCCESS
         )
         session.add(submission)
         session.commit()
