@@ -93,7 +93,7 @@ class TestSubmissionsEndpoint:
         response = client.patch(f"/submissions/{submission.submission_id}",data={"grading": "zero"}, headers={"Authorization":"ad3_teacher"})
         data = response.json
         assert response.status_code == 400
-        assert data["message"] == "Invalid grading (grading=0-20)"
+        assert data["message"] == "Invalid grading (not a valid float)"
 
     def test_patch_submission_correct_teacher(self, client: FlaskClient, session: Session):
         """Test patching a submission"""
