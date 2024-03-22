@@ -51,14 +51,6 @@ def valid_user():
     }
 
 @pytest.fixture
-def user_invalid_field(valid_user):
-    """
-    Returns a user form with an invalid field
-    """
-    valid_user["err"] = "brr"
-    return valid_user
-
-@pytest.fixture
 def valid_user_entry(session, valid_user):
     """
     Returns a user that is in the database
