@@ -114,8 +114,8 @@ class SubmissionsEndpoint(Resource):
                 # Check files otherwise stop
                 project = session.get(Project, submission.project_id)
                 if not files or not all_files_uploaded(files, project.regex_expressions):
-                    data["message"] = "No file were uploaded" if not files else \
-                        "Not all required file were uploaded"
+                    data["message"] = "No files were uploaded" if not files else \
+                        "Not all required files were uploaded"
                     return data, 400
 
                 # Submission_id needed for the file location
