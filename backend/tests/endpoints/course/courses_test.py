@@ -15,7 +15,8 @@ class TestCourseEndpoint:
         assert data["data"]["teacher"] == valid_course["teacher"]
 
         # Is reachable using the API
-        get_response = client.get(f"/courses/{data['data']['course_id']}", headers={"Authorization":"teacher2"})
+        get_response = client.get(f"/courses/{data['data']['course_id']}",
+                                  headers={"Authorization":"teacher2"})
         assert get_response.status_code == 200
 
 
@@ -58,7 +59,8 @@ class TestCourseEndpoint:
         assert response.status_code == 200
 
         # Is not reachable using the API
-        get_response = client.get(f"/courses/{valid_course_entry.course_id}", headers={"Authorization":"teacher2"})
+        get_response = client.get(f"/courses/{valid_course_entry.course_id}",
+                                  headers={"Authorization":"teacher2"})
         assert get_response.status_code == 404
 
     def test_course_patch(self, valid_course_entry, client):

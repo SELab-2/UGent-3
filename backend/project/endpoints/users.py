@@ -8,7 +8,8 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from project import db
 from project.models.user import User as userModel
-from project.utils.authentication import login_required, authorize_user, not_allowed
+from project.utils.authentication import login_required, authorize_user, \
+    authorize_admin, not_allowed
 
 users_bp = Blueprint("users", __name__)
 users_api = Api(users_bp)
@@ -44,13 +45,13 @@ class Users(Resource):
 
     @not_allowed
     def post(self):
-        # TODO make it so this just creates a user for yourself
         """
         This function will respond to post requests made to /users.
         It should create a new user and return a success message.
         """
         uid = request.json.get('uid')
         role = request.args.get("role")
+        url = f"{API_URL}/users"
 
         if role is None or uid is None:
             return {
@@ -63,20 +64,19 @@ class Users(Resource):
         try:
             user = db.session.get(userModel, uid)
             if user is not None:
-                # bad request, error code could be 409 but is rarely used
+                # Bad request, error code could be 409 but is rarely used
                 return {"message": f"User {uid} already exists"}, 400
             # Code to create a new user in the database using the uid and role
             new_user = userModel(uid=uid, role=role)
             db.session.add(new_user)
             db.session.commit()
             return jsonify({"message": "User created successfully!",
-                    "data": user, "url": f"{API_URL}/users/{user.uid}", "status_code": 201})
+                    "data": user, "url": f"{url}/{user.uid}", "status_code": 201})
 
         except SQLAlchemyError:
-            # every exception should result in a rollback
             db.session.rollback()
             return {"message": "An error occurred while creating the user",
-                    "url": f"{API_URL}/users"}, 500
+                    "url": url}, 500
 
 
 class User(Resource):
@@ -99,7 +99,7 @@ class User(Resource):
             return {"message": "An error occurred while fetching the user",
                     "url": f"{API_URL}/users"}, 500
 
-    @not_allowed
+    @authorize_admin
     def patch(self, user_id):
         """
         Update the user's information.
