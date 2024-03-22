@@ -86,8 +86,8 @@ class TestUserEndpoint:
 
     def test_wrong_form_post(self, client, user_invalid_field):
         """Test posting with a wrong form."""
-        response = client.post("/users", user_invalid_field, headers={"Authorization":"teacher1"})
-        assert response.status_code == 201
+        response = client.post("/users", data=user_invalid_field, headers={"Authorization":"teacher1"})
+        assert response.status_code == 403
 
     def test_get_all_users(self, client, valid_user_entries):
         """Test getting all users."""
