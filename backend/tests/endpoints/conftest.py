@@ -210,7 +210,7 @@ def valid_teacher_entry(session):
 @pytest.fixture
 def valid_course(valid_teacher_entry):
     """A valid course json form"""
-    return {"name": "Sel", "teacher": valid_teacher_entry.uid}
+    return {"name": "Sel", "ufora_id": "C003784A_2023", "teacher": valid_teacher_entry.uid}
 
 @pytest.fixture
 def course_no_name(valid_teacher_entry):
