@@ -86,7 +86,7 @@ class TestUserEndpoint:
 
     def test_wrong_form_post(self, client, user_invalid_field):
         """Test posting with a wrong form."""
-        response = client.post("/users", data=user_invalid_field, 
+        response = client.post("/users", data=user_invalid_field,
                                headers={"Authorization":"teacher1"})
         assert response.status_code == 403
 
