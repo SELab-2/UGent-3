@@ -84,6 +84,11 @@ class TestUserEndpoint:
                                headers={"Authorization":"teacher1"})
         assert response.status_code == 403 # POST to /users is not allowed
 
+    def test_wrong_form_post(self, client, user_invalid_field):
+        """Test posting with a wrong form."""
+        response = client.post("/users", user_invalid_field, headers={"Authorization":"teacher1"})
+        assert response.status_code == 201
+
     def test_get_all_users(self, client, valid_user_entries):
         """Test getting all users."""
         response = client.get("/users", headers={"Authorization":"teacher1"})
