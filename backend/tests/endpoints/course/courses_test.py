@@ -329,6 +329,56 @@ class TestCourseEndpoint:
         assert response.json["data"]["name"] == "test"
 
     ### DELETE COURSE ###
+    def test_delete_course_not_authenticated(self, client: FlaskClient, valid_course_entry):
+        """Test deleting a course while not authenticated"""
+        response = client.delete(f"/courses/{valid_course_entry.course_id}")
+        assert response.status_code == 401
+
+    def test_delete_course_bad_authentication_token(self, client: FlaskClient, valid_course_entry):
+        """Test deleting a course while using a bad authentication token"""
+        response = client.delete(
+            f"/courses/{valid_course_entry.course_id}",
+            headers = {"Authorization": AUTH_TOKEN_BAD}
+        )
+        assert response.status_code == 401
+
+    def test_delete_course_no_authorization_student(self, client: FlaskClient, valid_course_entry):
+        """Test deleting a course as a student"""
+        response = client.delete(
+            f"/courses/{valid_course_entry.course_id}",
+            headers = {"Authorization": AUTH_TOKEN_STUDENT}
+        )
+        assert response.status_code == 403
+
+    def test_delete_course_no_authorization_teacher(self, client: FlaskClient, valid_course_entry):
+        """Test deleting a course as a teacher of a different course"""
+        response = client.delete(
+            f"/courses/{valid_course_entry.course_id}",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_1}
+        )
+        assert response.status_code == 403
+
+    def test_delete_course_wrong_course_id(self, client: FlaskClient):
+        """Test deleting a course that does not exist"""
+        response = client.delete(
+            "/courses/0",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_2}
+        )
+        assert response.status_code == 404
+
+    def test_delete_course_correct(self, client: FlaskClient, valid_course_entry):
+        """Test deleting a course"""
+        response = client.delete(
+            f"/courses/{valid_course_entry.course_id}",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_2}
+        )
+        assert response.status_code == 200
+        response = client.get(
+            f"/courses/{valid_course_entry.course_id}",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_2}
+        )
+        assert response.status_code == 404
+
     ### GET COURSE ADMINS ###
     ### POST COURSE ADMINS ###
     ### DELETE COURSE ADMINS ###
