@@ -4,6 +4,7 @@ from flask.testing import FlaskClient
 
 AUTH_TOKEN_BAD = ""
 AUTH_TOKEN_TEACHER = "teacher2"
+AUTH_TOKEN_STUDENT = "student1"
 
 class TestCourseEndpoint:
     """Class to test the courses API endpoint"""
@@ -127,6 +128,73 @@ class TestCourseEndpoint:
         assert valid_course_entry.name in [course["name"] for course in response.json["data"]]
 
     ### POST COURSES ###
+    def test_post_courses_not_authenticated(self, client: FlaskClient):
+        """Test posting a course when not authenticated"""
+        response = client.post("/courses")
+        assert response.status_code == 401
+
+    def test_post_courses_bad_authentication_token(self, client: FlaskClient):
+        """Test posting a course when given a bad authentication token"""
+        response = client.post("/courses", headers = {"Authorization": AUTH_TOKEN_BAD})
+        assert response.status_code == 401
+
+    def test_post_courses_no_authorization(self, client: FlaskClient):
+        """Test posting a course when not having the correct authorization"""
+        response = client.post("/courses", headers = {"Authorization": AUTH_TOKEN_STUDENT})
+        assert response.status_code == 403
+
+    def test_post_courses_wrong_name_type(self, client: FlaskClient):
+        """Test posting a course where the name does not have the correct type"""
+        response = client.post(
+            "/courses",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER},
+            json = {
+                "name": 0,
+                "ufora_id": "test"
+            }
+        )
+        assert response.status_code == 400
+
+    def test_post_courses_wrong_ufora_id_type(self, client: FlaskClient):
+        """Test posting a course where the ufora_id does not have the correct type"""
+        response = client.post(
+            "/courses",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER},
+            json = {
+                "name": "test",
+                "ufora_id": 0
+            }
+        )
+        assert response.status_code == 400
+
+    def test_post_courses_incorrect_field(self, client: FlaskClient, valid_teacher_entry):
+        """Test posting a course where a field that doesn't occur in the model is given"""
+        response = client.post(
+            "/courses",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER},
+            json = {
+                "name": "test",
+                "ufora_id": "test",
+                "teacher": valid_teacher_entry.uid
+            }
+        )
+        assert response.status_code == 400
+
+    def test_post_courses_correct(self, client: FlaskClient):
+        """Test posting a course"""
+        response = client.post(
+            "/courses",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER},
+            json = {
+                "name": "test",
+                "ufora_id": "test"
+            }
+        )
+        assert response.status_code == 201
+        response = client.get("/courses?name=test", headers = {"Authorization": AUTH_TOKEN_TEACHER})
+        assert response.status_code == 200
+        assert response.json["data"][0]["ufora_id"] == "test"
+
     ### GET COURSE ###
     ### PATCH COURSE ###
     ### DELETE COURSE ###
