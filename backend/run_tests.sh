@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Run Docker Compose to build and start the services, and capture the exit code from the test runner service
 docker-compose -f tests.yaml up --build --exit-code-from test-runner

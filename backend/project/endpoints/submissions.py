@@ -2,7 +2,7 @@
 
 from urllib.parse import urljoin
 from datetime import datetime
-from os import getenv, path
+from os import getenv, path, makedirs
 from dotenv import load_dotenv
 from flask import Blueprint, request
 from flask_restful import Resource
@@ -11,7 +11,7 @@ from project.db_in import db
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 from project.models.user import User
-from project.utils.files import filter_files, all_files_uploaded, zip_files
+from project.utils.files import filter_files, all_files_uploaded
 from project.utils.user import is_valid_user
 from project.utils.project import is_valid_project
 from project.utils.authentication import authorize_submission_request, \
@@ -104,26 +104,32 @@ class SubmissionsEndpoint(Resource):
                 # Submission time
                 submission.submission_time = datetime.now()
 
-                # Submission path
-                files = filter_files(request.files.getlist("files"))
-                project = session.get(Project, submission.project_id)
-                if not files or not all_files_uploaded(files, project.regex_expressions):
-                    data["message"] = "No files were uploaded" if not files else \
-                        "Not all required files were uploaded"
-                    return data, 400
-
-                # Zip the files and save the zip
-                zip_file = zip_files("", files)
-                if zip_file is None:
-                    data["message"] = "Something went wrong while zipping the files"
-                    return data, 500
-                submission.submission_path = "/zip.zip"
-                zip_file.save(path.join(f"{UPLOAD_FOLDER}/", submission.submission_path))
-
                 # Submission status
                 submission.submission_status = SubmissionStatus.RUNNING
 
+                # Submission files
+                submission.submission_path = "" # Must be set on creation
+                files = filter_files(request.files.getlist("files"))
+
+                # Check files otherwise stop
+                project = session.get(Project, submission.project_id)
+                if not files or not all_files_uploaded(files, project.regex_expressions):
+                    data["message"] = "No file were uploaded" if not files else \
+                        "Not all required file were uploaded"
+                    return data, 400
+
+                # Submission_id needed for the file location
                 session.add(submission)
+                session.commit()
+
+                # Save the files
+                submission.submission_path = path.join(
+                    f"{UPLOAD_FOLDER}/",
+                    f"{submission.project_id}/submissions/{submission.submission_id}/"
+                )
+                makedirs(submission.submission_path, exist_ok=True)
+                for file in files:
+                    file.save(path.join(submission.submission_path, file.filename))
                 session.commit()
 
                 data["message"] = "Successfully fetched the submissions"
