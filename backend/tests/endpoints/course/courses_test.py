@@ -3,7 +3,8 @@
 from flask.testing import FlaskClient
 
 AUTH_TOKEN_BAD = ""
-AUTH_TOKEN_TEACHER = "teacher2"
+AUTH_TOKEN_TEACHER_1 = "teacher1"
+AUTH_TOKEN_TEACHER_2 = "teacher2"
 AUTH_TOKEN_STUDENT = "student1"
 
 class TestCourseEndpoint:
@@ -147,7 +148,7 @@ class TestCourseEndpoint:
         """Test posting a course where the name does not have the correct type"""
         response = client.post(
             "/courses",
-            headers = {"Authorization": AUTH_TOKEN_TEACHER},
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_1},
             json = {
                 "name": 0,
                 "ufora_id": "test"
@@ -159,7 +160,7 @@ class TestCourseEndpoint:
         """Test posting a course where the ufora_id does not have the correct type"""
         response = client.post(
             "/courses",
-            headers = {"Authorization": AUTH_TOKEN_TEACHER},
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_1},
             json = {
                 "name": "test",
                 "ufora_id": 0
@@ -171,7 +172,7 @@ class TestCourseEndpoint:
         """Test posting a course where a field that doesn't occur in the model is given"""
         response = client.post(
             "/courses",
-            headers = {"Authorization": AUTH_TOKEN_TEACHER},
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_1},
             json = {
                 "name": "test",
                 "ufora_id": "test",
@@ -184,14 +185,17 @@ class TestCourseEndpoint:
         """Test posting a course"""
         response = client.post(
             "/courses",
-            headers = {"Authorization": AUTH_TOKEN_TEACHER},
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_2},
             json = {
                 "name": "test",
                 "ufora_id": "test"
             }
         )
         assert response.status_code == 201
-        response = client.get("/courses?name=test", headers = {"Authorization": AUTH_TOKEN_TEACHER})
+        response = client.get(
+            "/courses?name=test",
+            headers = {"Authorization": AUTH_TOKEN_STUDENT}
+        )
         assert response.status_code == 200
         data = response.json["data"]
         assert data[0]["ufora_id"] == "test"
@@ -232,6 +236,98 @@ class TestCourseEndpoint:
         assert data["teacher"] == valid_course_entry.teacher
 
     ### PATCH COURSE ###
+    def test_patch_course_not_authenticated(self, client: FlaskClient, valid_course_entry):
+        """Test patching a course while not authenticated"""
+        response = client.patch(f"/courses/{valid_course_entry.course_id}")
+        assert response.status_code == 401
+
+    def test_patch_course_bad_authentication_token(self, client: FlaskClient, valid_course_entry):
+        """Test patching a course while using a bad authentication token"""
+        response = client.patch(
+            f"/courses/{valid_course_entry.course_id}",
+            headers = {"Authorization": AUTH_TOKEN_BAD}
+        )
+        assert response.status_code == 401
+
+    def test_patch_course_no_authorization_student(self, client: FlaskClient, valid_course_entry):
+        """Test patching a course as a student"""
+        response = client.patch(
+            f"/courses/{valid_course_entry.course_id}",
+            headers = {"Authorization": AUTH_TOKEN_STUDENT}
+        )
+        assert response.status_code == 403
+
+    def test_patch_course_no_authorization_teacher(self, client: FlaskClient, valid_course_entry):
+        """Test patching a course as a teacher of a different course"""
+        response = client.patch(
+            f"/courses/{valid_course_entry.course_id}",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_1}
+        )
+        assert response.status_code == 403
+
+    def test_patch_course_wrong_course_id(self, client: FlaskClient, valid_course_entry):
+        """Test patching a course that does not exist"""
+        response = client.patch(
+            "/courses/0",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_2}
+        )
+        assert response.status_code == 404
+
+    def test_patch_course_wrong_name_type(self, client: FlaskClient, valid_course_entry):
+        """Test patching a course given a wrong type for the course name"""
+        response = client.patch(
+            f"/courses/{valid_course_entry.course_id}",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_2},
+            json = {"name": 0}
+        )
+        assert response.status_code == 400
+
+    def test_patch_course_ufora_id_type(self, client: FlaskClient, valid_course_entry):
+        """Test patching a course given a wrong type for the ufora_id"""
+        response = client.patch(
+            f"/courses/{valid_course_entry.course_id}",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_2},
+            json = {"ufora_id": 0}
+        )
+        assert response.status_code == 400
+
+    def test_patch_course_wrong_teacher_type(self, client: FlaskClient, valid_course_entry):
+        """Test patching a course given a wrong type for the teacher"""
+        response = client.patch(
+            f"/courses/{valid_course_entry.course_id}",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_2},
+            json = {"teacher": 0}
+        )
+        assert response.status_code == 400
+
+    def test_patch_course_wrong_teacher(self, client: FlaskClient, valid_course_entry):
+        """Test patching a course given a teacher that does not exist"""
+        response = client.patch(
+            f"/courses/{valid_course_entry.course_id}",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_2},
+            json = {"teacher": "no_teacher"}
+        )
+        assert response.status_code == 400
+
+    def test_patch_course_incorrect_field(self, client: FlaskClient, valid_course_entry):
+        """Test patching a course with a field that doesn't occur in the course model"""
+        response = client.patch(
+            f"/courses/{valid_course_entry.course_id}",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_2},
+            json = {"field": 0}
+        )
+        assert response.status_code == 400
+
+    def test_patch_course_correct(self, client: FlaskClient, valid_course_entry):
+        """Test patching a course"""
+        response = client.patch(
+            f"/courses/{valid_course_entry.course_id}",
+            headers = {"Authorization": AUTH_TOKEN_TEACHER_2},
+            json = {"name": "test"}
+        )
+        assert response.status_code == 200
+        assert response.json["data"]["name"] == "test"
+
     ### DELETE COURSE ###
     ### GET COURSE ADMINS ###
     ### POST COURSE ADMINS ###
