@@ -47,7 +47,7 @@ def valid_user():
     """
     return {
         "uid": "w_student",
-        "role": Role.STUDENT
+        "role": Role.STUDENT.name
     }
 
 @pytest.fixture
@@ -67,8 +67,7 @@ def valid_admin():
     """
     return {
         "uid": "admin_person",
-        "is_teacher": False,
-        "is_admin":True
+        "role": Role.ADMIN,
     }
 
 @pytest.fixture

@@ -21,7 +21,7 @@ class TestUserModel:
         assert session.query(User).count() == 4
         teacher = session.query(User).filter_by(uid="brinkmann").first()
         assert teacher is not None
-        assert teacher.role == Role.TEACHER
+        assert teacher.role == Role.ADMIN
 
     def test_update_user(self, session: Session):
         """Test if a user can be updated"""

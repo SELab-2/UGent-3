@@ -128,10 +128,9 @@ class TestUserEndpoint:
             new_role = Role.STUDENT
         else:
             new_role = Role.TEACHER
-
+        new_role = new_role.name
         response = client.patch(f"/users/{valid_user_entry.uid}", json={
-            'is_teacher': new_role,
-            'is_admin': not valid_user_entry.is_admin
+            'role': new_role
         }, headers={"Authorization":"student01"})
         assert response.status_code == 403 # Patching a user is not allowed as a not-admin
 
@@ -144,7 +143,7 @@ class TestUserEndpoint:
             new_role = Role.STUDENT
         else:
             new_role = Role.TEACHER
-
+        new_role = new_role.name
         response = client.patch(f"/users/{valid_user_entry.uid}", json={
             'role': new_role
         }, headers={"Authorization":"admin1"})
@@ -153,17 +152,18 @@ class TestUserEndpoint:
     def test_patch_non_existent(self, client, valid_admin_entry):
         """Test updating a non-existent user."""
         response = client.patch("/users/-20", json={
-            'role': Role.TEACHER
+            'role': Role.TEACHER.name
         }, headers={"Authorization":"admin1"})
         assert response.status_code == 404
 
     def test_patch_non_json(self, client, valid_admin_entry, valid_user_entry):
         """Test sending a non-JSON patch request."""
         valid_user_form = asdict(valid_user_entry)
-        if valid_user_form["role"] == Role.TEACHER:
-            valid_user_form["role"] = Role.STUDENT
+        if valid_user_form["role"] == Role.TEACHER.name:
+            valid_user_form["role"] = Role.STUDENT.name
         else:
-            valid_user_form["role"] = Role.TEACHER
+            valid_user_form["role"] = Role.TEACHER.name
+
         response = client.patch(f"/users/{valid_user_form['uid']}", data=valid_user_form,
                                 headers={"Authorization":"admin1"})
         assert response.status_code == 415
@@ -178,4 +178,4 @@ class TestUserEndpoint:
         # Check that the response contains only the user that matches the query
         users = response.json["data"]
         for user in users:
-            assert user["role"] == Role.ADMIN
+            assert Role[user["role"]] == Role.ADMIN

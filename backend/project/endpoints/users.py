@@ -7,7 +7,7 @@ from flask_restful import Resource, Api
 from sqlalchemy.exc import SQLAlchemyError
 
 from project import db
-from project.models.user import User as userModel
+from project.models.user import User as userModel, Role
 from project.utils.authentication import login_required, authorize_user, \
     authorize_admin, not_allowed
 
@@ -30,11 +30,12 @@ class Users(Resource):
         try:
             query = userModel.query
             role = request.args.get("role")
-
             if role is not None:
-                query = query.filter(userModel.role == role.lower())
+                role = Role[role.upper()]
+                query = query.filter(userModel.role == role)
 
             users = query.all()
+            users = [user.to_dict() for user in users]
 
             result = jsonify({"message": "Queried all users", "data": users,
                               "url":f"{API_URL}/users", "status_code": 200})
@@ -51,6 +52,7 @@ class Users(Resource):
         """
         uid = request.json.get('uid')
         role = request.args.get("role")
+        role = Role[role.upper()] if role is not None else None
         url = f"{API_URL}/users"
 
         if role is None or uid is None:
@@ -93,7 +95,7 @@ class User(Resource):
             if user is None:
                 return {"message": "User not found!","url": f"{API_URL}/users"}, 404
 
-            return jsonify({"message": "User queried","data":user,
+            return jsonify({"message": "User queried","data":user.to_dict(),
                     "url": f"{API_URL}/users/{user.uid}", "status_code": 200})
         except SQLAlchemyError:
             return {"message": "An error occurred while fetching the user",
@@ -109,6 +111,7 @@ class User(Resource):
              or failure of the update.
         """
         role = request.args.get("role")
+        role = Role[role.upper()] if role is not None else None
         try:
             user = db.session.get(userModel, user_id)
             if user is None:
@@ -120,7 +123,7 @@ class User(Resource):
             # Save the changes to the database
             db.session.commit()
             return jsonify({"message": "User updated successfully!",
-                    "data": user, "url": f"{API_URL}/users/{user.uid}", "status_code": 200})
+                    "data": user.to_dict(), "url": f"{API_URL}/users/{user.uid}", "status_code": 200})
         except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
