@@ -47,8 +47,7 @@ def all_files_uploaded(files: List[FileStorage], regexes: List[str]) -> bool:
     for regex in regexes:
         match_found = any(match(regex, name) is not None for name in all_filenames)
         if not match_found:
-            all_uploaded = False
-            break
+            return False
 
     return all_uploaded
 
