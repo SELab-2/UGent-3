@@ -39,8 +39,11 @@ def return_authenticated_user_id():
     """
     authentication = request.headers.get("Authorization")
     if not authentication:
-        abort(make_response(({"message":
-                              "No authorization given, you need an access token to use this API"}, 401)))
+        abort(
+            make_response((
+                {"message":
+                 "No authorization given, you need an access token to use this API"},
+                 401)))
 
     auth_header = {"Authorization": authentication}
     try:
@@ -51,7 +54,8 @@ def return_authenticated_user_id():
             ({"message": "Request to Microsoft timed out"}, 500)))
     if not response or response.status_code != 200:
         abort(make_response(({"message":
-                              "An error occured while trying to authenticate your access token"}, 401)))
+                              "An error occured while trying to authenticate your access token"},
+                               401)))
 
     user_info = response.json()
     auth_user_id = user_info["id"]
@@ -60,14 +64,15 @@ def return_authenticated_user_id():
     except SQLAlchemyError:
         db.session.rollback()
         abort(make_response(({"message":
-                              "An unexpected database error occured while fetching the user"}, 500)))
+                              "An unexpected database error occured while fetching the user"},
+                               500)))
 
     if user:
         return auth_user_id
 
     # Use the Enum here
     role = Role.STUDENT
-    if user_info["jobTitle"] != None:
+    if user_info["jobTitle"] is not None:
         role = Role.TEACHER
 
     # add user if not yet in database

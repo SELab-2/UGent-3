@@ -123,7 +123,8 @@ class User(Resource):
             # Save the changes to the database
             db.session.commit()
             return jsonify({"message": "User updated successfully!",
-                    "data": user.to_dict(), "url": f"{API_URL}/users/{user.uid}", "status_code": 200})
+                    "data": user.to_dict(), 
+                    "url": f"{API_URL}/users/{user.uid}", "status_code": 200})
         except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
