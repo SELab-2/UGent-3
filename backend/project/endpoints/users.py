@@ -110,7 +110,7 @@ class User(Resource):
             dict: A dictionary containing the message indicating the success
              or failure of the update.
         """
-        role = request.args.get("role")
+        role = request.json.get("role")
         role = Role[role.upper()] if role is not None else None
         try:
             user = db.session.get(userModel, user_id)
