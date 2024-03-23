@@ -21,6 +21,9 @@ class User(db.Model):
     uid: str = Column(String(255), primary_key=True)
     role: Role = Column(EnumField(Role), nullable=False)
     def to_dict(self):
+        """
+        Converts a User to a serializable dict
+        """
         return {
             'uid': self.uid,
             'role': self.role.name,  # Convert the enum to a string
