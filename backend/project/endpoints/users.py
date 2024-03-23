@@ -51,7 +51,7 @@ class Users(Resource):
         It should create a new user and return a success message.
         """
         uid = request.json.get('uid')
-        role = request.args.get("role")
+        role = request.json.get("role")
         role = Role[role.upper()] if role is not None else None
         url = f"{API_URL}/users"
 
