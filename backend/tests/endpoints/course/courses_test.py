@@ -1,14 +1,16 @@
 """Here we will test all the courses endpoint related functionality"""
 
+
 class TestCourseEndpoint:
     """Class for testing the courses endpoint"""
 
-    def test_post_courses(self, client, valid_course,invalid_course):
+    def test_post_courses(self, client, valid_course, invalid_course):
         """
         Test posting a course to the /courses endpoint
         """
 
-        response = client.post("/courses", json=valid_course, headers={"Authorization":"teacher2"})
+        response = client.post("/courses", json=valid_course,
+                               headers={"Authorization": "teacher2"})
         assert response.status_code == 201
         data = response.json
         assert data["data"]["name"] == "Sel"
@@ -16,21 +18,23 @@ class TestCourseEndpoint:
 
         # Is reachable using the API
         get_response = client.get(f"/courses/{data['data']['course_id']}",
-                                  headers={"Authorization":"teacher2"})
+                                  headers={"Authorization": "teacher2"})
         assert get_response.status_code == 200
 
         response = client.post(
-            "/courses?uid=Bart", json=invalid_course
+            "/courses?uid=Bart", json=invalid_course,
+            headers={"Authorization": "teacher2"}
         )  # invalid course
         assert response.status_code == 400
-    
+
     def test_post_no_name(self, client, course_empty_name):
         """
         Test posting a course with a blank name
         """
 
-        response = client.post("/courses?uid=Bart", json=course_empty_name)
-        assert response.status_code == 400  
+        response = client.post("/courses?uid=Bart", json=course_empty_name,
+                               headers={"Authorization": "teacher2"})
+        assert response.status_code == 400
 
     def test_post_courses_course_id_students_and_admins(
             self, client, valid_course_entry, valid_students_entries):
@@ -45,18 +49,18 @@ class TestCourseEndpoint:
 
         response = client.post(
             sel2_students_link + f"/students?uid={valid_course_entry.teacher}",
-            json={"students": valid_students}, headers={"Authorization":"teacher2"}
+            json={"students": valid_students}, headers={"Authorization": "teacher2"}
         )
 
         assert response.status_code == 403
-
 
     def test_get_courses(self, valid_course_entries, client):
         """
         Test all the getters for the courses endpoint
         """
 
-        response = client.get("/courses", headers={"Authorization":"teacher1"})
+        response = client.get(
+            "/courses", headers={"Authorization": "teacher1"})
         assert response.status_code == 200
         data = response.json
         for course in valid_course_entries:
@@ -66,13 +70,13 @@ class TestCourseEndpoint:
         """Test all course endpoint related delete functionality"""
 
         response = client.delete(
-            "/courses/" + str(valid_course_entry.course_id), headers={"Authorization":"teacher2"}
+            "/courses/" + str(valid_course_entry.course_id), headers={"Authorization": "teacher2"}
         )
         assert response.status_code == 200
 
         # Is not reachable using the API
         get_response = client.get(f"/courses/{valid_course_entry.course_id}",
-                                  headers={"Authorization":"teacher2"})
+                                  headers={"Authorization": "teacher2"})
         assert get_response.status_code == 404
 
     def test_course_patch(self, valid_course_entry, client):
@@ -81,7 +85,7 @@ class TestCourseEndpoint:
         """
         response = client.patch(f"/courses/{valid_course_entry.course_id}", json={
             "name": "TestTest"
-        }, headers={"Authorization":"teacher2"})
+        }, headers={"Authorization": "teacher2"})
         data = response.json
         assert response.status_code == 200
         assert data["data"]["name"] == "TestTest"

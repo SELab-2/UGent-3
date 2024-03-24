@@ -67,7 +67,6 @@ def create_model_instance(model: DeclarativeMeta,
         return {"error": f"Missing required fields: {', '.join(missing_fields)}",
                 "url": response_url_base}, 400
 
-
     filtered_data = filter_model_fields(model, data)
     new_instance: DeclarativeMeta = model(**filtered_data)
     db.session.add(new_instance)
