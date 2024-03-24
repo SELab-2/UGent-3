@@ -65,13 +65,14 @@ def return_authenticated_user_id():
 
     if user:
         return auth_user_id
-    is_teacher = False
+    teacher_status = False
     if user_info["jobTitle"] is not None:
-        is_teacher = True
+        teacher_status = True
 
     # add user if not yet in database
     try:
-        new_user = User(uid=auth_user_id, is_teacher=is_teacher, is_admin=False)
+        new_user = User(uid=auth_user_id, is_teacher=teacher_status,
+                        is_admin=False, display_name=user_info["displayName"])
         db.session.add(new_user)
         db.session.commit()
     except SQLAlchemyError:
