@@ -19,6 +19,7 @@ load_dotenv()
 API_URL = getenv("API_HOST")
 RESPONSE_URL = urljoin(API_URL + "/", "courses")
 BASE_DB_ERROR = "Database error occurred while"
+
 def execute_query_abort_if_db_error(query, url, query_all=False):
     """
     Execute the given SQLAlchemy query and handle any SQLAlchemyError that might occur.
