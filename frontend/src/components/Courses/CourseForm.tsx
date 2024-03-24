@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, TextField, Button, List, ListItem, ListItemText, Typography } from '@mui/material';
+import { Grid, TextField, Button, List, ListItem, ListItemText, Typography, Box } from '@mui/material';
 
 export function CourseForm(): JSX.Element {
   const [courseName, setCourseName] = useState('');
@@ -10,9 +10,9 @@ export function CourseForm(): JSX.Element {
   };
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={6}>
-        <Grid container direction={'column'} spacing={2} justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }} >
+    <Grid container direction={'column'} spacing={2}>
+      <Grid item>
+        <Grid container direction={'column'} spacing={2} justifyContent="center" alignItems="center" style={{ minHeight: '80vh', maxWidth: '100%' }} >
           <Grid item>
             <Typography variant="h4">Naam Vak</Typography>
           </Grid>
@@ -20,20 +20,15 @@ export function CourseForm(): JSX.Element {
             <TextField
               value={courseName}
               onChange={(e) => setCourseName(e.target.value)}
-              sx={{ width: '50ch'}}
+              sx={{ width: '50ch', maxWidth: '100%'}}
             />
           </Grid>
         </Grid>
       </Grid>
-      <Grid item xs={6}>
-        <List>
-          {assistants.map((assistant, index) => (
-            <ListItem key={index}>
-              <ListItemText primary={`Assistant ${index + 1}`} />
-            </ListItem>
-          ))}
-        </List>
-        <Button onClick={handleAddAssistant}>Add Assistant</Button>
+      <Grid item container justifyContent="flex-end">
+        <Button variant="contained" color="primary" style={{ borderRadius: '50px',paddingLeft:'2rem',paddingRight:'2rem' }}>
+          <Typography variant='h5'>Opslaan</Typography>
+        </Button>
       </Grid>
     </Grid>
   );
