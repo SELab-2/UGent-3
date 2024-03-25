@@ -6,12 +6,13 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import pytest
 from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
 from project.models.user import User
 from project.models.course import Course
 from project.models.course_share_code import CourseShareCode
 from project import create_app_with_db
 from project.db_in import url, db
-from project.models.submission import Submission
+from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 
 
@@ -26,7 +27,7 @@ def valid_submission(valid_user_entry, valid_project_entry):
         "grading": 16,
         "submission_time": datetime(2024,3,14,12,0,0,tzinfo=ZoneInfo("GMT")),
         "submission_path": "/submission/1",
-        "submission_status": True
+        "submission_status": SubmissionStatus.SUCCESS
     }
 
 @pytest.fixture
@@ -55,6 +56,27 @@ def valid_user_entry(session, valid_user):
     Returns a user that is in the database
     """
     user = User(**valid_user)
+    session.add(user)
+    session.commit()
+    return user
+
+@pytest.fixture
+def valid_admin():
+    """
+    Returns a valid admin user form
+    """
+    return {
+        "uid": "admin_person",
+        "is_teacher": False,
+        "is_admin":True
+    }
+
+@pytest.fixture
+def valid_admin_entry(session, valid_admin):
+    """
+    Returns an admin user that is in the database
+    """
+    user = User(**valid_admin)
     session.add(user)
     session.commit()
     return user
@@ -177,9 +199,12 @@ def client(app):
 @pytest.fixture
 def valid_teacher_entry(session):
     """A valid teacher for testing that's already in the db"""
-    teacher = User(uid="Bart", is_teacher=True)
-    session.add(teacher)
-    session.commit()
+    teacher = User(uid="Bart", is_teacher=True, is_admin=False)
+    try:
+        session.add(teacher)
+        session.commit()
+    except SQLAlchemyError:
+        session.rollback()
     return teacher
 
 @pytest.fixture
