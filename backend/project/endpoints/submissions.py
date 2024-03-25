@@ -8,13 +8,15 @@ from flask import Blueprint, request
 from flask_restful import Resource
 from sqlalchemy import exc
 from project.db_in import db
-from project.models.submission import Submission
+from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 from project.models.user import User
 from project.utils.files import filter_files, all_files_uploaded, zip_files
 from project.utils.user import is_valid_user
 from project.utils.project import is_valid_project
-from project.utils.authentication import authorize_submission_request, authorize_submissions_request, authorize_grader, authorize_student_submission, authorize_submission_author
+from project.utils.authentication import authorize_submission_request, \
+    authorize_submissions_request, authorize_grader, \
+        authorize_student_submission, authorize_submission_author
 
 load_dotenv()
 API_HOST = getenv("API_HOST")
@@ -119,7 +121,7 @@ class SubmissionsEndpoint(Resource):
                 zip_file.save(path.join(f"{UPLOAD_FOLDER}/", submission.submission_path))
 
                 # Submission status
-                submission.submission_status = False
+                submission.submission_status = SubmissionStatus.RUNNING
 
                 session.add(submission)
                 session.commit()
@@ -210,10 +212,16 @@ class SubmissionEndpoint(Resource):
                 # Update the grading field
                 grading = request.form.get("grading")
                 if grading is not None:
-                    if not (grading.isdigit() and 0 <= int(grading) <= 20):
-                        data["message"] = "Invalid grading (grading=0-20)"
+                    try:
+                        grading_float = float(grading)
+                        if 0 <= grading_float <= 20:
+                            submission.grading = grading_float
+                        else:
+                            data["message"] = "Invalid grading (grading=0-20)"
+                            return data, 400
+                    except ValueError:
+                        data["message"] = "Invalid grading (not a valid float)"
                         return data, 400
-                    submission.grading = int(grading)
 
                 # Save the submission
                 session.commit()
