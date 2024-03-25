@@ -16,11 +16,6 @@ x-common-keys-selab: &common-keys-selab
     - ".env"
 
 services:
-  #certbot:
-  #image: certbot/certbot:latest
-  #volumes:
-  #   - ./certbot/www/:/var/www/certbot/:rw
-  #   - ./certbot/conf/:/etc/letsencrypt/:rw
   nginx:
     <<: *common-keys-selab
     image: nginx:latest
@@ -35,7 +30,6 @@ services:
        - ${DATA_DIR}/nginx/nginx.conf:/etc/nginx/nginx.conf:rw
        - /etc/letsencrypt/:/etc/letsencrypt/:rw 
        - ./certbot/www:/var/www/certbot/:ro
-         #- ./certbot/conf/:/etc/nginx/ssl/:ro
   frontend:
     <<: *common-keys-selab
     container_name: frontend
