@@ -24,7 +24,8 @@ class TestCourseEndpoint:
         Test posting a course with invalid fields
         """
 
-        response = client.post("/courses", course_invalid_field, headers={"Authorization":"teacher2"})
+        response = client.post("/courses", json=course_invalid_field,
+                               headers={"Authorization":"teacher2"})
         assert response.status_code == 201
 
     def test_post_courses_course_id_students_and_admins(
