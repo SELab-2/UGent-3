@@ -67,4 +67,4 @@ load_dotenv()
 app = Flask(__name__)
 app.register_blueprint(index_bp)
 
-app.run(debug=True, host='0.0.0.0',port=5001)
+app.run(debug=True, host='0.0.0.0')
