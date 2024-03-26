@@ -217,6 +217,16 @@ def course_no_name(valid_teacher_entry):
     return {"name": "", "teacher": valid_teacher_entry.uid}
 
 @pytest.fixture
+def course_empty_name():
+    """A course with an empty name"""
+    return {"name": "", "teacher": "Bart"}
+
+@pytest.fixture
+def invalid_course():
+    """An invalid course for testing."""
+    return {"invalid": "error"}
+
+@pytest.fixture
 def valid_course_entry(session, valid_course):
     """A valid course for testing that's already in the db"""
     course = Course(**valid_course)
