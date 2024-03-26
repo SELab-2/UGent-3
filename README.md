@@ -10,7 +10,7 @@ clear overview of deadlines and projects that need to be submitted.
 There's a separate functionality depending on if you're logged in as a teacher or as a student.
 For students the main functionality is to have a user-friendly interface to submit projects and check the correctness of their submissions.
 
-When a teacher is logged in he can get an overview of the projects he assigned and check how many students have already
+When a teacher is logged in they can get an overview of the projects he assigned and check how many students have already
 handed in a correct solution for example. It's also possible to edit the project and to grade projects in peristerónas' interface. 
 ## Usage
 ### Frontend
