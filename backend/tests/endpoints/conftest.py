@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
-from project.models.user import User
+from project.models.user import User,Role
 from project.models.course import Course
 from project.models.course_share_code import CourseShareCode
 from project import create_app_with_db
@@ -47,7 +47,7 @@ def valid_user():
     """
     return {
         "uid": "w_student",
-        "is_teacher": False
+        "role": Role.STUDENT.name
     }
 
 @pytest.fixture
@@ -67,8 +67,7 @@ def valid_admin():
     """
     return {
         "uid": "admin_person",
-        "is_teacher": False,
-        "is_admin":True
+        "role": Role.ADMIN,
     }
 
 @pytest.fixture
@@ -95,10 +94,10 @@ def valid_user_entries(session):
     Returns a list of users that are in the database
     """
     users = [
-        User(uid="del", is_admin=False, is_teacher=True),
-        User(uid="pat", is_admin=False, is_teacher=True),
-        User(uid="u_get", is_admin=False, is_teacher=True),
-        User(uid="query_user", is_admin=True, is_teacher=False)]
+        User(uid="del", role=Role.TEACHER),
+        User(uid="pat", role=Role.TEACHER),
+        User(uid="u_get", role=Role.TEACHER),
+        User(uid="query_user", role=Role.ADMIN)]
 
     session.add_all(users)
     session.commit()
@@ -149,7 +148,7 @@ def app():
 @pytest.fixture
 def course_teacher_ad():
     """A user that's a teacher for testing"""
-    ad_teacher = User(uid="Gunnar", is_teacher=True, is_admin=True)
+    ad_teacher = User(uid="Gunnar", role=Role.TEACHER)
     return ad_teacher
 
 @pytest.fixture
@@ -199,7 +198,7 @@ def client(app):
 @pytest.fixture
 def valid_teacher_entry(session):
     """A valid teacher for testing that's already in the db"""
-    teacher = User(uid="Bart", is_teacher=True, is_admin=False)
+    teacher = User(uid="Bart", role=Role.TEACHER)
     try:
         session.add(teacher)
         session.commit()
@@ -229,7 +228,7 @@ def valid_course_entry(session, valid_course):
 def valid_students_entries(session):
     """Valid students for testing that are already in the db"""
     students = [
-        User(uid=f"student_sel2_{i}", is_teacher=False)
+        User(uid=f"student_sel2_{i}", role=Role.STUDENT)
         for i in range(3)
     ]
     session.add_all(students)
