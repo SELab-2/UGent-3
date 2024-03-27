@@ -11,7 +11,7 @@ from dataclasses import asdict
 import pytest
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from project.models.user import User
+from project.models.user import User,Role
 from project.db_in import db
 from tests import db_url
 
@@ -24,12 +24,12 @@ def user_db_session():
     db.metadata.create_all(engine)
     session = Session()
     session.add_all(
-            [User(uid="del", is_admin=False, is_teacher=True),
-             User(uid="pat", is_admin=False, is_teacher=True),
-             User(uid="u_get", is_admin=False, is_teacher=True),
-             User(uid="query_user", is_admin=True, is_teacher=False)
-             ]
-        )
+        [User(uid="del", role=Role.TEACHER),
+         User(uid="pat", role=Role.TEACHER),
+         User(uid="u_get", role=Role.TEACHER),
+         User(uid="query_user", role=Role.ADMIN)
+         ]
+    )
     session.commit()
     yield session
     session.rollback()
@@ -120,38 +120,50 @@ class TestUserEndpoint:
         assert response.status_code == 401
 
     def test_patch_user_not_authorized(self, client, valid_admin_entry, valid_user_entry):
-        """Test trying to patch a user without authorization"""
-        new_is_teacher = not valid_user_entry.is_teacher
+        """Test updating a user."""
 
+        if valid_user_entry.role == Role.TEACHER:
+            new_role = Role.ADMIN
+        if valid_user_entry.role == Role.ADMIN:
+            new_role = Role.STUDENT
+        else:
+            new_role = Role.TEACHER
+        new_role = new_role.name
         response = client.patch(f"/users/{valid_user_entry.uid}", json={
-            'is_teacher': new_is_teacher,
-            'is_admin': not valid_user_entry.is_admin
+            'role': new_role
         }, headers={"Authorization":"student01"})
         assert response.status_code == 403 # Patching a user is not allowed as a not-admin
 
     def test_patch_user(self, client, valid_admin_entry, valid_user_entry):
         """Test updating a user."""
 
-        new_is_teacher = not valid_user_entry.is_teacher
-
+        if valid_user_entry.role == Role.TEACHER:
+            new_role = Role.ADMIN
+        if valid_user_entry.role == Role.ADMIN:
+            new_role = Role.STUDENT
+        else:
+            new_role = Role.TEACHER
+        new_role = new_role.name
         response = client.patch(f"/users/{valid_user_entry.uid}", json={
-            'is_teacher': new_is_teacher,
-            'is_admin': not valid_user_entry.is_admin
+            'role': new_role
         }, headers={"Authorization":"admin1"})
         assert response.status_code == 200
 
     def test_patch_non_existent(self, client, valid_admin_entry):
         """Test updating a non-existent user."""
         response = client.patch("/users/-20", json={
-            'is_teacher': False,
-            'is_admin': True
+            'role': Role.TEACHER.name
         }, headers={"Authorization":"admin1"})
         assert response.status_code == 404
 
     def test_patch_non_json(self, client, valid_admin_entry, valid_user_entry):
         """Test sending a non-JSON patch request."""
         valid_user_form = asdict(valid_user_entry)
-        valid_user_form["is_teacher"] = not valid_user_form["is_teacher"]
+        if valid_user_form["role"] == Role.TEACHER.name:
+            valid_user_form["role"] = Role.STUDENT.name
+        else:
+            valid_user_form["role"] = Role.TEACHER.name
+
         response = client.patch(f"/users/{valid_user_form['uid']}", data=valid_user_form,
                                 headers={"Authorization":"admin1"})
         assert response.status_code == 415
@@ -159,12 +171,11 @@ class TestUserEndpoint:
     def test_get_users_with_query(self, client, valid_user_entries):
         """Test getting users with a query."""
         # Send a GET request with query parameters, this is a nonsense entry but good for testing
-        response = client.get("/users?is_admin=true&is_teacher=false",
+        response = client.get("/users?role=ADMIN",
                               headers={"Authorization":"teacher1"})
         assert response.status_code == 200
 
         # Check that the response contains only the user that matches the query
         users = response.json["data"]
         for user in users:
-            assert user["is_admin"] is True
-            assert user["is_teacher"] is False
+            assert Role[user["role"]] == Role.ADMIN
