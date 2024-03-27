@@ -1,9 +1,10 @@
+CREATE TYPE role AS ENUM ('STUDENT', 'TEACHER', 'ADMIN');
+
 CREATE TYPE submission_status AS ENUM ('SUCCESS', 'LATE', 'FAIL', 'RUNNING');
 
 CREATE TABLE users (
 	uid VARCHAR(255),
-	is_teacher BOOLEAN,
-	is_admin BOOLEAN,
+	role role NOT NULL,
 	PRIMARY KEY(uid)
 );
 
@@ -57,7 +58,7 @@ CREATE TABLE submissions (
 	submission_id INT GENERATED ALWAYS AS IDENTITY,
 	uid VARCHAR(255) NOT NULL,
 	project_id INT NOT NULL,
-	grading INTEGER CHECK (grading >= 0 AND grading <= 20),
+	grading FLOAT CHECK (grading >= 0 AND grading <= 20),
 	submission_time TIMESTAMP WITH TIME ZONE NOT NULL,
 	submission_path VARCHAR(50) NOT NULL,
 	submission_status submission_status NOT NULL,
