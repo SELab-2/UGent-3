@@ -10,6 +10,7 @@ from .endpoints.courses.courses_config import courses_bp
 from .endpoints.projects.project_endpoint import project_bp
 from .endpoints.submissions import submissions_bp
 from .endpoints.courses.join_codes.join_codes_config import join_codes_bp
+from .endpoints.docs.docs_endpoint import swagger_ui_blueprint
 
 def create_app():
     """
@@ -25,6 +26,7 @@ def create_app():
     app.register_blueprint(project_bp)
     app.register_blueprint(submissions_bp)
     app.register_blueprint(join_codes_bp)
+    app.register_blueprint(swagger_ui_blueprint)
 
     return app
 
