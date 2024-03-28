@@ -124,10 +124,8 @@ class SubmissionsEndpoint(Resource):
                 session.commit()
 
                 # Save the files
-                submission.submission_path = path.join(
-                    UPLOAD_FOLDER,
-                    f"{submission.project_id}/submissions/{submission.submission_id}/"
-                )
+                submission.submission_path = path.join(UPLOAD_FOLDER, str(submission.project_id),
+                    "submissions", str(submission.submission_id))
                 makedirs(submission.submission_path, exist_ok=True)
                 for file in files:
                     file.save(path.join(submission.submission_path, file.filename))
