@@ -43,13 +43,12 @@ def all_files_uploaded(files: List[FileStorage], regexes: List[str]) -> bool:
         else:
             all_filenames.append(file.filename)
 
-    all_uploaded = True
     for regex in regexes:
         match_found = any(match(regex, name) is not None for name in all_filenames)
         if not match_found:
             return False
 
-    return all_uploaded
+    return True
 
 def zip_files(name: str, files: List[FileStorage]) -> Optional[FileStorage]:
     """Zip a dictionary of files
