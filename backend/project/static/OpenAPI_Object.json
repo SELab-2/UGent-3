@@ -1,5 +1,5 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.1",
   "info": {
     "title": "Pigeonhole API",
     "summary": "A project submission and grading API for University Ghent students and professors.",
@@ -56,9 +56,9 @@
                     "type": "object",
                     "properties": {
                       "project_id": {
-                        "type": "int"
+                        "type": "integer"
                       },
-                      "descriptions": {
+                      "description": {
                         "type": "string"
                       },
                       "title": {
@@ -74,6 +74,27 @@
       },
       "post": {
         "description": "Upload a new project",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "assignment_file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "title": { "type": "string" },
+                  "description": { "type": "string" },
+                  "course_id": { "type": "integer" },
+                  "visible_for_students": { "type": "boolean" },
+                  "archived": { "type": "boolean" }
+                },
+                "required": ["assignment_file", "title", "description", "course_id", "visible_for_students", "archived"]
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "Uploaded a new project succesfully",
@@ -82,7 +103,51 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": "string"
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad formatted request for uploading a project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Something went wrong inserting model into the database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error":{
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -94,6 +159,17 @@
     "/projects/{id}": {
       "get": {
         "description": "Return a project with corresponding id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the project to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "A project with corresponding id",
@@ -102,44 +178,39 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "archieved": {
-                      "type": "bool"
-                    },
-                    "assignment_file": {
-                      "type": "string"
-                    },
-                    "course_id": {
-                      "type": "int"
-                    },
-                    "deadline": {
-                      "type": "date"
-                    },
-                    "descriptions": {
-                      "type": "array",
-                      "items": {
-                        "description": "string"
-                      }
-                    },
                     "project_id": {
-                      "type": "int"
-                    },
-                    "regex_expressions": {
-                      "type": "array",
-                      "items": {
-                        "regex": "string"
-                      }
-                    },
-                    "script_name": {
-                      "type": "string"
-                    },
-                    "test_path": {
-                      "type": "string"
+                      "type": "integer"
                     },
                     "title": {
                       "type": "string"
                     },
+                    "description": {
+                      "type": "string"
+                    },
+                    "assignment_file": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "deadline": {
+                      "type": "string"
+                    },
+                    "course_id": {
+                      "type": "integer"
+                    },
                     "visible_for_students": {
-                      "type": "bool"
+                      "type": "boolean"
+                    },
+                    "archived": {
+                      "type": "boolean"
+                    },
+                    "test_path": {
+                      "type": "string"
+                    },
+                    "script_name": {
+                      "type": "string"
+                    },
+                    "regex_expressions": {
+                      "type": "array"
                     }
                   }
                 }
@@ -153,7 +224,31 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "data": {
+                      "type": "object"
+                    },
                     "message": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Something in the database went wrong fetching the project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "url": {
                       "type": "string"
                     }
                   }
@@ -165,6 +260,37 @@
       },
       "patch": {
         "description": "Patch certain fields of a project",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the project to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "assignment_file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "title": { "type": "string" },
+                  "description": { "type": "string" },
+                  "course_id": { "type": "integer" },
+                  "visible_for_students": { "type": "boolean" },
+                  "archived": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Patched a project succesfully",
@@ -173,7 +299,13 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": "string"
+                    "data": {
+                      "type": "object"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "url": { "type": "string" }
                   }
                 }
               }
@@ -188,6 +320,27 @@
                   "properties": {
                     "message": {
                       "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Something went wrong in the database trying to patch the project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
                     }
                   }
                 }
@@ -198,6 +351,17 @@
       },
       "delete": {
         "description": "Delete a project with given id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the project to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Removed a project succesfully",
@@ -206,7 +370,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": "string"
+                    "message": { "type": "string" },
+                    "url": { "type": "string" }
                   }
                 }
               }
@@ -219,7 +384,22 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": "string"
+                    "message": { "type": "string" },
+                    "url": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Something went wrong in the database trying to remove the project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" },
+                    "url": { "type": "string" }
                   }
                 }
               }
@@ -288,34 +468,34 @@
               }
             }
           }
-            },
-          "parameters": [
-            {
-              "name": "name",
-              "in": "query",
-              "description": "Name of the course",
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "ufora_id",
-              "in": "query",
-              "description": "Ufora ID of the course",
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "teacher",
-              "in": "query",
-              "description": "Teacher of the course",
-              "schema": {
-                "type": "string"
-              }
-            }
-          ]
         },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Name of the course",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ufora_id",
+            "in": "query",
+            "description": "Ufora ID of the course",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "teacher",
+            "in": "query",
+            "description": "Teacher of the course",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
       "post": {
         "description": "Create a new course.",
         "requestBody": {
@@ -333,37 +513,25 @@
                     "description": "Teacher of the course"
                   }
                 },
-                "required": ["name", "teacher"]
+                "required": [
+                  "name",
+                  "teacher"
+                ]
               }
             }
           }
         },
-        "parameters":[
+        "parameters": [
           {
-            "name":"uid",
-            "in":"query",
-            "description":"uid of the user sending the request",
-            "schema":{
-              "type":"string"
+            "name": "uid",
+            "in": "query",
+            "description": "uid of the user sending the request",
+            "schema": {
+              "type": "string"
             }
           }
         ],
-        "responses":{
-          "400": {
-            "description": "There was no uid in the request query.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
+        "responses": {
           "201": {
             "description": "Course with name: {name} and course_id: {course_id} was successfully created",
             "content": {
@@ -399,8 +567,8 @@
               }
             }
           },
-          "403": {
-            "description": "The user trying to create a course was unauthorized.",
+          "400": {
+            "description": "There was no uid in the request query.",
             "content": {
               "application/json": {
                 "schema": {
@@ -414,8 +582,8 @@
               }
             }
           },
-          "500": {
-            "description": "Internal server error.",
+          "403": {
+            "description": "The user trying to create a course was unauthorized.",
             "content": {
               "application/json": {
                 "schema": {
@@ -443,10 +611,26 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
-      }},
-    "/courses/{course_id}" : {
+      }
+    },
+    "/courses/{course_id}": {
       "get": {
         "description": "Get a course by its ID.",
         "parameters": [
@@ -563,18 +747,22 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Successfully deleted course with course_id: {course_id}"
+                      "examples": [
+                        "Successfully deleted course with course_id: {course_id}"
+                      ]
                     },
                     "url": {
                       "type": "string",
-                      "example": "{API_URL}/courses"
+                      "examples": [
+                        "{API_URL}/courses"
+                      ]
                     }
                   }
                 }
               }
             }
           },
-          "403" : {
+          "403": {
             "description": "The user trying to delete the course was unauthorized.",
             "content": {
               "application/json": {
@@ -621,7 +809,7 @@
           }
         }
       },
-      "patch":{
+      "patch": {
         "description": "Update the course with given ID.",
         "parameters": [
           {
@@ -642,25 +830,22 @@
                 "properties": {
                   "name": {
                     "type": "string",
-                    "description": "Name of the course",
-                    "required" : false
+                    "description": "Name of the course"
                   },
                   "teacher": {
                     "type": "string",
-                    "description": "Teacher of the course",
-                    "required" : false
+                    "description": "Teacher of the course"
                   },
                   "ufora_id": {
                     "type": "string",
-                    "description": "Ufora ID of the course",
-                    "required" : false
+                    "description": "Ufora ID of the course"
                   }
                 }
               }
             }
           }
         },
-        "responses" : {
+        "responses": {
           "200": {
             "description": "Course updated.",
             "content": {
@@ -696,7 +881,7 @@
               }
             }
           },
-          "403" : {
+          "403": {
             "description": "The user trying to update the course was unauthorized.",
             "content": {
               "application/json": {
@@ -812,7 +997,7 @@
           }
         }
       },
-      "post":{
+      "post": {
         "description": "Assign students to a course.",
         "parameters": [
           {
@@ -834,30 +1019,15 @@
             }
           },
           {
-            "name":"uid",
-            "in":"query",
-            "description":"uid of the user sending the request",
-            "schema":{
-              "type":"string"
+            "name": "uid",
+            "in": "query",
+            "description": "uid of the user sending the request",
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
-          "400": {
-            "description": "There was no uid in the request query.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
           "201": {
             "description": "Students assigned to course.",
             "content": {
@@ -867,11 +1037,15 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "User were succesfully added to the course"
+                      "examples": [
+                        "User were succesfully added to the course"
+                      ]
                     },
                     "url": {
                       "type": "string",
-                      "example": "http://api.example.com/courses/123/students"
+                      "examples": [
+                        "http://api.example.com/courses/123/students"
+                      ]
                     },
                     "data": {
                       "type": "object",
@@ -880,10 +1054,27 @@
                           "type": "array",
                           "items": {
                             "type": "string",
-                            "example": "http://api.example.com/users/123"
+                            "examples": [
+                              "http://api.example.com/users/123"
+                            ]
                           }
                         }
                       }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "There was no uid in the request query.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
                     }
                   }
                 }
@@ -937,7 +1128,7 @@
           }
         }
       },
-      "delete":{
+      "delete": {
         "description": "Remove students from a course.",
         "parameters": [
           {
@@ -959,15 +1150,15 @@
             }
           },
           {
-            "name":"uid",
-            "in":"query",
-            "description":"uid of the user sending the request",
-            "schema":{
-              "type":"string"
+            "name": "uid",
+            "in": "query",
+            "description": "uid of the user sending the request",
+            "schema": {
+              "type": "string"
             }
           }
         ],
-        "responses":{
+        "responses": {
           "204": {
             "description": "Students removed from course.",
             "content": {
@@ -977,11 +1168,13 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "User were succesfully removed from the course"
+                      "examples": "User were succesfully removed from the course"
                     },
                     "url": {
                       "type": "string",
-                      "example": "API_URL + '/courses/' + str(course_id) + '/students'"
+                      "examples": [
+                        "API_URL + /courses/ + str(course_id) + /students"
+                      ]
                     }
                   }
                 }
@@ -1003,7 +1196,7 @@
               }
             }
           },
-          "403":{
+          "403": {
             "description": "The user trying to remove students from the course was unauthorized.",
             "content": {
               "application/json": {
@@ -1018,22 +1211,7 @@
               }
             }
           },
-          "500":{
-            "description": "Internal server error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404":{
+          "404": {
             "description": "Course not found.",
             "content": {
               "application/json": {
@@ -1047,9 +1225,24 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
-          }
-          }
+        }
+      }
     },
     "/courses/{course_id}/admins": {
       "get": {
@@ -1119,7 +1312,7 @@
           }
         }
       },
-      "post":{
+      "post": {
         "description": "Assign admins to a course.",
         "parameters": [
           {
@@ -1141,30 +1334,15 @@
             }
           },
           {
-            "name":"uid",
-            "in":"query",
-            "description":"uid of the user sending the request",
-            "schema":{
-              "type":"string"
+            "name": "uid",
+            "in": "query",
+            "description": "uid of the user sending the request",
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
-          "400": {
-            "description": "There was no uid in the request query.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
           "201": {
             "description": "User were successfully added to the course.",
             "content": {
@@ -1174,11 +1352,15 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "User were successfully added to the course."
+                      "examples": [
+                        "User were successfully added to the course."
+                      ]
                     },
                     "url": {
                       "type": "string",
-                      "example": "http://api.example.com/courses/123/students"
+                      "examples": [
+                        "http://api.example.com/courses/123/students"
+                      ]
                     },
                     "data": {
                       "type": "object",
@@ -1188,9 +1370,27 @@
                           "items": {
                             "type": "string"
                           },
-                          "example": ["http://api.example.com/users/1", "http://api.example.com/users/2"]
+                          "examples": [
+                            "http://api.example.com/users/1",
+                            "http://api.example.com/users/2"
+                          ]
                         }
                       }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "There was no uid in the request query.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
                     }
                   }
                 }
@@ -1244,7 +1444,7 @@
           }
         }
       },
-      "delete":{
+      "delete": {
         "description": "Remove an admin from a course.",
         "parameters": [
           {
@@ -1266,15 +1466,15 @@
             }
           },
           {
-            "name":"uid",
-            "in":"query",
-            "description":"uid of the user sending the request",
-            "schema":{
-              "type":"string"
+            "name": "uid",
+            "in": "query",
+            "description": "uid of the user sending the request",
+            "schema": {
+              "type": "string"
             }
           }
         ],
-        "responses":{
+        "responses": {
           "204": {
             "description": "User was successfully removed from the course admins.",
             "content": {
@@ -1284,11 +1484,15 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "User was successfully removed from the course admins."
+                      "examples": [
+                        "User was successfully removed from the course admins."
+                      ]
                     },
                     "url": {
                       "type": "string",
-                      "example": "API_URL + '/courses/' + str(course_id) + '/students'"
+                      "examples": [
+                        "API_URL + /courses/ + str(course_id) + /students"
+                      ]
                     }
                   }
                 }
@@ -1310,7 +1514,7 @@
               }
             }
           },
-          "403":{
+          "403": {
             "description": "The user trying to remove the admin from the course was unauthorized.",
             "content": {
               "application/json": {
@@ -1325,22 +1529,7 @@
               }
             }
           },
-          "500":{
-            "description": "Internal server error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404":{
+          "404": {
             "description": "Course not found.",
             "content": {
               "application/json": {
@@ -1354,10 +1543,25 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
-          }
-          }
-      },
+        }
+      }
+    },
     "/users": {
       "get": {
         "summary": "Get all users",
@@ -1381,17 +1585,78 @@
                         "type": "boolean"
                       }
                     },
-                    "required": ["uid", "is_teacher", "is_admin"]
+                    "required": [
+                      "uid",
+                      "is_teacher",
+                      "is_admin"
+                    ]
                   }
                 }
               }
             }
-          }}},
-          "post": {
-            "summary": "Create a new user",
-            "requestBody": {
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uid": {
+                    "type": "string"
+                  },
+                  "is_teacher": {
+                    "type": "boolean"
+                  },
+                  "is_admin": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "uid",
+                  "is_teacher",
+                  "is_admin"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          },
+          "400": {
+            "description": "Invalid request data"
+          },
+          "415": {
+            "description": "Unsupported Media Type. Expected JSON."
+          },
+          "500": {
+            "description": "An error occurred while creating the user"
+          }
+        }
+      },
+      "/users/{user_id}": {
+        "get": {
+          "summary": "Get a user by ID",
+          "parameters": [
+            {
+              "name": "user_id",
+              "in": "path",
               "required": true,
-              "content":{
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "A user",
+              "content": {
                 "application/json": {
                   "schema": {
                     "type": "object",
@@ -1406,142 +1671,602 @@
                         "type": "boolean"
                       }
                     },
-                    "required": ["uid", "is_teacher", "is_admin"]
+                    "required": [
+                      "uid",
+                      "is_teacher",
+                      "is_admin"
+                    ]
                   }
                 }
               }
             },
-            "responses": {
-              "201": {
-                "description": "User created successfully"
-              },
-              "400": {
-                "description": "Invalid request data"
-              },
-              "415": {
-                "description": "Unsupported Media Type. Expected JSON."
-              },
-              "500": {
-                "description": "An error occurred while creating the user"
+            "404": {
+              "description": "User not found"
+            }
+          }
+        },
+        "patch": {
+          "summary": "Update a user's information",
+          "parameters": [
+            {
+              "name": "user_id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
               }
             }
-
-        },
-        "/users/{user_id}": {
-          "get": {
-            "summary": "Get a user by ID",
-            "parameters": [
-              {
-                "name": "user_id",
-                "in": "path",
-                "required": true,
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "is_teacher": {
+                      "type": "boolean"
+                    },
+                    "is_admin": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "is_teacher",
+                    "is_admin"
+                  ]
                 }
               }
-            ],
-            "responses": {
-              "200": {
-                "description": "A user",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "uid": {
-                          "type": "string"
-                        },
-                        "is_teacher": {
-                          "type": "boolean"
-                        },
-                        "is_admin": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["uid", "is_teacher", "is_admin"]
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "User updated successfully"
+            },
+            "404": {
+              "description": "User not found"
+            },
+            "415": {
+              "description": "Unsupported Media Type. Expected JSON."
+            },
+            "500": {
+              "description": "An error occurred while patching the user"
+            }
+          }
+        },
+        "delete": {
+          "summary": "Delete a user",
+          "parameters": [
+            {
+              "name": "user_id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "User deleted successfully"
+            },
+            "404": {
+              "description": "User not found"
+            },
+            "500": {
+              "description": "An error occurred while deleting the user"
+            }
+          }
+        }
+      }
+    }
+  },
+  "/submissions": {
+    "get": {
+      "summary": "Gets the submissions",
+      "parameters": [
+        {
+          "name": "uid",
+          "in": "query",
+          "description": "User ID",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "project_id",
+          "in": "query",
+          "description": "Project ID",
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successfully retrieved a list of submission URLs",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "submissions": "array",
+                      "items": {
+                        "type": "string",
+                        "format": "uri"
+                      }
                     }
                   }
                 }
-              },
-              "404": {
-                "description": "User not found"
               }
             }
-          },
-          "patch": {
-            "summary": "Update a user's information",
-            "parameters": [
-              {
-                "name": "user_id",
-                "in": "path",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            ],
-            "requestBody": {
-              "required": true,
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "is_teacher": {
-                        "type": "boolean"
-                      },
-                      "is_admin": {
-                        "type": "boolean"
-                      }
-                    },
-                    "required": ["is_teacher", "is_admin"]
+          }
+        },
+        "400": {
+          "description": "An invalid user or project is given",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
                   }
                 }
               }
-            },
-            "responses": {
-              "200": {
-                "description": "User updated successfully"
-              },
-              "404": {
-                "description": "User not found"
-              },
-              "415": {
-                "description": "Unsupported Media Type. Expected JSON."
-              },
-              "500": {
-                "description": "An error occurred while patching the user"
-              }
             }
-          },
-          "delete": {
-            "summary": "Delete a user",
-            "parameters": [
-              {
-                "name": "user_id",
-                "in": "path",
-                "required": true,
-                "schema": {
-                  "type": "string"
+          }
+        },
+        "500": {
+          "description": "An internal server error occurred",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
                 }
-              }
-            ],
-            "responses": {
-              "200": {
-                "description": "User deleted successfully"
-              },
-              "404": {
-                "description": "User not found"
-              },
-              "500": {
-                "description": "An error occurred while deleting the user"
               }
             }
           }
         }
       }
-
+    },
+    "post": {
+      "summary": "Posts a new submission to a project",
+      "requestBody": {
+        "description": "Form data",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "uid": {
+                  "type": "string",
+                  "required": true
+                },
+                "project_id": {
+                  "type": "integer",
+                  "required": true
+                },
+                "files": {
+                  "type": "array",
+                  "items": {
+                    "type": "file"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Successfully posts the submission and retrieves its data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "user": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "project": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "grading": {
+                        "type": "integer"
+                      },
+                      "time": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "path": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "An invalid user, project or list of files is given",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "An internal server error occurred",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/submissions/{submission_id}": {
+    "get": {
+      "summary": "Gets the submission",
+      "responses": {
+        "200": {
+          "description": "Successfully retrieved the submission",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "submission": {
+                        "type": "object",
+                        "properties": {
+                          "submission_id": {
+                            "type": "integer"
+                          },
+                          "user": {
+                            "type": "string",
+                            "format": "uri"
+                          },
+                          "project": {
+                            "type": "string",
+                            "format": "uri"
+                          },
+                          "grading": {
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "time": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "path": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "An invalid submission id is given",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "An internal server error occurred",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "patch": {
+      "summary": "Patches the submission",
+      "requestBody": {
+        "description": "The submission data",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "grading": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 20
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Successfully patches the submission and retrieves its data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "user": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "project": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "grading": {
+                        "type": "integer"
+                      },
+                      "time": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "path": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "An invalid submission grading is given",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "An invalid submission id is given",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "An internal server error occurred",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "delete": {
+      "summary": "Deletes the submission",
+      "responses": {
+        "200": {
+          "description": "Successfully deletes the submission",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "An invalid submission id is given",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "An internal server error occurred",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters": [
+      {
+        "name": "submission_id",
+        "in": "path",
+        "description": "Submission ID",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        }
+      }
+    ]
   }
-
-
 }
