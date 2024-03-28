@@ -32,9 +32,11 @@ export function CourseForm(): JSX.Element {
               body: JSON.stringify({ name: courseName }),
             })
               .then(response => response.json())
-              .then(data => console.log(data))
+              .then(data => {
+                window.location.href = data.url; // navigate to data.url
+              })
               .catch((error) => {
-                console.error('Error:', error);
+                console.error('Error:', error); //should redirect to error page
               });
           }}>
           <Typography variant='h5'>Opslaan</Typography>
