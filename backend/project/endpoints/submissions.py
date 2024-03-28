@@ -125,7 +125,7 @@ class SubmissionsEndpoint(Resource):
 
                 # Save the files
                 submission.submission_path = path.join(
-                    f"{UPLOAD_FOLDER}/",
+                    UPLOAD_FOLDER,
                     f"{submission.project_id}/submissions/{submission.submission_id}/"
                 )
                 makedirs(submission.submission_path, exist_ok=True)
