@@ -3,6 +3,7 @@
 from urllib.parse import urljoin
 from datetime import datetime
 from os import getenv, path, makedirs
+from shutil import rmtree
 from dotenv import load_dotenv
 from flask import Blueprint, request
 from flask_restful import Resource
@@ -126,10 +127,14 @@ class SubmissionsEndpoint(Resource):
                 # Save the files
                 submission.submission_path = path.join(UPLOAD_FOLDER, str(submission.project_id),
                     "submissions", str(submission.submission_id))
-                makedirs(submission.submission_path, exist_ok=True)
-                for file in files:
-                    file.save(path.join(submission.submission_path, file.filename))
-                session.commit()
+                try:
+                    makedirs(submission.submission_path, exist_ok=True)
+                    for file in files:
+                        file.save(path.join(submission.submission_path, file.filename))
+                    session.commit()
+                except OSError:
+                    rmtree(submission.submission_path)
+                    session.rollback()
 
                 data["message"] = "Successfully fetched the submissions"
                 data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
