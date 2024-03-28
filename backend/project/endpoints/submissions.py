@@ -14,6 +14,7 @@ from project.models.user import User
 from project.utils.files import filter_files, all_files_uploaded, zip_files
 from project.utils.user import is_valid_user
 from project.utils.project import is_valid_project
+from project.utils.query_agent import query_selected_from_model, delete_by_id_from_model
 from project.utils.authentication import authorize_submission_request, \
     authorize_submissions_request, authorize_grader, \
         authorize_student_submission, authorize_submission_author
@@ -21,6 +22,7 @@ from project.utils.authentication import authorize_submission_request, \
 load_dotenv()
 API_HOST = getenv("API_HOST")
 UPLOAD_FOLDER = getenv("UPLOAD_FOLDER")
+BASE_URL =  urljoin(f"{API_HOST}/", "/submissions")
 
 submissions_bp = Blueprint("submissions", __name__)
 
@@ -36,39 +38,37 @@ class SubmissionsEndpoint(Resource):
         """
 
         data = {
-            "url": urljoin(f"{API_HOST}/", "/submissions")
+            "url": BASE_URL
         }
         try:
-            with db.session() as session:
-                query = session.query(Submission)
+            # Filter by uid
+            uid = request.args.get("uid")
+            if uid is not None and (not uid.isdigit() or not User.query.filter_by(uid=uid).first()):
+                data["message"] = f"Invalid user (uid={uid})"
+                return data, 400
 
-                # Filter by uid
-                uid = request.args.get("uid")
-                if uid is not None:
-                    if session.get(User, uid) is not None:
-                        query = query.filter_by(uid=uid)
-                    else:
-                        data["message"] = f"Invalid user (uid={uid})"
-                        return data, 400
-
-                # Filter by project_id
-                project_id = request.args.get("project_id")
-                if project_id is not None:
-                    if not project_id.isdigit() or session.get(Project, int(project_id)) is None:
-                        data["message"] = f"Invalid project (project_id={project_id})"
-                        return data, 400
-                    query = query.filter_by(project_id=int(project_id))
-
-                # Get the submissions
-                data["message"] = "Successfully fetched the submissions"
-                data["data"] = [
-                    urljoin(f"{API_HOST}/", f"/submissions/{s.submission_id}") for s in query.all()
-                ]
-                return data, 200
-
+            # Filter by project_id
+            project_id = request.args.get("project_id")
+            if project_id is not None and (not project_id.isdigit() or not Project.query.filter_by(project_id=project_id).first()):
+                data["message"] = f"Invalid project (project_id={project_id})"
+                return data, 400
         except exc.SQLAlchemyError:
             data["message"] = "An error occurred while fetching the submissions"
             return data, 500
+        
+        return query_selected_from_model(
+            Submission,
+            urljoin(f"{API_HOST}/", "/submissions"),
+            select_values=[
+                "submission_id", "uid",
+                "project_id", "grading",
+                "submission_time", "submission_status"],
+            url_mapper={
+                "submission_id": BASE_URL,
+                "project_id": urljoin(f"{API_HOST}/", "projects"),
+                "uid": urljoin(f"{API_HOST}/", "users")},
+            filters=request.args
+        )
 
     @authorize_student_submission
     def post(self) -> dict[str, any]:
@@ -79,7 +79,7 @@ class SubmissionsEndpoint(Resource):
         """
 
         data = {
-            "url": urljoin(f"{API_HOST}/", "/submissions")
+            "url": BASE_URL
         }
         try:
             with db.session() as session:
@@ -129,12 +129,11 @@ class SubmissionsEndpoint(Resource):
                 data["message"] = "Successfully fetched the submissions"
                 data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
                 data["data"] = {
-                    "id": submission.submission_id,
+                    "id": urljoin(f"{BASE_URL}/",  submission.submission_id),
                     "user": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
                     "project": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
                     "grading": submission.grading,
                     "time": submission.submission_time,
-                    "path": submission.submission_path,
                     "status": submission.submission_status
                 }
                 return data, 201
@@ -159,7 +158,7 @@ class SubmissionEndpoint(Resource):
         """
 
         data = {
-            "url": urljoin(f"{API_HOST}/", f"/submissions/{submission_id}")
+            "url": urljoin(f"{BASE_URL}/", str(submission_id))
         }
         try:
             with db.session() as session:
@@ -171,12 +170,11 @@ class SubmissionEndpoint(Resource):
 
                 data["message"] = "Successfully fetched the submission"
                 data["data"] = {
-                    "id": submission.submission_id,
+                    "id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
                     "user": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
                     "project": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
                     "grading": submission.grading,
                     "time": submission.submission_time,
-                    "path": submission.submission_path,
                     "status": submission.submission_status
                 }
                 return data, 200
@@ -198,7 +196,7 @@ class SubmissionEndpoint(Resource):
         """
 
         data = {
-            "url": urljoin(f"{API_HOST}/", f"/submissions/{submission_id}")
+            "url": urljoin(f"{BASE_URL}/", str(submission_id))
         }
         try:
             with db.session() as session:
@@ -227,14 +225,13 @@ class SubmissionEndpoint(Resource):
                 session.commit()
 
                 data["message"] = f"Submission (submission_id={submission_id}) patched"
-                data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
+                data["url"] = urljoin(f"{BASE_URL}/", str(submission.submission_id))
                 data["data"] = {
-                    "id": submission.submission_id,
+                    "id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
                     "user": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
                     "project": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
                     "grading": submission.grading,
                     "time": submission.submission_time,
-                    "path": submission.submission_path,
                     "status": submission.submission_status
                 }
                 return data, 200
@@ -256,29 +253,12 @@ class SubmissionEndpoint(Resource):
             dict[str, any]: A message
         """
 
-        data = {
-            "url": urljoin(f"{API_HOST}/", "/submissions")
-        }
-        try:
-            with db.session() as session:
-                submission = session.get(Submission, submission_id)
-                if submission is None:
-                    data["url"] = urljoin(f"{API_HOST}/", "/submissions")
-                    data["message"] = f"Submission (submission_id={submission_id}) not found"
-                    return data, 404
-
-                # Delete the submission
-                session.delete(submission)
-                session.commit()
-
-                data["message"] = f"Submission (submission_id={submission_id}) deleted"
-                return data, 200
-
-        except exc.SQLAlchemyError:
-            db.session.rollback()
-            data["message"] = \
-                f"An error occurred while deleting submission (submission_id={submission_id})"
-            return data, 500
+        return delete_by_id_from_model(
+            Submission,
+            "submission_id",
+            submission_id,
+            BASE_URL
+        )
 
 submissions_bp.add_url_rule("/submissions", view_func=SubmissionsEndpoint.as_view("submissions"))
 submissions_bp.add_url_rule(
