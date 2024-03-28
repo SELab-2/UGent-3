@@ -1,13 +1,8 @@
-import React, { useState } from 'react';
-import { Grid, TextField, Button, List, ListItem, ListItemText, Typography, Box } from '@mui/material';
+import { useState } from 'react';
+import { Grid, TextField, Button, Typography} from '@mui/material';
 
 export function CourseForm(): JSX.Element {
   const [courseName, setCourseName] = useState('');
-  const [assistants, setAssistants] = useState<string[]>([]);
-
-  const handleAddAssistant = () => {
-    setAssistants([...assistants, '']);
-  };
 
   return (
     <Grid container direction={'column'} spacing={2}>
@@ -26,7 +21,22 @@ export function CourseForm(): JSX.Element {
         </Grid>
       </Grid>
       <Grid item container justifyContent="flex-end">
-        <Button variant="contained" color="primary" style={{ borderRadius: '50px',paddingLeft:'2rem',paddingRight:'2rem' }}>
+        <Button variant="contained" color="primary" style={{ borderRadius: '50px',paddingLeft:'2rem',paddingRight:'2rem' }}
+          onClick={() => {
+            fetch('http://127.0.0.1:5000/courses', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'teacher1'
+              },
+              body: JSON.stringify({ name: courseName }),
+            })
+              .then(response => response.json())
+              .then(data => console.log(data))
+              .catch((error) => {
+                console.error('Error:', error);
+              });
+          }}>
           <Typography variant='h5'>Opslaan</Typography>
         </Button>
       </Grid>
