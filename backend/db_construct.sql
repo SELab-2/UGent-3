@@ -1,9 +1,10 @@
+CREATE TYPE role AS ENUM ('STUDENT', 'TEACHER', 'ADMIN');
+
 CREATE TYPE submission_status AS ENUM ('SUCCESS', 'LATE', 'FAIL', 'RUNNING');
 
 CREATE TABLE users (
 	uid VARCHAR(255),
-	is_teacher BOOLEAN,
-	is_admin BOOLEAN,
+	role role NOT NULL,
 	PRIMARY KEY(uid)
 );
 

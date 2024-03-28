@@ -7,7 +7,7 @@ from flask_restful import Resource, Api
 from sqlalchemy.exc import SQLAlchemyError
 
 from project import db
-from project.models.user import User as userModel
+from project.models.user import User as userModel, Role
 from project.utils.authentication import login_required, authorize_user, \
     authorize_admin, not_allowed
 
@@ -29,16 +29,13 @@ class Users(Resource):
         """
         try:
             query = userModel.query
-            is_teacher = request.args.get('is_teacher')
-            is_admin = request.args.get('is_admin')
-
-            if is_teacher is not None:
-                query = query.filter(userModel.is_teacher == (is_teacher.lower() == 'true'))
-
-            if is_admin is not None:
-                query = query.filter(userModel.is_admin == (is_admin.lower() == 'true'))
+            role = request.args.get("role")
+            if role is not None:
+                role = Role[role.upper()]
+                query = query.filter(userModel.role == role)
 
             users = query.all()
+            users = [user.to_dict() for user in users]
 
             result = jsonify({"message": "Queried all users", "data": users,
                               "url":f"{API_URL}/users", "status_code": 200})
@@ -54,26 +51,25 @@ class Users(Resource):
         It should create a new user and return a success message.
         """
         uid = request.json.get('uid')
-        is_teacher = request.json.get('is_teacher')
-        is_admin = request.json.get('is_admin')
+        role = request.json.get("role")
+        role = Role[role.upper()] if role is not None else None
         url = f"{API_URL}/users"
 
-        if is_teacher is None or is_admin is None or uid is None:
+        if role is None or uid is None:
             return {
                 "message": "Invalid request data!",
                 "correct_format": {
                     "uid": "User ID (string)",
-                    "is_teacher": "Teacher status (boolean)",
-                    "is_admin": "Admin status (boolean)"
-                },"url": url
+                    "role": "User role (string)"
+                },"url": f"{API_URL}/users"
             }, 400
         try:
             user = db.session.get(userModel, uid)
             if user is not None:
                 # Bad request, error code could be 409 but is rarely used
                 return {"message": f"User {uid} already exists"}, 400
-            # Code to create a new user in the database using the uid, is_teacher, and is_admin
-            new_user = userModel(uid=uid, is_teacher=is_teacher, is_admin=is_admin)
+            # Code to create a new user in the database using the uid and role
+            new_user = userModel(uid=uid, role=role)
             db.session.add(new_user)
             db.session.commit()
             return jsonify({"message": "User created successfully!",
@@ -99,7 +95,7 @@ class User(Resource):
             if user is None:
                 return {"message": "User not found!","url": f"{API_URL}/users"}, 404
 
-            return jsonify({"message": "User queried","data":user,
+            return jsonify({"message": "User queried","data":user.to_dict(),
                     "url": f"{API_URL}/users/{user.uid}", "status_code": 200})
         except SQLAlchemyError:
             return {"message": "An error occurred while fetching the user",
@@ -114,22 +110,21 @@ class User(Resource):
             dict: A dictionary containing the message indicating the success
              or failure of the update.
         """
-        is_teacher = request.json.get('is_teacher')
-        is_admin = request.json.get('is_admin')
+        role = request.json.get("role")
+        role = Role[role.upper()] if role is not None else None
         try:
             user = db.session.get(userModel, user_id)
             if user is None:
                 return {"message": "User not found!","url": f"{API_URL}/users"}, 404
 
-            if is_teacher is not None:
-                user.is_teacher = is_teacher
-            if is_admin is not None:
-                user.is_admin = is_admin
+            if role is not None:
+                user.role = role
 
             # Save the changes to the database
             db.session.commit()
             return jsonify({"message": "User updated successfully!",
-                    "data": user, "url": f"{API_URL}/users/{user.uid}", "status_code": 200})
+                    "data": user.to_dict(), 
+                    "url": f"{API_URL}/users/{user.uid}", "status_code": 200})
         except SQLAlchemyError:
             # every exception should result in a rollback
             db.session.rollback()
