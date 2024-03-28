@@ -1,40 +1,34 @@
-import { Box, Grid, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import FileTreeView from "./TreeView";
-import hljs from "highlight.js";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { Button, Grid, Paper, Typography, styled } from "@mui/material";
+import { verifyZipContents } from "../../utils/file-utils";
+import JSZip from "jszip";
+import React, { useState } from "react";
 
 interface FolderDragDropProps {
-  onFolderDrop: (folder: FileSystemEntry) => void;
-  onFileDrop: (file: FileSystemEntry) => void;
+  onFileDrop?: (file: File) => void;
+  regexRequirements?: string[];
+  onWrongInput?: (message: string) => void;
 }
 
+const supportedFileTypes = ["application/x-zip-compressed", "application/zip"];
+
 const FolderDragDrop: React.FC<FolderDragDropProps> = ({
-  onFolderDrop,
   onFileDrop,
+  regexRequirements,
+  onWrongInput,
 }) => {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
-  const [fileRawText, setFileRawText] = useState<string>("");
-  const [selectedFile, setSelectedFile] = useState<FileSystemEntry | null>(
-    null
-  );
-  const [rootFolder, setRootFolder] = useState<FileSystemDirectoryEntry | null>(
-    null
-  );
 
-  useEffect(() => {
-    if (selectedFile) {
-      readTextFromFile(selectedFile as FileSystemFileEntry).then((text) => {
-        if (text) {
-          console.log(
-            hljs.getLanguage(getFileExtension(selectedFile?.name))?.name
-          );
-          setFileRawText(text);
-        }
-      });
-    }
-  }, [selectedFile]);
+  const VisuallyHiddenInput = styled("input")({
+    clip: "rect(0 0 0 0)",
+    clipPath: "inset(50%)",
+    height: 1,
+    overflow: "hidden",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    whiteSpace: "nowrap",
+    width: 1,
+  });
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -45,90 +39,94 @@ const FolderDragDrop: React.FC<FolderDragDropProps> = ({
     setIsDraggingOver(false);
   };
 
+  const handleNewFile = async (entry: File) => {
+    if (onFileDrop && supportedFileTypes.includes(entry.type)) {
+      const fileName: string = entry.name;
+      const fileExtension: string = getFileExtension(fileName);
+      if (fileExtension === "zip" && regexRequirements) {
+        try {
+          const regexReport = await JSZip.loadAsync(entry).then((zip) => {
+            return verifyZipContents(zip, regexRequirements);
+          });
+          if (regexReport.isValid) {
+            onFileDrop(entry);
+          } else {
+            onWrongInput &&
+              onWrongInput(
+                `Missing required fields: ${regexReport.missingFiles.join(
+                  ", "
+                )}.`
+              );
+          }
+        } catch {
+          onWrongInput &&
+            onWrongInput("Something went wrong getting parsing your zip.");
+        }
+      } else {
+        onFileDrop(entry);
+      }
+    } else {
+      onWrongInput && onWrongInput("The file must be zipped.");
+    }
+  };
+
   const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setIsDraggingOver(false);
 
     const items = event.dataTransfer?.items;
-    if (items) {
-      console.log(items);
+    if (items && onFileDrop) {
       const folderItem = items[0];
       if (folderItem.kind === "file") {
-        const entry = folderItem.webkitGetAsEntry();
-        if (entry && entry.isFile) {
-          onFileDrop(entry);
+        const entry = folderItem.getAsFile();
+        if (entry) {
+          handleNewFile(entry);
+        } else {
+          onWrongInput &&
+            onWrongInput("Something went wrong getting your file.");
         }
-        if (entry && entry.isDirectory) {
-          setRootFolder(entry as FileSystemDirectoryEntry);
-        }
+      } else {
+        onWrongInput && onWrongInput("Your input must be a file.");
       }
     }
   };
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      handleNewFile(file);
+    }
+  }
+
   return (
-    <Grid container direction="column" style={{margin: "1rem"}} spacing={2}>
+    <Grid container direction="column" style={{ margin: "1rem" }} spacing={2}>
       <Grid item>
-        <Box
+        <Paper
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          style={{ borderColor: isDraggingOver ? "#ff5722" : "#ccc" }}
+          style={{
+            width: "fit-content",
+            padding: "1rem",
+            borderStyle: "dashed",
+            backgroundColor: isDraggingOver ? "lightgray" : "inherit",
+            textAlign: "center"
+          }}
         >
-          <Typography variant="h5">Drag & Drop a Folder Here</Typography>
-        </Box>
-      </Grid>
-      <Grid item>
-        <Grid container spacing="20">
-          <Grid item sx={{ width: "40rem" }}>
-            <FileTreeView
-              rootFolder={rootFolder}
-              onFileSelect={setSelectedFile}
-            />
-          </Grid>
-          <Grid item>
-            {selectedFile?.name && (
-              <SyntaxHighlighter
-                customStyle={{width: "40rem", height: "20rem", overflow: "auto", margin: "0rem"}}
-                language={hljs
-                  .getLanguage(getFileExtension(selectedFile?.name))
-                  ?.name?.toLowerCase()}
-                style={docco}
-              >
-                {fileRawText || "No file selected."}
-              </SyntaxHighlighter>
-            )}
-          </Grid>
-        </Grid>
+          <Typography variant="h5">Drag & Drop a File Here</Typography>
+          <Button
+            component="label"
+            role={undefined}
+            tabIndex={-1}
+          >
+            <Typography>Or click to select a file</Typography>
+            <VisuallyHiddenInput type="file" onChange={handleFileUpload} />
+          </Button>
+        </Paper>
       </Grid>
     </Grid>
   );
 };
-
-async function readTextFromFile(
-  entry: FileSystemFileEntry
-): Promise<string | null> {
-  // Check if the entry is a file
-  if (entry.isFile) {
-    try {
-      // Get a file object
-      const file = await new Promise<File>((resolve, reject) => {
-        entry.file(resolve, reject);
-      });
-
-      // Read the file as text
-      const text = await file.text();
-
-      // Return the raw text
-      return text;
-    } catch (error) {
-      console.error("Error reading file:", error);
-      return null;
-    }
-  } else {
-    console.error("Entry is not a file.");
-    return null;
-  }
-}
 
 function getFileExtension(filename: string) {
   return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
