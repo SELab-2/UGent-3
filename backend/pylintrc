@@ -8,8 +8,9 @@ disable=W0621, # Redefining name %r from outer scope (line %s)
 
 [test-files:*_test.py]
 disable=
+    W0613, # Unused argument (pytest uses it)
     W0621, # Redefining name %r from outer scope (line %s)
-     W0613 # unused-argument
+    R0904, # Too many public methods (too many unit tests essentially)
 
 [modules:project/modules/*]
 disable=

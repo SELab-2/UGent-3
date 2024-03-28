@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from flask import abort
 from sqlalchemy.exc import SQLAlchemyError
 
-from project import db
+from project.db_in import db
 from project.models.course_relation import CourseAdmin
 from project.models.user import User
 from project.models.course import Course
@@ -18,6 +18,7 @@ from project.models.course import Course
 load_dotenv()
 API_URL = getenv("API_HOST")
 RESPONSE_URL = urljoin(API_URL + "/", "courses")
+BASE_DB_ERROR = "Database error occurred while"
 
 def execute_query_abort_if_db_error(query, url, query_all=False):
     """
@@ -35,8 +36,8 @@ def execute_query_abort_if_db_error(query, url, query_all=False):
             result = query.all()
         else:
             result = query.first()
-    except SQLAlchemyError as e:
-        response = json_message(str(e))
+    except SQLAlchemyError:
+        response = json_message(f"{BASE_DB_ERROR} executing query")
         response["url"] = url
         abort(500, description=response)
     return result
@@ -52,9 +53,9 @@ def add_abort_if_error(to_add, url):
     """
     try:
         db.session.add(to_add)
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         db.session.rollback()
-        response = json_message(str(e))
+        response = json_message(f"{BASE_DB_ERROR} adding object")
         response["url"] = url
         abort(500, description=response)
 
@@ -69,9 +70,9 @@ def delete_abort_if_error(to_delete, url):
     """
     try:
         db.session.delete(to_delete)
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         db.session.rollback()
-        response = json_message(str(e))
+        response = json_message(f"{BASE_DB_ERROR} deleting object")
         response["url"] = url
         abort(500, description=response)
 
@@ -82,9 +83,9 @@ def commit_abort_if_error(url):
     """
     try:
         db.session.commit()
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         db.session.rollback()
-        response = json_message(str(e))
+        response = json_message(f"{BASE_DB_ERROR} committing changes")
         response["url"] = url
         abort(500, description=response)
 
@@ -213,7 +214,7 @@ def json_message(message):
     return {"message": message}
 
 
-def get_course_abort_if_not_found(course_id):
+def get_course_abort_if_not_found(course_id, url=f"{API_URL}/courses"):
     """
     Get a course by its ID.
 
@@ -224,11 +225,11 @@ def get_course_abort_if_not_found(course_id):
         Course: The course with the given ID.
     """
     query = Course.query.filter_by(course_id=course_id)
-    course = execute_query_abort_if_db_error(query, f"{API_URL}/courses")
+    course = execute_query_abort_if_db_error(query, url)
 
     if not course:
         response = json_message("Course not found")
-        response["url"] = f"{API_URL}/courses"
+        response["url"] = url
         abort(404, description=response)
 
     return course
