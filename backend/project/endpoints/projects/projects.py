@@ -25,7 +25,7 @@ class ProjectsEndpoint(Resource):
     for implementing get method
     """
 
-    @authorize_teacher
+    # @authorize_teacher
     def get(self, teacher_id=None):
         """
         Get method for listing all available projects
@@ -46,7 +46,6 @@ class ProjectsEndpoint(Resource):
         Post functionality for project
         using flask_restfull parse lib
         """
-
         file = request.files["assignment_file"]
         project_json = parse_project_params()
         filename = os.path.basename(file.filename)
@@ -54,6 +53,7 @@ class ProjectsEndpoint(Resource):
 
         # save the file that is given with the request
         try:
+            print(project_json)
             new_project, status_code = create_model_instance(
                 Project,
                 project_json,
@@ -65,6 +65,7 @@ class ProjectsEndpoint(Resource):
                     "visible_for_students",
                     "archived"]
             )
+            print(new_project, status_code)
         except SQLAlchemyError:
             return jsonify({"error": "Something went wrong while inserting into the database.",
                             "url": f"{API_URL}/projects"}), 500

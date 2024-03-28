@@ -15,7 +15,7 @@ parser.add_argument(
     location="form"
 )
 parser.add_argument("deadline", type=str, help='Projects deadline', location="form")
-parser.add_argument("course_id", type=str, help='Projects course_id', location="form")
+parser.add_argument("course_id", type=int, help='Projects course_id', location="form")
 parser.add_argument(
     "visible_for_students",
     type=bool,

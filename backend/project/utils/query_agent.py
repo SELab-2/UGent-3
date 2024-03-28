@@ -60,15 +60,20 @@ def create_model_instance(model: DeclarativeMeta,
     """
     if required_fields is None:
         required_fields = []
+
     # Check if all non-nullable fields are present in the data
     missing_fields = [field for field in required_fields if field not in data]
 
     if missing_fields:
         return {"error": f"Missing required fields: {', '.join(missing_fields)}",
                 "url": response_url_base}, 400
+    print("met velden niets mis")
 
     filtered_data = filter_model_fields(model, data)
+    print(filtered_data)
     new_instance: DeclarativeMeta = model(**filtered_data)
+    print("augh")
+    print(new_instance)
     db.session.add(new_instance)
     db.session.commit()
 
