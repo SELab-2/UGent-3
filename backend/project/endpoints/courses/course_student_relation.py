@@ -30,7 +30,7 @@ from project.utils.authentication import login_required, authorize_teacher_or_co
 
 load_dotenv()
 API_URL = getenv("API_HOST")
-RESPONSE_URL = urljoin(API_URL + "/", "courses")
+RESPONSE_URL = urljoin(f"{API_URL}/", "courses")
 
 class CourseToAddStudents(Resource):
     """
