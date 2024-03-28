@@ -1,5 +1,5 @@
 import { Button, Grid, Paper, Typography, styled } from "@mui/material";
-import { verifyZipContents } from "../../utils/file-utils";
+import { verifyZipContents, getFileExtension } from "../../utils/file-utils";
 import JSZip from "jszip";
 import React, { useState } from "react";
 
@@ -127,9 +127,5 @@ const FolderDragDrop: React.FC<FolderDragDropProps> = ({
     </Grid>
   );
 };
-
-function getFileExtension(filename: string) {
-  return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
-}
 
 export default FolderDragDrop;
