@@ -1,16 +1,19 @@
 """Main entry point for the application."""
 
-from sys import path
-
 from dotenv import load_dotenv
 from flask_cors import CORS
 from project import create_app_with_db
 from project.db_in import url
 
-path.append(".")
+load_dotenv()
+DEBUG=getenv("DEBUG")
 
 if __name__ == "__main__":
-    load_dotenv()
     app = create_app_with_db(url)
     CORS(app)
-    app.run(debug=True)
+
+    if DEBUG and DEBUG.lower() == "true":
+        app.run(debug=True, host='0.0.0.0')
+    else:
+        from waitress import serve
+        serve(app, host='0.0.0.0', port=5000)

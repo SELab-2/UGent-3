@@ -7,6 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import { useTranslation } from "react-i18next";
 
 /**
  * The header component for the application that will be rendered at the top of the page.

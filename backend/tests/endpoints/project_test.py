@@ -16,7 +16,8 @@ def test_assignment_download(client, valid_project):
         )
     assert response.status_code == 201
     project_id = response.json["data"]["project_id"]
-    response = client.get(f"/projects/{project_id}/assignments", headers={"Authorization":"teacher2"})
+    response = client.get(f"/projects/{project_id}/assignments",
+                          headers={"Authorization":"teacher2"})
     # file downloaded succesfully
     assert response.status_code == 200
 
@@ -76,9 +77,7 @@ def test_remove_project(client, valid_project_entry):
     assert response.status_code == 404
 
 def test_patch_project(client, valid_project_entry):
-    """
-    Test functionality of the PATCH method for projects
-    """
+    """Test functionality of the PATCH method for projects"""
 
     project_id = valid_project_entry.project_id
 

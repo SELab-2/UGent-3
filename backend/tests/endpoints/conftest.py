@@ -6,12 +6,13 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import pytest
 from sqlalchemy import create_engine
-from project.models.user import User
+from sqlalchemy.exc import SQLAlchemyError
+from project.models.user import User,Role
 from project.models.course import Course
 from project.models.course_share_code import CourseShareCode
 from project import create_app_with_db
 from project.db_in import url, db
-from project.models.submission import Submission
+from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 
 
@@ -26,7 +27,7 @@ def valid_submission(valid_user_entry, valid_project_entry):
         "grading": 16,
         "submission_time": datetime(2024,3,14,12,0,0,tzinfo=ZoneInfo("GMT")),
         "submission_path": "/submission/1",
-        "submission_status": True
+        "submission_status": SubmissionStatus.SUCCESS
     }
 
 @pytest.fixture
@@ -46,7 +47,7 @@ def valid_user():
     """
     return {
         "uid": "w_student",
-        "is_teacher": False
+        "role": Role.STUDENT.name
     }
 
 @pytest.fixture
@@ -55,6 +56,26 @@ def valid_user_entry(session, valid_user):
     Returns a user that is in the database
     """
     user = User(**valid_user)
+    session.add(user)
+    session.commit()
+    return user
+
+@pytest.fixture
+def valid_admin():
+    """
+    Returns a valid admin user form
+    """
+    return {
+        "uid": "admin_person",
+        "role": Role.ADMIN,
+    }
+
+@pytest.fixture
+def valid_admin_entry(session, valid_admin):
+    """
+    Returns an admin user that is in the database
+    """
+    user = User(**valid_admin)
     session.add(user)
     session.commit()
     return user
@@ -73,10 +94,10 @@ def valid_user_entries(session):
     Returns a list of users that are in the database
     """
     users = [
-        User(uid="del", is_admin=False, is_teacher=True),
-        User(uid="pat", is_admin=False, is_teacher=True),
-        User(uid="u_get", is_admin=False, is_teacher=True),
-        User(uid="query_user", is_admin=True, is_teacher=False)]
+        User(uid="del", role=Role.TEACHER),
+        User(uid="pat", role=Role.TEACHER),
+        User(uid="u_get", role=Role.TEACHER),
+        User(uid="query_user", role=Role.ADMIN)]
 
     session.add_all(users)
     session.commit()
@@ -127,7 +148,7 @@ def app():
 @pytest.fixture
 def course_teacher_ad():
     """A user that's a teacher for testing"""
-    ad_teacher = User(uid="Gunnar", is_teacher=True, is_admin=True)
+    ad_teacher = User(uid="Gunnar", role=Role.TEACHER)
     return ad_teacher
 
 @pytest.fixture
@@ -177,9 +198,12 @@ def client(app):
 @pytest.fixture
 def valid_teacher_entry(session):
     """A valid teacher for testing that's already in the db"""
-    teacher = User(uid="Bart", is_teacher=True)
-    session.add(teacher)
-    session.commit()
+    teacher = User(uid="Bart", role=Role.TEACHER)
+    try:
+        session.add(teacher)
+        session.commit()
+    except SQLAlchemyError:
+        session.rollback()
     return teacher
 
 @pytest.fixture
@@ -193,6 +217,16 @@ def course_no_name(valid_teacher_entry):
     return {"name": "", "teacher": valid_teacher_entry.uid}
 
 @pytest.fixture
+def course_empty_name():
+    """A course with an empty name"""
+    return {"name": "", "teacher": "Bart"}
+
+@pytest.fixture
+def invalid_course():
+    """An invalid course for testing."""
+    return {"invalid": "error"}
+
+@pytest.fixture
 def valid_course_entry(session, valid_course):
     """A valid course for testing that's already in the db"""
     course = Course(**valid_course)
@@ -204,7 +238,7 @@ def valid_course_entry(session, valid_course):
 def valid_students_entries(session):
     """Valid students for testing that are already in the db"""
     students = [
-        User(uid=f"student_sel2_{i}", is_teacher=False)
+        User(uid=f"student_sel2_{i}", role=Role.STUDENT)
         for i in range(3)
     ]
     session.add_all(students)
