@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { Grid, TextField, Button, Typography} from '@mui/material';
 
+/**
+ * Renders the CourseForm component.
+ * @returns JSX.Element representing the CourseForm component.
+ */
 export function CourseForm(): JSX.Element {
   const [courseName, setCourseName] = useState('');
 
