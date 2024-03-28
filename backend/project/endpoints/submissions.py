@@ -49,13 +49,15 @@ class SubmissionsEndpoint(Resource):
 
             # Filter by project_id
             project_id = request.args.get("project_id")
-            if project_id is not None and (not project_id.isdigit() or not Project.query.filter_by(project_id=project_id).first()):
+            if project_id is not None \
+                and (not project_id.isdigit() or
+                     not Project.query.filter_by(project_id=project_id).first()):
                 data["message"] = f"Invalid project (project_id={project_id})"
                 return data, 400
         except exc.SQLAlchemyError:
             data["message"] = "An error occurred while fetching the submissions"
             return data, 500
-        
+
         return query_selected_from_model(
             Submission,
             urljoin(f"{API_HOST}/", "/submissions"),
