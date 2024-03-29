@@ -40,7 +40,6 @@ module.exports = {
     "jsdoc/require-param": 1,
     "jsdoc/require-param-description": 1,
     "jsdoc/require-param-name": 1,
-    // "jsdoc/require-param-type": 1,
     "jsdoc/require-property": 1,
     "jsdoc/require-property-description": 1,
     "jsdoc/require-property-name": 1,
