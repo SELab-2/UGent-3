@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Home from "./pages/home/Home";
+import HomeStudent from "./pages/home/Home_student.tsx";
 import { Header } from "./components/Header/Header";
 
 /**
@@ -11,7 +11,7 @@ function App(): JSX.Element {
     <BrowserRouter>
       <Header />
       <Routes>
-        <Route index element={<Home />} />
+        <Route index element={<HomeStudent />} />
       </Routes>
     </BrowserRouter>
   );
