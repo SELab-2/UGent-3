@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import pytest
+from pytest import fixture
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from project.models.user import User,Role
@@ -15,7 +16,23 @@ from project.db_in import url, db
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 
+### AUTHENTICATEN & AUTHORIZATION ###
+@fixture
+def auth_tokens(session):
+    """Return the authentication tokens"""
+    users = [
+        User("login", Role.STUDENT),
+        User("student", Role.STUDENT),
+        User("student_valid", Role.STUDENT),
+        User("teacher", Role.TEACHER),
+        User("teacher_valid", Role.TEACHER),
+        User("admin", Role.ADMIN),
+        User("admin_valid", Role.ADMIN)
+    ]
+    session.addAll(users)
+    session.commit()
 
+### OTHER ###
 @pytest.fixture
 def valid_submission(valid_user_entry, valid_project_entry):
     """

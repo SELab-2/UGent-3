@@ -44,6 +44,41 @@ token_dict = {
     "admin1":{
         "id":"admin_person",
         "jobTitle":"admin"
+    },
+    # Lowest authorized user to test login requirement
+    "login": {
+        "id": "login",
+        "jobTitle": None
+    },
+    # Student authorization access
+    "student": {
+        "id": "student",
+        "jobTitle": None
+    },
+    # Student authorization access, associated with valid_...
+    "student_valid": {
+        "id": "student_valid",
+        "jobTitle": None
+    },
+    # Teacher authorization access
+    "teacher": {
+        "id": "teacher",
+        "jobTitle": "teacher"
+    },
+    # Teacher authorization access, associated with valid_...
+    "teacher_valid": {
+        "id": "teacher_valid",
+        "jobTitle": "teacher"
+    },
+    # Admin authorization access
+    "admin": {
+        "id": "admin",
+        "jobTitle": "admin"
+    },
+    # Admin authorization access, associated with valid_...
+    "admin_valid": {
+        "id": "admin_valid",
+        "jobTitle": "admin"
     }
 }
 
