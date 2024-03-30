@@ -1,9 +1,10 @@
-""" Configuration for pytest, Flask, and the test client."""
+"""Pytest fixtures"""
 
 import tempfile
 import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from typing import Tuple
 import pytest
 from pytest import fixture, FixtureRequest
 from flask.testing import FlaskClient
@@ -19,8 +20,9 @@ from project.models.project import Project
 
 ### AUTHENTICATEN & AUTHORIZATION ###
 @fixture
-def auth_test(request: FixtureRequest, client: FlaskClient, valid_course_entry):
+def auth_test(request: FixtureRequest, client: FlaskClient, valid_course_entry) -> Tuple:
     """Add concrete test data"""
+
     # endpoint, parameters, method, token, status
     endpoint, parameters, method, *other = request.param
 
@@ -32,6 +34,38 @@ def auth_test(request: FixtureRequest, client: FlaskClient, valid_course_entry):
         endpoint = endpoint.replace(f"@{index}", str(d[parameter]))
 
     return endpoint, getattr(client, method), *other
+
+### USERS ###
+@fixture
+def valid_teacher_entry(session):
+    """A valid teacher for testing that's already in the db"""
+    return session.get(User, "teacher")
+
+### COURSES ###
+@fixture
+def valid_course_entries(session, valid_teacher_entry):
+    """A valid course for testing that's already in the db"""
+    courses = [Course(name=f"SEL{i}", teacher=valid_teacher_entry.uid) for i in range(1, 3)]
+    session.add_all(courses)
+    session.commit()
+    return courses
+
+@fixture
+def valid_course(valid_teacher_entry):
+    """A valid course json form"""
+    return {"name": "SEL", "ufora_id": "C003784A_2023", "teacher": valid_teacher_entry.uid}
+
+@fixture
+def valid_course_entry(session, valid_course):
+    """A valid course for testing that's already in the db"""
+    course = Course(**valid_course)
+    session.add(course)
+    session.commit()
+    return course
+
+
+
+
 
 ### OTHER ###
 @pytest.fixture
@@ -214,22 +248,6 @@ def client(app):
             yield client
 
 @pytest.fixture
-def valid_teacher_entry(session):
-    """A valid teacher for testing that's already in the db"""
-    teacher = User(uid="Bart", role=Role.TEACHER)
-    try:
-        session.add(teacher)
-        session.commit()
-    except SQLAlchemyError:
-        session.rollback()
-    return teacher
-
-@pytest.fixture
-def valid_course(valid_teacher_entry):
-    """A valid course json form"""
-    return {"name": "Sel", "ufora_id": "C003784A_2023", "teacher": valid_teacher_entry.uid}
-
-@pytest.fixture
 def course_no_name(valid_teacher_entry):
     """A course with no name"""
     return {"name": "", "teacher": valid_teacher_entry.uid}
@@ -245,14 +263,6 @@ def invalid_course():
     return {"invalid": "error"}
 
 @pytest.fixture
-def valid_course_entry(session, valid_course):
-    """A valid course for testing that's already in the db"""
-    course = Course(**valid_course)
-    session.add(course)
-    session.commit()
-    return course
-
-@pytest.fixture
 def valid_students_entries(session):
     """Valid students for testing that are already in the db"""
     students = [
@@ -262,14 +272,6 @@ def valid_students_entries(session):
     session.add_all(students)
     session.commit()
     return students
-
-@pytest.fixture
-def valid_course_entries(session, valid_teacher_entry):
-    """A valid course for testing that's already in the db"""
-    courses = [Course(name=f"Sel{i}", teacher=valid_teacher_entry.uid) for i in range(3)]
-    session.add_all(courses)
-    session.commit()
-    return courses
 
 @pytest.fixture
 def share_code_admin(session, valid_course_entry):

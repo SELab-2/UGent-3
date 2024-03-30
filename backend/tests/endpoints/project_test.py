@@ -17,7 +17,7 @@ def test_assignment_download(client, valid_project):
     assert response.status_code == 201
     project_id = response.json["data"]["project_id"]
     response = client.get(f"/projects/{project_id}/assignments",
-                          headers={"Authorization":"teacher2"})
+                          headers={"Authorization":"teacher"})
     # file downloaded succesfully
     assert response.status_code == 200
 
@@ -54,14 +54,14 @@ def test_post_project(client, valid_project):
         response = client.post(
             "/projects",
             data=valid_project,
-            content_type='multipart/form-data', headers={"Authorization":"teacher2"}
+            content_type='multipart/form-data', headers={"Authorization":"teacher"}
         )
 
     assert response.status_code == 201
 
     # check if the project with the id is present
     project_id = response.json["data"]["project_id"]
-    response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
+    response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher"})
 
     assert response.status_code == 200
 
@@ -69,11 +69,11 @@ def test_remove_project(client, valid_project_entry):
     """Test removing a project to the datab and fetching it, testing if it's not present anymore"""
 
     project_id = valid_project_entry.project_id
-    response = client.delete(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
+    response = client.delete(f"/projects/{project_id}", headers={"Authorization":"teacher"})
     assert response.status_code == 200
 
     # check if the project isn't present anymore and the delete indeed went through
-    response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher2"})
+    response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher"})
     assert response.status_code == 404
 
 def test_patch_project(client, valid_project_entry):
@@ -86,6 +86,6 @@ def test_patch_project(client, valid_project_entry):
 
     response = client.patch(f"/projects/{project_id}", json={
         "title": new_title, "archived": new_archived
-    }, headers={"Authorization":"teacher2"})
+    }, headers={"Authorization":"teacher"})
 
     assert response.status_code == 200
