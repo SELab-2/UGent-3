@@ -3,39 +3,32 @@
 from typing import List, Tuple
 from pytest import param
 
-class AuthenticationTests:
-    """Class to create authentication tests"""
+def authentication_tests(tests: List[Tuple[str, List[str], List[str]]]) -> List[any]:
+    """Transform the format to single authentication tests"""
 
-    def __init__(self):
-        self.tests = []
-
-    def add(self, endpoint: str, parameters: List[str], methods: List[str]):
-        """Add authentication tests"""
-
+    single_tests = []
+    for test in tests:
+        endpoint, parameters, methods = test
         for method in methods:
-            self.tests.append(param(
+            single_tests.append(param(
                 (endpoint, parameters, method),
                 id = f"{endpoint} {method}"
             ))
+    return single_tests
 
-class AuhtorizationTests:
-    """Class to create authorization tests"""
+def authorization_tests(tests: List[Tuple[str, List[str], str, List[str], List[str]]]) -> List[any]:
+    """Transform the format to single authorization tests"""
 
-    def __init__(self):
-        self.tests = []
-
-    # Disable too many arguments warning
-    # pylint: disable = R0913
-    def add(self, endpoint: str, parameters: List[str], method: str,
-            allowed_tokens: List[str], disallowed_tokens: List[str]):
-        """Add authorization tests"""
-
+    single_tests = []
+    for test in tests:
+        endpoint, parameters, method, allowed_tokens, disallowed_tokens = test
         for token in (allowed_tokens + disallowed_tokens):
             allowed = token in allowed_tokens
-            self.tests.append(param(
+            single_tests.append(param(
                 (endpoint, parameters, method, token, allowed),
                 id = f"{endpoint} {method} {token} {'allowed' if allowed else 'disallowed'}"
             ))
+    return single_tests
 
 class TestEndpoint:
     """Base class for endpoint tests"""

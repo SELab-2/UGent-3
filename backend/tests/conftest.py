@@ -128,13 +128,13 @@ def auth_tokens():
     """Add the authenticated users to the database"""
 
     return [
-        User(uid="login", role=Role.STUDENT.name),
-        User(uid="student", role=Role.STUDENT.name),
-        User(uid="student_other", role=Role.STUDENT.name),
-        User(uid="teacher", role=Role.TEACHER.name),
-        User(uid="teacher_other", role=Role.TEACHER.name),
-        User(uid="admin", role=Role.ADMIN.name),
-        User(uid="admin_other", role=Role.ADMIN.name)
+        User(uid="login", role=Role.STUDENT),
+        User(uid="student", role=Role.STUDENT),
+        User(uid="student_other", role=Role.STUDENT),
+        User(uid="teacher", role=Role.TEACHER),
+        User(uid="teacher_other", role=Role.TEACHER),
+        User(uid="admin", role=Role.ADMIN),
+        User(uid="admin_other", role=Role.ADMIN)
     ]
 
 ### SESSION ###

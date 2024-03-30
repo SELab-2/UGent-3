@@ -19,21 +19,6 @@ from project.models.project import Project
 
 ### AUTHENTICATEN & AUTHORIZATION ###
 @fixture
-def auth_tokens(session):
-    """Add the authenticated users to the database"""
-    users = [
-        User("login", Role.STUDENT),
-        User("student", Role.STUDENT),
-        User("student_valid", Role.STUDENT),
-        User("teacher", Role.TEACHER),
-        User("teacher_valid", Role.TEACHER),
-        User("admin", Role.ADMIN),
-        User("admin_valid", Role.ADMIN)
-    ]
-    session.addAll(users)
-    session.commit()
-
-@fixture
 def auth_test(request: FixtureRequest, client: FlaskClient, valid_course_entry):
     """Add concrete test data"""
     # endpoint, parameters, method, token, status
