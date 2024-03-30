@@ -5,7 +5,8 @@ import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import pytest
-from pytest import fixture
+from pytest import fixture, FixtureRequest
+from flask.testing import FlaskClient
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from project.models.user import User,Role
@@ -19,7 +20,7 @@ from project.models.project import Project
 ### AUTHENTICATEN & AUTHORIZATION ###
 @fixture
 def auth_tokens(session):
-    """Return the authentication tokens"""
+    """Add the authenticated users to the database"""
     users = [
         User("login", Role.STUDENT),
         User("student", Role.STUDENT),
@@ -31,6 +32,21 @@ def auth_tokens(session):
     ]
     session.addAll(users)
     session.commit()
+
+@fixture
+def auth_test(request: FixtureRequest, client: FlaskClient, valid_course_entry):
+    """Add concrete test data"""
+    # endpoint, parameters, method, token, status
+    endpoint, parameters, method, *other = request.param
+
+    d = {
+        "course_id": valid_course_entry.course_id
+    }
+
+    for index, parameter in enumerate(parameters):
+        endpoint = endpoint.replace(f"@{index}", str(d[parameter]))
+
+    return endpoint, getattr(client, method), *other
 
 ### OTHER ###
 @pytest.fixture
