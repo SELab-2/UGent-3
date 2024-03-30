@@ -207,6 +207,12 @@ def valid_teacher_entry(session):
     return teacher
 
 @pytest.fixture
+def course_invalid_field(valid_course):
+    """A course with an invalid field"""
+    valid_course["test_field"] = "test_value"
+    return valid_course
+
+@pytest.fixture
 def valid_course(valid_teacher_entry):
     """A valid course json form"""
     return {"name": "Sel", "teacher": valid_teacher_entry.uid}
