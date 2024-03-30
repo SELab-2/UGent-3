@@ -8,6 +8,7 @@ from flask_restful import Resource, Api
 index_bp = Blueprint("index", __name__)
 index_endpoint = Api(index_bp)
 
+# Take the key the same as the id, uid can then be used in backend
 token_dict = {
     "teacher1":{
         "id":"Gunnar",
@@ -44,6 +45,41 @@ token_dict = {
     "admin1":{
         "id":"admin_person",
         "jobTitle":"admin"
+    },
+    # Lowest authorized user to test login requirement
+    "login": {
+        "id": "login",
+        "jobTitle": None
+    },
+    # Student authorization access, associated with valid_...
+    "student": {
+        "id": "student",
+        "jobTitle": None
+    },
+    # Student authorization access, other
+    "student_other": {
+        "id": "student_other",
+        "jobTitle": None
+    },
+    # Teacher authorization access, associated with valid_...
+    "teacher": {
+        "id": "teacher",
+        "jobTitle": "teacher"
+    },
+    # Teacher authorization access, other
+    "teacher_other": {
+        "id": "teacher_other",
+        "jobTitle": "teacher"
+    },
+    # Admin authorization access, associated with valid_...
+    "admin": {
+        "id": "admin",
+        "jobTitle": "admin"
+    },
+    # Admin authorization access, other
+    "admin_other": {
+        "id": "admin_other",
+        "jobTitle": "admin"
     }
 }
 
@@ -67,4 +103,4 @@ load_dotenv()
 app = Flask(__name__)
 app.register_blueprint(index_bp)
 
-app.run(debug=True, host='0.0.0.0')
+app.run(debug=True, host='0.0.0.0', port=5001)
