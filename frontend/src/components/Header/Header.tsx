@@ -10,8 +10,8 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
-import LanguageIcon from '@mui/icons-material/Language';
+import { useState } from "react";
+import LanguageIcon from "@mui/icons-material/Language";
 
 /**
  * The header component for the application that will be rendered at the top of the page.
@@ -29,7 +29,7 @@ export function Header(): JSX.Element {
   const handleChangeLanguage = (language: string) => {
     i18n.changeLanguage(language);
     setLanguageMenuAnchor(null);
-  }
+  };
 
   const handleCloseLanguageMenu = () => {
     setLanguageMenuAnchor(null);
@@ -49,16 +49,22 @@ export function Header(): JSX.Element {
           <div>
             <IconButton onClick={handleLanguageMenu} color="inherit">
               <LanguageIcon />
-              <Typography style={{marginLeft: "0.3rem"}}>{t("tag")}</Typography>
+              <Typography style={{ marginLeft: "0.3rem" }}>
+                {t("tag")}
+              </Typography>
             </IconButton>
             <Menu
-                anchorEl={languageMenuAnchor}
-                open={Boolean(languageMenuAnchor)}
-                onClose={handleCloseLanguageMenu}
-              >
-                <MenuItem onClick={() => handleChangeLanguage("en")}>English</MenuItem>
-                <MenuItem onClick={() => handleChangeLanguage("nl")}>Nederlands</MenuItem>
-              </Menu>
+              anchorEl={languageMenuAnchor}
+              open={Boolean(languageMenuAnchor)}
+              onClose={handleCloseLanguageMenu}
+            >
+              <MenuItem onClick={() => handleChangeLanguage("en")}>
+                English
+              </MenuItem>
+              <MenuItem onClick={() => handleChangeLanguage("nl")}>
+                Nederlands
+              </MenuItem>
+            </Menu>
           </div>
         </Toolbar>
       </AppBar>
