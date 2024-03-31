@@ -53,7 +53,7 @@ const FolderDragDrop: React.FC<FolderDragDropProps> = ({
           } else {
             onWrongInput &&
               onWrongInput(
-                `Missing required fields: ${regexReport.missingFiles.join(
+                `Missing required files: ${regexReport.missingFiles.join(
                   ", "
                 )}.`
               );
