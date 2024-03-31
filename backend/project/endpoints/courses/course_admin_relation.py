@@ -21,10 +21,12 @@ from project.endpoints.courses.courses_utils import (
     json_message
 )
 from project.utils.query_agent import query_selected_from_model, insert_into_model
+from project.utils.authentication import authorize_teacher_of_course, \
+      authorize_teacher_or_course_admin
 
 load_dotenv()
 API_URL = getenv("API_HOST")
-RESPONSE_URL = urljoin(API_URL + "/", "courses")
+RESPONSE_URL = urljoin(f"{API_URL}/", "courses")
 
 class CourseForAdmins(Resource):
     """
@@ -32,6 +34,7 @@ class CourseForAdmins(Resource):
     the /courses/course_id/admins url, only the teacher of a course can do this
     """
 
+    @authorize_teacher_or_course_admin
     def get(self, course_id):
         """
         This function will return all the admins of a course
@@ -47,6 +50,7 @@ class CourseForAdmins(Resource):
             filters={"course_id": course_id},
         )
 
+    @authorize_teacher_of_course
     def post(self, course_id):
         """
         Api endpoint for adding new admins to a course, can only be done by the teacher
@@ -72,6 +76,7 @@ class CourseForAdmins(Resource):
             "uid"
         )
 
+    @authorize_teacher_of_course
     def delete(self, course_id):
         """
         Api endpoint for removing admins of a course, can only be done by the teacher

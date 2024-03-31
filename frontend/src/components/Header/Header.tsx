@@ -28,16 +28,22 @@ export function Header(): JSX.Element {
           <IconButton edge="start" onClick={() => setOpen(!open)} sx={{ color: "white", marginLeft: 0 }}>
             <Menu style={{fontSize:"2rem"}} />
           </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 0 }}>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {title}
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Button color="inherit">{t('login')}</Button>
         </Toolbar>
       </AppBar>
-      <DrawerMenu open={open} onClose={() => setOpen(false)} listItems={listItems} />
+      <DrawerMenu open={open} onClose={() => setOpen(false)} listItems={isLoggedIn() ? listItems : [listItems[0]]}/>
     </Box>
   );
+}
+/**
+ * @returns Whether a user is logged in or not.
+ */
+function isLoggedIn() {
+  return true;
 }
 
 /**
