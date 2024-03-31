@@ -6,22 +6,22 @@ import { useTranslation } from "react-i18next";
 const SUPPORTED_LANGUAGES = ["en", "nl"];
 
 /**
- * 
+ *
  * @returns - An outlet that detects the language and assigns it to i18next directly.
  */
 export default function LanguagePath() {
-    const { i18n } = useTranslation();
-    const { lang } = useParams();
-    const navigate = useNavigate();
-    const curPath = location.pathname;
-    useEffect(() => {
-      if (lang && i18n.resolvedLanguage !== lang) {
-        if (SUPPORTED_LANGUAGES.includes(lang)) {
-          i18n.changeLanguage(lang);
-        } else {
-          navigate("/" + i18n.resolvedLanguage + curPath, {replace: true});
-        }
+  const { i18n } = useTranslation();
+  const { lang } = useParams();
+  const navigate = useNavigate();
+  const curPath = location.pathname;
+  useEffect(() => {
+    if (lang && i18n.resolvedLanguage !== lang) {
+      if (SUPPORTED_LANGUAGES.includes(lang)) {
+        i18n.changeLanguage(lang);
+      } else {
+        navigate("/" + i18n.resolvedLanguage + curPath, { replace: true });
       }
-    }, [lang]);
-    return <Outlet />;
-  }
+    }
+  }, [lang, curPath, i18n, navigate]);
+  return <Outlet />;
+}

@@ -14,7 +14,7 @@ function App(): JSX.Element {
       <Routes>
         <Route index element={<Home />} />
         <Route path=":lang" element={<LanguagePath/>}>
-          <Route index element={<Home />} />
+          <Route path="home" element={<Home />} />
         </Route>
       </Routes>
     </BrowserRouter>
