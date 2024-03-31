@@ -17,7 +17,7 @@ from project.db_in import url, db
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 
-### AUTHENTICATEN & AUTHORIZATION ###
+### AUTHENTICATION & AUTHORIZATION ###
 @fixture
 def auth_test(request: FixtureRequest, client: FlaskClient, valid_course_entry):
     """Add concrete test data"""
