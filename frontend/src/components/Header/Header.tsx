@@ -13,11 +13,16 @@ export function Header(): JSX.Element {
   const location = useLocation();
   const [open, setOpen] = useState(false);
 
-  const listItems = [
-    {link: "/", text: t("homepage")},
-    {link: "/projects", text: t("myProjects")},
-    {link: "/courses", text: t("myCourses")}
-  ]
+  let listItems = [
+    {link: "/", text: t("homepage")}
+  ];
+
+  if(isLoggedIn()) {
+    listItems = listItems.concat([
+      {link: "/projects", text: t("myProjects")},
+      {link: "/courses", text: t("myCourses")}
+    ]);
+  }
 
   const title = getTitle(location.pathname, t);
 
@@ -35,7 +40,7 @@ export function Header(): JSX.Element {
           <Button color="inherit">{t('login')}</Button>
         </Toolbar>
       </AppBar>
-      <DrawerMenu open={open} onClose={() => setOpen(false)} listItems={isLoggedIn() ? listItems : [listItems[0]]}/>
+      <DrawerMenu open={open} onClose={() => setOpen(false)} listItems={listItems}/>
     </Box>
   );
 }
