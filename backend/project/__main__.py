@@ -1,5 +1,6 @@
 """Main entry point for the application."""
 
+from os import getenv
 from dotenv import load_dotenv
 from flask_cors import CORS
 from project import create_app_with_db
