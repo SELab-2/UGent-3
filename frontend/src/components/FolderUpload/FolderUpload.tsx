@@ -119,7 +119,7 @@ const FolderDragDrop: React.FC<FolderDragDropProps> = ({
             role={undefined}
             tabIndex={-1}
           >
-            <Typography>Or click to select a file</Typography>
+            <Typography>Or Click To Select a File</Typography>
             <VisuallyHiddenInput type="file" onChange={handleFileUpload} />
           </Button>
         </Paper>
