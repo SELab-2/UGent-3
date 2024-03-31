@@ -11,7 +11,7 @@ export function CourseForm(): JSX.Element {
   const [courseName, setCourseName] = useState('');
   const [error, setError] = useState('');
 
-  const { t } = useTranslation();
+  const { t } = useTranslation('translation', { keyPrefix: 'courseForm' });
 
   const apiHost = import.meta.env.VITE_API_HOST;
 
