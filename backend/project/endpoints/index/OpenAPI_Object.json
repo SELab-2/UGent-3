@@ -394,7 +394,7 @@
         }
       },
       "delete": {
-        "description": "Delete a project and all of its submissions in cascade done by project id",
+        "description": "Delete a project with corresponding project id and all of its submissions in cascade",
         "parameters": [
           {
             "name": "project_id",
@@ -461,7 +461,7 @@
             }
           },
           "404": {
-            "description": "The project of which you wanted to get the assignments files of doesn't exist"
+            "description": "Project not found"
           }, "500": {
             "description": "Internal server error"
           }
