@@ -66,7 +66,8 @@
                       }
                     }
                   }
-                }, "example": [
+                },
+                "example": [
                   {
                     "project_id": 1,
                     "description": "Project 1 description",
@@ -98,13 +99,30 @@
                     "type": "string",
                     "format": "binary"
                   },
-                  "title": { "type": "string" },
-                  "description": { "type": "string" },
-                  "course_id": { "type": "integer" },
-                  "visible_for_students": { "type": "boolean" },
-                  "archived": { "type": "boolean" }
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "course_id": {
+                    "type": "integer"
+                  },
+                  "visible_for_students": {
+                    "type": "boolean"
+                  },
+                  "archived": {
+                    "type": "boolean"
+                  }
                 },
-                "required": ["assignment_file", "title", "description", "course_id", "visible_for_students", "archived"]
+                "required": [
+                  "assignment_file",
+                  "title",
+                  "description",
+                  "course_id",
+                  "visible_for_students",
+                  "archived"
+                ]
               }
             }
           }
@@ -151,42 +169,6 @@
           },
           "500": {
             "description": "Something went wrong inserting model into the database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error":{
-                      "type": "string"
-                    },
-                    "url": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    },
-                    "url": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -272,24 +254,6 @@
             }
           },
           "404": {
-            "description": "Project not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    },
-                    "url": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
             "description": "An id that doesn't correspond to an existing project",
             "content": {
               "application/json": {
@@ -353,11 +317,21 @@
                     "type": "string",
                     "format": "binary"
                   },
-                  "title": { "type": "string" },
-                  "description": { "type": "string" },
-                  "course_id": { "type": "integer" },
-                  "visible_for_students": { "type": "boolean" },
-                  "archived": { "type": "boolean" }
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "course_id": {
+                    "type": "integer"
+                  },
+                  "visible_for_students": {
+                    "type": "boolean"
+                  },
+                  "archived": {
+                    "type": "boolean"
+                  }
                 }
               }
             }
@@ -377,7 +351,9 @@
                     "message": {
                       "type": "string"
                     },
-                    "url": { "type": "string" }
+                    "url": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -477,20 +453,33 @@
     "/projects/{id}/assignments": {
       "get": {
         "description": "Get the assignments file of project with given id",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "ID of the project to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successfully downloaded the assignment files of the project",
             "content": {
               "multipart/form-data": {
                 "schema": {
-                  "type": "file"
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
           },
           "404": {
             "description": "Project not found"
-          }, "500": {
+          },
+          "500": {
             "description": "Internal server error"
           }
         }
@@ -1727,71 +1716,32 @@
             "description": "An error occurred while creating the user"
           }
         }
-      },
-      "/users/{user_id}": {
-        "get": {
-          "summary": "Get a user by ID",
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "A user",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "uid": {
-                        "type": "string"
-                      },
-                      "is_teacher": {
-                        "type": "boolean"
-                      },
-                      "is_admin": {
-                        "type": "boolean"
-                      }
-                    },
-                    "required": [
-                      "uid",
-                      "is_teacher",
-                      "is_admin"
-                    ]
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "User not found"
+      }
+    },
+    "/users/{user_id}": {
+      "get": {
+        "summary": "Get a user by ID",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
-        "patch": {
-          "summary": "Update a user's information",
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "requestBody": {
-            "required": true,
+        ],
+        "responses": {
+          "200": {
+            "description": "A user",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "uid": {
+                      "type": "string"
+                    },
                     "is_teacher": {
                       "type": "boolean"
                     },
@@ -1800,6 +1750,7 @@
                     }
                   },
                   "required": [
+                    "uid",
                     "is_teacher",
                     "is_admin"
                   ]
@@ -1807,92 +1758,197 @@
               }
             }
           },
-          "responses": {
-            "200": {
-              "description": "User updated successfully"
-            },
-            "404": {
-              "description": "User not found"
-            },
-            "415": {
-              "description": "Unsupported Media Type. Expected JSON."
-            },
-            "500": {
-              "description": "An error occurred while patching the user"
-            }
-          }
-        },
-        "delete": {
-          "summary": "Delete a user",
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "User deleted successfully"
-            },
-            "404": {
-              "description": "User not found"
-            },
-            "500": {
-              "description": "An error occurred while deleting the user"
-            }
+          "404": {
+            "description": "User not found"
           }
         }
-      }
-    }
-  },
-  "/submissions": {
-    "get": {
-      "summary": "Gets the submissions",
-      "parameters": [
-        {
-          "name": "uid",
-          "in": "query",
-          "description": "User ID",
-          "schema": {
-            "type": "string"
+      },
+      "patch": {
+        "summary": "Update a user's information",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
-        },
-        {
-          "name": "project_id",
-          "in": "query",
-          "description": "Project ID",
-          "schema": {
-            "type": "integer"
-          }
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "Successfully retrieved a list of submission URLs",
+        ],
+        "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
+                  "is_teacher": {
+                    "type": "boolean"
                   },
-                  "message": {
-                    "type": "string"
-                  },
-                  "data": {
-                    "type": "object",
-                    "properties": {
-                      "submissions": "array",
-                      "items": {
-                        "type": "string",
-                        "format": "uri"
+                  "is_admin": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "is_teacher",
+                  "is_admin"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "415": {
+            "description": "Unsupported Media Type. Expected JSON."
+          },
+          "500": {
+            "description": "An error occurred while patching the user"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "An error occurred while deleting the user"
+          }
+        }
+      }
+    },
+    "/submissions": {
+      "get": {
+        "summary": "Gets the submissions",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "query",
+            "description": "Project ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved a list of submission URLs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "submissions": "array",
+                        "items": {
+                          "type": "string",
+                          "format": "uri"
+                        }
                       }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "An invalid user or project is given",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An internal server error occurred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Posts a new submission to a project",
+        "requestBody": {
+          "description": "Form data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uid": {
+                    "type": "string",
+                    "required": true
+                  },
+                  "project_id": {
+                    "type": "integer",
+                    "required": true
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "file"
                     }
                   }
                 }
@@ -1900,38 +1956,88 @@
             }
           }
         },
-        "400": {
-          "description": "An invalid user or project is given",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
+        "responses": {
+          "201": {
+            "description": "Successfully posts the submission and retrieves its data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "user": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "project": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "grading": {
+                          "type": "integer"
+                        },
+                        "time": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
                   }
                 }
               }
             }
-          }
-        },
-        "500": {
-          "description": "An internal server error occurred",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
+          },
+          "400": {
+            "description": "An invalid user, project or list of files is given",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An internal server error occurred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -1940,172 +2046,55 @@
         }
       }
     },
-    "post": {
-      "summary": "Posts a new submission to a project",
-      "requestBody": {
-        "description": "Form data",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "uid": {
-                  "type": "string",
-                  "required": true
-                },
-                "project_id": {
-                  "type": "integer",
-                  "required": true
-                },
-                "files": {
-                  "type": "array",
-                  "items": {
-                    "type": "file"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "responses": {
-        "201": {
-          "description": "Successfully posts the submission and retrieves its data",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
-                  },
-                  "data": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer"
-                      },
-                      "user": {
-                        "type": "string",
-                        "format": "uri"
-                      },
-                      "project": {
-                        "type": "string",
-                        "format": "uri"
-                      },
-                      "grading": {
-                        "type": "integer"
-                      },
-                      "time": {
-                        "type": "string",
-                        "format": "date-time"
-                      },
-                      "path": {
-                        "type": "string"
-                      },
-                      "status": {
-                        "type": "boolean"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "400": {
-          "description": "An invalid user, project or list of files is given",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "500": {
-          "description": "An internal server error occurred",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "/submissions/{submission_id}": {
-    "get": {
-      "summary": "Gets the submission",
-      "responses": {
-        "200": {
-          "description": "Successfully retrieved the submission",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
-                  },
-                  "data": {
-                    "type": "object",
-                    "properties": {
-                      "submission": {
-                        "type": "object",
-                        "properties": {
-                          "submission_id": {
-                            "type": "integer"
-                          },
-                          "user": {
-                            "type": "string",
-                            "format": "uri"
-                          },
-                          "project": {
-                            "type": "string",
-                            "format": "uri"
-                          },
-                          "grading": {
-                            "type": "integer",
-                            "nullable": true
-                          },
-                          "time": {
-                            "type": "string",
-                            "format": "date-time"
-                          },
-                          "path": {
-                            "type": "string"
-                          },
-                          "status": {
-                            "type": "boolean"
+    "/submissions/{submission_id}": {
+      "get": {
+        "summary": "Gets the submission",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the submission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "submission": {
+                          "type": "object",
+                          "properties": {
+                            "submission_id": {
+                              "type": "integer"
+                            },
+                            "user": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "project": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "grading": {
+                              "type": "integer",
+                              "nullable": true
+                            },
+                            "time": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "path": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "type": "boolean"
+                            }
                           }
                         }
                       }
@@ -2114,247 +2103,247 @@
                 }
               }
             }
-          }
-        },
-        "404": {
-          "description": "An invalid submission id is given",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
+          },
+          "404": {
+            "description": "An invalid submission id is given",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
             }
-          }
-        },
-        "500": {
-          "description": "An internal server error occurred",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "patch": {
-      "summary": "Patches the submission",
-      "requestBody": {
-        "description": "The submission data",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "grading": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 20
-                }
-              }
-            }
-          }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "Successfully patches the submission and retrieves its data",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
-                  },
-                  "data": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer"
-                      },
-                      "user": {
-                        "type": "string",
-                        "format": "uri"
-                      },
-                      "project": {
-                        "type": "string",
-                        "format": "uri"
-                      },
-                      "grading": {
-                        "type": "integer"
-                      },
-                      "time": {
-                        "type": "string",
-                        "format": "date-time"
-                      },
-                      "path": {
-                        "type": "string"
-                      },
-                      "status": {
-                        "type": "boolean"
-                      }
+          },
+          "500": {
+            "description": "An internal server error occurred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
                     }
                   }
                 }
               }
             }
           }
-        },
-        "400": {
-          "description": "An invalid submission grading is given",
+        }
+      },
+      "patch": {
+        "summary": "Patches the submission",
+        "requestBody": {
+          "description": "The submission data",
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
+                  "grading": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 20
                   }
                 }
               }
             }
           }
         },
-        "404": {
-          "description": "An invalid submission id is given",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
+        "responses": {
+          "200": {
+            "description": "Successfully patches the submission and retrieves its data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "user": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "project": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "grading": {
+                          "type": "integer"
+                        },
+                        "time": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
                   }
                 }
               }
             }
-          }
-        },
-        "500": {
-          "description": "An internal server error occurred",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
+          },
+          "400": {
+            "description": "An invalid submission grading is given",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "An invalid submission id is given",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An internal server error occurred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
             }
           }
         }
-      }
-    },
-    "delete": {
-      "summary": "Deletes the submission",
-      "responses": {
-        "200": {
-          "description": "Successfully deletes the submission",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
+      },
+      "delete": {
+        "summary": "Deletes the submission",
+        "responses": {
+          "200": {
+            "description": "Successfully deletes the submission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
             }
-          }
-        },
-        "404": {
-          "description": "An invalid submission id is given",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
+          },
+          "404": {
+            "description": "An invalid submission id is given",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
             }
-          }
-        },
-        "500": {
-          "description": "An internal server error occurred",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "message": {
-                    "type": "string"
+          },
+          "500": {
+            "description": "An internal server error occurred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
             }
           }
         }
-      }
-    },
-    "parameters": [
-      {
-        "name": "submission_id",
-        "in": "path",
-        "description": "Submission ID",
-        "required": true,
-        "schema": {
-          "type": "integer"
+      },
+      "parameters": [
+        {
+          "name": "submission_id",
+          "in": "path",
+          "description": "Submission ID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
         }
-      }
-    ]
+      ]
+    }
   }
 }
