@@ -3,5 +3,8 @@
     "myProjects": "My Projects",
     "myCourses": "My Courses",
     "login": "Login",
-    "home": "Home"
+    "home": "Home",
+    "courseName": "Course Name",
+    "submit": "Submit",
+    "emptyCourseName": "Course name should not be empty"
   }

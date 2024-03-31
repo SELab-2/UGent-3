@@ -3,5 +3,8 @@
     "myProjects": "Mijn Projecten",
     "myCourses": "Mijn Vakken",
     "login": "Login",
-    "home": "Home"
+    "home": "Home",
+    "courseName": "Vak Naam",
+    "submit": "Opslaan",
+    "emptyCourseName": "Vak naam mag niet leeg zijn"
   }

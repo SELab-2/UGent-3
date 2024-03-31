@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
-import { FormControl, Box, TextField, Button} from '@mui/material';
+import { FormControl, Box, TextField, Button, FormLabel} from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Renders the CourseForm component.
@@ -9,6 +10,8 @@ import { FormControl, Box, TextField, Button} from '@mui/material';
 export function CourseForm(): JSX.Element {
   const [courseName, setCourseName] = useState('');
   const [error, setError] = useState('');
+
+  const { t } = useTranslation();
 
   const apiHost = import.meta.env.VITE_API_HOST;
 
@@ -21,7 +24,7 @@ export function CourseForm(): JSX.Element {
     e.preventDefault(); // Prevents the default form submission behaviour
     
     if (!courseName.trim()) {
-      setError('Course name should not be empty');
+      setError(t('emptyCourseName'));
       return;
     }
 
@@ -33,8 +36,8 @@ export function CourseForm(): JSX.Element {
     <Box display="flex" justifyContent="center" alignItems="center" height="90vh" position="relative">
       <form onSubmit={handleSubmit}>
         <FormControl>
+          <FormLabel htmlFor="course-name">{t('courseName')}</FormLabel>
           <TextField
-            label="course name"
             value={courseName}
             onChange={handleInputChange}
             error={!!error} // Applying error style if there's an error message
@@ -50,7 +53,7 @@ export function CourseForm(): JSX.Element {
             right: '30rem',
           }}
         >
-          Submit
+          {t('submit')}
         </Button>
       </form>
     </Box>
