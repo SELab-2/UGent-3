@@ -1,4 +1,4 @@
-import { Button, Grid, Typography } from "@mui/material";
+import { Button, Grid, Paper, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams,Link } from "react-router-dom";
 
@@ -64,7 +64,7 @@ export function CourseDetailTeacher(): JSX.Element {
   }, [courseId]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000//courses/" + courseId + "/students", {
+    fetch("http://127.0.0.1:5000/courses/" + courseId + "/students", {
       headers: {
         "Authorization": "teacher1"
       }
@@ -76,41 +76,103 @@ export function CourseDetailTeacher(): JSX.Element {
   }, [courseId]);
   
   return (
-    <Grid container direction={'row'} spacing={2}>
+    <Grid container direction="column" spacing={2}>
       <Grid item>
-        <Grid container direction={'column'} spacing={2}>
-          <Grid item><Typography variant="h4">{course?.name}</Typography></Grid>
-          <Grid item><Typography variant="h6">projecten</Typography></Grid>
-          {projects.map((project) => (
-            <Grid item key={project.project_id}>
-              <Typography variant="body1"><Link to={'/projects/'+project.project_id}>{project.title}</Link></Typography>
+        <Typography variant="h4">{course?.name}</Typography>
+      </Grid>
+      <Grid item>
+        <Grid container direction="row" justifyContent="space-between" alignItems="flex-start">
+          <Grid item>
+            <Grid container direction="column" spacing={2} style={{ minHeight: '100vh' }}>
+              <Grid item>
+                <Typography variant="h6">projecten</Typography>
+              </Grid>
+              <Grid item>
+                <Paper style={{maxWidth:"100%", maxHeight:600,height:600, overflowY: 'auto' }}>
+                  <Grid container direction="column">
+                    {projects.map((project) => (
+                      <Grid item key={project.project_id}>
+                        <Typography variant="body1">
+                          <Link to={'/projects/' + project.project_id}>{project.title}</Link>
+                        </Typography>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item style={{ alignSelf: 'flex-end' }}>
+                <Button>
+                  <Link to={'/projects/create?courseId=' + courseId}>New Project</Link>
+                </Button>
+              </Grid>
             </Grid>
-          ))}
-          <Grid item><Button><Link to={'/projects/create?courseId='+courseId}>New Project</Link></Button></Grid>
-        </Grid>
-        <Grid container direction={'column'} spacing={2}>
-          <Grid item><Typography variant="h6">lijst co-lesgevers/assistenten</Typography></Grid>
-          {
-            admins.map((admin) => (
-              <Grid item key={admin.uid}>
-                <Typography variant="body1">{admin.uid}</Typography>
+          </Grid>
+          <Grid item>
+            <Grid container direction="column" spacing={2}>
+              <Grid item>
+                <Typography variant="h6">lijst co-lesgevers/assistenten</Typography>
               </Grid>
-            ))
-          }
-          <Grid item><Button>nieuwe lesgever</Button></Grid>
-        </Grid>
-        <Grid container direction={'column'} spacing={2}>
-          <Grid item><Typography variant="h6">lijst studenten</Typography></Grid>
-          {
-            students.map((student) => (
-              <Grid item key={student.uid}>
-                <Typography variant="body1">{student.uid}</Typography>
+              <Grid item>
+                <Paper style={{maxWidth:"100%", maxHeight:600,height:600, overflowY: 'auto' }}>
+                  <Grid container direction="column">
+                    {admins.map((admin) => (
+                      <Grid item key={admin.uid}>
+                        <Typography variant="body1">{admin.uid}</Typography>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Paper>
               </Grid>
-            ))
-          }
-          <Grid item><Button>nieuwe student(en)</Button></Grid>
+              <Grid item>
+                <Button>nieuwe lesgever</Button>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item>
+            <Grid container direction="column" spacing={2}>
+              <Grid item>
+                <Typography variant="h6">lijst studenten</Typography>
+              </Grid>
+              <Grid item>
+                <Paper style={{maxWidth:"100%", maxHeight:600,height:600, overflowY: 'auto' }}>
+                  <Grid container direction="column">
+                    {students.map((student) => (
+                      <Grid item key={student.uid}>
+                        <Typography variant="body1">{student.uid}</Typography>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item>
+                <Button>nieuwe student(en)</Button>
+              </Grid>
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
     </Grid>
   );
 }
+
+interface ScrollerBoxProps {
+  items: Project[];
+}
+
+export const ScrollerBox: React.FC<ScrollerBoxProps> = ({ items }) => {
+  return (
+    <Grid item>
+      <Paper style={{maxWidth:"100%", maxHeight:600,height:600, overflowY: 'auto' }}>
+        <Grid container direction="column">
+          {items.map((item) => (
+            <Grid item key={item.project_id}>
+              <Typography variant="body1">
+                <Link to={'/projects/' + item.project_id}>{item.title}</Link>
+              </Typography>
+            </Grid>
+          ))}
+        </Grid>
+      </Paper>
+    </Grid>
+  );
+};
