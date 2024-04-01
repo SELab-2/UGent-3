@@ -235,7 +235,7 @@ paths:
                     type: string
   "/projects/{id}/assignments":
     get:
-      description: Get the assignments file of project with given id
+      description: Get the assignment files of project with given id
       parameters:
       - name: project_id
         in: path
@@ -252,7 +252,7 @@ paths:
                 type: string
                 format: binary
         '404':
-          description: The project of which you wanted to get the assignment file of doesn't exist
+          description: The project of which you wanted to get the assignment files of doesn't exist
         '500':
           $ref: '#/components/responses/InternalError'
   "/courses":
@@ -553,23 +553,23 @@ paths:
     post:
       description: Assign students to a course.
       parameters:
-      - name: course_id
-        in: path
-        description: ID of the course
-        required: true
-        schema:
-          type: string
-      - name: students
-        in: body
-        description: list of uids of the students to be assigned to the course
-        required: true
-        schema:
-          type: array
-      - name: uid
-        in: query
-        description: uid of the user sending the request
-        schema:
-          type: string
+        - name: course_id
+          in: path
+          description: ID of the course
+          required: true
+          schema:
+            type: string
+        - name: students
+          in: body
+          description: List of uids of the students to be assigned to the course
+          required: true
+          schema:
+            type: array
+        - name: uid
+          in: query
+          description: Uid of the user sending the request
+          schema:
+            type: string
       responses:
         '201':
           description: Students assigned to course.
@@ -581,7 +581,7 @@ paths:
                   message:
                     type: string
                     examples:
-                    - User were succesfully added to the course
+                    - User was succesfully added to the course
                   url:
                     type: string
                     examples:
@@ -635,13 +635,13 @@ paths:
           type: string
       - name: students
         in: body
-        description: list of uids of the students to be removed from the course
+        description: List of uids of the students to be removed from the course
         required: true
         schema:
           type: array
       - name: uid
         in: query
-        description: uid of the user sending the request
+        description: Uid of the user sending the request
         schema:
           type: string
       responses:
@@ -654,7 +654,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    examples: User were succesfully removed from the course
+                    examples: User was succesfully removed from the course
                   url:
                     type: string
                     examples:
@@ -723,13 +723,13 @@ paths:
           type: string
       - name: admin_uid
         in: body
-        description: uid of the admin to be assigned to the course
+        description: Uid of the admin to be assigned to the course
         required: true
         schema:
           type: string
       - name: uid
         in: query
-        description: uid of the user sending the request
+        description: Uid of the user sending the request
         schema:
           type: string
       responses:
@@ -743,7 +743,7 @@ paths:
                   message:
                     type: string
                     examples:
-                    - User were successfully added to the course.
+                    - User was successfully added to the course.
                   url:
                     type: string
                     examples:
@@ -798,13 +798,13 @@ paths:
           type: string
       - name: admin_uid
         in: body
-        description: uid of the admin to be removed from the course
+        description: Uid of the admin to be removed from the course
         required: true
         schema:
           type: string
       - name: uid
         in: query
-        description: uid of the user sending the request
+        description: Uid of the user sending the request
         schema:
           type: string
       responses:
