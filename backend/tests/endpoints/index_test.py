@@ -1,6 +1,6 @@
-import yaml
-
 """Test the base routes of the application"""
+
+import yaml
 
 
 def test_home(client):
