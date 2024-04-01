@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./pages/home/Home";
 import { Header } from "./components/Header/Header";
-import { CourseDetailTeacher } from "./components/Courses/Teacher";
+import { AllCoursesTeacher, CourseDetailTeacher } from "./components/Courses/Teacher";
 
 /**
  * This component is the main application component that will be rendered by the ReactDOM. 
@@ -14,6 +14,7 @@ function App(): JSX.Element {
       <Routes>
         <Route index element={<Home />} />
         <Route path="/courses/:courseId" element={<CourseDetailTeacher />} />
+        <Route path="/courses" element={<AllCoursesTeacher />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,4 +1,4 @@
-import { Button, Grid, Paper, Typography } from "@mui/material";
+import { Button, Card, Grid, Paper, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams,Link } from "react-router-dom";
 
@@ -91,19 +91,13 @@ export function CourseDetailTeacher(): JSX.Element {
               <Grid item>
                 <Typography variant="h6">projecten</Typography>
               </Grid>
-              <Grid item>
-                <Paper style={{maxWidth:"100%", maxHeight:600,height:600, overflowY: 'auto' }}>
-                  <Grid container direction="column">
-                    {projects.map((project) => (
-                      <Grid item key={project.project_id}>
-                        <Typography variant="body1">
-                          <Link to={`/projects/${project.project_id}`}>{project.title}</Link>
-                        </Typography>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Paper>
-              </Grid>
+              <VerticaleScroller items={projects.map((project) => (
+                <Grid item key={project.project_id}>
+                  <Typography variant="body1">
+                    <Link to={`/projects/${project.project_id}`}>{project.title}</Link>
+                  </Typography>
+                </Grid>
+              ))}></VerticaleScroller>
               <Grid item style={{ alignSelf: 'flex-end' }}>
                 <Button>
                   <Link to={`/projects/create?courseId=${courseId}`}>New Project</Link>
@@ -116,17 +110,11 @@ export function CourseDetailTeacher(): JSX.Element {
               <Grid item>
                 <Typography variant="h6">lijst co-lesgevers/assistenten</Typography>
               </Grid>
-              <Grid item>
-                <Paper style={{maxWidth:"100%", maxHeight:600,height:600, overflowY: 'auto' }}>
-                  <Grid container direction="column">
-                    {admins.map((admin) => (
-                      <Grid item key={admin.uid}>
-                        <Typography variant="body1">{admin.uid}</Typography>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Paper>
-              </Grid>
+              <VerticaleScroller items={admins.map((admin) => (
+                <Grid item key={admin.uid}>
+                  <Typography variant="body1">{admin.uid}</Typography>
+                </Grid>
+              ))}></VerticaleScroller>
               <Grid item>
                 <Button>nieuwe lesgever</Button>
               </Grid>
@@ -137,17 +125,11 @@ export function CourseDetailTeacher(): JSX.Element {
               <Grid item>
                 <Typography variant="h6">lijst studenten</Typography>
               </Grid>
-              <Grid item>
-                <Paper style={{maxWidth:"100%", maxHeight:600,height:600, overflowY: 'auto' }}>
-                  <Grid container direction="column">
-                    {students.map((student) => (
-                      <Grid item key={student.uid}>
-                        <Typography variant="body1">{student.uid}</Typography>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Paper>
-              </Grid>
+              <VerticaleScroller items={students.map((student) => (
+                <Grid item key={student.uid}>
+                  <Typography variant="body1">{student.uid}</Typography>
+                </Grid>
+              ))}></VerticaleScroller>
               <Grid item>
                 <Button>nieuwe student(en)</Button>
               </Grid>
@@ -159,24 +141,84 @@ export function CourseDetailTeacher(): JSX.Element {
   );
 }
 
-interface ScrollerBoxProps {
-  items: Project[];
-}
-
-export const ScrollerBox: React.FC<ScrollerBoxProps> = ({ items }) => {
+/**
+ * Renders a vertical scroller component.
+ * @param props - The component props requiring the items that will be displayed in the scroller.
+ * @returns The rendered vertical scroller component.
+ */
+function VerticaleScroller({items}: {items: JSX.Element[]}): JSX.Element {
   return (
     <Grid item>
       <Paper style={{maxWidth:"100%", maxHeight:600,height:600, overflowY: 'auto' }}>
         <Grid container direction="column">
-          {items.map((item) => (
-            <Grid item key={item.project_id}>
-              <Typography variant="body1">
-                <Link to={'/projects/' + item.project_id}>{item.title}</Link>
-              </Typography>
-            </Grid>
-          ))}
+          {items}
         </Grid>
       </Paper>
     </Grid>
   );
-};
+}
+
+/**
+ * @returns A jsx component representing all courses for a teacher
+ */
+export function AllCoursesTeacher(): JSX.Element {
+  const [activeCourses, setActiveCourses] = useState<Course[]>([]);
+  const [archivedCourses, setArchivedCourses] = useState<Course[]>([]);
+
+  useEffect(() => {
+    const params = new URLSearchParams({ teacher: "teacher1" });
+    fetch(`${apiHost}/courses?${params}`, {
+      headers: {
+        "Authorization": "teacher1"
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        //const active = data.data.filter((course: Course) => !course.archived);
+        //const archived = data.data.filter((course: Course) => course.archived);
+        //setActiveCourses(active);
+        //setArchivedCourses(archived);
+        setActiveCourses(data.data);//TODO change once courses can be archiveable
+        setArchivedCourses([]);
+      })
+      .catch(error => console.error('Error:', error));
+  }, []);
+
+  return (
+    <Grid container direction={'column'}>
+      <SideScrollableCourses courses={activeCourses} title="Active Courses"></SideScrollableCourses>
+      <SideScrollableCourses courses={archivedCourses} title="Archived Courses"></SideScrollableCourses>
+    </Grid>
+  );
+}
+
+/**
+ * @param props - The component props requiring the courses and title that will be displayed in the scroller.
+ * @returns A component to display courses in horizontal scroller where each course is a card containing its name.
+ */
+function SideScrollableCourses({courses, title}: {courses: Course[], title: string}): JSX.Element {
+  return (
+    <Grid item>
+      <Grid container direction="column">
+        <Grid item>
+          <Typography variant="h4">{title}</Typography>
+        </Grid>
+        <Grid item>
+          <Paper style={{maxWidth:600,width:600,height:200,overflowX:'auto', boxShadow: 'none', display: 'flex', justifyContent: 'center'}}>
+            <Grid container direction="row" spacing={5} alignItems="center">
+              {
+                courses.map((course) => (
+                  <Grid item>
+                    <Card style={{width: '250px', height: '150px'}}>
+                      <Typography variant="h6">{course.name}</Typography>
+                    </Card>
+                  </Grid>
+                ))
+              }
+            </Grid>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Grid>
+  );
+}
