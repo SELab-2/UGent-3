@@ -18,7 +18,7 @@ interface Project{
 interface UserUid{
   uid: string
 }
-
+const apiHost = import.meta.env.VITE_API_HOST;
 /**
  * 
  * @returns A jsx component representing the course detail page for a teacher
@@ -31,7 +31,7 @@ export function CourseDetailTeacher(): JSX.Element {
   const { courseId } = useParams<{ courseId: string }>();
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/courses/" + courseId, {
+    fetch(`${apiHost}/courses/${courseId}`, {
       headers: {
         "Authorization": "teacher1"
       }
@@ -44,7 +44,7 @@ export function CourseDetailTeacher(): JSX.Element {
   useEffect(() => {
     if(courseId){
       const params = new URLSearchParams({ course_id: courseId });
-      fetch("http://127.0.0.1:5000/projects?" + params, {
+      fetch(`${apiHost}/projects?${params}`, {
         headers: {
           "Authorization": "teacher1"
         }
@@ -56,7 +56,7 @@ export function CourseDetailTeacher(): JSX.Element {
   }, [courseId]);
   
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/courses/" + courseId + "/admins", {
+    fetch(`${apiHost}/courses/${courseId}/admins`, {
       headers: {
         "Authorization": "teacher1"
       }
@@ -68,7 +68,7 @@ export function CourseDetailTeacher(): JSX.Element {
   }, [courseId]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/courses/" + courseId + "/students", {
+    fetch(`${apiHost}/courses/${courseId}/students`, {
       headers: {
         "Authorization": "teacher1"
       }
@@ -97,7 +97,7 @@ export function CourseDetailTeacher(): JSX.Element {
                     {projects.map((project) => (
                       <Grid item key={project.project_id}>
                         <Typography variant="body1">
-                          <Link to={'/projects/' + project.project_id}>{project.title}</Link>
+                          <Link to={`/projects/${project.project_id}`}>{project.title}</Link>
                         </Typography>
                       </Grid>
                     ))}
@@ -106,7 +106,7 @@ export function CourseDetailTeacher(): JSX.Element {
               </Grid>
               <Grid item style={{ alignSelf: 'flex-end' }}>
                 <Button>
-                  <Link to={'/projects/create?courseId=' + courseId}>New Project</Link>
+                  <Link to={`/projects/create?courseId=${courseId}`}>New Project</Link>
                 </Button>
               </Grid>
             </Grid>
