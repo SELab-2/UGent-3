@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
  * @returns - The header component
  */
 export function Header(): JSX.Element {
-  const { t } = useTranslation();
+  const { t } = useTranslation('translation', { keyPrefix: 'header' });
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky">
