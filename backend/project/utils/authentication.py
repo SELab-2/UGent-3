@@ -37,7 +37,6 @@ def return_authenticated_user_id():
     """This function will authenticate the request and check whether the authenticated user
     is already in the database, if not, they will be added
     """
-    print("wadaheeel")
     authentication = request.headers.get("Authorization")
     if not authentication:
         abort(
