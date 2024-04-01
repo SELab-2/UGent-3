@@ -19,6 +19,10 @@ interface UserUid{
   uid: string
 }
 
+/**
+ * 
+ * @returns A jsx component representing the course detail page for a teacher
+ */
 export function CourseDetailTeacher(): JSX.Element {
   const [course, setCourse] = useState<Course>();
   const [projects, setProjects] = useState<Project[]>([]);
