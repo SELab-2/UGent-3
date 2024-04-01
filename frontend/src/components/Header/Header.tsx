@@ -2,7 +2,7 @@ import { AppBar, Box, Button, Drawer, Grid, IconButton, List, ListItemButton, Li
 import { Menu } from "@mui/icons-material";
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Renders the header component.
@@ -12,17 +12,19 @@ export function Header(): JSX.Element {
   const { t } = useTranslation();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [listItems, setListItems] = useState([
+    { link: "/", text: t("homepage") }
+  ]);
 
-  let listItems = [
-    {link: "/", text: t("homepage")}
-  ];
+  useEffect(() => {
+    const baseItems = [{ link: "/", text: t("homepage") }];
+    const additionalItems = isLoggedIn() ? [
+      { link: "/projects", text: t("myProjects") },
+      { link: "/courses", text: t("myCourses") }
+    ] : [];
 
-  if(isLoggedIn()) {
-    listItems = listItems.concat([
-      {link: "/projects", text: t("myProjects")},
-      {link: "/courses", text: t("myCourses")}
-    ]);
-  }
+    setListItems([...baseItems, ...additionalItems]);
+  }, [t]);
 
   const title = getTitle(location.pathname, t);
 
