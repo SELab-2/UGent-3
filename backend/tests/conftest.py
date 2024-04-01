@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from zoneinfo import ZoneInfo
-import pytest
+from pytest import fixture
 from project.sessionmaker import engine, Session
 from project.db_in import db
 from project.models.course import Course
@@ -11,7 +11,7 @@ from project.models.project import Project
 from project.models.course_relation import CourseStudent,CourseAdmin
 from project.models.submission import Submission, SubmissionStatus
 
-@pytest.fixture
+@fixture
 def db_session():
     """Create a new database session for a test.
     After the test, all changes are rolled back and the session is closed."""
@@ -123,7 +123,22 @@ def submissions(session):
         )
     ]
 
-@pytest.fixture
+### AUTHENTICATION & AUTHORIZATION ###
+def auth_tokens():
+    """Add the authenticated users to the database"""
+
+    return [
+        User(uid="login", role=Role.STUDENT),
+        User(uid="student", role=Role.STUDENT),
+        User(uid="student_other", role=Role.STUDENT),
+        User(uid="teacher", role=Role.TEACHER),
+        User(uid="teacher_other", role=Role.TEACHER),
+        User(uid="admin", role=Role.ADMIN),
+        User(uid="admin_other", role=Role.ADMIN)
+    ]
+
+### SESSION ###
+@fixture
 def session():
     """Create a new database session for a test.
     After the test, all changes are rolled back and the session is closed."""
@@ -132,6 +147,8 @@ def session():
     session = Session()
 
     try:
+        session.add_all(auth_tokens())
+
         # Populate the database
         session.add_all(users())
         session.commit()
