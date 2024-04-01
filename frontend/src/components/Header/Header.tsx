@@ -18,12 +18,16 @@ export function Header(): JSX.Element {
 
   useEffect(() => {
     const baseItems = [{ link: "/", text: t("homepage") }];
-    const additionalItems = isLoggedIn() ? [
+    const additionalItems = [
       { link: "/projects", text: t("myProjects") },
       { link: "/courses", text: t("myCourses") }
-    ] : [];
-
-    setListItems([...baseItems, ...additionalItems]);
+    ];
+    if (isLoggedIn()) {
+      setListItems([...baseItems, ...additionalItems]);
+    }
+    else {
+      setListItems(baseItems);
+    }
   }, [t]);
 
   const title = getTitle(location.pathname, t);
