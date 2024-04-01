@@ -14,9 +14,10 @@ class Role(Enum):
 @dataclass
 class User(db.Model):
     """
+    This class defines the users table
     a user has a uid,
-    a display_name and a role, a user 
-    can be either a student,admin or teacher
+    a display_name and a role, 
+    this role can be either student, admin or teacher
     """
 
     __tablename__ = "users"
