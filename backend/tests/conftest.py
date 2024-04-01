@@ -148,7 +148,6 @@ def session():
 
     try:
         session.add_all(auth_tokens())
-        session.commit()
 
         # Populate the database
         session.add_all(users())
