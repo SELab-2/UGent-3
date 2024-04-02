@@ -1,4 +1,3 @@
-import { FormControl } from '@mui/base/FormControl';
 import {
   Button,
   Checkbox,
@@ -9,13 +8,15 @@ import {
   InputLabel,
   MenuItem, Select, SelectChangeEvent,
   TextField,
-  Typography
+  Typography,
+  FormControl
 } from "@mui/material";
-import {ReactNode, useEffect, useState} from "react";
-import { spacing } from '@mui/system';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import {ChangeEvent, MouseEvent, ReactNode, useEffect, useState} from "react";
+import {spacing} from '@mui/system';
+import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import JSZip from 'jszip';
 
 interface Course {
   course_id: string;
@@ -37,7 +38,7 @@ const user = "teacher1"
  * @param root0
  * @param root0.setHeaderText
  */
-export default function ProjectForm({ setHeaderText }) {
+export default function ProjectForm({setHeaderText}) {
 
   // fix the header value
   useEffect(() => {
@@ -60,10 +61,6 @@ export default function ProjectForm({ setHeaderText }) {
 
   const [visibleForStudents, setVisibleForStudents] = useState(false);
 
-  const [testPath, setTestPath] = useState('');
-
-  const [scriptName, setScriptName] = useState('');
-
   const [regexExpressions, setRegexExpressions] = useState([]);
 
   const [assignmentFile, setAssignmentFile] = useState<File>();
@@ -72,9 +69,11 @@ export default function ProjectForm({ setHeaderText }) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [course, setCourse] = useState<Course>({course_id: '', name: "course", teacher: "", ufora_id: ""})
   const [courseId, setCourseId] = useState<string>();
-  const [courseName, setCourseName] = useState<string>('')
+  const [courseName, setCourseName] = useState<string>('');
 
-  const handleFileUpload = async (event) => {
+  const [containsTests, setContainsTests] = useState(true);
+
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
 
     if (!event.target.files) {
@@ -82,27 +81,41 @@ export default function ProjectForm({ setHeaderText }) {
     }
 
     const file = event.target.files[0];
-    const { name } = file;
+    const zip = await JSZip.loadAsync(file);
+
+    // Check each file in the zip archive
+    let containsTestsFlag = false; // Initialize flag
+    for (const [_relativePath, zipEntry] of Object.entries(zip.files)) {
+      if (!zipEntry.dir) {
+        // Check if the file is a Dockerfile
+        if (zipEntry.name.trim().toLowerCase() === 'dockerfile') {
+          console.log('Found Dockerfile:', zipEntry.name);
+          // Perform actions specific to Dockerfile
+          // Example: Extract or process the Dockerfile
+          containsTestsFlag = true;
+        }
+      }
+    }
+
+    setContainsTests(containsTestsFlag);
+    const {name} = file;
     setAssignmentFile(file)
     setFilename(name);
+    console.log(containsTests)
 
   }
 
   const fetchCourses = async () => {
-    try {
-      const response = await fetch(`${apiUrl}/courses?teacher=${user}`, {
-        headers: {
-          "Authorization": user
-        },
-      })
-      const jsonData = await response.json();
-      setCourses(jsonData.data);
-    } catch (e) {
-      console.log(e);
-    }
+    const response = await fetch(`${apiUrl}/courses?teacher=${user}`, {
+      headers: {
+        "Authorization": user
+      },
+    })
+    const jsonData = await response.json();
+    setCourses(jsonData.data);
   }
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
 
     description == '' ? setDescriptionError(true) : setDescriptionError(false);
@@ -114,26 +127,21 @@ export default function ProjectForm({ setHeaderText }) {
     formData.append('title', title);
     formData.append('description', description);
     formData.append('deadline', deadline);
-    formData.append('visible_for_students', visibleForStudents);
+    formData.append('visible_for_students', visibleForStudents.toString());
     formData.append('archived', 'false');
     formData.append('assignment_file', assignmentFile);
     formData.append('course_id', courseId)
 
-    try {
-      const response = await fetch(apiUrl+"/projects", {
-        method: "post",
-        headers: {
-          "Authorization": user
-        },
-        body: formData
-      })
+    const response = await fetch(apiUrl+"/projects", {
+      method: "post",
+      headers: {
+        "Authorization": user
+      },
+      body: formData
+    })
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-    } catch (e) {
-      console.log(e);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
   }
 
@@ -150,6 +158,7 @@ export default function ProjectForm({ setHeaderText }) {
   return (
     <FormControl
       onSubmit={handleSubmit}
+      fullWidth
     >
       <Grid
         container
@@ -178,16 +187,15 @@ export default function ProjectForm({ setHeaderText }) {
             onChange={event => setDescription(event.target.value)}
           />
         </Grid>
-        <Grid item xs={12} sm={6} sx={{ width: '100%' }}>
-          <FormControl>
-            <InputLabel id="course-select-label">Label werkt niet</InputLabel>
+        <Grid item>
+          <FormControl sx={{ width: 246 }}>
+            <InputLabel id="demo-simple-select-label">Course</InputLabel>
             <Select
-              labelId="course-select-label"
+              labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={courseName}
               label="Course"
               onChange={handleCourseChange}
-              fullWidth
             >
               {courses.map(course => (
                 <MenuItem key={course.course_id} value={course.name}>
@@ -211,7 +219,7 @@ export default function ProjectForm({ setHeaderText }) {
           </LocalizationProvider>
         </Grid>
         <Grid item>
-          <FormControlLabel required control={<Checkbox />} label="Visible for students" />
+          <FormControlLabel required control={<Checkbox />} label="Visible for students" onChange={e => setVisibleForStudents(e.target.checked)}/>
         </Grid>
         <Grid item>
           <Button
@@ -225,6 +233,16 @@ export default function ProjectForm({ setHeaderText }) {
               onChange={e => handleFileUpload(e)}
             />
           </Button>
+        </Grid>
+        <Grid item>
+          <p>{filename}</p>
+        </Grid>
+        <Grid item>
+          {filename !== "" && !containsTests && (
+            <div style={{ color: 'orange' }}>
+                Warning: This assignment doesn't contains tests ⚠️
+            </div>
+          )}
         </Grid>
         <Grid item>
           <Button variant="contained" onClick={ e =>
