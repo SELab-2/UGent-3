@@ -26,7 +26,8 @@ from project.endpoints.courses.courses_utils import (
 )
 
 from project.utils.query_agent import query_selected_from_model
-from project.utils.authentication import login_required, authorize_teacher_or_course_admin
+from project.utils.authentication import login_required, authorize_teacher_or_course_admin, \
+    authorize_teacher_or_course_admin_or_join_code
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -57,20 +58,21 @@ class CourseToAddStudents(Resource):
             filters={"course_id": course_id}
         )
 
-    @authorize_teacher_or_course_admin
+    @authorize_teacher_or_course_admin_or_join_code
     def post(self, course_id):
         """
         Allows admins of a course to assign new students by posting to:
         /courses/course_id/students with a list of uid in the request body under key "students"
         """
         abort_url = f"{API_URL}/courses/{course_id}/students"
-        uid = request.args.get("uid")
         data = request.get_json()
         student_uids = data.get("students")
-        abort_if_none_uid_student_uids_or_non_existant_course_id(
-            course_id, uid, student_uids
-        )
+        join_code = data.get("join_code")
 
+        abort_if_none_uid_student_uids_or_non_existant_course_id(
+            course_id, student_uids
+        )
+        print(join_code)
         for uid in student_uids:
             query = CourseStudent.query.filter_by(uid=uid, course_id=course_id)
             student_relation = execute_query_abort_if_db_error(query, abort_url)

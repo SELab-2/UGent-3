@@ -11,6 +11,7 @@ from flask import request
 from flask_restful import Resource
 
 from project.models.course_relation import CourseAdmin
+from project.models.course_share_code import CourseShareCode
 from project.models.user import User
 from project.endpoints.courses.courses_utils import (
     execute_query_abort_if_db_error,
@@ -22,7 +23,7 @@ from project.endpoints.courses.courses_utils import (
 )
 from project.utils.query_agent import query_selected_from_model, insert_into_model
 from project.utils.authentication import authorize_teacher_of_course, \
-      authorize_teacher_or_course_admin
+      authorize_teacher_or_course_admin, authorize_teacher_of_course_or_join_code
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -50,19 +51,23 @@ class CourseForAdmins(Resource):
             filters={"course_id": course_id},
         )
 
-    @authorize_teacher_of_course
+    @authorize_teacher_of_course_or_join_code
     def post(self, course_id):
         """
         Api endpoint for adding new admins to a course, can only be done by the teacher
+        or with a join_code
         """
         abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
         teacher = request.args.get("uid")
         data = request.get_json()
         assistant = data.get("admin_uid")
-        abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant)
-
+        join_code = data.get("join_code")
+        if not join_code:
+            abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant)
+ 
         query = User.query.filter_by(uid=assistant)
         new_admin = execute_query_abort_if_db_error(query, abort_url)
+        print(new_admin,assistant)
         if not new_admin:
             message = (
                 "User to make admin was not found, please request with a valid uid"

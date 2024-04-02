@@ -14,6 +14,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from project import db
 
 from project.models.user import User, Role
+from project.models.course_share_code import CourseShareCode
 from project.utils.models.course_utils import is_admin_of_course, \
     is_student_of_course, is_teacher_of_course
 from project.utils.models.project_utils import get_course_of_project, project_visible
@@ -149,6 +150,50 @@ def authorize_teacher_of_course(f):
             ({"message": "You're not authorized to perform this action"}, 403)))
     return wrap
 
+def authorize_with_join_code(f, check_authorization, error_message, for_admins):
+    """
+    This function will check if the person sending a request to the API is logged in, 
+    and meets the authorization criteria specified by check_authorization function.
+    Or there was a valid join code passed.
+    Returns 403: Not Authorized if either condition is false
+    """
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        auth_user_id = return_authenticated_user_id()
+        course_id = kwargs["course_id"]
+        if check_authorization(auth_user_id, course_id):
+            return f(*args, **kwargs)
+
+        join_code = request.json.get("join_code")
+        print(join_code)
+        if join_code:
+            valid_code: CourseShareCode = db.session.query(CourseShareCode) \
+                                        .filter_by(course_id=course_id).first()
+            if valid_code and (str(valid_code.join_code) == join_code) \
+                and (valid_code.for_admins == for_admins):
+                return f(*args, **kwargs)
+
+        abort(make_response(({"message": error_message}, 403)))
+    return wrap
+
+def authorize_teacher_of_course_or_join_code(f):
+    """Check wether user is teacher or has valid join_code"""
+    return authorize_with_join_code(
+        f,
+        lambda auth_user_id, course_id: is_teacher_of_course(auth_user_id, course_id),
+        "You're not authorized to perform this action", True
+    )
+
+def authorize_teacher_or_course_admin_or_join_code(f):
+    """"Check wether user is teacher, admin or has valid join_code"""
+    return authorize_with_join_code(
+        f,
+        lambda auth_user_id, course_id: is_teacher_of_course(auth_user_id, course_id)
+        or is_admin_of_course(auth_user_id, course_id),
+        """You are not authorized to perfom this action,
+        only teachers and course admins are authorized""",
+        False
+    )
 
 def authorize_teacher_or_course_admin(f):
     """
