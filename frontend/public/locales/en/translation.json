@@ -1,7 +1,29 @@
 {
-    "homepage": "Homepage",
+  "header": {
     "myProjects": "My Projects",
     "myCourses": "My Courses",
     "login": "Login",
     "home": "Home"
+  },
+  "home": {
+    "homepage": "Homepage"
+  },
+  "courseDetailTeacher": {
+    "projects": "Projects",
+    "newProject": "New Project",
+    "assistantList": "List of co-teachers/assistants",
+    "newTeacher": "New teacher",
+    "studentList": "List of students",
+    "newStudent": "New student(s)"
+  },
+  "allCoursesTeacher": {
+    "courseForm": "Course Form",
+    "courseName": "Course Name",
+    "submit": "Submit",
+    "emptyCourseNameError": "Course name should not be empty",
+    "cancel": "Cancel",
+    "create": "Create",
+    "activeCourses": "Active Courses",
+    "archivedCourses":"Archived Courses"
   }
+}

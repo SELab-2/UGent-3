@@ -1,7 +1,29 @@
 {
-    "homepage": "Homepage",
+  "header": {
     "myProjects": "Mijn Projecten",
     "myCourses": "Mijn Vakken",
     "login": "Login",
     "home": "Home"
+  },
+  "home": {
+    "homepage": "Homepage"
+  },
+  "courseDetailTeacher": {
+    "projects": "Projecten",
+    "newProject": "Nieuw Project",
+    "assistantList": "Lijst co-leerkrachten/assistenten",
+    "newTeacher": "Nieuwe leerkracht",
+    "studentList": "Lijst studenten",
+    "newStudent": "Nieuwe student(en)"
+  },
+  "allCoursesTeacher": {
+    "courseForm": "Vak Form",
+    "courseName": "Vak Naam",
+    "submit": "Opslaan",
+    "emptyCourseNameError": "Vak name mag niet leeg zijn",
+    "cancel": "Annuleer",
+    "create": "Nieuw Vak",
+    "activeCourses": "Actieve Vakken",
+    "archivedCourses":"Gearchiveerde Vakken"
   }
+}

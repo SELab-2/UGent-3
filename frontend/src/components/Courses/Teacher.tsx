@@ -1,9 +1,10 @@
-import { Button, Card, Grid, Paper, Typography } from "@mui/material";
+import { Button, Card, Dialog, DialogActions, DialogTitle, FormControl, FormLabel, Grid, Paper, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useParams,Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useParams, useNavigate, NavigateFunction } from "react-router-dom";
 
 interface Course{
-    course_id: number,
+    course_id: string,
     name: string,
     teacher:string,
     ufora_id:string,
@@ -12,12 +13,27 @@ interface Course{
 
 interface Project{
     title: string,
-    project_id: number
+    project_id: string
 }
 
 interface UserUid{
   uid: string
 }
+
+/**
+ * @returns The uid of the acces token of the logged in user
+ */
+function loggedInToken(){
+  return "teacher1";
+}
+
+/**
+ * @returns The Uid of the logged in user
+ */
+function loggedInUid(){
+  return "Gunnar";
+}
+
 const apiHost = import.meta.env.VITE_API_HOST;
 /**
  * 
@@ -30,10 +46,13 @@ export function CourseDetailTeacher(): JSX.Element {
   const [students, setStudents] = useState<UserUid[]>([]);
   const { courseId } = useParams<{ courseId: string }>();
 
+  const { t } = useTranslation('translation', { keyPrefix: 'courseDetailTeacher' });
+
+  const navigate = useNavigate();
   useEffect(() => {
     fetch(`${apiHost}/courses/${courseId}`, {
       headers: {
-        "Authorization": "teacher1"
+        "Authorization": loggedInToken()
       }
     })
       .then(response => response.json())
@@ -46,7 +65,7 @@ export function CourseDetailTeacher(): JSX.Element {
       const params = new URLSearchParams({ course_id: courseId });
       fetch(`${apiHost}/projects?${params}`, {
         headers: {
-          "Authorization": "teacher1"
+          "Authorization": loggedInToken()
         }
       })
         .then(response => response.json())
@@ -58,7 +77,7 @@ export function CourseDetailTeacher(): JSX.Element {
   useEffect(() => {
     fetch(`${apiHost}/courses/${courseId}/admins`, {
       headers: {
-        "Authorization": "teacher1"
+        "Authorization": loggedInToken()
       }
     })
       .then(response => response.json())
@@ -70,7 +89,7 @@ export function CourseDetailTeacher(): JSX.Element {
   useEffect(() => {
     fetch(`${apiHost}/courses/${courseId}/students`, {
       headers: {
-        "Authorization": "teacher1"
+        "Authorization": loggedInToken()
       }
     })
       .then(response => response.json())
@@ -89,18 +108,18 @@ export function CourseDetailTeacher(): JSX.Element {
           <Grid item>
             <Grid container direction="column" spacing={2} style={{ minHeight: '100vh' }}>
               <Grid item>
-                <Typography variant="h6">projecten</Typography>
+                <Typography variant="h6">{t('projects')}</Typography>
               </Grid>
               <VerticaleScroller items={projects.map((project) => (
                 <Grid item key={project.project_id}>
-                  <Typography variant="body1">
-                    <Link to={`/projects/${project.project_id}`}>{project.title}</Link>
+                  <Typography variant="body1" onClick={() => navigate(`/projects/${getIdFromLink(project.project_id)}`)} paragraph component="span">
+                    {project.title}
                   </Typography>
                 </Grid>
               ))}></VerticaleScroller>
               <Grid item style={{ alignSelf: 'flex-end' }}>
-                <Button>
-                  <Link to={`/projects/create?courseId=${courseId}`}>New Project</Link>
+                <Button onClick={() => navigate(`/projects/create?courseId=${courseId}`)}>
+                  {t('newProject')}
                 </Button>
               </Grid>
             </Grid>
@@ -108,7 +127,7 @@ export function CourseDetailTeacher(): JSX.Element {
           <Grid item>
             <Grid container direction="column" spacing={2}>
               <Grid item>
-                <Typography variant="h6">lijst co-lesgevers/assistenten</Typography>
+                <Typography variant="h6">{t('assistantList')}</Typography>
               </Grid>
               <VerticaleScroller items={admins.map((admin) => (
                 <Grid item key={admin.uid}>
@@ -116,14 +135,14 @@ export function CourseDetailTeacher(): JSX.Element {
                 </Grid>
               ))}></VerticaleScroller>
               <Grid item>
-                <Button>nieuwe lesgever</Button>
+                <Button>{t('newTeacher')}</Button>
               </Grid>
             </Grid>
           </Grid>
           <Grid item>
             <Grid container direction="column" spacing={2}>
               <Grid item>
-                <Typography variant="h6">lijst studenten</Typography>
+                <Typography variant="h6">{t('studentList')}</Typography>
               </Grid>
               <VerticaleScroller items={students.map((student) => (
                 <Grid item key={student.uid}>
@@ -131,7 +150,7 @@ export function CourseDetailTeacher(): JSX.Element {
                 </Grid>
               ))}></VerticaleScroller>
               <Grid item>
-                <Button>nieuwe student(en)</Button>
+                <Button>{t('newStudent')}</Button>
               </Grid>
             </Grid>
           </Grid>
@@ -164,12 +183,28 @@ function VerticaleScroller({items}: {items: JSX.Element[]}): JSX.Element {
 export function AllCoursesTeacher(): JSX.Element {
   const [activeCourses, setActiveCourses] = useState<Course[]>([]);
   const [archivedCourses, setArchivedCourses] = useState<Course[]>([]);
+  const [open, setOpen] = useState(false);
+
+  const [courseName, setCourseName] = useState('');
+  const [error, setError] = useState('');
+
+  const navigate = useNavigate();
+
+  const { t } = useTranslation('translation', { keyPrefix: 'allCoursesTeacher' });
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   useEffect(() => {
-    const params = new URLSearchParams({ teacher: "teacher1" });
+    const params = new URLSearchParams({ teacher: loggedInUid() });
     fetch(`${apiHost}/courses?${params}`, {
       headers: {
-        "Authorization": "teacher1"
+        "Authorization": loggedInToken()
       }
     })
       .then(response => response.json())
@@ -184,12 +219,77 @@ export function AllCoursesTeacher(): JSX.Element {
       .catch(error => console.error('Error:', error));
   }, []);
 
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCourseName(event.target.value);
+    setError(''); // Clearing error message when user starts typing
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Prevents the default form submission behaviour
+
+    if (!courseName.trim()) {
+      setError(t('emptyCourseNameError'));
+      return;
+    }
+
+    const data = { name: courseName };
+    callToApi(`${apiHost}/courses`, JSON.stringify(data), 'POST', navigate);
+  };
+
   return (
-    <Grid container direction={'column'}>
-      <SideScrollableCourses courses={activeCourses} title="Active Courses"></SideScrollableCourses>
-      <SideScrollableCourses courses={archivedCourses} title="Archived Courses"></SideScrollableCourses>
+    <Grid container direction={'column'} style={{marginTop: '20px', marginLeft: '20px'}}>
+      <SideScrollableCourses courses={activeCourses} title={t("activeCourses")}></SideScrollableCourses>
+      <SideScrollableCourses courses={archivedCourses} title={t("archivedCourses")}></SideScrollableCourses>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>{t('courseForm')}</DialogTitle>
+        <form onSubmit={handleSubmit}>
+          <FormControl>
+            <FormLabel htmlFor="course-name">{t('courseName')}</FormLabel>
+            <TextField
+              value={courseName}
+              onChange={handleInputChange}
+              error={!!error} // Applying error style if there's an error message
+              helperText={error} // Displaying the error message
+              sx={{ borderColor: error ? 'red' : undefined }} // Changing border color to red if there's an error
+            />
+          </FormControl>
+          <DialogActions>
+            <Button onClick={handleClose}>{t('cancel')}</Button>
+            <Button type="submit">{t('submit')}</Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+      <Grid item style={{marginLeft:'500px'}}>
+        <Button onClick={handleClickOpen} >{t('create')}</Button>
+      </Grid>
     </Grid>
   );
+}
+
+/**
+ * 
+ * @param path - path to backend api endpoint
+ * @param data - optional data to send to the api
+ * @param method - POST, GET, PATCH, DELETE
+ * @param navigate - function that allows the app to redirect
+ */
+function callToApi(path: string, data: string, method:string, navigate: NavigateFunction){
+  
+  fetch(path, {
+    method: method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': loggedInToken()
+    },
+    body: data,
+  })
+    .then(response => response.json())
+    .then(data => {
+      navigate(getIdFromLink(data.url)); // navigate to data.url
+    })
+    .catch((error) => {
+      console.error('Error:', error); //should redirect to error page
+    });
 }
 
 /**
@@ -197,6 +297,7 @@ export function AllCoursesTeacher(): JSX.Element {
  * @returns A component to display courses in horizontal scroller where each course is a card containing its name.
  */
 function SideScrollableCourses({courses, title}: {courses: Course[], title: string}): JSX.Element {
+  const navigate = useNavigate();
   return (
     <Grid item>
       <Grid container direction="column">
@@ -207,9 +308,9 @@ function SideScrollableCourses({courses, title}: {courses: Course[], title: stri
           <Paper style={{maxWidth:600,width:600,height:300,overflowX:'auto', boxShadow: 'none', display: 'flex', justifyContent: 'center'}}>
             <Grid container direction="row" spacing={5} alignItems="center">
               {
-                courses.map((course) => (
-                  <Grid item>
-                    <Card style={{width: '250px', height: '150px'}}>
+                courses.map((course, index) => (
+                  <Grid item key={index}>
+                    <Card style={{width: '250px', height: '150px'}} onClick={() => navigate(getIdFromLink(course.course_id))}>
                       <Typography variant="h6">{course.name}</Typography>
                     </Card>
                   </Grid>
@@ -221,4 +322,13 @@ function SideScrollableCourses({courses, title}: {courses: Course[], title: stri
       </Grid>
     </Grid>
   );
+}
+
+/**
+ * @param link - the link to the api endpoint
+ * @returns the Id at the end of the link
+ */
+function getIdFromLink(link: string): string {
+  const parts = link.split('/');
+  return parts[parts.length - 1];
 }
