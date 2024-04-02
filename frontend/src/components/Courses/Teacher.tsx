@@ -204,7 +204,7 @@ function SideScrollableCourses({courses, title}: {courses: Course[], title: stri
           <Typography variant="h4">{title}</Typography>
         </Grid>
         <Grid item>
-          <Paper style={{maxWidth:600,width:600,height:200,overflowX:'auto', boxShadow: 'none', display: 'flex', justifyContent: 'center'}}>
+          <Paper style={{maxWidth:600,width:600,height:300,overflowX:'auto', boxShadow: 'none', display: 'flex', justifyContent: 'center'}}>
             <Grid container direction="row" spacing={5} alignItems="center">
               {
                 courses.map((course) => (
