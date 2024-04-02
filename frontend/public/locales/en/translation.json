@@ -3,5 +3,10 @@
     "myProjects": "My Projects",
     "myCourses": "My Courses",
     "login": "Login",
-    "home": "Home"
+    "home": "Home",
+    "deadlines":"Past deadlines",
+    "course": "Course",
+    "last_submission": "Last submission",
+    "SUCCESS": "Success",
+    "FAIL" : "Fail"
   }

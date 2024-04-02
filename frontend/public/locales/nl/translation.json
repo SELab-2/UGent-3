@@ -3,5 +3,10 @@
     "myProjects": "Mijn Projecten",
     "myCourses": "Mijn Vakken",
     "login": "Login",
-    "home": "Home"
+    "home": "Home",
+    "deadlines": "Verlopen Deadlines",
+    "course": "Vak",
+    "last_submission" : "Laatste indiening",
+    "SUCCESS": "Geslaagd",
+    "FAIL": "Gefaald"
   }
