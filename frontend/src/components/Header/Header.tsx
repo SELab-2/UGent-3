@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
  * @returns JSX.Element representing the header.
  */
 export function Header(): JSX.Element {
-  const { t } = useTranslation();
+  const { t } = useTranslation('translation', { keyPrefix: 'header' });
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [listItems, setListItems] = useState([

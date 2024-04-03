@@ -25,5 +25,10 @@
     "create": "Create",
     "activeCourses": "Active Courses",
     "archivedCourses":"Archived Courses"
+  },
+  "courseForm": {
+    "courseName": "Course Name",
+    "submit": "Submit",
+    "emptyCourseNameError": "Course name should not be empty"
   }
 }

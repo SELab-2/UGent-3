@@ -25,5 +25,10 @@
     "create": "Nieuw Vak",
     "activeCourses": "Actieve Vakken",
     "archivedCourses":"Gearchiveerde Vakken"
+  },
+  "courseForm": {
+    "courseName": "Vak Naam",
+    "submit": "Opslaan",
+    "emptyCourseNameError": "Vak naam mag niet leeg zijn"
   }
 }
