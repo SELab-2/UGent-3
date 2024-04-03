@@ -3,7 +3,8 @@
     "myProjects": "Mijn Projecten",
     "myCourses": "Mijn Vakken",
     "login": "Login",
-    "home": "Home"
+    "home": "Home",
+    "projectUploadForm": "Project uploaden"
   },
   "home": {
     "homepage": "Homepage"
@@ -12,5 +13,16 @@
     "courseName": "Vak Naam",
     "submit": "Opslaan",
     "emptyCourseNameError": "Vak naam mag niet leeg zijn"
+  },
+  "projectForm": {
+    "projectTitle": "Titel",
+    "projectDescription": "Beschrijving",
+    "projectCourse": "Vak",
+    "projectDeadline": "Deadline",
+    "visibleForStudents": "Zichtbaar voor studenten",
+    "uploadFile": "Upload File",
+    "regex": "Voeg Regex toe",
+    "selectCourseText": "Selecteer a vak",
+    "testWarning": "Opgelet: Deze opgave bevat geen tests"
   }
 }

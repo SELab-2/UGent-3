@@ -14,6 +14,8 @@ import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import JSZip from 'jszip';
+import {useTranslation} from "react-i18next";
+import { useLocation } from 'react-router-dom';
 
 interface Course {
   course_id: string;
@@ -25,26 +27,18 @@ interface Course {
 const apiUrl = import.meta.env.VITE_APP_API_URL
 const user = "teacher1"
 
-interface Props {
-  // function to set header text
-  setHeaderText?: (text: string) => void;
-}
-
 /**
- * @param props - root
  * @returns Form for uploading project
  */
-export default function ProjectForm({setHeaderText}: Props) {
+export default function ProjectForm() {
+
+  const { t } = useTranslation('translation', { keyPrefix: 'projectForm' });
+  const location = useLocation();
 
   // fix the header value
   useEffect(() => {
-    // Update header text on page load
-    if (setHeaderText) {
-      setHeaderText("Project submission form");
-    }
     fetchCourses();
-
-  }, [setHeaderText]);
+  }, []);
 
   // all the stuff needed for submitting a project
   const [title, setTitle] = useState('');
@@ -175,7 +169,7 @@ export default function ProjectForm({setHeaderText}: Props) {
             required
             id="outlined-title"
             label="title"
-            placeholder="Project title"
+            placeholder={t("projectTitle")}
             error={titleError}
             onChange={event => setTitle(event.target.value)}
           />
@@ -184,8 +178,8 @@ export default function ProjectForm({setHeaderText}: Props) {
           <TextField
             required
             id="outlined-title"
-            label="description"
-            placeholder="Project Description"
+            label={t("projectDescription")}
+            placeholder={`Project ${t("projectDescription")}`}
             error={descriptionError}
             onChange={event => setDescription(event.target.value)}
           />
@@ -197,7 +191,7 @@ export default function ProjectForm({setHeaderText}: Props) {
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={courseName}
-              label="Course"
+              label={t("projectCourse")}
               onChange={handleCourseChange}
             >
               {courses.map(course => (
@@ -206,7 +200,7 @@ export default function ProjectForm({setHeaderText}: Props) {
                 </MenuItem>
               ))}
             </Select>
-            <FormHelperText>Select a course</FormHelperText>
+            <FormHelperText>{t("selectCourseText")}</FormHelperText>
           </FormControl>
         </Grid>
         <Grid item width={269}>
@@ -222,14 +216,14 @@ export default function ProjectForm({setHeaderText}: Props) {
           </LocalizationProvider>
         </Grid>
         <Grid item>
-          <FormControlLabel required control={<Checkbox />} label="Visible for students" onChange={e => setVisibleForStudents(e.target.checked)}/>
+          <FormControlLabel required control={<Checkbox />} label={t("visibleForStudents")} onChange={e => setVisibleForStudents(e.target.checked)}/>
         </Grid>
         <Grid item>
           <Button
             variant="contained"
             component="label"
           >
-            Upload File
+            {"Upload file"}
             <input
               type="file"
               hidden
@@ -245,7 +239,7 @@ export default function ProjectForm({setHeaderText}: Props) {
         {filename !== "" && !containsTests && (
           <Grid item>
             <div style={{ color: 'orange' }}>
-              Warning: This assignment doesn't contains tests ⚠️
+              {t("testWarning")} ⚠️
             </div>
           </Grid>
         )}
@@ -262,7 +256,7 @@ export default function ProjectForm({setHeaderText}: Props) {
         </Grid>
         <Grid item>
           <Button variant="contained" onClick={appendRegex}>
-            Add regex
+            {t("regex")}
           </Button>
         </Grid>
         <Grid item>

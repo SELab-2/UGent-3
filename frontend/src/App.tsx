@@ -1,7 +1,6 @@
 import { BrowserRouter,Route,Routes } from "react-router-dom";
 import { Header } from "./components/Header/Header";
 import ProjectCreateHome from "./pages/create_project/ProjectCreateHome.tsx";
-import {useState} from "react";
 
 import Home from "./pages/home/Home";
 /**
@@ -9,14 +8,13 @@ import Home from "./pages/home/Home";
  * @returns - The main application component
  */
 function App(): JSX.Element {
-  const [headerText, setHeaderText] = useState<string>("Home");
 
   return (
     <BrowserRouter>
-      <Header headerText={headerText}/>
+      <Header/>
       <Routes>
         <Route index element={<Home />} />
-        <Route path="dummy-create-project" element={<ProjectCreateHome setHeaderText={setHeaderText} />}/>
+        <Route path="dummy-create-project" element={<ProjectCreateHome />}/>
       </Routes>
     </BrowserRouter>
   );

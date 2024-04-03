@@ -3,7 +3,8 @@
     "myProjects": "My Projects",
     "myCourses": "My Courses",
     "login": "Login",
-    "home": "Home"
+    "home": "Home",
+    "projectUploadForm": "Project upload form"
   },
   "home": {
     "homepage": "Homepage"
@@ -12,5 +13,16 @@
     "courseName": "Course Name",
     "submit": "Submit",
     "emptyCourseNameError": "Course name should not be empty"
+  },
+  "projectForm": {
+    "projectTitle": "Title",
+    "projectDescription": "Description",
+    "projectCourse": "Course",
+    "projectDeadline": "Deadline",
+    "visibleForStudents": "Visible for students",
+    "uploadFile": "Upload File",
+    "regex": "Add Regex",
+    "selectCourseText": "Select a course",
+    "testWarning": "Warning: This assignment doesn't contains tests"
   }
 }

@@ -12,10 +12,6 @@ import {
   ListItemText
 } from "@mui/material";
 
-interface Props {
-  // value of the header
-  headerText?: string;
-}
 import { Menu } from "@mui/icons-material";
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
@@ -23,10 +19,9 @@ import { useEffect, useState } from "react";
 
 /**
  * The header component for the application that will be rendered at the top of the page.
- * @param props - React props
  * @returns The header component.
  */
-export function Header({ headerText }: Props): JSX.Element {
+export function Header(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'header' });
   const location = useLocation();
   const [open, setOpen] = useState(false);
@@ -48,7 +43,7 @@ export function Header({ headerText }: Props): JSX.Element {
     }
   }, [t]);
 
-  // const title = getTitle(location.pathname, t);
+  const title = getTitle(location.pathname, t);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -58,7 +53,7 @@ export function Header({ headerText }: Props): JSX.Element {
             <Menu style={{fontSize:"2rem"}} />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {headerText}
+            {title}
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Button color="inherit">{t('login')}</Button>
@@ -87,6 +82,7 @@ function getTitle(pathname: string, t: (key: string) => string): string {
   case '/login': return t('login');
   case '/courses': return t('myCourses');
   case '/projects': return t('myProjects');
+  case '/dummy-create-project': return t('projectUploadForm')
   default: return t('home');
   }
 }
