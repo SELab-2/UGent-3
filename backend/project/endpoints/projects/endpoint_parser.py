@@ -26,10 +26,11 @@ parser.add_argument("archived", type=bool, help='Projects', location="form")
 parser.add_argument("test_path", type=str, help='Projects test path', location="form")
 parser.add_argument("script_name", type=str, help='Projects test script path', location="form")
 parser.add_argument(
-    "regex_expressions",
+    'regex_expressions',
     type=str,
+    action='append',
     help='Projects regex expressions',
-    location="form"
+    location='form'
 )
 
 
