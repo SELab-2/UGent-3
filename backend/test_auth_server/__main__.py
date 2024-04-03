@@ -1,10 +1,7 @@
 """Main entry point for the application."""
 
 from dotenv import load_dotenv
-from flask import Flask
-
-"""Index api point"""
-from flask import Blueprint, request
+from flask import Flask, Blueprint, request
 from flask_restful import Resource, Api
 
 
