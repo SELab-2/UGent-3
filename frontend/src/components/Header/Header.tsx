@@ -5,14 +5,17 @@ import {
   IconButton,
   Toolbar,
   Typography,
+  List,
+  Drawer,
+  Grid,
+  ListItemButton,
+  ListItemText
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
 
 interface Props {
   // value of the header
   headerText?: string;
 }
-import { AppBar, Box, Button, Drawer, Grid, IconButton, List, ListItemButton, ListItemText, Toolbar, Typography } from "@mui/material";
 import { Menu } from "@mui/icons-material";
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
@@ -24,7 +27,6 @@ import { useEffect, useState } from "react";
  * @returns The header component.
  */
 export function Header({ headerText }: Props): JSX.Element {
-export function Header(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'header' });
   const location = useLocation();
   const [open, setOpen] = useState(false);
@@ -46,7 +48,7 @@ export function Header(): JSX.Element {
     }
   }, [t]);
 
-  const title = getTitle(location.pathname, t);
+  // const title = getTitle(location.pathname, t);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
