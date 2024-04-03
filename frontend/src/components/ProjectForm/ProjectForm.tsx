@@ -15,7 +15,6 @@ import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import JSZip from 'jszip';
 import {useTranslation} from "react-i18next";
-import { useLocation } from 'react-router-dom';
 
 interface Course {
   course_id: string;
@@ -33,7 +32,6 @@ const user = "teacher1"
 export default function ProjectForm() {
 
   const { t } = useTranslation('translation', { keyPrefix: 'projectForm' });
-  const location = useLocation();
 
   // fix the header value
   useEffect(() => {
