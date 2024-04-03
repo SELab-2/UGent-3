@@ -1,7 +1,16 @@
 {
-    "homepage": "Homepage",
+  "header": {
     "myProjects": "My Projects",
     "myCourses": "My Courses",
     "login": "Login",
     "home": "Home"
+  },
+  "home": {
+    "homepage": "Homepage"
+  },
+  "courseForm": {
+    "courseName": "Course Name",
+    "submit": "Submit",
+    "emptyCourseNameError": "Course name should not be empty"
   }
+}
