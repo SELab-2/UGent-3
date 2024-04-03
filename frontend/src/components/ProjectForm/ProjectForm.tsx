@@ -4,15 +4,12 @@ import {
   FormControlLabel,
   FormHelperText,
   Grid,
-  Input,
   InputLabel,
   MenuItem, Select, SelectChangeEvent,
   TextField,
-  Typography,
   FormControl
 } from "@mui/material";
-import {ChangeEvent, MouseEvent, ReactNode, useEffect, useState} from "react";
-import {spacing} from '@mui/system';
+import {ChangeEvent, MouseEvent, useEffect, useState} from "react";
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
@@ -25,28 +22,29 @@ interface Course {
   ufora_id: string;
 }
 
-/**
- *
- * @param root0
- * @param root0.setHeaderText
- */
 const apiUrl = import.meta.env.VITE_APP_API_URL
 const user = "teacher1"
 
+interface Props {
+  // function to set header text
+  setHeaderText?: (text: string) => void;
+}
+
 /**
- *
- * @param root0
- * @param root0.setHeaderText
+ * @param props - root
+ * @returns Form for uploading project
  */
-export default function ProjectForm({setHeaderText}) {
+export default function ProjectForm({setHeaderText}: Props) {
 
   // fix the header value
   useEffect(() => {
     // Update header text on page load
-    setHeaderText("Project submission form");
+    if (setHeaderText) {
+      setHeaderText("Project submission form");
+    }
     fetchCourses();
 
-  }, []);
+  }, [setHeaderText]);
 
   // all the stuff needed for submitting a project
   const [title, setTitle] = useState('');
@@ -61,14 +59,14 @@ export default function ProjectForm({setHeaderText}) {
 
   const [visibleForStudents, setVisibleForStudents] = useState(false);
 
+  const [regex, setRegex] = useState<string>("");
   const [regexExpressions, setRegexExpressions] = useState([]);
 
   const [assignmentFile, setAssignmentFile] = useState<File>();
   const [filename, setFilename] = useState("");
 
   const [courses, setCourses] = useState<Course[]>([]);
-  const [course, setCourse] = useState<Course>({course_id: '', name: "course", teacher: "", ufora_id: ""})
-  const [courseId, setCourseId] = useState<string>();
+  const [courseId, setCourseId] = useState<string>('');
   const [courseName, setCourseName] = useState<string>('');
 
   const [containsTests, setContainsTests] = useState(true);
@@ -85,13 +83,10 @@ export default function ProjectForm({setHeaderText}) {
 
     // Check each file in the zip archive
     let containsTestsFlag = false; // Initialize flag
-    for (const [_relativePath, zipEntry] of Object.entries(zip.files)) {
+    for (const [, zipEntry] of Object.entries(zip.files)) {
       if (!zipEntry.dir) {
         // Check if the file is a Dockerfile
         if (zipEntry.name.trim().toLowerCase() === 'dockerfile') {
-          console.log('Found Dockerfile:', zipEntry.name);
-          // Perform actions specific to Dockerfile
-          // Example: Extract or process the Dockerfile
           containsTestsFlag = true;
         }
       }
@@ -115,6 +110,11 @@ export default function ProjectForm({setHeaderText}) {
     setCourses(jsonData.data);
   }
 
+  const appendRegex = () => {
+    const newRegexExpressions = [...regexExpressions, regex];
+    setRegexExpressions(newRegexExpressions);
+  };
+
   const handleSubmit = async (event: MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
 
@@ -131,7 +131,10 @@ export default function ProjectForm({setHeaderText}) {
     formData.append('archived', 'false');
     formData.append('assignment_file', assignmentFile);
     formData.append('course_id', courseId)
-
+    regexExpressions.forEach((expression,) => {
+      formData.append(`regex_expressions`, expression);
+    });
+    console.log(formData);
     const response = await fetch(apiUrl+"/projects", {
       method: "post",
       headers: {
@@ -149,15 +152,15 @@ export default function ProjectForm({setHeaderText}) {
     const selectedCourseName = e.target.value as string;
     const selectedCourse = courses.find(course => course.name === selectedCourseName);
     if (selectedCourse) {
-      setCourse(selectedCourse);
       setCourseName(selectedCourse.name);
-      setCourseId(selectedCourse.course_id);
+      const parts = selectedCourse.course_id.split('/');
+      const courseId = parts[parts.length - 1];
+      setCourseId(courseId);
     }
   };
 
   return (
     <FormControl
-      onSubmit={handleSubmit}
       fullWidth
     >
       <Grid
@@ -234,18 +237,43 @@ export default function ProjectForm({setHeaderText}) {
             />
           </Button>
         </Grid>
-        <Grid item>
-          <p>{filename}</p>
-        </Grid>
-        <Grid item>
-          {filename !== "" && !containsTests && (
+        {filename !== "" && (
+          <Grid item>
+            <p>{filename}</p>
+          </Grid>
+        )}
+        {filename !== "" && !containsTests && (
+          <Grid item>
             <div style={{ color: 'orange' }}>
-                Warning: This assignment doesn't contains tests ⚠️
+              Warning: This assignment doesn't contains tests ⚠️
             </div>
-          )}
+          </Grid>
+        )}
+        <Grid item sx={{ mt: 8 }}>
+          <TextField
+            required
+            id="outlined-title"
+            label="regex"
+            placeholder="Regex structure"
+            error={titleError}
+            onChange={event => setRegex(event.target.value)}
+            onSubmit={event => appendRegex(event)}
+          />
         </Grid>
         <Grid item>
-          <Button variant="contained" onClick={ e =>
+          <Button variant="contained" onClick={appendRegex}>
+            Add regex
+          </Button>
+        </Grid>
+        <Grid item>
+          <div>
+            {regexExpressions.map((expression, index) => (
+              <p key={index}>{expression}</p>
+            ))}
+          </div>
+        </Grid>
+        <Grid item>
+          <Button variant="contained" onClick={e =>
             handleSubmit(e)
           }>Upload project</Button>
         </Grid>

@@ -9,7 +9,7 @@ import {useState} from "react";
  * @returns - The main application component
  */
 function App(): JSX.Element {
-  const [headerText, setHeaderText] = useState("Home");
+  const [headerText, setHeaderText] = useState<string>("Home");
 
   return (
     <BrowserRouter>

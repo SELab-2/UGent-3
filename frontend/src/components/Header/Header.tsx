@@ -7,13 +7,18 @@ import {
   Typography,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useTranslation } from "react-i18next";
+
+interface Props {
+  // value of the header
+  headerText?: string;
+}
 
 /**
  * The header component for the application that will be rendered at the top of the page.
- * @returns - The header component
+ * @param props - React props
+ * @returns The header component.
  */
-export function Header({ headerText }): JSX.Element {
+export function Header({ headerText }: Props): JSX.Element {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky">
