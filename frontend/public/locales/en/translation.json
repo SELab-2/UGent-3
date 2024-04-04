@@ -3,7 +3,9 @@
     "myProjects": "My Projects",
     "myCourses": "My Courses",
     "login": "Login",
-    "home": "Home"
+    "home": "Home",
+    "tag": "en",
+    "homepage": "Homepage"
   },
   "home": {
     "homepage": "Homepage",

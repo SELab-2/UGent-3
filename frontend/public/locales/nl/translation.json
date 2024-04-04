@@ -1,7 +1,11 @@
 {
   "header": {
-    "login": "Login",
-    "home": "Home"
+    "myProjects": "Mijn Projecten",
+    "myCourses": "Mijn Vakken",
+    "login": "Aanmelden",
+    "home": "Home",
+    "tag": "nl",
+    "homepage": "Homepage"
   },
   "home": {
     "homepage": "Homepage",
