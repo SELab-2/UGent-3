@@ -1,5 +1,7 @@
 """Test the base routes of the application"""
 
+import yaml
+
 
 def test_home(client):
     """Test whether the index page is accesible"""
@@ -10,6 +12,8 @@ def test_home(client):
 def test_openapi_spec(client):
     """Test whether the required fields of the openapi spec are present"""
     response = client.get("/")
-    response_json = response.json
-    assert response_json["openapi"] is not None
-    assert response_json["info"] is not None
+    response_text = response.text
+    response_yaml = yaml.safe_load(response_text)
+
+    assert "openapi" in response_yaml
+    assert "info" in response_yaml

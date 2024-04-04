@@ -73,7 +73,7 @@ export default function HomeStudent() {
     {"course_id": "222", "name": "LOGPROG"},
     {"course_id": "222", "name": "FUNPROG"}
   ]
-  const { t } = useTranslation();
+  const { t } = useTranslation('translation', { keyPrefix: 'student' });
   //const [value, setValue] = useState<Date | null>(new Date());
   /*useEffect(() => {
     fetch("http://172.17.0.2:5000/project?uid=123")

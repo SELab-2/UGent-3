@@ -5,6 +5,8 @@ import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import pytest
+from pytest import fixture, FixtureRequest
+from flask.testing import FlaskClient
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from project.models.user import User,Role
@@ -15,7 +17,23 @@ from project.db_in import url, db
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 
+### AUTHENTICATION & AUTHORIZATION ###
+@fixture
+def auth_test(request: FixtureRequest, client: FlaskClient, valid_course_entry):
+    """Add concrete test data"""
+    # endpoint, parameters, method, token, status
+    endpoint, parameters, method, *other = request.param
 
+    d = {
+        "course_id": valid_course_entry.course_id
+    }
+
+    for index, parameter in enumerate(parameters):
+        endpoint = endpoint.replace(f"@{index}", str(d[parameter]))
+
+    return endpoint, getattr(client, method), *other
+
+### OTHER ###
 @pytest.fixture
 def valid_submission(valid_user_entry, valid_project_entry):
     """
@@ -205,6 +223,12 @@ def valid_teacher_entry(session):
     except SQLAlchemyError:
         session.rollback()
     return teacher
+
+@pytest.fixture
+def course_invalid_field(valid_course):
+    """A course with an invalid field"""
+    valid_course["test_field"] = "test_value"
+    return valid_course
 
 @pytest.fixture
 def valid_course(valid_teacher_entry):
