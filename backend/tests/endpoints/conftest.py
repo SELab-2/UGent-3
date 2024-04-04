@@ -17,13 +17,10 @@ from project.models.course_share_code import CourseShareCode
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 
-
-
-### AUTHENTICATEN & AUTHORIZATION ###
+### AUTHENTICATION & AUTHORIZATION ###
 @fixture
 def auth_test(request: FixtureRequest, client: FlaskClient, course: Course) -> Tuple:
     """Add concrete test data"""
-
     # endpoint, parameters, method, token, status
     endpoint, parameters, method, *other = request.param
 
