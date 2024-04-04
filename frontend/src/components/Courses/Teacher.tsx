@@ -1,7 +1,7 @@
-import { Button, Card, Dialog, DialogActions, DialogTitle, FormControl, FormLabel, Grid, Paper, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogTitle, FormControl, FormLabel, Grid, Paper, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams, useNavigate, NavigateFunction } from "react-router-dom";
+import { useParams, useNavigate, NavigateFunction, Link } from "react-router-dom";
 
 interface Course{
     course_id: string,
@@ -13,7 +13,8 @@ interface Course{
 
 interface Project{
     title: string,
-    project_id: string
+    project_id: string,
+    deadline: Date
 }
 
 interface UserUid{
@@ -181,8 +182,7 @@ function VerticaleScroller({items}: {items: JSX.Element[]}): JSX.Element {
  * @returns A jsx component representing all courses for a teacher
  */
 export function AllCoursesTeacher(): JSX.Element {
-  const [activeCourses, setActiveCourses] = useState<Course[]>([]);
-  const [archivedCourses, setArchivedCourses] = useState<Course[]>([]);
+  const [courses, setActiveCourses] = useState<Course[]>([]);
   const [open, setOpen] = useState(false);
 
   const [courseName, setCourseName] = useState('');
@@ -209,12 +209,7 @@ export function AllCoursesTeacher(): JSX.Element {
     })
       .then(response => response.json())
       .then(data => {
-        //const active = data.data.filter((course: Course) => !course.archived);
-        //const archived = data.data.filter((course: Course) => course.archived);
-        //setActiveCourses(active);
-        //setArchivedCourses(archived);
-        setActiveCourses(data.data);//TODO change once courses can be archiveable
-        setArchivedCourses([]);
+        setActiveCourses(data.data);
       })
       .catch(error => console.error('Error:', error));
   }, []);
@@ -237,9 +232,8 @@ export function AllCoursesTeacher(): JSX.Element {
   };
 
   return (
-    <Grid container direction={'column'} style={{marginTop: '20px', marginLeft: '20px'}}>
-      <SideScrollableCourses courses={activeCourses} title={t("activeCourses")}></SideScrollableCourses>
-      <SideScrollableCourses courses={archivedCourses} title={t("archivedCourses")}></SideScrollableCourses>
+    <Grid container direction={'column'} style={{marginTop: '20px'}}>
+      <SideScrollableCourses courses={courses}></SideScrollableCourses>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{t('courseForm')}</DialogTitle>
         <form onSubmit={handleSubmit}>
@@ -259,7 +253,7 @@ export function AllCoursesTeacher(): JSX.Element {
           </DialogActions>
         </form>
       </Dialog>
-      <Grid item style={{marginLeft:'500px'}}>
+      <Grid item style={{marginLeft:"2rem", marginTop:"2rem"}}>
         <Button onClick={handleClickOpen} >{t('create')}</Button>
       </Grid>
     </Grid>
@@ -293,34 +287,89 @@ function callToApi(path: string, data: string, method:string, navigate: Navigate
 }
 
 /**
- * @param props - The component props requiring the courses and title that will be displayed in the scroller.
+ * We should reuse this in the student course view since it will be mainly the same except the create button.
+ * @param props - The component props requiring the courses that will be displayed in the scroller.
  * @returns A component to display courses in horizontal scroller where each course is a card containing its name.
  */
-function SideScrollableCourses({courses, title}: {courses: Course[], title: string}): JSX.Element {
+function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Element {
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [projects, setProjects] = useState<{ [courseId: string]: Project[] }>({});
+
+  useEffect(() => {
+    // Fetch projects for each course
+    const fetchProjects = async () => {
+      const projectPromises = courses.map(course =>
+        fetch(`${apiHost}/projects?course_id=${getIdFromLink(course.course_id)}`, 
+          { headers: { "Authorization": loggedInToken() } })
+          .then(response => response.json())
+      );
+
+      const projectResults = await Promise.all(projectPromises);
+      const projectsMap: { [courseId: string]: Project[] } = {};
+
+      projectResults.forEach((result, index) => {
+        projectsMap[getIdFromLink(courses[index].course_id)] = result.data;
+      });
+
+      setProjects(projectsMap);
+      console.log(projectsMap);
+    };
+
+    fetchProjects();
+  }, [courses]);
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredCourses = courses.filter(course => 
+    course.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <Grid item>
-      <Grid container direction="column">
-        <Grid item>
-          <Typography variant="h4">{title}</Typography>
-        </Grid>
-        <Grid item>
-          <Paper style={{maxWidth:600,width:600,height:300,overflowX:'auto', boxShadow: 'none', display: 'flex', justifyContent: 'center'}}>
-            <Grid container direction="row" spacing={5} alignItems="center">
-              {
-                courses.map((course, index) => (
-                  <Grid item key={index}>
-                    <Card style={{width: '250px', height: '150px'}} onClick={() => navigate(getIdFromLink(course.course_id))}>
-                      <Typography variant="h6">{course.name}</Typography>
-                    </Card>
-                  </Grid>
-                ))
-              }
+    <Grid item xs={12} marginLeft="2rem">
+      <Box display="flex" marginBottom="1rem">
+        <TextField
+          variant="outlined"
+          label="Search"
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+      </Box>
+      <Paper style={{width: '100%', height: '100%', overflowY: 'auto', boxShadow: 'none', display: 'flex', justifyContent: 'center' }}>
+        <Grid container direction="row" spacing={5} alignItems="flex-start">
+          {filteredCourses.map((course, index) => (
+            <Grid item key={index} xs={12} sm={6} md={4} lg={2}>
+              <Card variant='outlined'>
+                <CardHeader title={<EpsilonTypography text={course.name}/>}/>
+                <CardContent style={{margin:"10", height:"12vh"}}>
+                  {course.ufora_id && (
+                    <EpsilonTypography text={`Ufora_id:${course.ufora_id}`}/>
+                  )}
+                  <EpsilonTypography text={`Teacher: ${course.teacher}`}/>
+                  <Typography variant="body1">Projects:</Typography>
+                  {projects[getIdFromLink(course.course_id)] && projects[getIdFromLink(course.course_id)].slice(0, 3).map((project) => (
+                    <Grid item key={project.project_id}>
+                      <Link to={`/projects/${getIdFromLink(project.project_id)}`}><EpsilonTypography text={`${project.title} ${project.deadline}`}/></Link>
+                    </Grid>
+                  ))}
+                </CardContent>
+                <CardActions>
+                  <Button onClick={() => navigate(`/courses/${getIdFromLink(course.course_id)}`)}>View</Button>
+                </CardActions>
+              </Card>
             </Grid>
-          </Paper>
+          ))}
         </Grid>
-      </Grid>
+      </Paper>
     </Grid>
+  );
+}
+
+function EpsilonTypography({text} : {text: string}): JSX.Element {
+  return (
+    <Typography variant="body1" style={{ maxWidth: '13rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{text}</Typography>
   );
 }
 
