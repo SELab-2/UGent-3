@@ -22,6 +22,6 @@ project_bp.add_url_rule(
 )
 
 project_bp.add_url_rule(
-    '/projects/<int:project_id>/assignments',
-    view_func=ProjectAssignmentFiles.as_view('project_assignments')
+    '/projects/<int:project_id>/assignment',
+    view_func=ProjectAssignmentFiles.as_view('project_assignment')
 )
