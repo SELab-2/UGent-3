@@ -15,21 +15,15 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useTranslation } from "react-i18next";
-<<<<<<< HEAD
-=======
 import { useEffect, useState } from "react";
 import LanguageIcon from "@mui/icons-material/Language";
 import { Link, useLocation } from "react-router-dom";
->>>>>>> 496cd4d46088996ae3cfaf370e5edde8b6eff8b9
 
 /**
  * The header component for the application that will be rendered at the top of the page.
  * @returns - The header component
  */
 export function Header(): JSX.Element {
-<<<<<<< HEAD
-  const { t } = useTranslation();
-=======
   const { t, i18n } = useTranslation('translation', { keyPrefix: 'header' });
   const [languageMenuAnchor, setLanguageMenuAnchor] =
     useState<null | HTMLElement>(null);
@@ -69,7 +63,6 @@ export function Header(): JSX.Element {
 
   const title = getTitle(location.pathname, t);
 
->>>>>>> 496cd4d46088996ae3cfaf370e5edde8b6eff8b9
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky">
@@ -78,11 +71,7 @@ export function Header(): JSX.Element {
             <MenuIcon style={{fontSize:"2rem"}} />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-<<<<<<< HEAD
-            {t('home')}
-=======
             {title}
->>>>>>> 496cd4d46088996ae3cfaf370e5edde8b6eff8b9
           </Typography>
           <Button color="inherit">{t("login")}</Button>
           <div>
