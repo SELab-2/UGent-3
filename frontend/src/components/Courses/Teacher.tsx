@@ -326,6 +326,7 @@ function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Element {
   const filteredCourses = courses.filter(course => 
     course.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const now = new Date();
 
   return (
     <Grid item xs={12} marginLeft="2rem">
@@ -349,11 +350,26 @@ function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Element {
                   )}
                   <EpsilonTypography text={`Teacher: ${course.teacher}`}/>
                   <Typography variant="body1">Projects:</Typography>
-                  {projects[getIdFromLink(course.course_id)] && projects[getIdFromLink(course.course_id)].slice(0, 3).map((project) => (
-                    <Grid item key={project.project_id}>
-                      <Link to={`/projects/${getIdFromLink(project.project_id)}`}><EpsilonTypography text={`${project.title} ${project.deadline}`}/></Link>
-                    </Grid>
-                  ))}
+                  {projects[getIdFromLink(course.course_id)] && projects[getIdFromLink(course.course_id)].slice(0, 3).map((project) => {
+                    let timeLeft = '';
+                    if (project.deadline != undefined) {
+                      const deadlineDate = new Date(project.deadline);
+                      if(deadlineDate.getTime() < now.getTime()){
+                        return <></>
+                      }
+                      const diffTime = Math.abs(deadlineDate.getTime() - now.getTime());
+                      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                      const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+                      timeLeft = diffDays > 1 ? `${diffDays} days` : `${diffHours} hours`;
+                    }
+                    return (
+                      <Grid item key={project.project_id}>
+                        <Link to={`/projects/${getIdFromLink(project.project_id)}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                          <EpsilonTypography text={`${project.title} ${timeLeft ? ` - ${timeLeft}` : ''}`}/>
+                        </Link>
+                      </Grid>
+                    );
+                  })}
                 </CardContent>
                 <CardActions>
                   <Button onClick={() => navigate(`/courses/${getIdFromLink(course.course_id)}`)}>View</Button>
