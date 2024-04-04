@@ -464,6 +464,130 @@ class TestCourseEndpoint(TestEndpoint):
         assert response.status_code == 200
         assert response.json["data"] == []
 
-    # ### GET COURSE ADMINS ###
-    # ### POST COURSE ADMINS ###
-    # ### DELETE COURSE ADMINS ###
+
+
+    ### GET COURSE ADMINS ###
+    def test_get_admins_wrong_course_id(self, client: FlaskClient):
+        """Test getting the admins of a non existing course"""
+        response = client.get("/courses/0/admins", headers = {"Authorization": "teacher"})
+        assert response.status_code == 404
+
+    def test_get_admins_correct(self, client: FlaskClient, api_host: str, course: Course):
+        """Test getting the admins of a course"""
+        response = client.get(
+            f"/courses/{course.course_id}/admins",
+            headers = {"Authorization": "teacher"}
+        )
+        assert response.status_code == 200
+        assert response.json["data"][0]["uid"] == f"{api_host}/users/admin"
+
+
+
+    ### POST COURSE ADMINS ###
+    def test_post_admins_wrong_course_id(self, client: FlaskClient):
+        """Test adding admins to a non existing course"""
+        response = client.post("/courses/0/admins", headers = {"Authorization": "teacher"})
+        assert response.status_code == 404
+
+    def test_post_admins_wrong_admin_uid_type(self, client: FlaskClient, course: Course):
+        """Test adding an admin where the uid has a wrong typing"""
+        response = client.post(
+            f"/courses/{course.course_id}/admins",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "admin_uid": None
+            }
+        )
+        assert response.status_code == 400
+
+    def test_post_admins_wrong_user(self, client: FlaskClient, course: Course, student: User):
+        """Test adding a student as an admin"""
+        response = client.post(
+            f"/courses/{course.course_id}/admins",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "admin_uid": student.uid
+            }
+        )
+        assert response.status_code == 400
+
+    def test_post_admins_incorrect_field(self, client: FlaskClient, course: Course, admin: User):
+        """Test adding an admin but the data has an incorrect field"""
+        response = client.post(
+            f"/courses/{course.course_id}/admins",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "incorrect": admin.uid
+            }
+        )
+        assert response.status_code == 400
+
+    def test_post_admins_correct(self, client: FlaskClient, course: Course, admin: User):
+        """Test adding an admin to a course"""
+        response = client.post(
+            f"/courses/{course.course_id}/admins",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "admin_uid": admin.uid
+            }
+        )
+        assert response.status_code == 201
+        assert response.json["data"]["uid"] == admin.uid
+
+
+
+    ### DELETE COURSE ADMINS ###
+    def test_delete_admins_wrong_course_id(self, client: FlaskClient):
+        """Test deleting an admin from a non existing course"""
+        response = client.delete("/courses/0/admins", headers = {"Authorization": "teacher"})
+        assert response.status_code == 404
+
+    def test_delete_admins_wrong_admin_uid_type(self, client: FlaskClient, course: Course):
+        """Test deleting an admin where the uid has the wrong typing"""
+        response = client.delete(
+            f"/courses/{course.course_id}/admins",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "admin_uid": None
+            }
+        )
+        assert response.status_code == 400
+
+    def test_delete_admins_wrong_user(self, client: FlaskClient, course: Course, student: User):
+        """Test deleting an user that is not an admin for this course"""
+        response = client.delete(
+            f"/courses/{course.course_id}/admins",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "admin_uid": student.uid
+            }
+        )
+        assert response.status_code == 400
+
+    def test_delete_admins_incorrect_field(self, client: FlaskClient, course: Course, admin: User):
+        """Test deleting an admin but the data has an incorrect field"""
+        response = client.delete(
+            f"/courses/{course.course_id}/admins",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "incorrect": admin.uid
+            }
+        )
+        assert response.status_code == 400
+
+    def test_delete_admins_correct(self, client: FlaskClient, course: Course, admin: User):
+        """Test deleting an admin from a course"""
+        response = client.delete(
+            f"/courses/{course.course_id}/admins",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "admin_uid": admin.uid
+            }
+        )
+        assert response.status_code == 200
+        response = client.get(
+            f"/courses/{course.course_id}/admins",
+            headers = {"Authorization": "teacher"}
+        )
+        assert response.status_code == 200
+        assert response.json["data"] == []
