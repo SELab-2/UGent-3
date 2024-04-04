@@ -60,7 +60,7 @@ const FolderDragDrop: React.FC<FolderDragDropProps> = ({
           }
         } catch {
           onWrongInput &&
-            onWrongInput("Something went wrong getting parsing your zip.");
+            onWrongInput("Something went wrong parsing your zip.");
         }
       } else {
         onFileDrop(entry);
