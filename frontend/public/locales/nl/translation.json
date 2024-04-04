@@ -1,8 +1,15 @@
 {
-    "homepage": "Homepage",
+  "header": {
     "myProjects": "Mijn Projecten",
     "myCourses": "Mijn Vakken",
     "login": "Aanmelden",
     "home": "Home",
-    "tag": "nl"
+    "tag": "nl",
+    "homepage": "Homepage"
+  },
+  "courseForm": {
+    "courseName": "Vak Naam",
+    "submit": "Opslaan",
+    "emptyCourseNameError": "Vak naam mag niet leeg zijn"
   }
+}
