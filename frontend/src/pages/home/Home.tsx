@@ -1,11 +1,9 @@
-import { useTranslation } from "react-i18next";
 
 /**
  * This component is the home page component that will be rendered when on the index route.
  * @returns - The home page component
  */
 export default function Home() {
-  const { t } = useTranslation();
   return (
     <div>
       <h1></h1>
