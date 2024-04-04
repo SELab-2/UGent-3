@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 export const PageTitle = ({ title, defaultTitle, className }: {title:string,defaultTitle:string,className:string}) => {
 
   return (
