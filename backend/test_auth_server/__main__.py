@@ -8,51 +8,49 @@ from flask_restful import Resource, Api
 index_bp = Blueprint("index", __name__)
 index_endpoint = Api(index_bp)
 
+# Take the key the same as the id, uid can then be used in backend
 token_dict = {
-    "teacher1":{
-        "id":"Gunnar",
-        "jobTitle":"teacher",
-        "displayName":"Gunnar Brinckmann"
+    # Lowest authorized user to test login requirement
+    "login": {
+        "id": "login",
+        "jobTitle": None,
+        "displayName":"Login User"
     },
-    "teacher2":{
-        "id":"Bart",
-        "jobTitle":"teacher",
-        "displayName":"Bart Mesure"
+    # Student authorization access, associated with valid_...
+    "student": {
+        "id": "student",
+        "jobTitle": None,
+        "displayName":"Student User"
     },
-    "student1":{
-        "id":"w_student",
-        "jobTitle":None,
-        "displayName":"William Student"
+    # Student authorization access, other
+    "student_other": {
+        "id": "student_other",
+        "jobTitle": None,
+        "displayName":"Other Student"
     },
-    "student01":{
-        "id":"student01",
-        "jobTitle":None,
-        "displayName":"Student Nuleen"
+    # Teacher authorization access, associated with valid_...
+    "teacher": {
+        "id": "teacher",
+        "jobTitle": "teacher",
+        "displayName":"Teacher User"
     },
-    "course_admin1":{
-        "id":"Rien",
-        "jobTitle":None,
-        "displayName":"Rien Achternaam"
+    # Teacher authorization access, other
+    "teacher_other": {
+        "id": "teacher_other",
+        "jobTitle": "teacher",
+        "displayName":"Other Teacher"
     },
-    "del_user":{
-        "id":"del",
-        "jobTitle":None,
-        "displayName":"Delete me Pls"
+    # Admin authorization access, associated with valid_...
+    "admin": {
+        "id": "admin",
+        "jobTitle": "admin",
+        "displayName":"Admin User"
     },
-    "ad3_teacher":{
-        "id":"brinkmann",
-        "jobTitle0":"teacher",
-        "displayName":"Gunnar Brinckmann"
-    },
-    "student02":{
-        "id":"student02",
-        "jobTitle":None,
-        "displayName":"Student Nultwee"
-    },
-    "admin1":{
-        "id":"admin_person",
-        "jobTitle":"admin",
-        "displayName":"Firstname Admin"
+    # Admin authorization access, other
+    "admin_other": {
+        "id": "admin_other",
+        "jobTitle": "admin",
+        "displayName":"Other Admin"
     }
 }
 

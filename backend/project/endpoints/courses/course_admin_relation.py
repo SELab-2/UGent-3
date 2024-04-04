@@ -56,10 +56,9 @@ class CourseForAdmins(Resource):
         Api endpoint for adding new admins to a course, can only be done by the teacher
         """
         abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
-        teacher = request.args.get("uid")
         data = request.get_json()
         assistant = data.get("admin_uid")
-        abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant)
+        abort_if_not_teacher_or_none_assistant(course_id, assistant)
 
         query = User.query.filter_by(uid=assistant)
         new_admin = execute_query_abort_if_db_error(query, abort_url)
@@ -82,10 +81,9 @@ class CourseForAdmins(Resource):
         Api endpoint for removing admins of a course, can only be done by the teacher
         """
         abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
-        teacher = request.args.get("uid")
         data = request.get_json()
         assistant = data.get("admin_uid")
-        abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant)
+        abort_if_not_teacher_or_none_assistant(course_id, assistant)
 
         query = CourseAdmin.query.filter_by(uid=assistant, course_id=course_id)
         admin_relation = execute_query_abort_if_db_error(query, abort_url)
