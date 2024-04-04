@@ -9,7 +9,7 @@ import {
   TextField,
   FormControl
 } from "@mui/material";
-import {ChangeEvent, MouseEvent, useEffect, useState} from "react";
+import React, {ChangeEvent, MouseEvent, SyntheticEvent, useEffect, useState} from "react";
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
@@ -47,7 +47,7 @@ export default function ProjectForm() {
 
   // const [assignmentFile, setAssignmentFile] = useState('');
 
-  const [deadline, setDeadline] = useState(new Date());
+  const [deadline, setDeadline] = useState<Date>(new Date());
 
   const [visibleForStudents, setVisibleForStudents] = useState(false);
 
@@ -106,7 +106,7 @@ export default function ProjectForm() {
     setRegexExpressions(newRegexExpressions);
   };
 
-  const handleSubmit = async (event: MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
     event.preventDefault();
 
     description == '' ? setDescriptionError(true) : setDescriptionError(false);
@@ -211,15 +211,17 @@ export default function ProjectForm() {
             <DatePicker
               label="Project deadline"
               disablePast
-              onChange={(date) => {
-                setDeadline(date);
+              onChange={(date: Date | null) => {
+                if (date) {
+                  setDeadline(date);
+                }
               }}
               slotProps={{ textField: { helperText: 'Please fill in a valid deadline for the project' } }}
             />
           </LocalizationProvider>
         </Grid>
         <Grid item>
-          <FormControlLabel required control={<Checkbox />} label={t("visibleForStudents")} onChange={e => setVisibleForStudents(e.target.checked)}/>
+          <FormControlLabel control={<Checkbox defaultChecked />} label="Visible for students" onChange={e=>setVisibleForStudents((e.target as HTMLInputElement).checked)}/>
         </Grid>
         <Grid item>
           <Button
@@ -254,7 +256,6 @@ export default function ProjectForm() {
             placeholder="Regex structure"
             error={titleError}
             onChange={event => setRegex(event.target.value)}
-            onSubmit={event => appendRegex(event)}
           />
         </Grid>
         <Grid item>
@@ -270,8 +271,9 @@ export default function ProjectForm() {
           </div>
         </Grid>
         <Grid item>
-          <Button variant="contained" onClick={e =>
-            handleSubmit(e)
+          <Button variant="contained" onClick={e => {
+            return handleSubmit(e);
+          }
           }>Upload project</Button>
         </Grid>
       </Grid>

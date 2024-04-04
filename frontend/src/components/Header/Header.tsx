@@ -10,14 +10,11 @@ import {
   List,
   Drawer,
   Grid,
-  List,
   ListItemButton,
   ListItemText
 } from "@mui/material";
-
-import { Menu } from "@mui/icons-material";
+import MenuIcon from "@mui/icons-material/Menu";
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import LanguageIcon from "@mui/icons-material/Language";
 import { Link, useLocation } from "react-router-dom";
