@@ -52,7 +52,7 @@ export default function ProjectForm() {
   const [visibleForStudents, setVisibleForStudents] = useState(false);
 
   const [regex, setRegex] = useState<string>("");
-  const [regexExpressions, setRegexExpressions] = useState([]);
+  const [regexExpressions, setRegexExpressions] = useState<string[]>([]);
 
   const [assignmentFile, setAssignmentFile] = useState<File>();
   const [filename, setFilename] = useState("");
@@ -88,7 +88,6 @@ export default function ProjectForm() {
     const {name} = file;
     setAssignmentFile(file)
     setFilename(name);
-    console.log(containsTests)
 
   }
 
@@ -113,15 +112,21 @@ export default function ProjectForm() {
     description == '' ? setDescriptionError(true) : setDescriptionError(false);
     title == '' ? setTitleError(true) : setTitleError(false);
 
-    const formData = new FormData(); // Create FormData object
+    if (!assignmentFile) {
+      return;
+    }
+
+    const assignmentFileBlob = new Blob([assignmentFile], { type: assignmentFile.type });
+
+    const formData = new FormData();
 
     // Append fields to the FormData object
     formData.append('title', title);
     formData.append('description', description);
-    formData.append('deadline', deadline);
+    formData.append('deadline', deadline.toISOString());
     formData.append('visible_for_students', visibleForStudents.toString());
     formData.append('archived', 'false');
-    formData.append('assignment_file', assignmentFile);
+    formData.append('assignment_file', assignmentFileBlob, filename);
     formData.append('course_id', courseId)
     regexExpressions.forEach((expression,) => {
       formData.append(`regex_expressions`, expression);
