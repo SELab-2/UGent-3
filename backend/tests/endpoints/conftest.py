@@ -10,6 +10,7 @@ from pytest import fixture, FixtureRequest
 from flask.testing import FlaskClient
 from project.models.user import User,Role
 from project.models.course import Course
+from project.models.course_relation import CourseStudent, CourseAdmin
 from project.models.course_share_code import CourseShareCode
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
@@ -33,9 +34,19 @@ def auth_test(request: FixtureRequest, client: FlaskClient, valid_course_entry) 
 
 ### USERS ###
 @fixture
+def valid_student_entry(session):
+    """Return a student entry"""
+    return session.get(User, "student")
+
+@fixture
 def valid_teacher_entry(session):
-    """A valid teacher for testing that's already in the db"""
+    """Return a teacher entry"""
     return session.get(User, "teacher")
+
+@fixture
+def valid_admin_entry(session):
+    """Return an admin entry"""
+    return session.get(User, "admin")
 
 ### COURSES ###
 @fixture
@@ -49,15 +60,17 @@ def valid_course_entries(session, valid_teacher_entry):
 @fixture
 def valid_course(valid_teacher_entry):
     """A valid course json form"""
-    return {"name": "SEL", "ufora_id": "C003784A_2023", "teacher": valid_teacher_entry.uid}
+    return Course(name="SEL", ufora_id="C003784A_2023", teacher=valid_teacher_entry.uid)
 
 @fixture
-def valid_course_entry(session, valid_course):
+def valid_course_entry(session, valid_course, valid_student_entry, valid_admin_entry):
     """A valid course for testing that's already in the db"""
-    course = Course(**valid_course)
-    session.add(course)
+    session.add(valid_course)
     session.commit()
-    return course
+    session.add(CourseStudent(course_id=valid_course.course_id, uid=valid_student_entry.uid))
+    session.add(CourseAdmin(course_id=valid_course.course_id, uid=valid_admin_entry.uid))
+    session.commit()
+    return valid_course
 
 
 
@@ -104,26 +117,6 @@ def valid_user_entry(session, valid_user):
     Returns a user that is in the database
     """
     user = User(**valid_user)
-    session.add(user)
-    session.commit()
-    return user
-
-@pytest.fixture
-def valid_admin():
-    """
-    Returns a valid admin user form
-    """
-    return {
-        "uid": "admin_person",
-        "role": Role.ADMIN,
-    }
-
-@pytest.fixture
-def valid_admin_entry(session, valid_admin):
-    """
-    Returns an admin user that is in the database
-    """
-    user = User(**valid_admin)
     session.add(user)
     session.commit()
     return user

@@ -14,7 +14,9 @@ class TestCourseEndpoint(TestEndpoint):
     # (endpoint, parameters, methods)
     authentication = authentication_tests([
         ("/courses", [], ["get", "post"]),
-        ("/courses/@0", ["course_id"], ["get", "patch", "delete"])
+        ("/courses/@0", ["course_id"], ["get", "patch", "delete"]),
+        ("/courses/@0/students", ["course_id"], ["get", "post", "delete"]),
+        ("/courses/@0/admins", ["course_id"], ["get", "post", "delete"])
     ])
 
     # Who can access what
@@ -22,8 +24,25 @@ class TestCourseEndpoint(TestEndpoint):
     authorization = authorization_tests([
         ("/courses", [], "get", ["student", "teacher", "admin"], []),
         ("/courses", [], "post", ["teacher"], ["student", "admin"]),
-        ("/courses/@0", ["course_id"], "patch", ["teacher"], ["student", "teacher_other", "admin"]),
-        ("/courses/@0", ["course_id"], "delete", ["teacher"], ["student", "teacher_other", "admin"])
+
+        ("/courses/@0", ["course_id"], "patch",
+            ["teacher"], ["student", "teacher_other", "admin"]),
+        ("/courses/@0", ["course_id"], "delete",
+            ["teacher"], ["student", "teacher_other", "admin"]),
+
+        ("/courses/@0/students", ["course_id"], "get",
+            ["student", "teacher", "admin"], []),
+        ("/courses/@0/students", ["course_id"], "post",
+            ["teacher", "admin"], ["student", "teacher_other", "admin_other"]),
+        ("/courses/@0/students", ["course_id"], "delete",
+            ["teacher", "admin"], ["student", "teacher_other", "admin_other"]),
+
+        ("/courses/@0/admins", ["course_id"], "get",
+            ["teacher", "admin"], ["student", "teacher_other", "admin_other"]),
+        ("/courses/@0/admins", ["course_id"], "post",
+            ["teacher"], ["student", "teacher_other", "admin"]),
+        ("/courses/@0/admins", ["course_id"], "delete",
+            ["teacher"], ["student", "teacher_other", "admin"]),
     ])
 
     @mark.parametrize("auth_test", authentication, indirect=True)
@@ -147,6 +166,10 @@ class TestCourseEndpoint(TestEndpoint):
         assert response.status_code == 200
         assert valid_course_entry.name in [course["name"] for course in response.json["data"]]
 
+
+
+
+
     ### POST COURSES ###
     def test_post_courses_wrong_name_type(self, client: FlaskClient):
         """Test posting a course where the name does not have the correct type"""
@@ -194,6 +217,10 @@ class TestCourseEndpoint(TestEndpoint):
         assert data[0]["ufora_id"] == "test"
         assert data[0]["teacher"] == valid_teacher_entry.uid
 
+
+
+
+
     ### GET COURSE ###
     def test_get_course_wrong_course_id(self, client: FlaskClient):
         """Test getting a non existing course by given a wrong course_id"""
@@ -211,6 +238,10 @@ class TestCourseEndpoint(TestEndpoint):
         assert data["name"] == valid_course_entry.name
         assert data["ufora_id"] == valid_course_entry.ufora_id
         assert data["teacher"] == valid_course_entry.teacher
+
+
+
+
 
     ### PATCH COURSE ###
     def test_patch_course_wrong_course_id(self, client: FlaskClient, valid_course_entry):
@@ -276,6 +307,10 @@ class TestCourseEndpoint(TestEndpoint):
         assert response.status_code == 200
         assert response.json["data"]["name"] == "test"
 
+
+
+
+
     ### DELETE COURSE ###
     def test_delete_course_wrong_course_id(self, client: FlaskClient):
         """Test deleting a course that does not exist"""
@@ -298,9 +333,13 @@ class TestCourseEndpoint(TestEndpoint):
         )
         assert response.status_code == 404
 
-    # ### GET COURSE ADMINS ###
-    # ### POST COURSE ADMINS ###
-    # ### DELETE COURSE ADMINS ###
+
+
+
+
     # ### GET COURSE STUDENTS ###
     # ### POST COURSE STUDENTS ###
     # ### DELETE COURSE STUDENTS ###
+    # ### GET COURSE ADMINS ###
+    # ### POST COURSE ADMINS ###
+    # ### DELETE COURSE ADMINS ###

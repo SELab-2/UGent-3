@@ -12,7 +12,7 @@ def authentication_tests(tests: List[Tuple[str, List[str], List[str]]]) -> List[
         for method in methods:
             single_tests.append(param(
                 (endpoint, parameters, method),
-                id = f"{endpoint} {method}"
+                id = f"{endpoint} {method.upper()}"
             ))
     return single_tests
 
@@ -26,7 +26,8 @@ def authorization_tests(tests: List[Tuple[str, List[str], str, List[str], List[s
             allowed = token in allowed_tokens
             single_tests.append(param(
                 (endpoint, parameters, method, token, allowed),
-                id = f"{endpoint} {method} {token} {'allowed' if allowed else 'disallowed'}"
+                id = f"{endpoint} {method.upper()} " \
+                    f"({token} {'allowed' if allowed else 'disallowed'})"
             ))
     return single_tests
 
