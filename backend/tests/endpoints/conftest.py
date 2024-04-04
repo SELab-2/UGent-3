@@ -8,13 +8,9 @@ from typing import Tuple
 import pytest
 from pytest import fixture, FixtureRequest
 from flask.testing import FlaskClient
-from sqlalchemy import create_engine
-from sqlalchemy.exc import SQLAlchemyError
 from project.models.user import User,Role
 from project.models.course import Course
 from project.models.course_share_code import CourseShareCode
-from project import create_app_with_db
-from project.db_in import url, db
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 
@@ -187,17 +183,6 @@ def files():
             yield [(temp01, name01), (temp02, name02)]
 
 @pytest.fixture
-def app():
-    """A fixture that creates and configures a new app instance for each test.
-    Returns:
-        Flask -- A Flask application instance
-    """
-    engine = create_engine(url)
-    app = create_app_with_db(url)
-    db.metadata.create_all(engine)
-    yield app
-
-@pytest.fixture
 def course_teacher_ad():
     """A user that's a teacher for testing"""
     ad_teacher = User(uid="Gunnar", role=Role.TEACHER)
@@ -239,13 +224,6 @@ def valid_project(valid_course_entry):
 def api_url():
     """Get the API URL from the environment."""
     return os.getenv("API_HOST")
-
-@pytest.fixture
-def client(app):
-    """Returns client for testing requests to the app."""
-    with app.test_client() as client:
-        with app.app_context():
-            yield client
 
 @pytest.fixture
 def course_no_name(valid_teacher_entry):
