@@ -2,9 +2,15 @@
 
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from os import getenv
+from typing import Generator
+
 from pytest import fixture
+from flask import Flask
+from sqlalchemy.orm import Session
+
 from project import create_app_with_db
-from project.sessionmaker import engine, Session
+from project.sessionmaker import engine, Session as session_maker
 from project.db_in import db, url
 from project.models.course import Course
 from project.models.user import User,Role
@@ -12,24 +18,26 @@ from project.models.project import Project
 from project.models.course_relation import CourseStudent,CourseAdmin
 from project.models.submission import Submission, SubmissionStatus
 
+
+
 ### CLIENT & SESSION ###
 @fixture
-def app():
+def app() -> Generator[Flask, any, None]:
     """Yield a Flask application instance with database"""
     app = create_app_with_db(url)
     yield app
 
 @fixture
-def client(app):
+def client(app) -> Generator[any, any, None]:
     """Yield a test client"""
     with app.test_client() as client:
         with app.app_context():
             yield client
 
 @fixture
-def session():
+def session() -> Generator[Session, any, None]:
     """Yield a database session for other fixtures to use"""
-    session = Session()
+    session = session_maker()
     try:
         # Create all tables
         db.metadata.create_all(engine)
@@ -57,9 +65,11 @@ def session():
         session.commit()
         session.close()
 
+
+
 ### AUTHENTICATION & AUTHORIZATION ###
 @fixture(autouse=True) # Always run this before a test
-def auth_tokens(session):
+def auth_tokens(session) -> None:
     """Add the authenticated users to the database"""
 
     session.add_all([
@@ -74,6 +84,12 @@ def auth_tokens(session):
     session.commit()
 
 
+
+### OTHER ###
+@fixture
+def api_host() -> str:
+    """Get the API URL from the environment"""
+    return getenv("API_HOST") or ""
 
 
 

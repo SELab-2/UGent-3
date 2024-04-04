@@ -4,6 +4,7 @@ from typing import Tuple, List
 from pytest import mark
 from flask.testing import FlaskClient
 from tests.endpoints.endpoint import TestEndpoint, authentication_tests, authorization_tests
+from project.models.user import User
 from project.models.course import Course
 
 class TestCourseEndpoint(TestEndpoint):
@@ -57,15 +58,13 @@ class TestCourseEndpoint(TestEndpoint):
 
 
 
-
-
     ### GET COURSES ###
-    def test_get_courses_all(self, client: FlaskClient, valid_course_entries: List[Course]):
+    def test_get_courses_all(self, client: FlaskClient, courses: List[Course]):
         """Test getting all courses"""
         response = client.get("/courses", headers = {"Authorization": "student"})
         assert response.status_code == 200
         data = [course["name"] for course in response.json["data"]]
-        assert all(course.name in data for course in valid_course_entries)
+        assert all(course.name in data for course in courses)
 
     def test_get_courses_wrong_parameter(self, client: FlaskClient):
         """Test getting courses for a wrong parameter"""
@@ -74,21 +73,18 @@ class TestCourseEndpoint(TestEndpoint):
 
     def test_get_courses_wrong_name(self, client: FlaskClient):
         """Test getting courses for a wrong course name"""
-        response = client.get(
-            "/courses?name=no_name",
-            headers = {"Authorization": "student"}
-        )
+        response = client.get("/courses?name=no_name", headers = {"Authorization": "student"})
         assert response.status_code == 200
         assert response.json["data"] == []
 
-    def test_get_courses_name(self, client: FlaskClient, valid_course_entry: Course):
+    def test_get_courses_name(self, client: FlaskClient, course: Course):
         """Test getting courses for a given course name"""
         response = client.get(
-            f"/courses?name={valid_course_entry.name}",
+            f"/courses?name={course.name}",
             headers = {"Authorization": "student"}
         )
         assert response.status_code == 200
-        assert valid_course_entry.name in [course["name"] for course in response.json["data"]]
+        assert response.json["data"][0]["name"] == course.name
 
     def test_get_courses_wrong_ufora_id(self, client: FlaskClient):
         """Test getting courses for a wrong ufora_id"""
@@ -99,15 +95,14 @@ class TestCourseEndpoint(TestEndpoint):
         assert response.status_code == 200
         assert response.json["data"] == []
 
-    def test_get_courses_ufora_id(self, client: FlaskClient, valid_course_entry: Course):
+    def test_get_courses_ufora_id(self, client: FlaskClient, course: Course):
         """Test getting courses for a given ufora_id"""
         response = client.get(
-            f"/courses?ufora_id={valid_course_entry.ufora_id}",
+            f"/courses?ufora_id={course.ufora_id}",
             headers = {"Authorization": "student"}
         )
         assert response.status_code == 200
-        assert valid_course_entry.ufora_id in \
-            [course["ufora_id"] for course in response.json["data"]]
+        assert response.json["data"][0]["ufora_id"] == course.ufora_id
 
     def test_get_courses_wrong_teacher(self, client: FlaskClient):
         """Test getting courses for a wrong teacher"""
@@ -118,55 +113,59 @@ class TestCourseEndpoint(TestEndpoint):
         assert response.status_code == 200
         assert response.json["data"] == []
 
-    def test_get_courses_teacher(self, client: FlaskClient, valid_course_entry: Course):
+    def test_get_courses_teacher(self, client: FlaskClient, course: Course):
         """Test getting courses for a given teacher"""
         response = client.get(
-            f"/courses?teacher={valid_course_entry.teacher}",
+            f"/courses?teacher={course.teacher}",
             headers = {"Authorization": "student"}
         )
         assert response.status_code == 200
-        assert valid_course_entry.teacher in [course["teacher"] for course in response.json["data"]]
+        assert response.json["data"][0]["teacher"] == course.teacher
 
-    def test_get_courses_name_ufora_id(self, client: FlaskClient, valid_course_entry: Course):
+    def test_get_courses_name_ufora_id(self, client: FlaskClient, course: Course):
         """Test getting courses for a given course name and ufora_id"""
         response = client.get(
-            f"/courses?name={valid_course_entry.name}&ufora_id={valid_course_entry.ufora_id}",
+            f"/courses?name={course.name}&ufora_id={course.ufora_id}",
             headers = {"Authorization": "student"}
         )
         assert response.status_code == 200
-        assert valid_course_entry.name in [course["name"] for course in response.json["data"]]
+        data = response.json["data"][0]
+        assert data["name"] == course.name
+        assert data["ufora_id"] == course.ufora_id
 
-    def test_get_courses_name_teacher(self, client: FlaskClient, valid_course_entry: Course):
+    def test_get_courses_name_teacher(self, client: FlaskClient, course: Course):
         """Test getting courses for a given course name and teacher"""
         response = client.get(
-            f"/courses?name={valid_course_entry.name}&teacher={valid_course_entry.teacher}",
+            f"/courses?name={course.name}&teacher={course.teacher}",
             headers = {"Authorization": "student"}
         )
         assert response.status_code == 200
-        assert valid_course_entry.name in [course["name"] for course in response.json["data"]]
+        data = response.json["data"][0]
+        assert data["name"] == course.name
+        assert data["teacher"] == course.teacher
 
-    def test_get_courses_ufora_id_teacher(self, client: FlaskClient, valid_course_entry: Course):
+    def test_get_courses_ufora_id_teacher(self, client: FlaskClient, course: Course):
         """Test getting courses for a given ufora_id and teacher"""
         response = client.get(
-            f"/courses?ufora_id={valid_course_entry.ufora_id}&teacher={valid_course_entry.teacher}",
+            f"/courses?ufora_id={course.ufora_id}&teacher={course.teacher}",
             headers = {"Authorization": "student"}
         )
         assert response.status_code == 200
-        assert valid_course_entry.name in [course["name"] for course in response.json["data"]]
+        data = response.json["data"][0]
+        assert data["ufora_id"] == course.ufora_id
+        assert data["teacher"] == course.teacher
 
-    def test_get_courses_name_ufora_id_teacher(
-            self, client: FlaskClient, valid_course_entry: Course
-        ):
+    def test_get_courses_name_ufora_id_teacher(self, client: FlaskClient, course: Course):
         """Test getting courses for a given name, ufora_id and teacher"""
         response = client.get(
-            f"/courses?name={valid_course_entry.name}&ufora_id={valid_course_entry.ufora_id}" \
-                f"&teacher={valid_course_entry.teacher}",
+            f"/courses?name={course.name}&ufora_id={course.ufora_id}&teacher={course.teacher}",
             headers = {"Authorization": "student"}
         )
         assert response.status_code == 200
-        assert valid_course_entry.name in [course["name"] for course in response.json["data"]]
-
-
+        data = response.json["data"][0]
+        assert data["name"] == course.name
+        assert data["ufora_id"] == course.ufora_id
+        assert data["teacher"] == course.teacher
 
 
 
@@ -191,18 +190,18 @@ class TestCourseEndpoint(TestEndpoint):
         )
         assert response.status_code == 400
 
-    def test_post_courses_incorrect_field(self, client: FlaskClient, valid_teacher_entry):
+    def test_post_courses_incorrect_field(self, client: FlaskClient, teacher: User):
         """Test posting a course where a field that doesn't occur in the model is given"""
         response = client.post("/courses", headers = {"Authorization": "teacher"},
             json = {
                 "name": "test",
                 "ufora_id": "test",
-                "teacher": valid_teacher_entry.uid
+                "teacher": teacher.uid
             }
         )
         assert response.status_code == 400
 
-    def test_post_courses_correct(self, client: FlaskClient, valid_teacher_entry):
+    def test_post_courses_correct(self, client: FlaskClient, teacher: User):
         """Test posting a course"""
         response = client.post("/courses", headers = {"Authorization": "teacher"},
             json = {
@@ -213,101 +212,92 @@ class TestCourseEndpoint(TestEndpoint):
         assert response.status_code == 201
         response = client.get("/courses?name=test", headers = {"Authorization": "student"})
         assert response.status_code == 200
-        data = response.json["data"]
-        assert data[0]["ufora_id"] == "test"
-        assert data[0]["teacher"] == valid_teacher_entry.uid
-
-
+        data = response.json["data"][0]
+        assert data["ufora_id"] == "test"
+        assert data["teacher"] == teacher.uid
 
 
 
     ### GET COURSE ###
     def test_get_course_wrong_course_id(self, client: FlaskClient):
-        """Test getting a non existing course by given a wrong course_id"""
+        """Test getting a non existing course by giving a wrong course_id"""
         response = client.get("/courses/0", headers = {"Authorization": "student"})
         assert response.status_code == 404
 
-    def test_get_course_correct(self, client: FlaskClient, valid_course_entry):
+    def test_get_course_correct(self, client: FlaskClient, course: Course):
         """Test getting a course"""
         response = client.get(
-            f"/courses/{valid_course_entry.course_id}",
+            f"/courses/{course.course_id}",
             headers = {"Authorization": "student"}
         )
         assert response.status_code == 200
         data = response.json["data"]
-        assert data["name"] == valid_course_entry.name
-        assert data["ufora_id"] == valid_course_entry.ufora_id
-        assert data["teacher"] == valid_course_entry.teacher
-
-
+        assert data["name"] == course.name
+        assert data["ufora_id"] == course.ufora_id
+        assert data["teacher"] == course.teacher
 
 
 
     ### PATCH COURSE ###
-    def test_patch_course_wrong_course_id(self, client: FlaskClient, valid_course_entry):
+    def test_patch_course_wrong_course_id(self, client: FlaskClient):
         """Test patching a course that does not exist"""
-        response = client.patch(
-            "/courses/0",
-            headers = {"Authorization": "teacher"}
-        )
+        response = client.patch("/courses/0", headers = {"Authorization": "teacher"})
         assert response.status_code == 404
 
-    def test_patch_course_wrong_name_type(self, client: FlaskClient, valid_course_entry):
+    def test_patch_course_wrong_name_type(self, client: FlaskClient, course: Course):
         """Test patching a course given a wrong type for the course name"""
         response = client.patch(
-            f"/courses/{valid_course_entry.course_id}",
+            f"/courses/{course.course_id}",
             headers = {"Authorization": "teacher"},
             json = {"name": 0}
         )
         assert response.status_code == 400
 
-    def test_patch_course_ufora_id_type(self, client: FlaskClient, valid_course_entry):
+    def test_patch_course_ufora_id_type(self, client: FlaskClient, course: Course):
         """Test patching a course given a wrong type for the ufora_id"""
         response = client.patch(
-            f"/courses/{valid_course_entry.course_id}",
+            f"/courses/{course.course_id}",
             headers = {"Authorization": "teacher"},
             json = {"ufora_id": 0}
         )
         assert response.status_code == 400
 
-    def test_patch_course_wrong_teacher_type(self, client: FlaskClient, valid_course_entry):
+    def test_patch_course_wrong_teacher_type(self, client: FlaskClient, course: Course):
         """Test patching a course given a wrong type for the teacher"""
         response = client.patch(
-            f"/courses/{valid_course_entry.course_id}",
+            f"/courses/{course.course_id}",
             headers = {"Authorization": "teacher"},
             json = {"teacher": 0}
         )
         assert response.status_code == 400
 
-    def test_patch_course_wrong_teacher(self, client: FlaskClient, valid_course_entry):
+    def test_patch_course_wrong_teacher(self, client: FlaskClient, course: Course):
         """Test patching a course given a teacher that does not exist"""
         response = client.patch(
-            f"/courses/{valid_course_entry.course_id}",
+            f"/courses/{course.course_id}",
             headers = {"Authorization": "teacher"},
             json = {"teacher": "no_teacher"}
         )
         assert response.status_code == 400
 
-    def test_patch_course_incorrect_field(self, client: FlaskClient, valid_course_entry):
+    def test_patch_course_incorrect_field(self, client: FlaskClient, course: Course):
         """Test patching a course with a field that doesn't occur in the course model"""
         response = client.patch(
-            f"/courses/{valid_course_entry.course_id}",
+            f"/courses/{course.course_id}",
             headers = {"Authorization": "teacher"},
             json = {"field": 0}
         )
         assert response.status_code == 400
 
-    def test_patch_course_correct(self, client: FlaskClient, valid_course_entry):
+    def test_patch_course_correct(self, client: FlaskClient, course: Course):
         """Test patching a course"""
         response = client.patch(
-            f"/courses/{valid_course_entry.course_id}",
+            f"/courses/{course.course_id}",
             headers = {"Authorization": "teacher"},
             json = {"name": "test"}
         )
         assert response.status_code == 200
         assert response.json["data"]["name"] == "test"
-
-
 
 
 
@@ -320,26 +310,160 @@ class TestCourseEndpoint(TestEndpoint):
         )
         assert response.status_code == 404
 
-    def test_delete_course_correct(self, client: FlaskClient, valid_course_entry):
+    def test_delete_course_correct(self, client: FlaskClient, course: Course):
         """Test deleting a course"""
         response = client.delete(
-            f"/courses/{valid_course_entry.course_id}",
+            f"/courses/{course.course_id}",
             headers = {"Authorization": "teacher"}
         )
         assert response.status_code == 200
         response = client.get(
-            f"/courses/{valid_course_entry.course_id}",
+            f"/courses/{course.course_id}",
             headers = {"Authorization": "student"}
         )
         assert response.status_code == 404
 
 
 
+    ### GET COURSE STUDENTS ###
+    def test_get_students_wrong_course_id(self, client: FlaskClient):
+        """Test getting the students of a non existing course by giving a wrong course_id"""
+        response = client.get("/courses/0/students", headers = {"Authorization": "student"})
+        assert response.status_code == 404
+
+    def test_get_students_correct(self, client: FlaskClient, api_host: str, course: Course):
+        """Test getting the students fo a course"""
+        response = client.get(
+            f"/courses/{course.course_id}/students",
+            headers = {"Authorization": "student"}
+        )
+        assert response.status_code == 200
+        assert response.json["data"][0]["uid"] == f"{api_host}/users/student"
 
 
-    # ### GET COURSE STUDENTS ###
-    # ### POST COURSE STUDENTS ###
-    # ### DELETE COURSE STUDENTS ###
+
+    ### POST COURSE STUDENTS ###
+    def test_post_students_wrong_course_id(self, client: FlaskClient):
+        """Test adding students to a non existing course"""
+        response = client.post("/courses/0/students", headers = {"Authorization": "teacher"})
+        assert response.status_code == 404
+
+    def test_post_students_wrong_students_type(
+            self, client: FlaskClient, course: Course, student_other: User
+        ):
+        """Test adding a student without putting it in a list"""
+        response = client.post(
+            f"/courses/{course.course_id}/students",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "students": student_other.uid
+            }
+        )
+        assert response.status_code == 400
+
+    def test_post_students_wrong_students(self, client: FlaskClient, course: Course):
+        """Test adding students with invalid uid values in the list"""
+        response = client.post(
+            f"/courses/{course.course_id}/students",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "students": [None, "no_user"]
+            }
+        )
+        assert response.status_code == 400
+
+    def test_post_students_incorrect_field(
+            self, client: FlaskClient, course: Course, student_other: User
+        ):
+        """Test adding students but give unnecessary fields to the data"""
+        response = client.post(
+            f"/courses/{course.course_id}/students",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "incorrect": [student_other.uid]
+            }
+        )
+        assert response.status_code == 400
+
+    def test_post_students_correct(
+            self, client: FlaskClient, course: Course, student_other: User
+        ):
+        """Test adding students to a course"""
+        response = client.post(
+            f"/courses/{course.course_id}/students",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "students": [student_other.uid]
+            }
+        )
+        assert response.status_code == 201
+        data = response.json["data"][0]
+        assert not data
+
+
+
+    ### DELETE COURSE STUDENTS ###
+    def test_delete_students_wrong_course_id(self, client: FlaskClient):
+        """Test deleting students from a non existing course"""
+        response = client.delete("/courses/0/students", headers = {"Authorization": "teacher"})
+        assert response.status_code == 404
+
+    def test_delete_students_wrong_students_type(
+            self, client: FlaskClient, course: Course, student_other: User
+        ):
+        """Test deleting a student without putting it in a list"""
+        response = client.delete(
+            f"/courses/{course.course_id}/students",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "students": student_other.uid
+            }
+        )
+        assert response.status_code == 400
+
+    def test_delete_students_wrong_students(self, client: FlaskClient, course: Course):
+        """Test deleting students with invalid uid values in the list"""
+        response = client.delete(
+            f"/courses/{course.course_id}/students",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "students": [None, "no_user"]
+            }
+        )
+        assert response.status_code == 400
+
+    def test_delete_students_incorrect_field(
+            self, client: FlaskClient, course: Course, student: User
+        ):
+        """Test deleting students with an extra field that should not be there"""
+        response = client.delete(
+            f"/courses/{course.course_id}/students",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "incorrect": [student.uid]
+            }
+        )
+        assert response.status_code == 400
+
+    def test_delete_students_correct(
+            self, client: FlaskClient, course: Course, student: User
+        ):
+        """Test deleting students from a course"""
+        response = client.delete(
+            f"/courses/{course.course_id}/students",
+            headers = {"Authorization": "teacher"},
+            json = {
+                "students": [student.uid]
+            }
+        )
+        assert response.status_code == 200
+        response = client.get(
+            f"/courses/{course.course_id}/students",
+            headers = {"Authorization": "student"}
+        )
+        assert response.status_code == 200
+        assert response.json["data"] == []
+
     # ### GET COURSE ADMINS ###
     # ### POST COURSE ADMINS ###
     # ### DELETE COURSE ADMINS ###

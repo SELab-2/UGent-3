@@ -1,13 +1,15 @@
 """Pytest fixtures"""
 
 import tempfile
-import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from typing import Tuple
+from typing import Tuple, List
+
 import pytest
 from pytest import fixture, FixtureRequest
 from flask.testing import FlaskClient
+from sqlalchemy.orm import Session
+
 from project.models.user import User,Role
 from project.models.course import Course
 from project.models.course_relation import CourseStudent, CourseAdmin
@@ -15,16 +17,18 @@ from project.models.course_share_code import CourseShareCode
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 
+
+
 ### AUTHENTICATEN & AUTHORIZATION ###
 @fixture
-def auth_test(request: FixtureRequest, client: FlaskClient, valid_course_entry) -> Tuple:
+def auth_test(request: FixtureRequest, client: FlaskClient, course: Course) -> Tuple:
     """Add concrete test data"""
 
     # endpoint, parameters, method, token, status
     endpoint, parameters, method, *other = request.param
 
     d = {
-        "course_id": valid_course_entry.course_id
+        "course_id": course.course_id
     }
 
     for index, parameter in enumerate(parameters):
@@ -32,47 +36,50 @@ def auth_test(request: FixtureRequest, client: FlaskClient, valid_course_entry) 
 
     return endpoint, getattr(client, method), *other
 
+
+
 ### USERS ###
 @fixture
-def valid_student_entry(session):
+def student(session: Session) -> User:
     """Return a student entry"""
     return session.get(User, "student")
 
 @fixture
-def valid_teacher_entry(session):
+def student_other(session: Session) -> User:
+    """Return a student entry"""
+    return session.get(User, "student_other")
+
+@fixture
+def teacher(session: Session) -> User:
     """Return a teacher entry"""
     return session.get(User, "teacher")
 
 @fixture
-def valid_admin_entry(session):
+def admin(session: Session) -> User:
     """Return an admin entry"""
     return session.get(User, "admin")
 
+
+
 ### COURSES ###
 @fixture
-def valid_course_entries(session, valid_teacher_entry):
-    """A valid course for testing that's already in the db"""
-    courses = [Course(name=f"SEL{i}", teacher=valid_teacher_entry.uid) for i in range(1, 3)]
+def courses(session: Session, teacher: User) -> List[Course]:
+    """Return course entries"""
+    courses = [Course(name=f"SEL{i}", teacher=teacher.uid) for i in range(1, 3)]
     session.add_all(courses)
     session.commit()
     return courses
 
 @fixture
-def valid_course(valid_teacher_entry):
-    """A valid course json form"""
-    return Course(name="SEL", ufora_id="C003784A_2023", teacher=valid_teacher_entry.uid)
-
-@fixture
-def valid_course_entry(session, valid_course, valid_student_entry, valid_admin_entry):
-    """A valid course for testing that's already in the db"""
-    session.add(valid_course)
+def course(session: Session, student: User, teacher: User, admin: User) -> Course:
+    """Return a course entry"""
+    course = Course(name="SEL", ufora_id="C003784A_2023", teacher=teacher.uid)
+    session.add(course)
     session.commit()
-    session.add(CourseStudent(course_id=valid_course.course_id, uid=valid_student_entry.uid))
-    session.add(CourseAdmin(course_id=valid_course.course_id, uid=valid_admin_entry.uid))
+    session.add(CourseStudent(course_id=course.course_id, uid=student.uid))
+    session.add(CourseAdmin(course_id=course.course_id, uid=admin.uid))
     session.commit()
-    return valid_course
-
-
+    return course
 
 
 
@@ -145,7 +152,6 @@ def valid_user_entries(session):
 
     return users
 
-
 @pytest.fixture
 def file_empty():
     """Return an empty file"""
@@ -197,14 +203,14 @@ def valid_project_entry(session, valid_project):
     return project
 
 @pytest.fixture
-def valid_project(valid_course_entry):
+def valid_project(course):
     """A function that return the json form data of a project"""
     data = {
         "title": "Project",
         "description": "Test project",
         "assignment_file": "testfile",
         "deadline": "2024-02-25T12:00:00",
-        "course_id": valid_course_entry.course_id,
+        "course_id": course.course_id,
         "visible_for_students": True,
         "archived": False,
         "test_path": "tests",
@@ -214,14 +220,9 @@ def valid_project(valid_course_entry):
     return data
 
 @pytest.fixture
-def api_url():
-    """Get the API URL from the environment."""
-    return os.getenv("API_HOST")
-
-@pytest.fixture
-def course_no_name(valid_teacher_entry):
+def course_no_name(teacher):
     """A course with no name"""
-    return {"name": "", "teacher": valid_teacher_entry.uid}
+    return {"name": "", "teacher": teacher.uid}
 
 @pytest.fixture
 def course_empty_name():
@@ -245,9 +246,9 @@ def valid_students_entries(session):
     return students
 
 @pytest.fixture
-def share_code_admin(session, valid_course_entry):
+def share_code_admin(session, course):
     """A course with share codes for testing."""
-    share_code = CourseShareCode(course_id=valid_course_entry.course_id, for_admins=True)
+    share_code = CourseShareCode(course_id=course.course_id, for_admins=True)
     session.add(share_code)
     session.commit()
     return share_code
