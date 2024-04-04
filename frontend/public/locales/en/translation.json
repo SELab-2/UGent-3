@@ -3,9 +3,8 @@
     "myProjects": "My Projects",
     "myCourses": "My Courses",
     "login": "Login",
-    "home": "Home"
-  },
-  "home": {
+    "home": "Home",
+    "tag": "en",
     "homepage": "Homepage"
   },
   "courseForm": {

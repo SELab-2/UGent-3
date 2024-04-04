@@ -1,15 +1,46 @@
-import { AppBar, Box, Button, Drawer, Grid, IconButton, List, ListItemButton, ListItemText, Toolbar, Typography } from "@mui/material";
-import { Menu } from "@mui/icons-material";
-import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
+import {
+  AppBar,
+  Box,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography,
+  Drawer,
+  Grid,
+  List,
+  ListItemButton,
+  ListItemText
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
+import LanguageIcon from "@mui/icons-material/Language";
+import { Link, useLocation } from "react-router-dom";
 
 /**
- * Renders the header component.
- * @returns JSX.Element representing the header.
+ * The header component for the application that will be rendered at the top of the page.
+ * @returns - The header component
  */
 export function Header(): JSX.Element {
-  const { t } = useTranslation('translation', { keyPrefix: 'header' });
+  const { t, i18n } = useTranslation('translation', { keyPrefix: 'header' });
+  const [languageMenuAnchor, setLanguageMenuAnchor] =
+    useState<null | HTMLElement>(null);
+
+  const handleLanguageMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setLanguageMenuAnchor(event.currentTarget);
+  };
+
+  const handleChangeLanguage = (language: string) => {
+    i18n.changeLanguage(language);
+    setLanguageMenuAnchor(null);
+  };
+
+  const handleCloseLanguageMenu = () => {
+    setLanguageMenuAnchor(null);
+  };
+
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [listItems, setListItems] = useState([
@@ -37,13 +68,32 @@ export function Header(): JSX.Element {
       <AppBar position="sticky">
         <Toolbar disableGutters>
           <IconButton edge="start" onClick={() => setOpen(!open)} sx={{ color: "white", marginLeft: 0 }}>
-            <Menu style={{fontSize:"2rem"}} />
+            <MenuIcon style={{fontSize:"2rem"}} />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {title}
           </Typography>
-          <Box sx={{ flexGrow: 1 }} />
-          <Button color="inherit">{t('login')}</Button>
+          <Button color="inherit">{t("login")}</Button>
+          <div>
+            <IconButton onClick={handleLanguageMenu} color="inherit">
+              <LanguageIcon />
+              <Typography style={{ marginLeft: "0.3rem" }}>
+                {t("tag")}
+              </Typography>
+            </IconButton>
+            <Menu
+              anchorEl={languageMenuAnchor}
+              open={Boolean(languageMenuAnchor)}
+              onClose={handleCloseLanguageMenu}
+            >
+              <MenuItem onClick={() => handleChangeLanguage("en")}>
+                English
+              </MenuItem>
+              <MenuItem onClick={() => handleChangeLanguage("nl")}>
+                Nederlands
+              </MenuItem>
+            </Menu>
+          </div>
         </Toolbar>
       </AppBar>
       <DrawerMenu open={open} onClose={() => setOpen(false)} listItems={listItems}/>
@@ -93,7 +143,7 @@ function DrawerMenu({ open, onClose, listItems }: { open: boolean, onClose: () =
           <IconButton onClick={onClose} sx={{
             color: "white"
           }}>
-            <Menu style={{fontSize:"2rem"}} />
+            <MenuIcon style={{fontSize:"2rem"}} />
           </IconButton>
         </Grid>
         <List>
