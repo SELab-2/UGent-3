@@ -9,8 +9,6 @@ from flask import send_from_directory
 
 from flask_restful import Resource
 
-from project.models.project import Project
-from project.utils.query_agent import query_by_id_from_model
 from project.utils.authentication import authorize_project_visible
 
 API_URL = os.getenv('API_HOST')
@@ -40,6 +38,6 @@ class ProjectAssignmentFiles(Resource):
                 "url": f"{API_URL}/projects/{project_id}/assignment"
             }, 404
 
-        
+
 
         return send_from_directory(directory_path, ASSIGNMENT_FILE_NAME)

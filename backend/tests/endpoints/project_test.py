@@ -18,8 +18,8 @@ def test_assignment_download(client, valid_project):
     project_id = response.json["data"]["project_id"]
     response = client.get(f"/projects/{project_id}/assignment",
                           headers={"Authorization":"teacher2"})
-    # file downloaded succesfully
-    assert response.status_code == 404 # 404 because the file is not found, no assignment.md in zip file
+    # 404 because the file is not found, no assignment.md in zip file
+    assert response.status_code == 404
 
 
 def test_not_found_download(client):
