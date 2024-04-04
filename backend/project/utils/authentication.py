@@ -100,6 +100,14 @@ def login_required(f):
     return wrap
 
 
+def login_return_id(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        kwargs["user_id"] = return_authenticated_user_id()
+        return f(*args, **kwargs)
+    return wrap
+
+
 def authorize_admin(f):
     """
     This function will check if the person sending a request to the API is logged in and an admin.

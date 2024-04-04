@@ -13,7 +13,8 @@ from project.db_in import db
 
 from project.models.project import Project
 from project.utils.query_agent import query_selected_from_model, create_model_instance
-from project.utils.authentication import authorize_teacher
+from project.utils.authentication import authorize_teacher, login_return_id
+from project.utils.models.user_utils import is_teacher
 
 from project.endpoints.projects.endpoint_parser import parse_project_params
 
@@ -28,8 +29,8 @@ class ProjectsEndpoint(Resource):
     for implementing get method
     """
 
-    @authorize_teacher
-    def get(self, teacher_id=None):
+    @login_return_id
+    def get(self, user_id=None):
         """
         Get method for listing all available projects
         that are currently in the API
