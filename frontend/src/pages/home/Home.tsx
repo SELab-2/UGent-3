@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
  * @returns - The home page component
  */
 export default function Home() {
-  const { t } = useTranslation();
+  const { t } = useTranslation('translation', { keyPrefix: 'home' });
   return (
     <div>
       <h1>{t('homepage')}</h1>

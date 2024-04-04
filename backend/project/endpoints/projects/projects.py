@@ -38,7 +38,7 @@ class ProjectsEndpoint(Resource):
         return query_selected_from_model(
             Project,
             response_url,
-            select_values=["project_id", "title", "description"],
+            select_values=["project_id", "title", "description", "deadline"],
             url_mapper={"project_id": response_url},
             filters=request.args
         )
