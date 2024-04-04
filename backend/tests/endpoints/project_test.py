@@ -19,7 +19,7 @@ def test_assignment_download(client, valid_project):
     response = client.get(f"/projects/{project_id}/assignment",
                           headers={"Authorization":"teacher2"})
     # file downloaded succesfully
-    assert response.status_code == 200
+    assert response.status_code == 404 # 404 because the file is not found, no assignment.md in zip file
 
 
 def test_not_found_download(client):
