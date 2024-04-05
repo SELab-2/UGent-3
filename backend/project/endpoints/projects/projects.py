@@ -3,6 +3,7 @@ Module that implements the /projects endpoint of the API
 """
 import os
 from urllib.parse import urljoin
+import json
 import zipfile
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -38,7 +39,7 @@ class ProjectsEndpoint(Resource):
         return query_selected_from_model(
             Project,
             response_url,
-            select_values=["project_id", "title", "description", "deadline"],
+            select_values=["project_id", "title", "description", "deadlines"],
             url_mapper={"project_id": response_url},
             filters=request.args
         )
@@ -55,7 +56,6 @@ class ProjectsEndpoint(Resource):
         if "assignment_file" in request.files:
             file = request.files["assignment_file"]
             filename = os.path.basename(file.filename)
-            project_json["assignment_file"] = filename
 
         # save the file that is given with the request
         try:
@@ -70,7 +70,8 @@ class ProjectsEndpoint(Resource):
                     "visible_for_students",
                     "archived"]
             )
-        except SQLAlchemyError:
+        except SQLAlchemyError as e:
+            print(e)
             return jsonify({"error": "Something went wrong while inserting into the database.",
                             "url": f"{API_URL}/projects"}), 500
 

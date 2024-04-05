@@ -47,7 +47,7 @@ CREATE TABLE projects (
 	project_id INT GENERATED ALWAYS AS IDENTITY,
 	title VARCHAR(50) NOT NULL,
 	description TEXT NOT NULL,
-	deadline deadline[],
+	deadlines deadline[],
 	course_id INT NOT NULL,
 	visible_for_students BOOLEAN NOT NULL,
 	archived BOOLEAN NOT NULL,
