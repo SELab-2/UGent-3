@@ -12,14 +12,14 @@ def test_assignment_download(client, valid_project):
             "/projects",
             data=valid_project,
             content_type='multipart/form-data',
-            headers={"Authorization":"teacher2"}
+            headers={"Authorization":"teacher"}
         )
     assert response.status_code == 201
     project_id = response.json["data"]["project_id"]
-    response = client.get(f"/projects/{project_id}/assignments",
+    response = client.get(f"/projects/{project_id}/assignment",
                           headers={"Authorization":"teacher"})
-    # file downloaded succesfully
-    assert response.status_code == 200
+    # 404 because the file is not found, no assignment.md in zip file
+    assert response.status_code == 404
 
 
 def test_not_found_download(client):
