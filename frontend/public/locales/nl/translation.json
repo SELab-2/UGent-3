@@ -21,11 +21,14 @@
     "projectTitle": "Titel",
     "projectDescription": "Beschrijving",
     "projectCourse": "Vak",
-    "projectDeadline": "Deadline",
+    "projectDeadline": "Project deadline",
     "visibleForStudents": "Zichtbaar voor studenten",
-    "uploadFile": "Upload File",
+    "uploadFile": "Upload bestand",
     "regex": "Voeg Regex toe",
     "selectCourseText": "Selecteer een vak",
-    "testWarning": "Opgelet: Deze opgave bevat geen tests"
+    "testWarning": "Opgelet: Deze opgave bevat geen tests",
+    "helperText": "Selecteer een geldige deadline voor het project",
+    "uploadProject": "Upload project",
+    "regexStructure": "Regex structuur"
   }
 }

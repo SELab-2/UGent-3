@@ -18,13 +18,16 @@
   },
   "projectForm": {
     "projectTitle": "Title",
-    "projectDescription": "Description",
+    "projectDescription": "Project description",
     "projectCourse": "Course",
-    "projectDeadline": "Deadline",
+    "projectDeadline": "Project deadline",
     "visibleForStudents": "Visible for students",
-    "uploadFile": "Upload File",
+    "uploadFile": "Upload file",
     "regex": "Add Regex",
     "selectCourseText": "Select a course",
-    "testWarning": "Warning: This assignment doesn't contain tests"
+    "testWarning": "Warning: This assignment doesn't contain tests",
+    "helperText": "Please fill in a valid deadline for the project",
+    "uploadProject": "Upload project",
+    "regexStructure": "Regex structure"
   }
 }

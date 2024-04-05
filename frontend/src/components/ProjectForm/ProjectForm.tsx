@@ -7,7 +7,7 @@ import {
   InputLabel,
   MenuItem, Select, SelectChangeEvent,
   TextField,
-  FormControl
+  FormControl, Box, Typography
 } from "@mui/material";
 import React, {ChangeEvent, useEffect, useState} from "react";
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
@@ -45,8 +45,6 @@ export default function ProjectForm() {
   const [description, setDescription] = useState('');
   const [descriptionError, setDescriptionError] = useState(false);
 
-  // const [assignmentFile, setAssignmentFile] = useState('');
-
   const [deadline, setDeadline] = useState<Date>(new Date());
 
   const [visibleForStudents, setVisibleForStudents] = useState(false);
@@ -78,7 +76,7 @@ export default function ProjectForm() {
     for (const [, zipEntry] of Object.entries(zip.files)) {
       if (!zipEntry.dir) {
         // Check if the file is a Dockerfile
-        if (zipEntry.name.trim().toLowerCase() === 'dockerfile') {
+        if (zipEntry.name.trim().toLowerCase() === 'dockerfile' || zipEntry.name.trim().toLowerCase() == 'run_tests.sh') {
           containsTestsFlag = true;
         }
       }
@@ -131,7 +129,7 @@ export default function ProjectForm() {
     regexExpressions.forEach((expression,) => {
       formData.append(`regex_expressions`, expression);
     });
-    console.log(formData);
+
     const response = await fetch(apiUrl+"/projects", {
       method: "post",
       headers: {
@@ -157,126 +155,126 @@ export default function ProjectForm() {
   };
 
   return (
-    <FormControl
-      fullWidth
+    <Box
+      width='30%'
+      paddingLeft='75p'
     >
-      <Grid
-        container
-        direction="column"
-        justifyContent="center"
-        alignItems="center"
-        spacing={3}
+      <FormControl
       >
-        <Grid item sx={{ mt: 8 }}>
-          <TextField
-            required
-            id="outlined-title"
-            label="title"
-            placeholder={t("projectTitle")}
-            error={titleError}
-            onChange={event => setTitle(event.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            required
-            id="outlined-title"
-            label={t("projectDescription")}
-            placeholder={`Project ${t("projectDescription")}`}
-            error={descriptionError}
-            onChange={event => setDescription(event.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <FormControl sx={{ width: 246 }}>
-            <InputLabel id="demo-simple-select-label">Course</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={courseName}
-              label={t("projectCourse")}
-              onChange={handleCourseChange}
-            >
-              {courses.map(course => (
-                <MenuItem key={course.course_id} value={course.name}>
-                  {course.name}
-                </MenuItem>
-              ))}
-            </Select>
-            <FormHelperText>{t("selectCourseText")}</FormHelperText>
-          </FormControl>
-        </Grid>
-        <Grid item width={269}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              label="Project deadline"
-              disablePast
-              onChange={(date: Date | null) => {
-                if (date) {
-                  setDeadline(date);
-                }
-              }}
-              slotProps={{ textField: { helperText: 'Please fill in a valid deadline for the project' } }}
+        <Grid
+          container
+          direction="column"
+          spacing={3}
+          display='flex'
+          alignItems='left'
+        >
+          <Grid item sx={{ mt: 8 }}>
+            <TextField
+              required
+              id="outlined-title"
+              label={t("projectTitle")}
+              placeholder={t("projectTitle")}
+              error={titleError}
+              onChange={event => setTitle(event.target.value)}
             />
-          </LocalizationProvider>
-        </Grid>
-        <Grid item>
-          <FormControlLabel control={<Checkbox defaultChecked />} label="Visible for students" onChange={e=>setVisibleForStudents((e.target as HTMLInputElement).checked)}/>
-        </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            component="label"
-          >
-            {"Upload file"}
-            <input
-              type="file"
-              hidden
-              onChange={e => handleFileUpload(e)}
-            />
-          </Button>
-        </Grid>
-        {filename !== "" && (
-          <Grid item>
-            <p>{filename}</p>
           </Grid>
-        )}
-        {filename !== "" && !containsTests && (
           <Grid item>
-            <div style={{ color: 'orange' }}>
-              {t("testWarning")} ⚠️
+            <TextField
+              required
+              id="outlined-title"
+              label={t("projectDescription")}
+              placeholder={t("projectDescription")}
+              error={descriptionError}
+              onChange={event => setDescription(event.target.value)}
+            />
+          </Grid>
+          <Grid item>
+            <FormControl>
+              <InputLabel id="course-simple-select-label">{t("projectCourse")}</InputLabel>
+              <Select
+                labelId="course-simple-select-label"
+                id="course-simple-select"
+                value={courseName}
+                label={t("projectCourse")}
+                onChange={handleCourseChange}
+              >
+                {courses.map(course => (
+                  <MenuItem key={course.course_id} value={course.name}>
+                    {course.name}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>{t("selectCourseText")}</FormHelperText>
+            </FormControl>
+          </Grid>
+          <Grid item>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label={t("projectDeadline")}
+                disablePast
+                onChange={(date: Date | null) => {
+                  if (date) {
+                    setDeadline(date);
+                  }
+                }}
+                slotProps={{ textField: { helperText: t("helperText") } }}
+              />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item>
+            <FormControlLabel control={<Checkbox defaultChecked />} label={t("visibleForStudents")} onChange={e=>setVisibleForStudents((e.target as HTMLInputElement).checked)}/>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              component="label"
+            >
+              {"Upload file"}
+              <input
+                type="file"
+                hidden
+                onChange={e => handleFileUpload(e)}
+              />
+            </Button>
+            {filename !== "" && (
+              <Typography>{filename}</Typography>
+            )}
+            {filename !== "" && !containsTests && (
+              <Typography style={{ color: 'orange' }}>
+                {t("testWarning")} ⚠️
+              </Typography>
+            )}
+          </Grid>
+          <Grid item>
+            <TextField
+              required
+              id="outlined-title"
+              label="regex"
+              placeholder={t("regexStructure")}
+              error={titleError}
+              onChange={event => setRegex(event.target.value)}
+            />
+          </Grid>
+          <Grid item>
+            <Button variant="contained" onClick={appendRegex}>
+              {t("regex")}
+            </Button>
+          </Grid>
+          <Grid item>
+            <div>
+              {regexExpressions.map((expression, index) => (
+                <p key={index}>{expression}</p>
+              ))}
             </div>
           </Grid>
-        )}
-        <Grid item sx={{ mt: 8 }}>
-          <TextField
-            required
-            id="outlined-title"
-            label="regex"
-            placeholder="Regex structure"
-            error={titleError}
-            onChange={event => setRegex(event.target.value)}
-          />
+          <Grid item>
+            <Button variant="contained" onClick={e => {
+              return handleSubmit(e);
+            }
+            }>{t("uploadProject")}</Button>
+          </Grid>
         </Grid>
-        <Grid item>
-          <Button variant="contained" onClick={appendRegex}>
-            {t("regex")}
-          </Button>
-        </Grid>
-        <Grid item>
-          <div>
-            {regexExpressions.map((expression, index) => (
-              <p key={index}>{expression}</p>
-            ))}
-          </div>
-        </Grid>
-        <Grid item>
-          <Button variant="contained" onClick={e => {
-            return handleSubmit(e);
-          }
-          }>Upload project</Button>
-        </Grid>
-      </Grid>
-    </FormControl>
+      </FormControl>
+    </Box>
   )
 }
