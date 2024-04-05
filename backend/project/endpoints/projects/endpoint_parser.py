@@ -2,9 +2,9 @@
 Parser for the argument when posting or patching a project
 """
 
+import json
 from flask_restful import reqparse
 from werkzeug.datastructures import FileStorage
-import json
 
 parser = reqparse.RequestParser()
 parser.add_argument('title', type=str, help='Projects title', location="form")

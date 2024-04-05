@@ -3,7 +3,6 @@ Module that implements the /projects endpoint of the API
 """
 import os
 from urllib.parse import urljoin
-import json
 import zipfile
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -82,9 +81,9 @@ class ProjectsEndpoint(Resource):
         os.makedirs(project_upload_directory, exist_ok=True)
         if filename is not None:
             try:
-                file.save(os.path.join(project_upload_directory, filename))
-                zip_location = os.path.join(project_upload_directory, filename)
-                with zipfile.ZipFile(zip_location) as upload_zip:
+                file_path = os.path.join(project_upload_directory, filename)
+                file.save(file_path)
+                with zipfile.ZipFile(file_path) as upload_zip:
                     upload_zip.extractall(project_upload_directory)
             except zipfile.BadZipfile:
                 os.remove(os.path.join(project_upload_directory, filename))
