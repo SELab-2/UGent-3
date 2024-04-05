@@ -17,15 +17,21 @@ from project.models.course_share_code import CourseShareCode
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 
+
+
 ### AUTHENTICATION & AUTHORIZATION ###
 @fixture
-def auth_test(request: FixtureRequest, client: FlaskClient, course: Course) -> Tuple:
+def auth_test(request: FixtureRequest, client: FlaskClient,
+        course: Course,
+        submission: Submission
+    ) -> Tuple:
     """Add concrete test data"""
     # endpoint, parameters, method, token, status
     endpoint, parameters, method, *other = request.param
 
     d = {
-        "course_id": course.course_id
+        "course_id": course.course_id,
+        "submission_id": submission.submission_id
     }
 
     for index, parameter in enumerate(parameters):
@@ -80,31 +86,47 @@ def course(session: Session, student: User, teacher: User, admin: User) -> Cours
 
 
 
-### OTHER ###
-@pytest.fixture
-def valid_submission(valid_user_entry, valid_project_entry):
-    """
-    Returns a valid submission form
-    """
-    return {
-        "uid": valid_user_entry.uid,
-        "project_id": valid_project_entry.project_id,
-        "grading": 16,
-        "submission_time": datetime(2024,3,14,12,0,0,tzinfo=ZoneInfo("GMT")),
-        "submission_path": "/submission/1",
-        "submission_status": SubmissionStatus.SUCCESS
-    }
+### PROJECTS ###
+@fixture
+def project(session: Session, course: Course) -> Project:
+    """Return a project entry"""
+    project = Project(
+        title="Test project",
+        description="Used as a test project instance",
+        assignment_file="assignment.md",
+        deadline=datetime(2025, 1, 1, 0, 0, 0, tzinfo=ZoneInfo("GMT")),
+        course_id=course.course_id,
+        visible_for_students=True,
+        archived=False,
+        test_path="/tests",
+        script_name="project.sh",
+        regex_expressions=r".*"
+    )
+    session.add(project)
+    session.commit()
+    return project
 
-@pytest.fixture
-def valid_submission_entry(session, valid_submission):
-    """
-    Returns a submission that is in the database
-    """
-    submission = Submission(**valid_submission)
+
+
+### SUBMISSIONS ###
+@fixture
+def submission(session: Session, student: User, project: Project) -> Submission:
+    """Return a submission entry"""
+    submission = Submission(
+        uid=student.uid,
+        project_id=project.project_id,
+        grading=16,
+        submission_time=datetime(2024, 1, 1, 0, 0, 0, tzinfo=ZoneInfo("GMT")),
+        submission_path="/submission",
+        submission_status= SubmissionStatus.SUCCESS
+    )
     session.add(submission)
     session.commit()
     return submission
 
+
+
+### OTHER ###
 @pytest.fixture
 def valid_user():
     """
@@ -179,18 +201,6 @@ def files():
             yield [(temp01, name01), (temp02, name02)]
 
 @pytest.fixture
-def course_teacher_ad():
-    """A user that's a teacher for testing"""
-    ad_teacher = User(uid="Gunnar", role=Role.TEACHER)
-    return ad_teacher
-
-@pytest.fixture
-def course_ad(course_teacher_ad: User):
-    """A course for testing, with the course teacher as the teacher."""
-    ad2 = Course(name="Ad2", teacher=course_teacher_ad.uid)
-    return ad2
-
-@pytest.fixture
 def valid_project_entry(session, valid_project):
     """A project for testing, with the course as the course it belongs to"""
     project = Project(**valid_project)
@@ -215,21 +225,6 @@ def valid_project(course):
         "regex_expressions": ["*.pdf", "*.txt"]
     }
     return data
-
-@pytest.fixture
-def course_no_name(teacher):
-    """A course with no name"""
-    return {"name": "", "teacher": teacher.uid}
-
-@pytest.fixture
-def course_empty_name():
-    """A course with an empty name"""
-    return {"name": "", "teacher": "Bart"}
-
-@pytest.fixture
-def invalid_course():
-    """An invalid course for testing."""
-    return {"invalid": "error"}
 
 @pytest.fixture
 def valid_students_entries(session):

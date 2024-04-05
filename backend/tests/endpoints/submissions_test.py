@@ -1,15 +1,41 @@
-"""Test the submissions API endpoint"""
+"""Tests the submissions API endpoint"""
 
-from os import getenv
+from typing import Tuple
+
+from pytest import mark
 from flask.testing import FlaskClient
 from sqlalchemy.orm import Session
+
+from tests.endpoints.endpoint import TestEndpoint, authentication_tests, authorization_tests
 from project.models.project import Project
 from project.models.submission import Submission
 
-API_HOST = getenv("API_HOST")
-
-class TestSubmissionsEndpoint:
+class TestSubmissionsEndpoint(TestEndpoint):
     """Class to test the submissions API endpoint"""
+
+    ### AUTHENTICATION & AUTHORIZATION ###
+    # Where is login required
+    # (endpoint, parameters, methods)
+    authentication = authentication_tests([
+        ("/submissions", [], ["get", "post"]),
+        ("/submissions/@0", ["submission_id"], ["get", "patch", "delete"])
+    ])
+
+    # Who can access what
+    # (endpoint, parameters, method, allowed, disallowed)
+    authorization = authorization_tests([])
+
+    @mark.parametrize("auth_test", authentication, indirect=True)
+    def test_authentication(self, auth_test: Tuple[str, any]):
+        """Test the authentication"""
+        super().authentication(auth_test)
+
+    @mark.parametrize("auth_test", authorization, indirect=True)
+    def test_authorization(self, auth_test: Tuple[str, any, str, bool]):
+        """Test the authorization"""
+        super().authorization(auth_test)
+
+
 
     ### GET SUBMISSIONS ###
     def test_get_submissions_wrong_user(self, client: FlaskClient):
@@ -30,9 +56,9 @@ class TestSubmissionsEndpoint:
         assert response.status_code == 400
         assert "message" in response.json
 
-    def test_get_submissions_project(self, client: FlaskClient, valid_submission_entry):
+    def test_get_submissions_project(self, client: FlaskClient, submission: Submission):
         """Test getting the submissions given a specific project"""
-        response = client.get(f"/submissions?project_id={valid_submission_entry.project_id}",
+        response = client.get(f"/submissions?project_id={submission.project_id}",
                               headers={"Authorization":"teacher"})
         data = response.json
         assert response.status_code == 200
@@ -47,7 +73,7 @@ class TestSubmissionsEndpoint:
         assert response.status_code == 404
         assert data["message"] == "Submission with id: 0 not found"
 
-    def test_get_submission_correct(self, client: FlaskClient, session: Session):
+    def test_get_submission_correct(self, client: FlaskClient, api_host: str, session: Session):
         """Test getting a submission"""
         project = session.query(Project).filter_by(title="B+ Trees").first()
         submission = session.query(Submission).filter_by(
@@ -59,9 +85,9 @@ class TestSubmissionsEndpoint:
         assert response.status_code == 200
         assert data["message"] == "Successfully fetched the submission"
         assert data["data"] == {
-            "id": f"{API_HOST}/submissions/{submission.submission_id}",
-            "user": f"{API_HOST}/users/student01",
-            "project": f"{API_HOST}/projects/{project.project_id}",
+            "id": f"{api_host}/submissions/{submission.submission_id}",
+            "user": f"{api_host}/users/student01",
+            "project": f"{api_host}/projects/{project.project_id}",
             "grading": 16,
             "time": "Thu, 14 Mar 2024 12:00:00 GMT",
             "status": 'SUCCESS'
@@ -102,7 +128,7 @@ class TestSubmissionsEndpoint:
         assert response.status_code == 400
         assert data["message"] == "Invalid grading (not a valid float)"
 
-    def test_patch_submission_correct_teacher(self, client: FlaskClient, session: Session):
+    def test_patch_submission_correct_teacher(self, client: FlaskClient, api_host: str, session: Session):
         """Test patching a submission"""
         project = session.query(Project).filter_by(title="B+ Trees").first()
         submission = session.query(Submission).filter_by(
@@ -114,11 +140,11 @@ class TestSubmissionsEndpoint:
         data = response.json
         assert response.status_code == 200
         assert data["message"] == f"Submission (submission_id={submission.submission_id}) patched"
-        assert data["url"] == f"{API_HOST}/submissions/{submission.submission_id}"
+        assert data["url"] == f"{api_host}/submissions/{submission.submission_id}"
         assert data["data"] == {
-            "id": f"{API_HOST}/submissions/{submission.submission_id}",
-            "user": f"{API_HOST}/users/student02",
-            "project": f"{API_HOST}/projects/{project.project_id}",
+            "id": f"{api_host}/submissions/{submission.submission_id}",
+            "user": f"{api_host}/users/student02",
+            "project": f"{api_host}/projects/{project.project_id}",
             "grading": 20,
             "time": 'Thu, 14 Mar 2024 23:59:59 GMT',
             "status": 'FAIL'
