@@ -38,9 +38,9 @@ CREATE TABLE course_students (
 	PRIMARY KEY(course_id, uid)
 );
 
-CREATE TYPE deadline (
-	description TEXT NOT NULL,
-	deadline TIMESTAMP WITH TIME ZONE NOT NULL
+CREATE TYPE deadline AS(
+	description TEXT,
+	deadline TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE projects (
