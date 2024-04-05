@@ -25,6 +25,6 @@
     "uploadFile": "Upload File",
     "regex": "Add Regex",
     "selectCourseText": "Select a course",
-    "testWarning": "Warning: This assignment doesn't contains tests"
+    "testWarning": "Warning: This assignment doesn't contain tests"
   }
 }

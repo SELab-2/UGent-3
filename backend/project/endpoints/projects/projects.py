@@ -60,7 +60,6 @@ class ProjectsEndpoint(Resource):
 
         # save the file that is given with the request
         try:
-            print(project_json)
             new_project, status_code = create_model_instance(
                 Project,
                 project_json,
