@@ -21,10 +21,12 @@
     "jszip": "^3.10.1",
     "i18next-browser-languagedetector": "^7.2.0",
     "i18next-http-backend": "^2.5.0",
+    "jszip": "^3.10.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^14.1.0",
     "react-router-dom": "^6.22.1",
+    "stream": "^0.0.2",
     "styled-components": "^6.1.8"
   },
   "devDependencies": {
