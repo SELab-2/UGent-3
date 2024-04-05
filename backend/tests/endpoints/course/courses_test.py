@@ -66,7 +66,7 @@ class TestCourseEndpoint(TestEndpoint):
         data = [course["name"] for course in response.json["data"]]
         assert all(course.name in data for course in courses)
 
-    def test_get_courses_wrong_parameter(self, client: FlaskClient):
+    def test_get_courses_wrong_argument(self, client: FlaskClient):
         """Test getting courses for a wrong parameter"""
         response = client.get("/courses?parameter=0", headers = {"Authorization": "student"})
         assert response.status_code == 400
@@ -285,7 +285,7 @@ class TestCourseEndpoint(TestEndpoint):
         response = client.patch(
             f"/courses/{course.course_id}",
             headers = {"Authorization": "teacher"},
-            json = {"field": 0}
+            json = {"incorrect": 0}
         )
         assert response.status_code == 400
 
@@ -386,7 +386,7 @@ class TestCourseEndpoint(TestEndpoint):
         assert response.status_code == 400
 
     def test_post_students_correct(
-            self, client: FlaskClient, course: Course, student_other: User
+            self, client: FlaskClient, api_host: str, course: Course, student_other: User
         ):
         """Test adding students to a course"""
         response = client.post(
@@ -397,8 +397,7 @@ class TestCourseEndpoint(TestEndpoint):
             }
         )
         assert response.status_code == 201
-        data = response.json["data"][0]
-        assert not data
+        assert response.json["data"]["students"][0] == f"{api_host}/users/student_other"
 
 
 
@@ -584,7 +583,7 @@ class TestCourseEndpoint(TestEndpoint):
                 "admin_uid": admin.uid
             }
         )
-        assert response.status_code == 200
+        assert response.status_code == 204
         response = client.get(
             f"/courses/{course.course_id}/admins",
             headers = {"Authorization": "teacher"}
