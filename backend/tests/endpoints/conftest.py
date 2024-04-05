@@ -4,7 +4,6 @@ import tempfile
 import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
-import json
 import pytest
 from pytest import fixture, FixtureRequest
 from flask.testing import FlaskClient
