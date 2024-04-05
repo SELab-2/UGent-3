@@ -1,4 +1,4 @@
-"""Pytest fixtures"""
+"""Endpoint level fixtures"""
 
 import tempfile
 from datetime import datetime

@@ -28,7 +28,7 @@ def app() -> Generator[Flask, any, None]:
     yield app
 
 @fixture
-def client(app) -> Generator[any, any, None]:
+def client(app: Flask) -> Generator[any, any, None]:
     """Yield a test client"""
     with app.test_client() as client:
         with app.app_context():
@@ -69,7 +69,7 @@ def session() -> Generator[Session, any, None]:
 
 ### AUTHENTICATION & AUTHORIZATION ###
 @fixture(autouse=True) # Always run this before a test
-def auth_tokens(session) -> None:
+def auth_tokens(session: Session) -> None:
     """Add the authenticated users to the database"""
 
     session.add_all([
