@@ -1,5 +1,6 @@
 import {
   Card,
+  CardContent,
   CardHeader,
   Container,
   Grid,
@@ -8,7 +9,10 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import Markdown from "react-markdown";
 import { useParams } from "react-router-dom";
+import SubmissionCard from "./SubmissionCard";
+import { Course } from "../../../types/course";
 
 const API_URL = import.meta.env.VITE_API_HOST;
 
@@ -17,10 +21,16 @@ interface Project {
   description: string;
 }
 
+/**
+ *
+ * @returns - ProjectView component which displays the project details
+ * and submissions of the current user for that project
+ */
 export default function ProjectView() {
   const { projectId } = useParams<{ projectId: string }>();
   const [projectData, setProjectData] = useState<Project | null>(null);
-  const [courseData, setCourseData] = useState<any | null>(null);
+  const [courseData, setCourseData] = useState<Course | null>(null);
+  const [assignmentRawText, setAssignmentRawText] = useState<string>("");
 
   useEffect(() => {
     fetch(`${API_URL}/projects/${projectId}`, {
@@ -35,7 +45,6 @@ export default function ProjectView() {
           }).then((response) => {
             if (response.ok) {
               response.json().then((data) => {
-                console.log(data);
                 setCourseData(data["data"]);
               });
             }
@@ -43,7 +52,17 @@ export default function ProjectView() {
         });
       }
     });
+
+    fetch(`${API_URL}/projects/${projectId}/assignment`, {
+      headers: { Authorization: "teacher" },
+    }).then((response) => {
+      if (response.ok) {
+        response.text().then((data) => setAssignmentRawText(data));
+      }
+    });
   }, [projectId]);
+
+  if (!projectId) return null;
 
   return (
     <Grid
@@ -51,13 +70,14 @@ export default function ProjectView() {
       container
       direction="column"
       rowGap="2rem"
-      marginTop="2rem"
+      margin="2rem 0"
     >
       <Grid item sm={12}>
         <Container>
           {projectData && (
             <Card>
               <CardHeader
+                color="secondary"
                 title={projectData.title}
                 subheader={
                   <>
@@ -65,7 +85,7 @@ export default function ProjectView() {
                       <Typography>{projectData.description}</Typography>
                       <Typography flex="1" />
                       {courseData && (
-                        <Link href={`/courses/${courseData.course_id}`} >
+                        <Link href={`/courses/${courseData.course_id}`}>
                           <Typography>{courseData.name}</Typography>
                         </Link>
                       )}
@@ -73,15 +93,19 @@ export default function ProjectView() {
                   </>
                 }
               />
+              <CardContent>
+                <Markdown>{assignmentRawText}</Markdown>
+              </CardContent>
             </Card>
           )}
         </Container>
       </Grid>
       <Grid item sm={12}>
         <Container>
-          <Card>
-            <CardHeader title="Tasks" />
-          </Card>
+          <SubmissionCard
+            submissionUrl={`${API_URL}/submissions`}
+            projectId={projectId}
+          />
         </Container>
       </Grid>
     </Grid>

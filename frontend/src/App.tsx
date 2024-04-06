@@ -2,7 +2,7 @@ import { BrowserRouter,Route,Routes } from "react-router-dom";
 import { Header } from "./components/Header/Header";
 import Home from "./pages/home/Home";
 import LanguagePath from "./components/LanguagePath";
-import ProjectView from "./pages/project/ProjectView";
+import ProjectView from "./pages/project/projectView/ProjectView";
 
 /**
  * This component is the main application component that will be rendered by the ReactDOM. 
