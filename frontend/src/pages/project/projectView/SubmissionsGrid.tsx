@@ -56,7 +56,7 @@ export default function SubmissionsGrid({
       type: "actions",
       width: 50,
       getActions: (props) => [
-        <IconButton href={`${submissionUrl}/${props.id}`}>
+        <IconButton href={`${submissionUrl}/${props.id}/download`}>
           <DownloadIcon />
         </IconButton>,
       ],
