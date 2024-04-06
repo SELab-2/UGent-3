@@ -1,12 +1,14 @@
-FROM python:3.9
+FROM docker:dind
 
-# Set the working directory
+RUN apk add --no-cache \
+    python3 \
+    py3-pip
+
 WORKDIR /app
 
-# Copy the application code into the container
+RUN python3 -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+
 COPY . /app
 
-# Install dependencies
-RUN apt-get update 
-RUN apt-get install -y --no-install-recommends python3-pip
-RUN pip3 install -r requirements.txt -r dev-requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt -r dev-requirements.txt
