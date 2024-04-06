@@ -8,19 +8,6 @@ from zipfile import ZipFile, ZIP_DEFLATED, is_zipfile
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 
-def filter_files(files: List[FileStorage]) -> List[FileStorage]:
-    """Filter out bad files
-
-    Args:
-        files (List[FileStorage]): A list of files to filter on
-
-    Returns:
-        List[FileStorage]: The filtered list
-    """
-    return list(filter(lambda file:
-        file and file.filename != "" and getsize(file.filename) > 0,
-        files
-    ))
 
 def all_files_uploaded(files: List[FileStorage], regexes: List[str]) -> bool:
     """Check if all the required files are uploaded

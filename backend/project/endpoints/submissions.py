@@ -12,7 +12,7 @@ from project.db_in import db
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 from project.models.user import User
-from project.utils.files import filter_files, all_files_uploaded
+from project.utils.files import all_files_uploaded
 from project.utils.user import is_valid_user
 from project.utils.project import is_valid_project
 from project.utils.query_agent import query_selected_from_model, delete_by_id_from_model
@@ -73,7 +73,6 @@ class SubmissionsEndpoint(Resource):
             filters=request.args
         )
 
-    @authorize_student_submission
     def post(self) -> dict[str, any]:
         """Post a new submission to a project
 
@@ -112,11 +111,12 @@ class SubmissionsEndpoint(Resource):
 
                 # Submission files
                 submission.submission_path = "" # Must be set on creation
-                files = filter_files(request.files.getlist("files"))
+                files = request.files.getlist("files")
 
                 # Check files otherwise stop
                 project = session.get(Project, submission.project_id)
-                if not files or not all_files_uploaded(files, project.regex_expressions):
+                if project.regex_expressions and \
+                    (not files or not all_files_uploaded(files, project.regex_expressions)):
                     data["message"] = "No files were uploaded" if not files else \
                         "Not all required files were uploaded " \
                         f"(required files={','.join(project.regex_expressions)})"
@@ -141,12 +141,12 @@ class SubmissionsEndpoint(Resource):
                 data["message"] = "Successfully fetched the submissions"
                 data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
                 data["data"] = {
-                    "id": urljoin(f"{BASE_URL}/",  submission.submission_id),
-                    "user": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
-                    "project": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
+                    "submission_id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
+                    "uid": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
+                    "project_id": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
                     "grading": submission.grading,
-                    "time": submission.submission_time,
-                    "status": submission.submission_status
+                    "submission_time": submission.submission_time,
+                    "submission_status": submission.submission_status
                 }
                 return data, 201
 
@@ -182,12 +182,12 @@ class SubmissionEndpoint(Resource):
 
                 data["message"] = "Successfully fetched the submission"
                 data["data"] = {
-                    "id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
-                    "user": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
-                    "project": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
+                    "submission_id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
+                    "uid": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
+                    "project_id": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
                     "grading": submission.grading,
-                    "time": submission.submission_time,
-                    "status": submission.submission_status
+                    "submission_time": submission.submission_time,
+                    "submission_status": submission.submission_status
                 }
                 return data, 200
 
