@@ -9,6 +9,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from flask import request, jsonify
 from flask_restful import Resource
 
+from project.db_in import db
+
 from project.models.project import Project
 from project.utils.query_agent import query_selected_from_model, create_model_instance
 from project.utils.authentication import authorize_teacher
@@ -17,6 +19,7 @@ from project.endpoints.projects.endpoint_parser import parse_project_params
 
 API_URL = os.getenv('API_HOST')
 UPLOAD_FOLDER = os.getenv('UPLOAD_URL')
+
 
 class ProjectsEndpoint(Resource):
     """
@@ -35,7 +38,7 @@ class ProjectsEndpoint(Resource):
         return query_selected_from_model(
             Project,
             response_url,
-            select_values=["project_id", "title", "description"],
+            select_values=["project_id", "title", "description", "deadlines"],
             url_mapper={"project_id": response_url},
             filters=request.args
         )
@@ -47,10 +50,11 @@ class ProjectsEndpoint(Resource):
         using flask_restfull parse lib
         """
 
-        file = request.files["assignment_file"]
         project_json = parse_project_params()
-        filename = os.path.basename(file.filename)
-        project_json["assignment_file"] = filename
+        filename = None
+        if "assignment_file" in request.files:
+            file = request.files["assignment_file"]
+            filename = os.path.basename(file.filename)
 
         # save the file that is given with the request
         try:
@@ -73,20 +77,21 @@ class ProjectsEndpoint(Resource):
             return new_project, status_code
 
         project_upload_directory = os.path.join(f"{UPLOAD_FOLDER}", f"{new_project.project_id}")
-
         os.makedirs(project_upload_directory, exist_ok=True)
-
-        file.save(os.path.join(project_upload_directory, filename))
-        try:
-            with zipfile.ZipFile(os.path.join(project_upload_directory, filename)) as upload_zip:
-                upload_zip.extractall(project_upload_directory)
-        except zipfile.BadZipfile:
-            return ({
-                        "message": "Please provide a .zip file for uploading the instructions",
-                        "url": f"{API_URL}/projects"
-                    },
-                    400)
-
+        if filename is not None:
+            try:
+                file_path = os.path.join(project_upload_directory, filename)
+                file.save(file_path)
+                with zipfile.ZipFile(file_path) as upload_zip:
+                    upload_zip.extractall(project_upload_directory)
+            except zipfile.BadZipfile:
+                os.remove(os.path.join(project_upload_directory, filename))
+                db.session.rollback()
+                return ({
+                            "message": "Please provide a .zip file for uploading the instructions",
+                            "url": f"{API_URL}/projects"
+                        },
+                        400)
         return {
             "message": "Project created succesfully",
             "data": new_project,

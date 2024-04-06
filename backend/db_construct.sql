@@ -1,7 +1,10 @@
+CREATE TYPE role AS ENUM ('STUDENT', 'TEACHER', 'ADMIN');
+
+CREATE TYPE submission_status AS ENUM ('SUCCESS', 'LATE', 'FAIL', 'RUNNING');
+
 CREATE TABLE users (
 	uid VARCHAR(255),
-	is_teacher BOOLEAN,
-	is_admin BOOLEAN,
+	role role NOT NULL,
 	PRIMARY KEY(uid)
 );
 
@@ -35,17 +38,19 @@ CREATE TABLE course_students (
 	PRIMARY KEY(course_id, uid)
 );
 
+CREATE TYPE deadline AS(
+	description TEXT,
+	deadline TIMESTAMP WITH TIME ZONE
+);
+
 CREATE TABLE projects (
 	project_id INT GENERATED ALWAYS AS IDENTITY,
 	title VARCHAR(50) NOT NULL,
 	description TEXT NOT NULL,
-	assignment_file VARCHAR(50),
-	deadline TIMESTAMP WITH TIME ZONE,
+	deadlines deadline[],
 	course_id INT NOT NULL,
 	visible_for_students BOOLEAN NOT NULL,
 	archived BOOLEAN NOT NULL,
-	test_path VARCHAR(50),
-	script_name VARCHAR(50),
 	regex_expressions VARCHAR(50)[],
 	PRIMARY KEY(project_id),
 	CONSTRAINT fk_course FOREIGN KEY(course_id) REFERENCES courses(course_id) ON DELETE CASCADE
@@ -55,10 +60,10 @@ CREATE TABLE submissions (
 	submission_id INT GENERATED ALWAYS AS IDENTITY,
 	uid VARCHAR(255) NOT NULL,
 	project_id INT NOT NULL,
-	grading INTEGER CHECK (grading >= 0 AND grading <= 20),
+	grading FLOAT CHECK (grading >= 0 AND grading <= 20),
 	submission_time TIMESTAMP WITH TIME ZONE NOT NULL,
 	submission_path VARCHAR(50) NOT NULL,
-	submission_status BOOLEAN NOT NULL,
+	submission_status submission_status NOT NULL,
 	PRIMARY KEY(submission_id),
 	CONSTRAINT fk_project FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE,
 	CONSTRAINT fk_user FOREIGN KEY(uid) REFERENCES users(uid) ON DELETE CASCADE

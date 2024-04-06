@@ -7,7 +7,7 @@ from os import getenv
 from urllib.parse import urljoin
 from dotenv import load_dotenv
 
-from flask import abort, request
+from flask import request
 from flask_restful import Resource
 
 from project.models.course_relation import CourseAdmin
@@ -21,11 +21,12 @@ from project.endpoints.courses.courses_utils import (
     json_message
 )
 from project.utils.query_agent import query_selected_from_model, insert_into_model
-from project.utils.authentication import login_required, authorize_teacher_of_course, authorize_teacher_or_course_admin
+from project.utils.authentication import authorize_teacher_of_course, \
+      authorize_teacher_or_course_admin
 
 load_dotenv()
 API_URL = getenv("API_HOST")
-RESPONSE_URL = urljoin(API_URL + "/", "courses")
+RESPONSE_URL = urljoin(f"{API_URL}/", "courses")
 
 class CourseForAdmins(Resource):
     """
@@ -55,10 +56,9 @@ class CourseForAdmins(Resource):
         Api endpoint for adding new admins to a course, can only be done by the teacher
         """
         abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
-        teacher = request.args.get("uid")
         data = request.get_json()
         assistant = data.get("admin_uid")
-        abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant)
+        abort_if_not_teacher_or_none_assistant(course_id, assistant)
 
         query = User.query.filter_by(uid=assistant)
         new_admin = execute_query_abort_if_db_error(query, abort_url)
@@ -81,10 +81,9 @@ class CourseForAdmins(Resource):
         Api endpoint for removing admins of a course, can only be done by the teacher
         """
         abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
-        teacher = request.args.get("uid")
         data = request.get_json()
         assistant = data.get("admin_uid")
-        abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant)
+        abort_if_not_teacher_or_none_assistant(course_id, assistant)
 
         query = CourseAdmin.query.filter_by(uid=assistant, course_id=course_id)
         admin_relation = execute_query_abort_if_db_error(query, abort_url)
