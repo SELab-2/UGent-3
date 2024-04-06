@@ -30,7 +30,7 @@ from project.utils.authentication import login_required, authorize_teacher_or_co
 
 load_dotenv()
 API_URL = getenv("API_HOST")
-RESPONSE_URL = urljoin(API_URL + "/", "courses")
+RESPONSE_URL = urljoin(f"{API_URL}/", "courses")
 
 class CourseToAddStudents(Resource):
     """
@@ -64,11 +64,10 @@ class CourseToAddStudents(Resource):
         /courses/course_id/students with a list of uid in the request body under key "students"
         """
         abort_url = f"{API_URL}/courses/{course_id}/students"
-        uid = request.args.get("uid")
         data = request.get_json()
         student_uids = data.get("students")
         abort_if_none_uid_student_uids_or_non_existant_course_id(
-            course_id, uid, student_uids
+            course_id, student_uids
         )
 
         for uid in student_uids:
@@ -96,11 +95,10 @@ class CourseToAddStudents(Resource):
         a field "students" = [list of uids to unassign]
         """
         abort_url = f"{API_URL}/courses/{str(course_id)}/students"
-        uid = request.args.get("uid")
         data = request.get_json()
         student_uids = data.get("students")
         abort_if_none_uid_student_uids_or_non_existant_course_id(
-            course_id, uid, student_uids
+            course_id, student_uids
         )
 
         for uid in student_uids:

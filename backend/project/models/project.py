@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy_utils import CompositeType
 from project.db_in import db
 
 @dataclass
@@ -23,11 +24,18 @@ class Project(db.Model): # pylint: disable=too-many-instance-attributes
     project_id: int = Column(Integer, primary_key=True)
     title: str = Column(String(50), nullable=False, unique=False)
     description: str = Column(Text, nullable=False)
-    assignment_file: str = Column(String(50))
-    deadline: str = Column(DateTime(timezone=True))
+    deadlines: list = Column(ARRAY(
+        CompositeType(
+            "deadline",
+            [
+                Column("description", Text),
+                Column("deadline", DateTime(timezone=True))
+            ]
+            ),
+        dimensions=1
+        )
+    )
     course_id: int = Column(Integer, ForeignKey("courses.course_id"), nullable=False)
     visible_for_students: bool = Column(Boolean, nullable=False)
     archived: bool = Column(Boolean, nullable=False)
-    test_path: str = Column(String(50))
-    script_name: str = Column(String(50))
     regex_expressions: list[str] = Column(ARRAY(String(50)))

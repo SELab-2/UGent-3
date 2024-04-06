@@ -2,16 +2,16 @@
 
 from datetime import datetime
 from zoneinfo import ZoneInfo
-import pytest
+from pytest import fixture
 from project.sessionmaker import engine, Session
 from project.db_in import db
 from project.models.course import Course
-from project.models.user import User
+from project.models.user import User,Role
 from project.models.project import Project
 from project.models.course_relation import CourseStudent,CourseAdmin
-from project.models.submission import Submission
+from project.models.submission import Submission, SubmissionStatus
 
-@pytest.fixture
+@fixture
 def db_session():
     """Create a new database session for a test.
     After the test, all changes are rolled back and the session is closed."""
@@ -34,10 +34,10 @@ def db_session():
 def users():
     """Return a list of users to populate the database"""
     return [
-        User(uid="brinkmann", is_admin=True, is_teacher=True),
-        User(uid="laermans", is_admin=True, is_teacher=True),
-        User(uid="student01", is_admin=False, is_teacher=False),
-        User(uid="student02", is_admin=False, is_teacher=False)
+        User(uid="brinkmann", role=Role.ADMIN),
+        User(uid="laermans", role=Role.ADMIN),
+        User(uid="student01", role=Role.STUDENT),
+        User(uid="student02", role=Role.STUDENT)
     ]
 
 def courses():
@@ -69,25 +69,19 @@ def projects(session):
         Project(
             title="B+ Trees",
             description="Implement B+ trees",
-            assignment_file="assignement.pdf",
-            deadline=datetime(2024,3,15,13,0,0),
+            deadlines=[("Deadline 1",datetime(2024,3,15,13,0,0))],
             course_id=course_id_ad3,
             visible_for_students=True,
             archived=False,
-            test_path="/tests",
-            script_name="script.sh",
             regex_expressions=["solution"]
         ),
         Project(
             title="Predicaten",
             description="Predicaten project",
-            assignment_file="assignment.pdf",
-            deadline=datetime(2023,3,15,13,0,0),
+            deadlines=[("Deadline 1", datetime(2023,3,15,13,0,0))],
             course_id=course_id_raf,
             visible_for_students=False,
             archived=True,
-            test_path="/tests",
-            script_name="script.sh",
             regex_expressions=[".*"]
         )
     ]
@@ -104,14 +98,14 @@ def submissions(session):
             grading=16,
             submission_time=datetime(2024,3,14,12,0,0,tzinfo=ZoneInfo("GMT")),
             submission_path="/submissions/1",
-            submission_status=True
+            submission_status= SubmissionStatus.SUCCESS
         ),
         Submission(
             uid="student02",
             project_id=project_id_ad3,
             submission_time=datetime(2024,3,14,23,59,59,tzinfo=ZoneInfo("GMT")),
             submission_path="/submissions/2",
-            submission_status=False
+            submission_status= SubmissionStatus.FAIL
         ),
         Submission(
             uid="student02",
@@ -119,11 +113,26 @@ def submissions(session):
             grading=15,
             submission_time=datetime(2023,3,5,10,0,0,tzinfo=ZoneInfo("GMT")),
             submission_path="/submissions/3",
-            submission_status=True
+            submission_status= SubmissionStatus.SUCCESS
         )
     ]
 
-@pytest.fixture
+### AUTHENTICATION & AUTHORIZATION ###
+def auth_tokens():
+    """Add the authenticated users to the database"""
+
+    return [
+        User(uid="login", role=Role.STUDENT),
+        User(uid="student", role=Role.STUDENT),
+        User(uid="student_other", role=Role.STUDENT),
+        User(uid="teacher", role=Role.TEACHER),
+        User(uid="teacher_other", role=Role.TEACHER),
+        User(uid="admin", role=Role.ADMIN),
+        User(uid="admin_other", role=Role.ADMIN)
+    ]
+
+### SESSION ###
+@fixture
 def session():
     """Create a new database session for a test.
     After the test, all changes are rolled back and the session is closed."""
@@ -132,6 +141,8 @@ def session():
     session = Session()
 
     try:
+        session.add_all(auth_tokens())
+
         # Populate the database
         session.add_all(users())
         session.commit()

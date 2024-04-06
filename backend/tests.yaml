@@ -18,7 +18,7 @@ services:
   auth-server:
     build:
       context: .
-      dockerfile: ./Dockerfile_auth_test
+      dockerfile: Dockerfile_auth_test
     environment:
       API_HOST: http://auth-server
     volumes:
@@ -41,8 +41,10 @@ services:
       POSTGRES_PASSWORD: test_password
       POSTGRES_DB: test_database
       API_HOST: http://api_is_here
-      AUTHENTICATION_URL: http://auth-server:5000 # Use the service name defined in Docker Compose
+      AUTHENTICATION_URL: http://auth-server:5001 # Use the service name defined in Docker Compose
       UPLOAD_URL: /data/assignments
+      DOCS_JSON_PATH: static/OpenAPI_Object.yaml
+      DOCS_URL: /docs
     volumes:
       - .:/app
       - /var/run/docker.sock:/var/run/docker.sock

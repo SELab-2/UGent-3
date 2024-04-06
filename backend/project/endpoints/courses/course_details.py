@@ -23,7 +23,7 @@ from project.utils.authentication import login_required, authorize_teacher_of_co
 
 load_dotenv()
 API_URL = getenv("API_HOST")
-RESPONSE_URL = urljoin(API_URL + "/", "courses")
+RESPONSE_URL = urljoin(f"{API_URL}/", "courses")
 
 class CourseByCourseId(Resource):
     """Api endpoint for the /courses/course_id link"""
