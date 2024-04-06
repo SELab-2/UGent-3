@@ -16,13 +16,10 @@ class TestProjectModel:
         project = Project(
             title="Pigeonhole",
             description="A new project",
-            assignment_file="assignment.pdf",
-            deadline=datetime(2024,12,31,23,59,59),
+            deadlines=[("Deadline 1", datetime(2024,12,31,23,59,59))],
             course_id=course.course_id,
             visible_for_students=True,
             archived=False,
-            test_path="/test",
-            script_name="script",
             regex_expressions=[r".*"]
         )
         session.add(project)
