@@ -13,6 +13,7 @@ import Markdown from "react-markdown";
 import { useParams } from "react-router-dom";
 import SubmissionCard from "./SubmissionCard";
 import { Course } from "../../../types/course";
+import { Title } from "../../../components/Header/Title";
 
 const API_URL = import.meta.env.VITE_API_HOST;
 
@@ -76,6 +77,7 @@ export default function ProjectView() {
         <Container>
           {projectData && (
             <Card>
+              <Title title={projectData.title}/>
               <CardHeader
                 color="secondary"
                 title={projectData.title}
