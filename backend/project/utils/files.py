@@ -1,6 +1,5 @@
 """Utility functions for files"""
 
-from os.path import getsize
 from re import match
 from typing import List, Optional
 from io import BytesIO

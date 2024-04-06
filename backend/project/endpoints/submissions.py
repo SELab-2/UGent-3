@@ -73,6 +73,7 @@ class SubmissionsEndpoint(Resource):
             filters=request.args
         )
 
+    @authorize_student_submission
     def post(self) -> dict[str, any]:
         """Post a new submission to a project
 
