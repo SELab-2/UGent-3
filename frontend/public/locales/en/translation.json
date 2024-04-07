@@ -26,6 +26,7 @@
     "SUCCESS": "Success",
     "FAIL": "Fail",
     "deadlinesOnDay": "Deadlines on: ",
-    "noDeadline": "No deadlines"
+    "noDeadline": "No deadlines",
+    "no_submission_yet" : "No submission yet"
   }
 }

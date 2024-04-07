@@ -26,7 +26,8 @@
     "SUCCESS": "Geslaagd",
     "FAIL": "Gefaald",
     "deadlinesOnDay": "Deadlines op: ",
-    "noDeadline": "Geen deadlines"
+    "noDeadline": "Geen deadlines",
+    "no_submission_yet" : "Nog geen indiening"
 
   }
 }

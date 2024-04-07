@@ -16,7 +16,7 @@ interface ShortSubmission {
   submission_status:string
 }
 interface Project {
-  project_id:number ,
+  project_id:string ,
   title :string,
   description:string,
   assignment_file:string,
@@ -27,7 +27,8 @@ interface Project {
   test_path:string,
   script_name:string,
   regex_expressions:string[],
-  short_submission: ShortSubmission
+  short_submission: ShortSubmission,
+  course:Course
 
 }
 interface Course {
@@ -74,16 +75,18 @@ const ProjectCard: React.FC<ProjectCardProps> = ({  deadlines }) => {
     <Box>
       {deadlines.map((project, index) => (
         <Card key={index} style={{margin: '10px 0'}}>
-          <CardActionArea component={Link} to={`/submission/${project.short_submission.submission_id}`}>
+          <CardActionArea component={Link} to={`/${project.project_id}`}>
             <CardContent>
-              <Typography variant="h6" style={{color: project.short_submission.submission_status === 'SUCCESS' ? 'green' : 'red'}}>
+              <Typography variant="h6" style={{color: project.short_submission ?
+                (project.short_submission.submission_status === 'SUCCESS' ? 'green' : 'red') : '#686868'}}>
                 {project.title}
               </Typography>
               <Typography variant="subtitle1">
-                {t('course')}: {"placeholder name"}
+                {t('course')}: <Link to={`/courses/${project.course.course_id}`} style={{ color: 'inherit' }}>{project.course.name}</Link>
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                {t('last_submission')}: {project.short_submission.submission_status}
+                {t('last_submission')}: {project.short_submission ?
+                  t(project.short_submission.submission_status.toString()) : t('no_submission_yet')}
               </Typography>
               <Typography variant="body2" color="textSecondary">
                 Deadline: {dayjs(project.deadline).format('MMMM D, YYYY')}
@@ -92,7 +95,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({  deadlines }) => {
           </CardActionArea>
         </Card>
       ))}
-
     </Box>
   );
 };
@@ -123,22 +125,6 @@ function ServerDay(props: PickersDayProps<Dayjs> & { highlightedDays?: number[] 
     </Badge>
   );
 }
-const changeMonth = (
-  date:Dayjs, 
-  projects:Project[], 
-  setHighlightedDays:React.Dispatch<React.SetStateAction<number[]>>,
-) =>{
-  const month = date.month()
-  const year = date.year()
-  const hDays:number[] = []
-  projects.map((project, ) => {
-    if(project.deadline.getMonth() == month && project.deadline.getFullYear() == year){
-      hDays.push(project.deadline.getDate())
-    }
-  }
-  );
-  setHighlightedDays(hDays)
-}
 const handleMonthChange =(
   date: Dayjs,
   projects:Project[],
@@ -147,31 +133,53 @@ const handleMonthChange =(
 
   setHighlightedDays([]);
   // projects are now only fetched on page load
-  changeMonth(date, projects, setHighlightedDays)
+  const hDays:number[] = []
+  projects.map((project, ) => {
+    if(project.deadline.getMonth() == date.month() && project.deadline.getFullYear() == date.year()){
+      hDays.push(project.deadline.getDate())
+    }
+  }
+  );
+  setHighlightedDays(hDays)
 
 };
 const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Project[]>>) => {
+  const header  = {
+    "Authorization": "teacher2" // todo add true authorization
+  }
   const response = await fetch(`${apiUrl}/projects`, {
-    headers: {
-      "Authorization": "teacher2" // todo add true authorization
-    },
+    headers:header
   })
   const jsonData = await response.json();
   const formattedData: Project[] = await Promise.all( jsonData.data.map(async (item:Project) => {
-    const uid:string = "Bart" // todo check if we can fecth it so and get the uid of the logged in user
-    const project_id:number = 94 // todo make this item.project_id when fixed
+    const project_id:string = item.project_id.split("/")[1]// todo this can change later
+
     const response_submissions = await (await fetch(encodeURI(`${apiUrl}/submissions?&project_id=${project_id}`), {
-      headers: {
-        "Authorization": "teacher2" // todo add true authorization
-      },
+      headers: header
     })).json()
+
     //get the latest submission
     const latest_submission = response_submissions.data.map((submission:ShortSubmission) => ({
-      submission_id: submission.submission_id,//todo convert this into a number after bugfix
+      submission_id: submission.submission_id,//this is the path 
       submission_time: new Date(submission.submission_time),
       submission_status: submission.submission_status
     }
     )).sort((a:ShortSubmission, b:ShortSubmission) => b.submission_time.getTime() - a.submission_time.getTime())[0];
+    // fetch the course id of the project
+    const project_item = await (await fetch(encodeURI(`${apiUrl}/${item.project_id}`), {
+      headers:header
+    })).json()
+
+    //fetch the course
+    const response_courses = await (await fetch(encodeURI(`${apiUrl}/courses/${project_item.data.course_id}`), {
+      headers: header
+    })).json()
+    const course = {
+      course_id: response_courses.data.course_id,
+      name: response_courses.data.name,
+      teacher: response_courses.data.teacher,
+      ufora_id: response_courses.data.ufora_id
+    }
     return  {
       project_id: item.project_id, // todo convert this into a number after bug fix "project_id"
       title: item.title,
@@ -184,7 +192,8 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
       test_path: item.test_path,
       script_name: item.script_name,
       regex_expressions: item.regex_expressions,
-      short_submission: latest_submission
+      short_submission: latest_submission,
+      course: course
     }}));
   setProjects(formattedData);
   return formattedData
@@ -217,7 +226,7 @@ export default function HomeStudent() {
 
   return (
     <Container style={{ paddingTop: '50px' }}>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} wrap="nowrap">
         <Grid item xs={6}>
           <Typography variant="body2">
             {t('myProjects')}
@@ -231,25 +240,6 @@ export default function HomeStudent() {
 
         </Grid>
         <Grid item xs={6}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DateCalendar
-              value={selectedDay}
-              onMonthChange={(date:Dayjs) => {handleMonthChange(date, projects,
-                setHighlightedDays)}}
-              onChange={handleDaySelect}
-              renderLoading={() => <DayCalendarSkeleton />}
-              slots={{
-                day: ServerDay,
-              }}
-              slotProps={{
-                day: {
-                  highlightedDays,
-                } as any,
-              }}
-            />
-          </LocalizationProvider>
-        </Grid>
-        <Grid item xs={6}>
           <Typography variant="body2">
             {t('deadlines')}
           </Typography>
@@ -259,11 +249,33 @@ export default function HomeStudent() {
             .slice(-2)
           } />
         </Grid>
-        <Grid item xs ={6}>
-          <Typography variant="body2">
-            {t('deadlinesOnDay')} {selectedDay.format('MMMM D, YYYY')}
-          </Typography>
-          <DeadlineInfo selectedDay={selectedDay} deadlines={projects} />
+        <Grid item xs={6}>
+          <Card>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateCalendar
+                value={selectedDay}
+                onMonthChange={(date:Dayjs) => {handleMonthChange(date, projects,
+                  setHighlightedDays)}}
+                onChange={handleDaySelect}
+                renderLoading={() => <DayCalendarSkeleton />}
+                slots={{
+                  day: ServerDay,
+                }}
+                slotProps={{
+                  day: {
+                    highlightedDays,
+                  } as any,
+                }}
+              />
+            </LocalizationProvider>
+            <CardContent>
+              <Typography variant="body2">
+                {t('deadlinesOnDay')} {selectedDay.format('MMMM D, YYYY')}
+              </Typography>
+              <DeadlineInfo selectedDay={selectedDay} deadlines={projects} />
+            </CardContent>
+
+          </Card>
         </Grid>
       </Grid>
     </Container>
