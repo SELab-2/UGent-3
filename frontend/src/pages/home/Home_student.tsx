@@ -1,33 +1,105 @@
 import { useTranslation } from "react-i18next";
-import {Card, CardContent, Typography, Grid, Container, Badge} from '@mui/material';
+import {Card, CardContent, Typography, Grid, Container, Badge, Box} from '@mui/material';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import {DayCalendarSkeleton, LocalizationProvider} from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { CardActionArea } from '@mui/material';
 import {Link } from "react-router-dom";
 
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import dayjs, {Dayjs} from "dayjs";
 import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
 
-
-function fakeFetch(date: Dayjs, { signal }: { signal: AbortSignal }) {
-  return new Promise<{ daysToHighlight: number[] }>((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      const daysInMonth = date.daysInMonth();
-      const daysToHighlight: number[] = [5, 12, 15];
-
-      resolve({ daysToHighlight });
-    }, 500);
-
-    signal.onabort = () => {
-      clearTimeout(timeout);
-      reject(new DOMException('aborted', 'AbortError'));
-    };
-  });
+interface ShortSubmission {
+  submission_id:number,
+  submission_time:Date,
+  submission_status:string
 }
+interface Project {
+  project_id:number ,
+  title :string,
+  description:string,
+  assignment_file:string,
+  deadline:Date,
+  course_id:number,
+  visible_for_students:boolean,
+  archived:boolean,
+  test_path:string,
+  script_name:string,
+  regex_expressions:string[],
+  short_submission: ShortSubmission
+
+}
+interface Course {
+  course_id: string;
+  name: string;
+  teacher: string;
+  ufora_id: string;
+}
+const apiUrl = import.meta.env.VITE_APP_API_URL
 const initialValue = dayjs(Date.now());
 
+interface DeadlineInfoProps {
+  selectedDay: Dayjs;
+  deadlines: Project[];
+}
+interface ProjectCardProps{
+  deadlines:Project[]
+}
+
+const DeadlineInfo: React.FC<DeadlineInfoProps> = ({ selectedDay, deadlines }) => {
+  const { t } = useTranslation('translation', { keyPrefix: 'student' });
+  const deadlinesOnSelectedDay = deadlines.filter(
+    deadline => dayjs(deadline.deadline).isSame(selectedDay, 'day')
+  );
+  //list of the corresponding assignment
+  return (
+    <div>
+      {deadlinesOnSelectedDay.length === 0 ? (
+        <Card style={{margin: '10px 0'}}>
+          <CardContent>
+            <Typography variant="body1">
+              {t('noDeadline')}
+            </Typography>
+          </CardContent>
+        </Card>
+      ) : <ProjectCard deadlines={deadlinesOnSelectedDay}/>}
+    </div>
+  );
+};
+const ProjectCard: React.FC<ProjectCardProps> = ({  deadlines }) => {
+  const { t } = useTranslation('translation', { keyPrefix: 'student' });
+  //list of the corresponding assignment
+  return (
+    <Box>
+      {deadlines.map((project, index) => (
+        <Card key={index} style={{margin: '10px 0'}}>
+          <CardActionArea component={Link} to={`/submission/${project.short_submission.submission_id}`}>
+            <CardContent>
+              <Typography variant="h6" style={{color: project.short_submission.submission_status === 'SUCCESS' ? 'green' : 'red'}}>
+                {project.title}
+              </Typography>
+              <Typography variant="subtitle1">
+                {t('course')}: {"placeholder name"}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                {t('last_submission')}: {project.short_submission.submission_status}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                Deadline: {dayjs(project.deadline).format('MMMM D, YYYY')}
+              </Typography>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+      ))}
+
+    </Box>
+  );
+};
+
+/**
+ *
+ */
 function ServerDay(props: PickersDayProps<Dayjs> & { highlightedDays?: number[] }) {
   const { highlightedDays = [], day, outsideCurrentMonth, ...other } = props;
 
@@ -41,9 +113,9 @@ function ServerDay(props: PickersDayProps<Dayjs> & { highlightedDays?: number[] 
       badgeContent={isSelected ? '🔴' : undefined}
       sx={{
         '.MuiBadge-badge': {
-          fontSize: '0.5em', // Adjust as needed
-          top: 8, // Adjust as needed
-          right: 8, // Adjust as needed
+          fontSize: '0.5em',
+          top: 8,
+          right: 8,
         },
       }}
     >
@@ -51,80 +123,96 @@ function ServerDay(props: PickersDayProps<Dayjs> & { highlightedDays?: number[] 
     </Badge>
   );
 }
+const changeMonth = (
+  date:Dayjs, 
+  projects:Project[], 
+  setHighlightedDays:React.Dispatch<React.SetStateAction<number[]>>,
+) =>{
+  const month = date.month()
+  const year = date.year()
+  const hDays:number[] = []
+  projects.map((project, ) => {
+    if(project.deadline.getMonth() == month && project.deadline.getFullYear() == year){
+      hDays.push(project.deadline.getDate())
+    }
+  }
+  );
+  setHighlightedDays(hDays)
+}
+const handleMonthChange =(
+  date: Dayjs,
+  projects:Project[],
+  setHighlightedDays: React.Dispatch<React.SetStateAction<number[]>>,
+) => {
+
+  setHighlightedDays([]);
+  // projects are now only fetched on page load
+  changeMonth(date, projects, setHighlightedDays)
+
+};
+const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Project[]>>) => {
+  const response = await fetch(`${apiUrl}/projects`, {
+    headers: {
+      "Authorization": "teacher2" // todo add true authorization
+    },
+  })
+  const jsonData = await response.json();
+  const formattedData: Project[] = await Promise.all( jsonData.data.map(async (item:Project) => {
+    const uid:string = "Bart" // todo check if we can fecth it so and get the uid of the logged in user
+    const project_id:number = 94 // todo make this item.project_id when fixed
+    const response_submissions = await (await fetch(encodeURI(`${apiUrl}/submissions?&project_id=${project_id}`), {
+      headers: {
+        "Authorization": "teacher2" // todo add true authorization
+      },
+    })).json()
+    //get the latest submission
+    const latest_submission = response_submissions.data.map((submission:ShortSubmission) => ({
+      submission_id: submission.submission_id,//todo convert this into a number after bugfix
+      submission_time: new Date(submission.submission_time),
+      submission_status: submission.submission_status
+    }
+    )).sort((a:ShortSubmission, b:ShortSubmission) => b.submission_time.getTime() - a.submission_time.getTime())[0];
+    return  {
+      project_id: item.project_id, // todo convert this into a number after bug fix "project_id"
+      title: item.title,
+      description: item.description,
+      assignment_file: item.assignment_file,
+      deadline: new Date(item.deadline),
+      course_id: Number(item.course_id),
+      visible_for_students: Boolean(item.visible_for_students),
+      archived: Boolean(item.archived),
+      test_path: item.test_path,
+      script_name: item.script_name,
+      regex_expressions: item.regex_expressions,
+      short_submission: latest_submission
+    }}));
+  setProjects(formattedData);
+  return formattedData
+}
 
 /**
  * This component is the home page component that will be rendered when on the index route.
  * @returns - The home page component
  */
 export default function HomeStudent() {
-  const list_of_projects = [
-    {"deadline": "2024-05-01", "title": "Python lists", "course_id":"123", "project_id": "111"},
-    {"deadline": "2024-06-05", "title": "Prolog intro", "course_id":"333", "project_id": "222"},
-    {"deadline": "2024-04-01", "title": "Verlopen", "course_id":"333", "project_id": "222"}
-  ]
-  // get the corresponding course and latest submission, order is important needs to be the same for matching
-  const latest_submissions = [{"project_id": "111", "submission_status": "FAIL",
-    "submission_id":"111"},
-  {"project_id": "333", "submission_status": "SUCCESS", "submission_id": "232"},
-  {"project_id": "333", "submission_status": "SUCCESS", "submission_id": "444"}
-
-  ]
-  const courses = [{"course_id": "123", "name": "Programmeren"},
-    {"course_id": "222", "name": "LOGPROG"},
-    {"course_id": "222", "name": "FUNPROG"}
-  ]
   const { t } = useTranslation('translation', { keyPrefix: 'student' });
-  //const [value, setValue] = useState<Date | null>(new Date());
-  /*useEffect(() => {
-    fetch("http://172.17.0.2:5000/project?uid=123")
-      .then(response => response.json())
-  }, []);*/
-  const requestAbortController = React.useRef<AbortController | null>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
+
+  const [projects, setProjects] = useState<Project[]>([]);
+
   const [highlightedDays, setHighlightedDays] = React.useState<number[]>([]);
-  const fetchHighlightedDays = (date: Dayjs) => {
-    const controller = new AbortController();
 
-    fakeFetch(date, {
-      signal: controller.signal,
+  useEffect(() => {
+    fetchProjects(setProjects).then(p => {
+      handleMonthChange(initialValue, p,setHighlightedDays)
     })
-      .then(({ daysToHighlight }) => {
-        setHighlightedDays(daysToHighlight);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        // ignore the error if it's caused by `controller.abort`
-        if (error.name !== 'AbortError') {
-          throw error;
-        }
-      });
-
-    requestAbortController.current = controller;
-  };
-
-  React.useEffect(() => {
-    fetchHighlightedDays(initialValue);
-    // abort request on unmount
-    return () => requestAbortController.current?.abort();
   }, []);
 
-  const handleMonthChange = (date: Dayjs) => {
-    if (requestAbortController.current) {
-      // make sure that you are aborting useless requests
-      // because it is possible to switch between months pretty quickly
-      requestAbortController.current.abort();
-    }
-
-    setIsLoading(true);
-    setHighlightedDays([]);
-    fetchHighlightedDays(date);
-  };
-  const [selectedDay, setSelectedDay] = useState<Dayjs | null>(null);
+  const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs(Date.now()));
 
   // Update selectedDay state when a day is selected
   const handleDaySelect = (day: Dayjs) => {
-    console.log(day.get('day'));
     setSelectedDay(day);
+    
   };
 
   return (
@@ -134,34 +222,20 @@ export default function HomeStudent() {
           <Typography variant="body2">
             {t('myProjects')}
           </Typography>
-          {latest_submissions.map((submission, index) => (
-            (new Date(list_of_projects[index].deadline).getTime() > Date.now())  && (
-              <Card key={index} style={{margin: '10px 0'}}>
-                <CardActionArea component={Link} to={`/submission/${submission.submission_id}`}>
-                  <CardContent>
-                    <Typography variant="h6" style={{color: submission.submission_status === 'SUCCESS' ? 'green' : 'red'}}>
-                      {list_of_projects[index].title}
-                    </Typography>
-                    <Typography variant="subtitle1">
-                      {t('course')}: {courses[index].name}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      {t('last_submission')}: {submission.submission_status}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
 
-              </Card>
-            )
-        
-          ))}
+          <ProjectCard deadlines={projects
+            .filter((project) => dayjs(dayjs()).isBefore(project.deadline))
+            .sort((a, b) => dayjs(a.deadline).isBefore(dayjs(b.deadline)) ? -1 : 1)
+            .slice(0, 3)
+          } />
+
         </Grid>
         <Grid item xs={6}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DateCalendar
-              defaultValue={initialValue}
-              loading={isLoading}
-              onMonthChange={handleMonthChange}
+              value={selectedDay}
+              onMonthChange={(date:Dayjs) => {handleMonthChange(date, projects,
+                setHighlightedDays)}}
               onChange={handleDaySelect}
               renderLoading={() => <DayCalendarSkeleton />}
               slots={{
@@ -179,25 +253,17 @@ export default function HomeStudent() {
           <Typography variant="body2">
             {t('deadlines')}
           </Typography>
-          {latest_submissions.map((submission, index) => (
-            (new Date(list_of_projects[index].deadline).getTime() <= Date.now())  && (
-              <Card key={index} style={{margin: '10px 0'}}>
-                <CardActionArea component={Link} to={`/submission/${submission.submission_id}`}>
-                  <CardContent>
-                    <Typography variant="h6" style={{color: submission.submission_status === 'SUCCESS' ? 'green' : 'red'}}>
-                      {list_of_projects[index].title}
-                    </Typography>
-                    <Typography variant="subtitle1">
-                      {t('course')}: {courses[index].name}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      {t('last_submission')}: {submission.submission_status}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            )
-          ))}
+          <ProjectCard deadlines={projects
+            .filter((project) => dayjs(dayjs()).isAfter(project.deadline))
+            .sort((a, b) => dayjs(a.deadline).isAfter(dayjs(b.deadline)) ? -1 : 1)
+            .slice(-2)
+          } />
+        </Grid>
+        <Grid item xs ={6}>
+          <Typography variant="body2">
+            {t('deadlinesOnDay')} {selectedDay.format('MMMM D, YYYY')}
+          </Typography>
+          <DeadlineInfo selectedDay={selectedDay} deadlines={projects} />
         </Grid>
       </Grid>
     </Container>
