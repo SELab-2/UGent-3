@@ -9,7 +9,8 @@
   },
   "home": {
     "homepage": "Homepage",
-    "welcomeDescription": "Welcome to Peristeronas the online submission platform of UGent"
+    "welcomeDescription": "Welcome to Peristerónas the online submission platform of UGent",
+    "login": "Login"
   },
   "courseForm": {
     "courseName": "Course Name",
@@ -19,10 +20,13 @@
   "student" : {
     "myProjects": "My Projects",
     "myCourses": "My Courses",
-    "deadlines": "Past deadline",
+    "deadlines": "Past deadlines",
     "last_submission" : "Last submission",
     "course": "Course",
     "SUCCESS": "Success",
-    "FAIL": "Fail"
+    "FAIL": "Fail",
+    "deadlinesOnDay": "Deadlines on: ",
+    "noDeadline": "No deadlines",
+    "no_submission_yet" : "No submission yet"
   }
 }

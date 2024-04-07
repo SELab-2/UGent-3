@@ -9,7 +9,8 @@
   },
   "home": {
     "homepage": "Homepage",
-    "welcomeDescription": "Welkom bij Peristeronas het online indieningsplatform van UGent"
+    "welcomeDescription": "Welkom bij Peristerónas het online indieningsplatform van UGent",
+    "login": "Aanmelden"
   },
   "courseForm": {
     "courseName": "Vak Naam",
@@ -23,6 +24,10 @@
     "course": "Vak",
     "last_submission": "Laatste indiening",
     "SUCCESS": "Geslaagd",
-    "FAIL": "Gefaald"
+    "FAIL": "Gefaald",
+    "deadlinesOnDay": "Deadlines op: ",
+    "noDeadline": "Geen deadlines",
+    "no_submission_yet" : "Nog geen indiening"
+
   }
 }
