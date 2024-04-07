@@ -119,7 +119,7 @@ function getTitle(pathname: string, t: (key: string) => string): string {
   case '/login': return t('login');
   case '/courses': return t('myCourses');
   case '/projects': return t('myProjects');
-  case '/dummy-create-project': return t('projectUploadForm')
+  case '/projects/create': return t('projectUploadForm')
   default: return t('home');
   }
 }

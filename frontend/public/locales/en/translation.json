@@ -28,6 +28,7 @@
     "testWarning": "Warning: This assignment doesn't contain tests",
     "helperText": "Please fill in a valid deadline for the project",
     "uploadProject": "Upload project",
-    "regexStructure": "Regex structure"
+    "regexStructure": "Regex structure",
+    "uploadError": "Project isn't formatted appropriately"
   }
 }

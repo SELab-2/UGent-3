@@ -29,6 +29,7 @@
     "testWarning": "Opgelet: Deze opgave bevat geen tests",
     "helperText": "Selecteer een geldige deadline voor het project",
     "uploadProject": "Upload project",
-    "regexStructure": "Regex structuur"
+    "regexStructure": "Regex structuur",
+    "uploadError": "Project is niet goed geformatteerd"
   }
 }

@@ -17,8 +17,8 @@ function App(): JSX.Element {
         <Route index element={<Home />} />
         <Route path=":lang" element={<LanguagePath/>}>
           <Route path="home" element={<Home />} />
+          <Route path="projects/create" element={<ProjectCreateHome />}/>
         </Route>
-        <Route path="dummy-create-project" element={<ProjectCreateHome />}/>
       </Routes>
     </BrowserRouter>
   );
