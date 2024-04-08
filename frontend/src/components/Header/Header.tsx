@@ -17,7 +17,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from "react";
 import LanguageIcon from "@mui/icons-material/Language";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { TitlePortal } from "./TitlePortal";
 
 /**
  * The header component for the application that will be rendered at the top of the page.
@@ -41,7 +42,6 @@ export function Header(): JSX.Element {
     setLanguageMenuAnchor(null);
   };
 
-  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [listItems, setListItems] = useState([
     { link: "/", text: t("homepage") }
@@ -61,8 +61,6 @@ export function Header(): JSX.Element {
     }
   }, [t]);
 
-  const title = getTitle(location.pathname, t);
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky">
@@ -70,9 +68,7 @@ export function Header(): JSX.Element {
           <IconButton edge="start" onClick={() => setOpen(!open)} sx={{ color: "white", marginLeft: 0 }}>
             <MenuIcon style={{fontSize:"2rem"}} />
           </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {title}
-          </Typography>
+          <TitlePortal />
           <Button color="inherit">{t("login")}</Button>
           <div>
             <IconButton onClick={handleLanguageMenu} color="inherit">
@@ -105,23 +101,6 @@ export function Header(): JSX.Element {
  */
 function isLoggedIn() {
   return true;
-}
-
-/**
- * Get the title based on the given pathname.
- * @param pathname - The current pathname.
- * @param t - The translation function.
- * @returns The title.
- */
-function getTitle(pathname: string, t: (key: string) => string): string {
-  switch(pathname) {
-  case '/': return t('home');
-  case '/login': return t('login');
-  case '/courses': return t('myCourses');
-  case '/projects': return t('myProjects');
-  case '/projects/create': return t('projectUploadForm')
-  default: return t('home');
-  }
 }
 
 /**

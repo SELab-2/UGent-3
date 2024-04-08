@@ -1,4 +1,7 @@
 {
+  "home": {
+    "title": "Homepagina"
+  },
   "header": {
     "myProjects": "Mijn Projecten",
     "myCourses": "Mijn Vakken",
