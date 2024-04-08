@@ -10,7 +10,6 @@ in the submission output folder.
 """
 from os import path
 import docker
-from project.models.project import Project
 from project.models.submission import Submission
 
 DOCKER_IMAGE_MAPPER = {

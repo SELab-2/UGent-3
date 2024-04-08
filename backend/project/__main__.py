@@ -1,5 +1,6 @@
 """Main entry point for the application."""
 
+from os import getenv
 from dotenv import load_dotenv
 from project import create_app_with_db
 from project.db_in import url

@@ -2,7 +2,7 @@
 This file contains tests for the python submission evaluator.
 """
 
-from os import path, listdir
+from os import path
 import pytest
 from project.utils.submissions.evaluator import evaluate
 from project.utils.submissions.file_handling import create_submission_folder
