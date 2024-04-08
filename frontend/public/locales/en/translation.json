@@ -1,4 +1,7 @@
 {
+  "home": {
+    "title": "Homepage"
+  },
   "header": {
     "myProjects": "My Projects",
     "myCourses": "My Courses",

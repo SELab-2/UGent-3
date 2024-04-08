@@ -1,10 +1,13 @@
 """Tests for project endpoints."""
 
+import json
+
 def test_assignment_download(client, valid_project):
     """
     Method for assignment download
     """
 
+    valid_project["deadlines"] = json.dumps(valid_project["deadlines"])
     with open("tests/resources/testzip.zip", "rb") as zip_file:
         valid_project["assignment_file"] = zip_file
         # post the project
@@ -16,10 +19,10 @@ def test_assignment_download(client, valid_project):
         )
     assert response.status_code == 201
     project_id = response.json["data"]["project_id"]
-    response = client.get(f"/projects/{project_id}/assignments",
+    response = client.get(f"/projects/{project_id}/assignment",
                           headers={"Authorization":"teacher2"})
-    # file downloaded succesfully
-    assert response.status_code == 200
+    # 404 because the file is not found, no assignment.md in zip file
+    assert response.status_code == 404
 
 
 def test_not_found_download(client):
@@ -48,6 +51,7 @@ def test_getting_all_projects(client):
 def test_post_project(client, valid_project):
     """Test posting a project to the database and testing if it's present"""
 
+    valid_project["deadlines"] = json.dumps(valid_project["deadlines"])
     with open("tests/resources/testzip.zip", "rb") as zip_file:
         valid_project["assignment_file"] = zip_file
         # post the project
