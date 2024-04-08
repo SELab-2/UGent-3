@@ -8,15 +8,22 @@ import {
   MenuItem, Select, SelectChangeEvent,
   TextField,
   FormControl, Box, Typography,
-  ListItem, Chip, Stack
+  Stack, TableContainer, Table,
+  TableRow,
+  TableCell,
+  TableHead,
+  TableBody, Paper,
+  Tooltip, IconButton,
 } from "@mui/material";
-import React, {ChangeEvent, useEffect, useState} from "react";
-import {DatePicker} from '@mui/x-date-pickers/DatePicker';
-import {LocalizationProvider} from "@mui/x-date-pickers";
-import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import React, {useEffect, useState} from "react";
 import JSZip from 'jszip';
 import {useTranslation} from "react-i18next";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DeadlineCalender from "../Calender/DeadlineCalender.tsx";
+import { Deadline } from "../../types/deadline";
+import {InfoOutlined} from "@mui/icons-material";
+import {Link} from "react-router-dom";
+import FolderDragDrop from "../FolderUpload/FolderUpload.tsx";
 
 interface Course {
   course_id: string;
@@ -47,7 +54,8 @@ export default function ProjectForm() {
   const [description, setDescription] = useState('');
   const [descriptionError, setDescriptionError] = useState(false);
 
-  const [deadline, setDeadline] = useState<Date>(new Date());
+  const [deadlines, setDeadlines] = useState<Deadline[]>([])
+  const [files, setFiles] = useState<string[]>([]);
 
   const [visibleForStudents, setVisibleForStudents] = useState(false);
 
@@ -68,17 +76,10 @@ export default function ProjectForm() {
     fetchCourses();
   }, [regexError]);
 
-  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    event.preventDefault();
-
-    if (!event.target.files) {
-      return;
-    }
-
-    const file = event.target.files[0];
+  const handleFileUpload2 = async (file: File) => {
     const zip = await JSZip.loadAsync(file);
+    const newFiles = files.slice();
 
-    // Check each file in the zip archive
     let containsTestsFlag = false; // Initialize flag
     for (const [, zipEntry] of Object.entries(zip.files)) {
       if (!zipEntry.dir) {
@@ -86,9 +87,11 @@ export default function ProjectForm() {
         if (zipEntry.name.trim().toLowerCase() === 'dockerfile' || zipEntry.name.trim().toLowerCase() == 'run_tests.sh') {
           containsTestsFlag = true;
         }
+        newFiles.push(zipEntry.name);
       }
     }
 
+    setFiles(newFiles);
     setContainsTests(containsTestsFlag);
     const {name} = file;
     setAssignmentFile(file)
@@ -142,7 +145,8 @@ export default function ProjectForm() {
     // Append fields to the FormData object
     formData.append('title', title);
     formData.append('description', description);
-    formData.append('deadline', deadline.toISOString());
+    // TODO fix deadlines
+    // formData.append('deadline', deadline.toISOString());
     formData.append('visible_for_students', visibleForStudents.toString());
     formData.append('archived', 'false');
     formData.append('assignment_file', assignmentFileBlob, filename);
@@ -175,15 +179,24 @@ export default function ProjectForm() {
     }
   };
 
+  const handleDeadlineChange = (deadlines: Deadline[]) => {
+    setDeadlines(deadlines);
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter') {
+      appendRegex();
+    }
+  };
+
   const removeRegex = (regexToDelete: RegexData) => () => {
     setRegexExpressions((regexes) => regexes.filter((regex) => regex.key !== regexToDelete.key));
   };
 
   return (
     <Box
-      width='30%'
       paddingLeft='75p'
-      paddingBottom='75p'
+      paddingBottom='150px'
     >
       <FormControl
       >
@@ -196,6 +209,7 @@ export default function ProjectForm() {
         >
           <Grid item sx={{ mt: 8 }}>
             <TextField
+              sx={{ minWidth: 650 }}
               required
               id="outlined-title"
               label={t("projectTitle")}
@@ -206,10 +220,13 @@ export default function ProjectForm() {
           </Grid>
           <Grid item>
             <TextField
+              sx={{ minWidth: 650 }}
               required
               id="outlined-title"
               label={t("projectDescription")}
               placeholder={t("projectDescription")}
+              multiline
+              rows={4}
               error={descriptionError}
               onChange={event => setDescription(event.target.value)}
             />
@@ -234,40 +251,68 @@ export default function ProjectForm() {
             </FormControl>
           </Grid>
           <Grid item>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label={t("projectDeadline")}
-                disablePast
-                onChange={(date: Date | null) => {
-                  if (date) {
-                    setDeadline(date);
-                  }
-                }}
-                slotProps={{ textField: { helperText: t("helperText") } }}
-              />
-            </LocalizationProvider>
+            <DeadlineCalender
+              deadlines={[]}
+              onChange={(deadlines: Deadline[]) => handleDeadlineChange(deadlines)}
+              editable={true} />
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{t("deadline")}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }} align="right">{t("description")}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {deadlines.map((deadline, index) => (
+                    <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                      <TableCell component="th" scope="row">{deadline.deadline}</TableCell>
+                      <TableCell align="right">{deadline.description}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
           <Grid item>
-            <FormControlLabel control={<Checkbox defaultChecked />} label={t("visibleForStudents")} onChange={e=>setVisibleForStudents((e.target as HTMLInputElement).checked)}/>
+            <Stack direction="row" style={{display: "flex", alignItems:"center"}}>
+              <FormControlLabel control={<Checkbox defaultChecked />} label={t("visibleForStudents")} onChange={e=>setVisibleForStudents((e.target as HTMLInputElement).checked)}/>
+              <Tooltip title={<Typography variant="h6">{t("visibleForStudentsTooltip")}</Typography>}>
+                <IconButton>
+                  <InfoOutlined/>
+                </IconButton>
+              </Tooltip>
+            </Stack>
           </Grid>
           <Grid item>
-            <Button
-              variant="contained"
-              component="label"
-            >
-              {"Upload file"}
-              <input
-                type="file"
-                hidden
-                onChange={e => handleFileUpload(e)}
-                accept=".zip,.7zip"
-              />
-            </Button>
-            {filename !== "" && (
-              <Typography>{filename}</Typography>
-            )}
+          </Grid>
+          <Grid item>
+            <Stack direction="row" style={{display: "flex", alignItems:"center"}}>
+              <FolderDragDrop onFileDrop={file => handleFileUpload2(file)} regexRequirements={[]} />
+              <Tooltip style={{ height: "40%" }} title={<Typography variant="h6">{t("fileInfo")}: <Link to="/">{t("userDocs")}</Link></Typography>}>
+                <IconButton>
+                  <InfoOutlined/>
+                </IconButton>
+              </Tooltip>
+            </Stack>
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: "350px" }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{t("zipFile")}: {filename}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {files.map((file, index) => (
+                    <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                      <TableCell component="th" scope="row">{file}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
             {filename !== "" && !containsTests && (
-              <Typography style={{ color: 'orange' }}>
+              <Typography style={{color: 'orange', paddingTop: "20px" }}>
                 {t("testWarning")} ⚠️
               </Typography>
             )}
@@ -279,8 +324,9 @@ export default function ProjectForm() {
               label="regex"
               placeholder={t("regexStructure")}
               error={regexError}
-              helperText={regexError ? "Regex can't be empty or already added" : ''}
+              helperText={regexError ? t("helperRegexText") : ''}
               onChange={event => setRegex(event.target.value)}
+              onKeyPress={event => handleKeyDown(event)}
             />
           </Grid>
           <Grid item>
@@ -289,24 +335,31 @@ export default function ProjectForm() {
             </Button>
           </Grid>
           <Grid item>
-            <Stack
-              direction="row"
-              spacing={1}
-            >
-              {regexExpressions.map((regexData: RegexData) => {
-                return (
-                  <ListItem key={regexData.key}>
-                    <Chip
-                      label={regexData.regex}
-                      onDelete={removeRegex(regexData)}
-                      deleteIcon={<DeleteIcon />}
-                    />
-                  </ListItem>
-                )
-              })
-                
-              }
-            </Stack>
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Regex</TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {regexExpressions.map((regexData: RegexData) => {
+                    return (
+                      <TableRow key={regexData.key}>
+                        <TableCell>{regexData.regex}</TableCell>
+                        <TableCell align="right">
+                          <IconButton>
+                            <DeleteIcon onClick={removeRegex(regexData)}/>
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
+                  }
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
           <Grid item>
             <Button variant="contained" onClick={e => {

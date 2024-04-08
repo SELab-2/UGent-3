@@ -97,3 +97,4 @@ class ProjectsEndpoint(Resource):
             "data": new_project,
             "url": f"{API_URL}/projects/{new_project.project_id}"
         }, 201
+
