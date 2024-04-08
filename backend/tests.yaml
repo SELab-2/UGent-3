@@ -47,4 +47,5 @@ services:
       DOCS_URL: /docs
     volumes:
       - .:/app
-    command: ["pytest", "tests/endpoints"]
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ["pytest", "tests/utils"]
