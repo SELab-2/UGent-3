@@ -28,6 +28,7 @@ import { useTranslation } from "react-i18next";
 interface DeadlineCalenderProps {
   deadlines: Deadline[];
   onChange: (deadline: Deadline[]) => void;
+  editable?: boolean;
 }
 
 /**
@@ -38,6 +39,7 @@ interface DeadlineCalenderProps {
 export default function DeadlineCalender({
   deadlines,
   onChange,
+  editable = false,
 }: DeadlineCalenderProps) {
   const [deadlinesS, setDeadlines] = useState<Deadline[]>(deadlines);
   const { i18n } = useTranslation();
@@ -66,6 +68,7 @@ export default function DeadlineCalender({
             deadlines: deadlinesS,
             handleNewDeadline,
             handleDeadlineRemoved,
+            editable
           } as any // eslint-disable-line @typescript-eslint/no-explicit-any,
         }}
       />
