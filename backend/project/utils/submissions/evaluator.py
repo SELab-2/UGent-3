@@ -17,13 +17,14 @@ DOCKER_IMAGE_MAPPER = {
     "python": path.join(path.dirname(__file__), "evaluators", "python"),
 }
 
-def evaluate(submission: Submission, project: Project, evaluator: str) -> int:
+
+def evaluate(submission: Submission, project_path: str, evaluator: str) -> int:
     """
     Evaluate a submission using the evaluator.
 
     Args:
         submission (Submissions): The submission to evaluate.
-        project (Projects): The project the submission is for.
+        project_path (str): The path to the project.
         evaluator (str): The evaluator to use.
     
     Returns:
@@ -33,7 +34,6 @@ def evaluate(submission: Submission, project: Project, evaluator: str) -> int:
         ValueError: If the evaluator is not found in the DOCKER_IMAGE_MAPPER
                     and the project test path does not exist.
     """
-    project_path = project.test_path
 
     docker_image = DOCKER_IMAGE_MAPPER.get(evaluator, None)
     if docker_image is None:
