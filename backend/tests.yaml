@@ -48,4 +48,4 @@ services:
       DOCS_URL: /docs
     volumes:
       - .:/app
-    command: ["pytest", "tests/utils"]
+    command: ["pytest"]
