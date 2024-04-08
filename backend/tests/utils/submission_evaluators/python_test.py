@@ -15,7 +15,6 @@ def project_path_succes():
     """
     Return the path to a project with a succesful test case.
     """
-    print(listdir(path.dirname(__file__)))
     return path.join(path.dirname(__file__), "resources", "python", "tc_1/assignment")
 
 @pytest.fixture
@@ -24,8 +23,7 @@ def evaluate_python(submission_root, project_path_succes):
     project_id = 1
     submission = Submission(submission_id=1, project_id=project_id)
     submission.submission_path = create_submission_folder(submission_root, project_id)
-    project = Project(project_id=project_id, test_path=project_path_succes)
-    return evaluate(submission, project, "python"), submission.submission_path
+    return evaluate(submission, project_path_succes, "python"), submission.submission_path
 
 def prep_submission_and_clear_after_py(tc_folder: str) -> tuple[Submission, Project]:
     """
