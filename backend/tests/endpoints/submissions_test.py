@@ -7,6 +7,7 @@ from flask.testing import FlaskClient
 from sqlalchemy.orm import Session
 
 from tests.endpoints.endpoint import TestEndpoint, authentication_tests, authorization_tests
+from project.models.user import User
 from project.models.project import Project
 from project.models.submission import Submission
 
@@ -23,7 +24,17 @@ class TestSubmissionsEndpoint(TestEndpoint):
 
     # Who can access what
     # (endpoint, parameters, method, allowed, disallowed)
-    authorization = authorization_tests([])
+    authorization = authorization_tests([
+        ("/submissions", [], "get",
+            ["student", "teacher", "admin"], []),
+        ("/submissions", [], "post",
+            ["student"], ["student_other", "teacher", "admin"]),
+
+        ("/submissions/@0", ["submission_id"], "get",
+            ["student", "teacher", "admin"], ["student_other", "teacher_other", "admin_other"]),
+        ("/submissions/@0", ["submission_id"], "patch",
+            ["teacher", "admin"], ["student", "teacher_other", "admin_other"]),
+    ])
 
     @mark.parametrize("auth_test", authentication, indirect=True)
     def test_authentication(self, auth_test: Tuple[str, any]):
@@ -40,29 +51,50 @@ class TestSubmissionsEndpoint(TestEndpoint):
     ### GET SUBMISSIONS ###
     def test_get_submissions_wrong_user(self, client: FlaskClient):
         """Test getting submissions for a non-existing user"""
-        response = client.get("/submissions?uid=-20", headers={"Authorization":"teacher1"})
+        response = client.get("/submissions?uid=no_user", headers = {"Authorization": "teacher"})
+        assert response.status_code == 400
+
+    def test_get_submissions_user(
+            self, client: FlaskClient, api_host: str, student: User, submission: Submission
+        ):
+        """Test getting submission from a student"""
+        response = client.get(
+            f"/submissions?uid={student.uid}",
+            headers = {"Authorization": "teacher"}
+        )
+        assert response.status_code == 200
+        assert response.json["data"][0]["submission_id"] == \
+            f"{api_host}/submissions/{submission.submission_id}"
+
+    def test_get_submissions_wrong_project_type(self, client: FlaskClient):
+        """Test getting submissions for a non-existing project of the wrong type"""
+        response = client.get(
+            "/submissions?project_id=no_project",
+            headers = {"Authorization": "teacher"}
+        )
         assert response.status_code == 400
 
     def test_get_submissions_wrong_project(self, client: FlaskClient):
         """Test getting submissions for a non-existing project"""
-        response = client.get("/submissions?project_id=123456789",
-                              headers={"Authorization":"teacher1"})
-        assert response.status_code == 404 # can't find course of project in authorization
-        assert "message" in response.json
-
-    def test_get_submissions_wrong_project_type(self, client: FlaskClient):
-        """Test getting submissions for a non-existing project of the wrong type"""
-        response = client.get("/submissions?project_id=zero", headers={"Authorization":"teacher1"})
+        response = client.get(
+            "/submissions?project_id=0",
+            headers = {"Authorization": "teacher"}
+        )
         assert response.status_code == 400
-        assert "message" in response.json
 
-    def test_get_submissions_project(self, client: FlaskClient, submission: Submission):
+    def test_get_submissions_project(
+            self, client: FlaskClient, api_host: str, submission: Submission
+        ):
         """Test getting the submissions given a specific project"""
-        response = client.get(f"/submissions?project_id={submission.project_id}",
-                              headers={"Authorization":"teacher"})
-        data = response.json
+        response = client.get("/submissions", headers = {"Authorization": "teacher"})
         assert response.status_code == 200
-        assert "message" in data
+        assert response.json["data"][0]["submission_id"] == \
+            f"{api_host}/submissions/{submission.submission_id}"
+
+
+
+    ### POST SUBMISSIONS ###
+
 
 
     ### GET SUBMISSION ###
