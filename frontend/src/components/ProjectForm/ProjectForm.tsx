@@ -38,7 +38,7 @@ interface RegexData {
 }
 
 const apiUrl = import.meta.env.VITE_APP_API_URL
-const user = "teacher1"
+const user = "Gunnar"
 
 /**
  * @returns Form for uploading project
@@ -139,6 +139,8 @@ export default function ProjectForm() {
     }
 
     const assignmentFileBlob = new Blob([assignmentFile], { type: assignmentFile.type });
+    console.log("blob");
+    console.log(assignmentFileBlob);
 
     const formData = new FormData();
 
@@ -150,10 +152,20 @@ export default function ProjectForm() {
     formData.append('visible_for_students', visibleForStudents.toString());
     formData.append('archived', 'false');
     formData.append('assignment_file', assignmentFileBlob, filename);
-    formData.append('course_id', courseId)
+    // formData.append('course_id', courseId)
+    formData.append('course_id', courseId.toString());
     regexExpressions.forEach((expression,) => {
       formData.append(`regex_expressions`, expression.regex);
     });
+    deadlines.forEach((deadline: Deadline) => {
+      formData.append("deadlines",
+        JSON.stringify({
+          "deadline": deadline.deadline,
+          "description": deadline.description
+        })
+      );
+    });
+    console.log(formData)
 
     const response = await fetch(`${apiUrl}/projects`, {
       method: "post",

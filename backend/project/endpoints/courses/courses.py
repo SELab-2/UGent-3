@@ -23,7 +23,7 @@ RESPONSE_URL = urljoin(f"{API_URL}/", "courses")
 class CourseForUser(Resource):
     """Api endpoint for the /courses link"""
 
-    @login_required
+    # @login_required
     def get(self):
         """ "
         Get function for /courses this will be the main endpoint

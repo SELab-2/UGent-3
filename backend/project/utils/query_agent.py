@@ -7,11 +7,14 @@ to interact with the database.
 from typing import Dict, List, Union
 from urllib.parse import urljoin
 from flask import jsonify
+import json
 from sqlalchemy import and_
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm.query import Query
 from sqlalchemy.exc import SQLAlchemyError
 from project.db_in import db
+from sqlalchemy.sql import text
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 from project.utils.misc import map_all_keys_to_url, models_to_dict, filter_model_fields
 
 def delete_by_id_from_model(
@@ -67,13 +70,15 @@ def create_model_instance(model: DeclarativeMeta,
     if missing_fields:
         return {"error": f"Missing required fields: {', '.join(missing_fields)}",
                 "url": response_url_base}, 400
-
+    print("data")
+    print(data)
     filtered_data = filter_model_fields(model, data)
+    print(filtered_data)
     new_instance: DeclarativeMeta = model(**filtered_data)
+    print(new_instance)
     db.session.add(new_instance)
-
     db.session.commit()
-
+    print("what the actual fuck")
     return new_instance, 201
 
 
@@ -123,7 +128,8 @@ def query_selected_from_model(model: DeclarativeMeta,
                               response_url: str,
                               url_mapper: Dict[str, str] = None,
                               select_values: List[str] = None,
-                              filters: Dict[str, Union[str, int]]=None):
+                              filters: Dict[str, Union[str, int]]=None,
+                              custom_sql_query: str =""):
     """
     Query entries from the database giving the model corresponding to a certain table and
     the filters to apply to the query.
@@ -150,12 +156,20 @@ def query_selected_from_model(model: DeclarativeMeta,
             query = query.filter(and_(*conditions))
 
         if select_values:
-            query = query.with_entities(*[getattr(model, value) for value in select_values])
-            query_result = query.all()
+            if custom_sql_query != "":
+                custom_query = text(
+                    custom_sql_query
+                )
+                query_result = db.session.execute(custom_query)
+            else:
+                query = query.with_entities(*[getattr(model, value) for value in select_values])
+                query_result = query.all()
             results = []
             for instance in query_result:
+                print(type(instance))
                 selected_instance = {}
                 for value in select_values:
+                    print(value)
                     selected_instance[value] = getattr(instance, value)
                 results.append(selected_instance)
         else:
@@ -166,7 +180,8 @@ def query_selected_from_model(model: DeclarativeMeta,
                     "message": "Resources fetched successfully",
                     "url": response_url}
         return jsonify(response), 200
-    except SQLAlchemyError:
+    except SQLAlchemyError as e:
+        print(e)
         return {"error": "Something went wrong while querying the database.",
                 "url": response_url}, 500
 

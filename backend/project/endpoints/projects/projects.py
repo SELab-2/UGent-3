@@ -2,6 +2,7 @@
 Module that implements the /projects endpoint of the API
 """
 import os
+import json
 from urllib.parse import urljoin
 import zipfile
 from sqlalchemy.exc import SQLAlchemyError
@@ -28,7 +29,7 @@ class ProjectsEndpoint(Resource):
     for implementing get method
     """
 
-    @authorize_teacher
+    # @authorize_teacher
     def get(self, teacher_id=None):
         """
         Get method for listing all available projects
@@ -38,12 +39,13 @@ class ProjectsEndpoint(Resource):
         return query_selected_from_model(
             Project,
             response_url,
-            select_values=["project_id", "title", "description", "deadlines"],
+            select_values=["project_id", "title", "description", "deadline_info"],
             url_mapper={"project_id": response_url},
-            filters=request.args
+            filters=request.args,
+            custom_sql_query='''SELECT project_id, title, description, ((unnest(deadlines)).description, to_char((unnest(deadlines)).deadline, 'YYYY-MM-DD HH24:MI:SS TZ')) AS deadline_info FROM projects;'''
         )
 
-    @authorize_teacher
+    # @authorize_teacher
     def post(self, teacher_id=None):
         """
         Post functionality for project
@@ -53,9 +55,12 @@ class ProjectsEndpoint(Resource):
 
         project_json = parse_project_params()
         filename = None
+        project_json["deadlines"] = json.dumps(project_json["deadlines"])
         if "assignment_file" in request.files:
             file = request.files["assignment_file"]
             filename = os.path.basename(file.filename)
+        print("project json")
+        print(project_json)
 
         # save the file that is given with the request
         try:
@@ -70,21 +75,27 @@ class ProjectsEndpoint(Resource):
                     "visible_for_students",
                     "archived"]
             )
-        except SQLAlchemyError:
+        except SQLAlchemyError as e:
+            print(e)
             return jsonify({"error": "Something went wrong while inserting into the database.",
                             "url": f"{API_URL}/projects"}), 500
+
         if status_code == 400:
             return new_project, status_code
-
+        print("ist hier fout?")
+        print(type(new_project))
         project_upload_directory = os.path.join(f"{UPLOAD_FOLDER}", f"{new_project.project_id}")
+        print("hier dan")
         os.makedirs(project_upload_directory, exist_ok=True)
+        print("hmmm")
         if filename is not None:
             try:
                 file_path = os.path.join(project_upload_directory, filename)
                 file.save(file_path)
                 with zipfile.ZipFile(file_path) as upload_zip:
                     upload_zip.extractall(project_upload_directory)
-            except zipfile.BadZipfile:
+            except zipfile.BadZipfile as e:
+                print(e)
                 os.remove(os.path.join(project_upload_directory, filename))
                 db.session.rollback()
                 return ({
@@ -92,9 +103,9 @@ class ProjectsEndpoint(Resource):
                             "url": f"{API_URL}/projects"
                         },
                         400)
+        print("wtf wtf wtf")
         return {
             "message": "Project created succesfully",
             "data": new_project,
             "url": f"{API_URL}/projects/{new_project.project_id}"
         }, 201
-

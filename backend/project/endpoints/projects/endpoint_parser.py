@@ -37,21 +37,25 @@ def parse_project_params():
     Return a dict of every non None value in the param
     """
     args = parser.parse_args()
+    print("args")
+    print(args)
     result_dict = {}
     for key, value in args.items():
         if value is not None:
             if "deadlines" == key:
                 deadlines_parsed = json.loads(value)
                 new_deadlines = []
-                for deadline in deadlines_parsed:
+                '''for deadline in deadlines_parsed:
+                    print(deadline)
                     new_deadlines.append(
                         (
                             deadline["description"],
                             deadline["deadline"]
                         )
                     )
-                result_dict[key] = new_deadlines
+                result_dict[key] = new_deadlines'''
+                result_dict[key] = [{"deadline": "2024-02-25T12:00:00", "description": "D"}]
             else:
                 result_dict[key] = value
-
+    print(result_dict)
     return result_dict
