@@ -3,61 +3,58 @@
 from typing import List, Tuple, Dict
 from pytest import param
 
-def authentication_tests(tests: List[Tuple[str, List[str]]]) -> List[any]:
+def authentication_tests(endpoint: str, methods: List[str]) -> List[any]:
     """Transform the format to single authentication tests"""
+    tests = []
 
-    single_tests = []
-    for test in tests:
-        endpoint, methods = test
-        for method in methods:
-            single_tests.append(param(
-                (endpoint, method),
-                id = f"{endpoint} {method.upper()}"
-            ))
-    return single_tests
-
-def authorization_tests(tests: List[Tuple[str, str, List[str], List[str]]]) -> List[any]:
-    """Transform the format to single authorization tests"""
-
-    single_tests = []
-    for test in tests:
-        endpoint, method, allowed_tokens, disallowed_tokens = test
-        for token in (allowed_tokens + disallowed_tokens):
-            allowed = token in allowed_tokens
-            single_tests.append(param(
-                (endpoint, method, token, allowed),
-                id = f"{endpoint} {method.upper()} " \
-                    f"({token} {'allowed' if allowed else 'disallowed'})"
-            ))
-    return single_tests
-
-def data_field_type_tests(
-        tests: List[Tuple[str, str, str, Dict[str, any], Dict[str, List[any]]]]
-    ) -> List[any]:
-    """Transform the format to single data_field tests"""
-
-    single_tests = []
-    for test in tests:
-        endpoint, method, token, data, changes = test
-
-        # Test by adding an incorrect field
-        new_data = dict(data)
-        new_data["field"] = None
-        single_tests.append(param(
-            (endpoint, method, token, new_data),
-            id = f"{endpoint} {method.upper()} {token} (field None 400)"
+    for method in methods:
+        tests.append(param(
+            (endpoint, method),
+            id = f"{endpoint} {method.upper()}"
         ))
 
-        # Test the with the given changes
-        for key, values in changes.items():
-            for value in values:
-                new_data = dict(data)
-                new_data[key] = value
-                single_tests.append(param(
-                    (endpoint, method, token, new_data),
-                    id = f"{endpoint} {method.upper()} {token} ({key} {value} 400)"
-                ))
-    return single_tests
+    return tests
+
+def authorization_tests(
+        endpoint: str, method: str, allowed_tokens: List[str], disallowed_tokens: List[str]
+    ) -> List[any]:
+    """Transform the format to single authorization tests"""
+    tests = []
+
+    for token in (allowed_tokens + disallowed_tokens):
+        allowed = token in allowed_tokens
+        tests.append(param(
+            (endpoint, method, token, allowed),
+            id = f"{endpoint} {method.upper()} ({token} {'allowed' if allowed else 'disallowed'})"
+        ))
+
+    return tests
+
+def data_field_type_tests(
+        endpoint: str, method: str, token: str, data: Dict[str, any], changes: Dict[str, List[any]]
+    ) -> List[any]:
+    """Transform the format to single data_field tests"""
+    tests = []
+
+    # Test by adding an incorrect field
+    new_data = dict(data)
+    new_data["field"] = None
+    tests.append(param(
+        (endpoint, method, token, new_data),
+        id = f"{endpoint} {method.upper()} {token} (field None 400)"
+    ))
+
+    # Test the with the given changes
+    for key, values in changes.items():
+        for value in values:
+            new_data = dict(data)
+            new_data[key] = value
+            tests.append(param(
+                (endpoint, method, token, new_data),
+                id = f"{endpoint} {method.upper()} {token} ({key} {value} 400)"
+            ))
+
+    return tests
 
 class TestEndpoint:
     """Base class for endpoint tests"""

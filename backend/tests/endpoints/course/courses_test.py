@@ -17,46 +17,39 @@ class TestCourseEndpoint(TestEndpoint):
 
     ### AUTHENTICATION & AUTHORIZATION ###
     # Where is login required
-    # (endpoint, methods)
-    authentication = authentication_tests([
-        ("/courses", ["get", "post"]),
-        ("/courses/@course_id", ["get", "patch", "delete"]),
-        ("/courses/@course_id/students", ["get", "post", "delete"]),
-        ("/courses/@course_id/admins", ["get", "post", "delete"])
-    ])
+    authentication_tests = \
+        authentication_tests("/courses", ["get", "post"]) + \
+        authentication_tests("/courses/@course_id", ["get", "patch", "delete"]) + \
+        authentication_tests("/courses/@course_id/students", ["get", "post", "delete"]) + \
+        authentication_tests("/courses/@course_id/admins", ["get", "post", "delete"])
 
     # Who can access what
-    # (endpoint, method, allowed, disallowed)
-    authorization = authorization_tests([
-        ("/courses", "get", ["student", "teacher", "admin"], []),
-        ("/courses", "post", ["teacher"], ["student", "admin"]),
+    authorization_tests = \
+        authorization_tests("/courses", "get", ["student", "teacher", "admin"], []) + \
+        authorization_tests("/courses", "post", ["teacher"], ["student", "admin"]) + \
+        authorization_tests("/courses/@course_id", "patch",
+            ["teacher"], ["student", "teacher_other", "admin"]) + \
+        authorization_tests("/courses/@course_id", "delete",
+            ["teacher"], ["student", "teacher_other", "admin"]) + \
+        authorization_tests("/courses/@course_id/students", "get",
+            ["student", "teacher", "admin"], []) + \
+        authorization_tests("/courses/@course_id/students", "post",
+            ["teacher", "admin"], ["student", "teacher_other", "admin_other"]) + \
+        authorization_tests("/courses/@course_id/students", "delete",
+            ["teacher", "admin"], ["student", "teacher_other", "admin_other"]) + \
+        authorization_tests("/courses/@course_id/admins", "get",
+            ["teacher", "admin"], ["student", "teacher_other", "admin_other"]) + \
+        authorization_tests("/courses/@course_id/admins", "post",
+            ["teacher"], ["student", "admin"]) + \
+        authorization_tests("/courses/@course_id/admins", "delete",
+            ["teacher"], ["student", "teacher_other", "admin"])
 
-        ("/courses/@course_id", "patch",
-            ["teacher"], ["student", "teacher_other", "admin"]),
-        ("/courses/@course_id", "delete",
-            ["teacher"], ["student", "teacher_other", "admin"]),
-
-        ("/courses/@course_id/students", "get",
-            ["student", "teacher", "admin"], []),
-        ("/courses/@course_id/students", "post",
-            ["teacher", "admin"], ["student", "teacher_other", "admin_other"]),
-        ("/courses/@course_id/students", "delete",
-            ["teacher", "admin"], ["student", "teacher_other", "admin_other"]),
-
-        ("/courses/@course_id/admins", "get",
-            ["teacher", "admin"], ["student", "teacher_other", "admin_other"]),
-        ("/courses/@course_id/admins", "post",
-            ["teacher"], ["student", "admin"]),
-        ("/courses/@course_id/admins", "delete",
-            ["teacher"], ["student", "teacher_other", "admin"]),
-    ])
-
-    @mark.parametrize("auth_test", authentication, indirect=True)
+    @mark.parametrize("auth_test", authentication_tests, indirect=True)
     def test_authentication(self, auth_test: Tuple[str, any]):
         """Test the authentication"""
         super().authentication(auth_test)
 
-    @mark.parametrize("auth_test", authorization, indirect=True)
+    @mark.parametrize("auth_test", authorization_tests, indirect=True)
     def test_authorization(self, auth_test: Tuple[str, any, str, bool]):
         """Test the authorization"""
         super().authorization(auth_test)
@@ -65,34 +58,35 @@ class TestCourseEndpoint(TestEndpoint):
 
     ### DATA ###
     # Test a data field by passing a list of values for which it should return bad request
-    # (endpoint, method, token, minimal_data, {key, [value]})
-    data_fields = data_field_type_tests([
-        ("/courses", "post", "teacher", {"name": "test", "ufora_id": "test"}, {
-            "name": [None, 0],
-            "ufora_id": [0],
-        }),
-        ("/courses/@course_id", "patch", "teacher", {}, {
-            "name": [None, 0],
-            "ufora_id": [0],
-            "teacher": [None, 0, "student"],
-        }),
-        ("/courses/@course_id/students", "post", "teacher", {"students": ["student_other"]}, {
-            "students": [None, [None], ["no_user"], ["student"]]
-        }),
-        ("/courses/@course_id/students", "delete", "teacher", {"students": ["student"]}, {
-            "students": [None, [None], ["no_user"], ["student_other"]]
-        }),
-        ("/courses/@course_id/admins", "post", "teacher", {"admin_uid": "admin_other"}, {
-            "admin_uid": [None, "no_user", "student", "admin"]
-        }),
-        ("/courses/@course_id/admins", "delete", "teacher", {"admin_uid": ["admin"]}, {
-            "admin_uid": [None, "no_user", "admin_other"]
-        })
-    ])
+    data_fields = \
+        data_field_type_tests("/courses", "post", "teacher",
+            {"name": "test", "ufora_id": "test"},
+            {"name": [None, 0], "ufora_id": [0]}
+        ) + \
+        data_field_type_tests("/courses/@course_id", "patch", "teacher",
+            {},
+            {"name": [None, 0], "ufora_id": [0], "teacher": [None, 0, "student"]}
+        ) + \
+        data_field_type_tests("/courses/@course_id/students", "post", "teacher",
+            {"students": ["student_other"]},
+            {"students": [None, [None], ["no_user"], ["student"]]}
+        ) + \
+        data_field_type_tests("/courses/@course_id/students", "delete", "teacher",
+            {"students": ["student"]},
+            {"students": [None, [None], ["no_user"], ["student_other"]]}
+        ) + \
+        data_field_type_tests("/courses/@course_id/admins", "post", "teacher",
+            {"admin_uid": "admin_other"},
+            {"admin_uid": [None, "no_user", "student", "admin"]}
+        ) + \
+        data_field_type_tests("/courses/@course_id/admins", "delete", "teacher",
+            {"admin_uid": ["admin"]},
+            {"admin_uid": [None, "no_user", "admin_other"]}
+        )
 
     @mark.parametrize("data_field_type_test", data_fields, indirect=True)
     def test_data_fields(self, data_field_type_test: Tuple[str, any, str, Dict[str, any]]):
-        """Test a data field"""
+        """Test a data field typing"""
         super().data_field_type(data_field_type_test)
 
 
