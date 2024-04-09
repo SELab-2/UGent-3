@@ -31,8 +31,8 @@ def authorization_tests(tests: List[Tuple[str, str, List[str], List[str]]]) -> L
             ))
     return single_tests
 
-def data_field_tests(
-        tests: List[Tuple[str, str, str, Dict[str, any], Dict[str, List[Tuple[any, int]]]]]
+def data_field_type_tests(
+        tests: List[Tuple[str, str, str, Dict[str, any], Dict[str, List[any]]]]
     ) -> List[any]:
     """Transform the format to single data_field tests"""
 
@@ -44,23 +44,20 @@ def data_field_tests(
         new_data = dict(data)
         new_data["field"] = None
         single_tests.append(param(
-            (endpoint, method, token, new_data, 400),
+            (endpoint, method, token, new_data),
             id = f"{endpoint} {method.upper()} {token} (field None 400)"
         ))
 
         # Test the with the given changes
         for key, values in changes.items():
-            for value, status in values:
+            for value in values:
                 new_data = dict(data)
                 new_data[key] = value
                 single_tests.append(param(
-                    (endpoint, method, token, new_data, status),
-                    id = f"{endpoint} {method.upper()} {token} ({key} {value} {status})"
+                    (endpoint, method, token, new_data),
+                    id = f"{endpoint} {method.upper()} {token} ({key} {value} 400)"
                 ))
     return single_tests
-
-def url_query_tests(tests: List[Tuple[str]]):
-    """Transform the format to single url_query tests"""
 
 class TestEndpoint:
     """Base class for endpoint tests"""
@@ -87,13 +84,10 @@ class TestEndpoint:
         response = method(endpoint, headers = {"Authorization": token})
         assert allowed == (response.status_code != 403)
 
-    def data_field(self, data_field_test: Tuple[str, any, str, Dict[str, any], int]):
-        """Test if a data field for the given endpoint works"""
+    def data_field_type(self, data_field_test: Tuple[str, any, str, Dict[str, any]]):
+        """Test if the datatypes are properly checked for data fields"""
 
-        endpoint, method, token, data, status = data_field_test
+        endpoint, method, token, data = data_field_test
 
         response = method(endpoint, headers = {"Authorization": token}, json = data)
-        assert response.status_code == status
-
-    def url_query(self):
-        """Test if url query for the given endpoint works"""
+        assert response.status_code == 400

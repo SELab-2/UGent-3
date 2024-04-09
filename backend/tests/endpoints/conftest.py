@@ -37,12 +37,11 @@ def auth_test(request: FixtureRequest, client: FlaskClient, data_map: Dict[str, 
     return endpoint, getattr(client, method), *other
 
 @fixture
-def data_field_test(
+def data_field_type_test(
         request: FixtureRequest, client: FlaskClient, data_map: Dict[str, any]
-    ) -> Tuple[str, any, str, Dict[str, any], int]:
+    ) -> Tuple[str, any, str, Dict[str, any]]:
     """Add concrete test data to the data_field tests"""
-    # endpoint, method, token, data, status
-    endpoint, method, token, data, status = request.param
+    endpoint, method, token, data = request.param
 
     for key, value in data_map.items():
         endpoint = endpoint.replace(key, str(value))
@@ -53,7 +52,7 @@ def data_field_test(
         elif value in data_map.keys():
             data[key] = data_map[value]
 
-    return endpoint, getattr(client, method), token, data, status
+    return endpoint, getattr(client, method), token, data
 
 
 

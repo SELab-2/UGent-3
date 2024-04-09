@@ -7,7 +7,7 @@ from tests.endpoints.endpoint import (
     TestEndpoint,
     authentication_tests,
     authorization_tests,
-    data_field_tests
+    data_field_type_tests
 )
 from project.models.user import User
 from project.models.course import Course
@@ -63,51 +63,37 @@ class TestCourseEndpoint(TestEndpoint):
 
 
 
-    ### DATA & QUERIES ###
-    # Test a data field
-    # Other tests to verify the changes for a correct request
-    # (endpoint, method, token, minimal_data, {key, [(value, status)]})
-    data_fields = data_field_tests([
+    ### DATA ###
+    # Test a data field by passing a list of values for which it should return bad request
+    # (endpoint, method, token, minimal_data, {key, [value]})
+    data_fields = data_field_type_tests([
         ("/courses", "post", "teacher", {"name": "test", "ufora_id": "test"}, {
-            "name": [(None, 400), (0, 400)],
-            "ufora_id": [(0, 400)],
+            "name": [None, 0],
+            "ufora_id": [0],
         }),
         ("/courses/@course_id", "patch", "teacher", {}, {
-            "name": [(None, 400), (0, 400)],
-            "ufora_id": [(0, 400)],
-            "teacher": [(None, 400), (0, 400), ("student", 400)],
+            "name": [None, 0],
+            "ufora_id": [0],
+            "teacher": [None, 0, "student"],
         }),
-        ("/courses/@course_id/students", "post", "teacher",
-            {"students": ["student_other"]},
-            {"students": [(None, 400), ([None], 400), (["no_user"], 400), (["student"], 400)]}
-        ),
-        ("/courses/@course_id/students", "delete", "teacher",
-            {"students": ["student"]},
-            {"students": [
-                (None, 400), ([None], 400), (["no_user"], 400), (["student_other"], 400)
-            ]}
-        ),
-        ("/courses/@course_id/admins", "post", "teacher",
-            {"admin_uid": "admin_other"},
-            {"admin_uid": [(None, 400), ("no_user", 400), ("student", 400), ("admin", 400)]}
-        ),
-        ("/courses/@course_id/admins", "delete", "teacher",
-            {"admin_uid": ["admin"]},
-            {"admin_uid": [(None, 400), ("no_user", 400), ("admin_other", 400)]}
-        )
+        ("/courses/@course_id/students", "post", "teacher", {"students": ["student_other"]}, {
+            "students": [None, [None], ["no_user"], ["student"]]
+        }),
+        ("/courses/@course_id/students", "delete", "teacher", {"students": ["student"]}, {
+            "students": [None, [None], ["no_user"], ["student_other"]]
+        }),
+        ("/courses/@course_id/admins", "post", "teacher", {"admin_uid": "admin_other"}, {
+            "admin_uid": [None, "no_user", "student", "admin"]
+        }),
+        ("/courses/@course_id/admins", "delete", "teacher", {"admin_uid": ["admin"]}, {
+            "admin_uid": [None, "no_user", "admin_other"]
+        })
     ])
 
-    # queries = []
-
-    @mark.parametrize("data_field_test", data_fields, indirect=True)
-    def test_data_fields(self, data_field_test: Tuple[str, any, str, Dict[str, any], int]):
+    @mark.parametrize("data_field_type_test", data_fields, indirect=True)
+    def test_data_fields(self, data_field_type_test: Tuple[str, any, str, Dict[str, any]]):
         """Test a data field"""
-        super().data_field(data_field_test)
-
-    # @mark.parametrize("url_query", queries)
-    # def test_url_query(self, url_query: Tuple[str]):
-    #     """Test a url query"""
-    #     super().url_query(url_query)
+        super().data_field_type(data_field_type_test)
 
 
 
