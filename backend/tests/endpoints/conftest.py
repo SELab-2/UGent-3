@@ -3,7 +3,7 @@
 import tempfile
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 
 import pytest
 from pytest import fixture, FixtureRequest
@@ -19,19 +19,41 @@ from project.models.project import Project
 
 ### AUTHENTICATION & AUTHORIZATION ###
 @fixture
-def auth_test(request: FixtureRequest, client: FlaskClient, course: Course) -> Tuple:
-    """Add concrete test data"""
-    # endpoint, parameters, method, token, status
-    endpoint, parameters, method, *other = request.param
-
-    d = {
-        "course_id": course.course_id
+def data_map(course: Course) -> Dict[str, any]:
+    """Map an id to data"""
+    return {
+        "@course_id": course.course_id
     }
 
-    for index, parameter in enumerate(parameters):
-        endpoint = endpoint.replace(f"@{index}", str(d[parameter]))
+@fixture
+def auth_test(request: FixtureRequest, client: FlaskClient, data_map: Dict[str, any]) -> Tuple:
+    """Add concrete test data to auth"""
+    # endpoint, method, token, allowed
+    endpoint, method, *other = request.param
+
+    for k, v in data_map.items():
+        endpoint = endpoint.replace(k, str(v))
 
     return endpoint, getattr(client, method), *other
+
+@fixture
+def data_field_test(
+        request: FixtureRequest, client: FlaskClient, data_map: Dict[str, any]
+    ) -> Tuple[str, any, str, Dict[str, any], int]:
+    """Add concrete test data to the data_field tests"""
+    # endpoint, method, token, data, status
+    endpoint, method, token, data, status = request.param
+
+    for key, value in data_map.items():
+        endpoint = endpoint.replace(key, str(value))
+
+    for key, value in data.items():
+        if isinstance(value, list):
+            data[key] = [data_map.get(v,v) for v in value]
+        elif value in data_map.keys():
+            data[key] = data_map[value]
+
+    return endpoint, getattr(client, method), token, data, status
 
 
 
