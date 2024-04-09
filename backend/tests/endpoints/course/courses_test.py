@@ -1,6 +1,6 @@
 """Tests the courses API endpoint"""
 
-from typing import Tuple, List, Dict
+from typing import Any
 from pytest import mark
 from flask.testing import FlaskClient
 from tests.endpoints.endpoint import (
@@ -15,7 +15,7 @@ from project.models.course import Course
 class TestCourseEndpoint(TestEndpoint):
     """Class to test the courses API endpoint"""
 
-    ### AUTHENTICATION & AUTHORIZATION ###
+    ### AUTHENTICATION ###
     # Where is login required
     authentication_tests = \
         authentication_tests("/courses", ["get", "post"]) + \
@@ -23,6 +23,14 @@ class TestCourseEndpoint(TestEndpoint):
         authentication_tests("/courses/@course_id/students", ["get", "post", "delete"]) + \
         authentication_tests("/courses/@course_id/admins", ["get", "post", "delete"])
 
+    @mark.parametrize("auth_test", authentication_tests, indirect=True)
+    def test_authentication(self, auth_test: tuple[str, Any]):
+        """Test the authentication"""
+        super().authentication(auth_test)
+
+
+
+    ### AUTHORIZATION ###
     # Who can access what
     authorization_tests = \
         authorization_tests("/courses", "get", ["student", "teacher", "admin"], []) + \
@@ -44,13 +52,8 @@ class TestCourseEndpoint(TestEndpoint):
         authorization_tests("/courses/@course_id/admins", "delete",
             ["teacher"], ["student", "teacher_other", "admin"])
 
-    @mark.parametrize("auth_test", authentication_tests, indirect=True)
-    def test_authentication(self, auth_test: Tuple[str, any]):
-        """Test the authentication"""
-        super().authentication(auth_test)
-
     @mark.parametrize("auth_test", authorization_tests, indirect=True)
-    def test_authorization(self, auth_test: Tuple[str, any, str, bool]):
+    def test_authorization(self, auth_test: tuple[str, Any, str, bool]):
         """Test the authorization"""
         super().authorization(auth_test)
 
@@ -85,14 +88,14 @@ class TestCourseEndpoint(TestEndpoint):
         )
 
     @mark.parametrize("data_field_type_test", data_fields, indirect=True)
-    def test_data_fields(self, data_field_type_test: Tuple[str, any, str, Dict[str, any]]):
+    def test_data_fields(self, data_field_type_test: tuple[str, Any, str, dict[str, Any]]):
         """Test a data field typing"""
         super().data_field_type(data_field_type_test)
 
 
 
-    ### GET COURSES ###
-    def test_get_courses_all(self, client: FlaskClient, courses: List[Course]):
+    ### COURSES ###
+    def test_get_courses(self, client: FlaskClient, courses: list[Course]):
         """Test getting all courses"""
         response = client.get("/courses", headers = {"Authorization": "student"})
         assert response.status_code == 200
@@ -200,10 +203,7 @@ class TestCourseEndpoint(TestEndpoint):
         assert data["ufora_id"] == course.ufora_id
         assert data["teacher"] == course.teacher
 
-
-
-    ### POST COURSES ###
-    def test_post_courses_correct(self, client: FlaskClient, teacher: User):
+    def test_post_courses(self, client: FlaskClient, teacher: User):
         """Test posting a course"""
         response = client.post("/courses", headers = {"Authorization": "teacher"},
             json = {
@@ -220,8 +220,8 @@ class TestCourseEndpoint(TestEndpoint):
 
 
 
-    ### GET COURSE ###
-    def test_get_course_correct(self, client: FlaskClient, course: Course):
+    ### COURSE ###
+    def test_get_course(self, client: FlaskClient, course: Course):
         """Test getting a course"""
         response = client.get(
             f"/courses/{course.course_id}",
@@ -233,10 +233,7 @@ class TestCourseEndpoint(TestEndpoint):
         assert data["ufora_id"] == course.ufora_id
         assert data["teacher"] == course.teacher
 
-
-
-    ### PATCH COURSE ###
-    def test_patch_course_correct(self, client: FlaskClient, course: Course):
+    def test_patch_course(self, client: FlaskClient, course: Course):
         """Test patching a course"""
         response = client.patch(
             f"/courses/{course.course_id}",
@@ -246,10 +243,7 @@ class TestCourseEndpoint(TestEndpoint):
         assert response.status_code == 200
         assert response.json["data"]["name"] == "test"
 
-
-
-    ### DELETE COURSE ###
-    def test_delete_course_correct(self, client: FlaskClient, course: Course):
+    def test_delete_course(self, client: FlaskClient, course: Course):
         """Test deleting a course"""
         response = client.delete(
             f"/courses/{course.course_id}",
@@ -264,8 +258,8 @@ class TestCourseEndpoint(TestEndpoint):
 
 
 
-    ### GET COURSE STUDENTS ###
-    def test_get_students_correct(self, client: FlaskClient, api_host: str, course: Course):
+    ### COURSE STUDENTS ###
+    def test_get_students(self, client: FlaskClient, api_host: str, course: Course):
         """Test getting the students fo a course"""
         response = client.get(
             f"/courses/{course.course_id}/students",
@@ -274,10 +268,7 @@ class TestCourseEndpoint(TestEndpoint):
         assert response.status_code == 200
         assert response.json["data"][0]["uid"] == f"{api_host}/users/student"
 
-
-
-    ### POST COURSE STUDENTS ###
-    def test_post_students_correct(
+    def test_post_students(
             self, client: FlaskClient, api_host: str, course: Course, student_other: User
         ):
         """Test adding students to a course"""
@@ -291,10 +282,7 @@ class TestCourseEndpoint(TestEndpoint):
         assert response.status_code == 201
         assert response.json["data"]["students"][0] == f"{api_host}/users/student_other"
 
-
-
-    ### DELETE COURSE STUDENTS ###
-    def test_delete_students_correct(
+    def test_delete_students(
             self, client: FlaskClient, course: Course, student: User
         ):
         """Test deleting students from a course"""
@@ -315,8 +303,8 @@ class TestCourseEndpoint(TestEndpoint):
 
 
 
-    ### GET COURSE ADMINS ###
-    def test_get_admins_correct(self, client: FlaskClient, api_host: str, course: Course):
+    ### COURSE ADMINS ###
+    def test_get_admins(self, client: FlaskClient, api_host: str, course: Course):
         """Test getting the admins of a course"""
         response = client.get(
             f"/courses/{course.course_id}/admins",
@@ -325,10 +313,7 @@ class TestCourseEndpoint(TestEndpoint):
         assert response.status_code == 200
         assert response.json["data"][0]["uid"] == f"{api_host}/users/admin"
 
-
-
-    ### POST COURSE ADMINS ###
-    def test_post_admins_correct(self, client: FlaskClient, course: Course, admin: User):
+    def test_post_admins(self, client: FlaskClient, course: Course, admin: User):
         """Test adding an admin to a course"""
         response = client.post(
             f"/courses/{course.course_id}/admins",
@@ -340,10 +325,7 @@ class TestCourseEndpoint(TestEndpoint):
         assert response.status_code == 201
         assert response.json["data"]["uid"] == admin.uid
 
-
-
-    ### DELETE COURSE ADMINS ###
-    def test_delete_admins_correct(self, client: FlaskClient, course: Course, admin: User):
+    def test_delete_admins(self, client: FlaskClient, course: Course, admin: User):
         """Test deleting an admin from a course"""
         response = client.delete(
             f"/courses/{course.course_id}/admins",
