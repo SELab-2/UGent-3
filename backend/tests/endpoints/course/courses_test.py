@@ -313,17 +313,17 @@ class TestCourseEndpoint(TestEndpoint):
         assert response.status_code == 200
         assert response.json["data"][0]["uid"] == f"{api_host}/users/admin"
 
-    def test_post_admins(self, client: FlaskClient, course: Course, admin: User):
+    def test_post_admins(self, client: FlaskClient, course: Course, admin_other: User):
         """Test adding an admin to a course"""
         response = client.post(
             f"/courses/{course.course_id}/admins",
             headers = {"Authorization": "teacher"},
             json = {
-                "admin_uid": admin.uid
+                "admin_uid": admin_other.uid
             }
         )
         assert response.status_code == 201
-        assert response.json["data"]["uid"] == admin.uid
+        assert response.json["data"]["uid"] == admin_other.uid
 
     def test_delete_admins(self, client: FlaskClient, course: Course, admin: User):
         """Test deleting an admin from a course"""

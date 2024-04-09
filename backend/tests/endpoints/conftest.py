@@ -77,6 +77,11 @@ def admin(session: Session) -> User:
     """Return an admin entry"""
     return session.get(User, "admin")
 
+@fixture
+def admin_other(session: Session) -> User:
+    """Return an admin entry"""
+    return session.get(User, "admin_other")
+
 
 
 ### COURSES ###
