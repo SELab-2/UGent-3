@@ -102,7 +102,7 @@ class TestCourseEndpoint(TestEndpoint):
         data = [course["name"] for course in response.json["data"]]
         assert all(course.name in data for course in courses)
 
-    def test_get_courses_wrong_argument(self, client: FlaskClient):
+    def test_get_courses_wrong_parameter(self, client: FlaskClient):
         """Test getting courses for a wrong parameter"""
         response = client.get("/courses?parameter=0", headers = {"Authorization": "student"})
         assert response.status_code == 400
