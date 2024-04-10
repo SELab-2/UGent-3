@@ -147,12 +147,9 @@ export default function ProjectForm() {
     // Append fields to the FormData object
     formData.append('title', title);
     formData.append('description', description);
-    // TODO fix deadlines
-    // formData.append('deadline', deadline.toISOString());
     formData.append('visible_for_students', visibleForStudents.toString());
     formData.append('archived', 'false');
     formData.append('assignment_file', assignmentFileBlob, filename);
-    // formData.append('course_id', courseId)
     formData.append('course_id', courseId.toString());
     regexExpressions.forEach((expression,) => {
       formData.append(`regex_expressions`, expression.regex);
