@@ -247,13 +247,10 @@ def valid_project(course):
     data = {
         "title": "Project",
         "description": "Test project",
-        "assignment_file": "testfile",
-        "deadline": "2024-02-25T12:00:00",
+        "deadlines": [{"deadline": "2024-02-25T12:00:00", "description": "Deadline 1"}],
         "course_id": course.course_id,
         "visible_for_students": True,
         "archived": False,
-        "test_path": "tests",
-        "script_name": "script.sh",
         "regex_expressions": ["*.pdf", "*.txt"]
     }
     return data
