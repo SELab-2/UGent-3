@@ -107,7 +107,7 @@ class CourseByCourseId(Resource):
         This function will update the course with course_id
         """
 
-        message, status = check_data(request.json, False)
+        message, status = check_data(request.json, True)
         if status != 200:
             return message, status
 
