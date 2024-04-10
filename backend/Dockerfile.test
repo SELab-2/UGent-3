@@ -1,15 +1,24 @@
-FROM python:3.9-slim
+FROM docker:dind
 
-# Set the working directory
-WORKDIR /app
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    tzdata
 
-# Copy the application code into the container
+ENV TZ=UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+    
+
+
+RUN python3 -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+
 COPY . /app
 
-# Install dependencies
-RUN apt-get update 
-RUN apt-get install -y --no-install-recommends python3-pip
+WORKDIR /app
+
 RUN pip3 install --no-cache-dir -r requirements.txt -r dev-requirements.txt
 
-# Command to run the tests
-CMD ["pytest"]
+RUN chmod +x /app/entry-point.sh
+
+ENTRYPOINT ["/app/entry-point.sh"]
