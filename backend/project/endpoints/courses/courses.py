@@ -15,6 +15,7 @@ from flask_restful import Resource
 from project.models.course import Course
 from project.utils.query_agent import query_selected_from_model, insert_into_model
 from project.utils.authentication import login_required, authorize_teacher
+from project.endpoints.courses.courses_utils import json_message
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -44,6 +45,20 @@ class CourseForUser(Resource):
         This function will create a new course
         if the body of the post contains a name and uid is an admin or teacher
         """
+
+        if not all(hasattr(Course, key) for key in request.json.keys()):
+            return json_message("The data contains an incorrect field"), 400
+
+        if "name" in request.json.keys():
+            name = request.json.get("name")
+            if name is None or not isinstance(name, str):
+                return json_message("Name field does not have the correct type"), 400
+
+        if "ufora_id" in request.json.keys():
+            ufora_id = request.json.get("ufora_id")
+            if not isinstance(ufora_id, str):
+                return json_message("ufora_id field does not have the correct type"), 400
+
         req = request.json
         req["teacher"] = teacher_id
         return insert_into_model(

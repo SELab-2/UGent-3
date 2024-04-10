@@ -87,4 +87,5 @@ class TestEndpoint:
         endpoint, method, token, data = test
 
         response = method(endpoint, headers = {"Authorization": token}, json = data)
+        print("TESTING", response.status_code)
         assert response.status_code == 400

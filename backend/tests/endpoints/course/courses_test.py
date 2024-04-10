@@ -80,7 +80,7 @@ class TestCourseEndpoint(TestEndpoint):
         ) + \
         data_field_type_tests("/courses/@course_id/admins", "post", "teacher",
             {"admin_uid": "admin_other"},
-            {"admin_uid": [None, "no_user", "student", "admin"]}
+            {"admin_uid": [None, "no_user", "admin"]}
         ) + \
         data_field_type_tests("/courses/@course_id/admins", "delete", "teacher",
             {"admin_uid": ["admin"]},

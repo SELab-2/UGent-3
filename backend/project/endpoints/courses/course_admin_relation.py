@@ -57,16 +57,24 @@ class CourseForAdmins(Resource):
         """
         abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
         data = request.get_json()
+        if len([key for key in data.keys() if key != "admin_uid"]) != 0:
+            return json_message("Incorrect data"), 400
         assistant = data.get("admin_uid")
         abort_if_not_teacher_or_none_assistant(course_id, assistant)
 
         query = User.query.filter_by(uid=assistant)
         new_admin = execute_query_abort_if_db_error(query, abort_url)
+
         if not new_admin:
             message = (
                 "User to make admin was not found, please request with a valid uid"
             )
-            return json_message(message), 404
+            return json_message(message), 400
+
+        query = CourseAdmin.query.filter_by(uid=assistant)
+        new_admin = execute_query_abort_if_db_error(query, abort_url)
+        if new_admin:
+            return json_message("Admin already added to the course"), 400
 
         return insert_into_model(
             CourseAdmin,
@@ -82,6 +90,8 @@ class CourseForAdmins(Resource):
         """
         abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
         data = request.get_json()
+        if len([key for key in data.keys() if key != "admin_uid"]) != 0:
+            return json_message("Incorrect data"), 400
         assistant = data.get("admin_uid")
         abort_if_not_teacher_or_none_assistant(course_id, assistant)
 
@@ -89,7 +99,7 @@ class CourseForAdmins(Resource):
         admin_relation = execute_query_abort_if_db_error(query, abort_url)
         if not admin_relation:
             message = "Course with given admin not found"
-            return json_message(message), 404
+            return json_message(message), 400
 
         delete_abort_if_error(admin_relation, abort_url)
         commit_abort_if_error(abort_url)
