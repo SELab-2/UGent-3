@@ -17,6 +17,8 @@
     "@mui/icons-material": "^5.15.10",
     "@mui/material": "^5.15.10",
     "@mui/styled-engine-sc": "^6.0.0-alpha.16",
+    "@mui/x-data-grid": "^7.1.1",
+    "axios": "^1.6.8",
     "@mui/x-date-pickers": "^7.1.1",
     "dayjs": "^1.11.10",
     "i18next-browser-languagedetector": "^7.2.0",
@@ -25,6 +27,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^14.1.0",
+    "react-markdown": "^9.0.1",
     "react-router-dom": "^6.22.1",
     "stream": "^0.0.2",
     "styled-components": "^6.1.8"

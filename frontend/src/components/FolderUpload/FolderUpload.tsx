@@ -99,7 +99,7 @@ const FolderDragDrop: React.FC<FolderDragDropProps> = ({
   }
 
   return (
-    <Grid container direction="column" style={{ margin: "1rem" }} spacing={2}>
+    <Grid container direction="column" spacing={2}>
       <Grid item>
         <Paper
           onDragOver={handleDragOver}
