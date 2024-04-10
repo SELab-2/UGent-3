@@ -114,20 +114,22 @@ class CourseByCourseId(Resource):
         if "name" in request.json.keys():
             name = request.json.get("name")
             if name is None or not isinstance(name, str):
-                return json_message("Name field does not have the correct type"), 400
+                return json_message("The name field does not have the correct type"), 400
 
         if "ufora_id" in request.json.keys():
             ufora_id = request.json.get("ufora_id")
             if not isinstance(ufora_id, str):
-                return json_message("ufora_id field does not have the correct type"), 400
+                return json_message("The ufora_id field does not have the correct type"), 400
 
         if "teacher" in request.json.keys():
             teacher = request.json.get("teacher")
             if teacher is None or not isinstance(teacher, str):
-                return json_message("teacher does not have the correct type"), 400
+                return json_message("The teacher field does not have the correct type"), 400
             user = execute_query_abort_if_db_error(User.query.filter_by(uid=teacher), RESPONSE_URL)
             if user.role != Role.TEACHER:
-                return json_message("teacher does not have the correct role"), 400
+                return json_message(
+                    "The user given in the teacher field does not have the correct role"
+                ), 400
 
         return patch_by_id_from_model(
             Course,

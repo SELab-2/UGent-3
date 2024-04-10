@@ -66,8 +66,8 @@ class CourseToAddStudents(Resource):
         """
         abort_url = f"{API_URL}/courses/{course_id}/students"
         data = request.get_json()
-        if len([key for key in data.keys() if key != "students"]) != 0:
-            return json_message("Incorrect data"), 400
+        if any(key != "students" for key in data.keys()):
+            return json_message("Incorrect data field given"), 400
         student_uids = data.get("students")
         abort_if_none_uid_student_uids_or_non_existant_course_id(
             course_id, student_uids
@@ -104,7 +104,7 @@ class CourseToAddStudents(Resource):
         abort_url = f"{API_URL}/courses/{str(course_id)}/students"
         data = request.get_json()
         if len([key for key in data.keys() if key != "students"]) != 0:
-            return json_message("Incorrect data"), 400
+            return json_message("Incorrect data field given"), 400
         student_uids = data.get("students")
         abort_if_none_uid_student_uids_or_non_existant_course_id(
             course_id, student_uids
@@ -116,7 +116,7 @@ class CourseToAddStudents(Resource):
             if student_relation:
                 delete_abort_if_error(student_relation, abort_url)
             else:
-                return json_message("Not a student of the course"), 400
+                return json_message(f"'{uid}' is not a student of the course"), 400
         commit_abort_if_error(abort_url)
 
         response = json_message("Users were succesfully removed from the course")

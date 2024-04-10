@@ -12,7 +12,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm.query import Query
 from sqlalchemy.exc import SQLAlchemyError
 from project.db_in import db
-from project.utils.misc import map_all_keys_to_url, models_to_dict, filter_model_fields, check_model_fields
+from project.utils.misc import map_all_keys_to_url, models_to_dict, filter_model_fields
 
 def delete_by_id_from_model(
         model: DeclarativeMeta,
@@ -141,7 +141,7 @@ def query_selected_from_model(model: DeclarativeMeta,
     try:
         query: Query = model.query
         if filters:
-            if not check_model_fields(model, filters):
+            if not all(hasattr(model, key) for key in filters.keys()):
                 return {"message": "Unknown parameter", "url": response_url}, 400
             conditions: List[bool] = []
             for key, value in filters.items():

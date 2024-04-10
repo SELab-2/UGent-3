@@ -52,12 +52,12 @@ class CourseForUser(Resource):
         if "name" in request.json.keys():
             name = request.json.get("name")
             if name is None or not isinstance(name, str):
-                return json_message("Name field does not have the correct type"), 400
+                return json_message("The name field does not have the correct type"), 400
 
         if "ufora_id" in request.json.keys():
             ufora_id = request.json.get("ufora_id")
             if not isinstance(ufora_id, str):
-                return json_message("ufora_id field does not have the correct type"), 400
+                return json_message("The ufora_id field does not have the correct type"), 400
 
         req = request.json
         req["teacher"] = teacher_id

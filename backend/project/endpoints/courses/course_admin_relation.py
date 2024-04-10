@@ -57,14 +57,13 @@ class CourseForAdmins(Resource):
         """
         abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
         data = request.get_json()
-        if len([key for key in data.keys() if key != "admin_uid"]) != 0:
-            return json_message("Incorrect data"), 400
+        if any(key != "admin_uid" for key in data.keys()):
+            return json_message("Incorrect data field given"), 400
         assistant = data.get("admin_uid")
         abort_if_not_teacher_or_none_assistant(course_id, assistant)
 
         query = User.query.filter_by(uid=assistant)
         new_admin = execute_query_abort_if_db_error(query, abort_url)
-
         if not new_admin:
             message = (
                 "User to make admin was not found, please request with a valid uid"
@@ -90,8 +89,8 @@ class CourseForAdmins(Resource):
         """
         abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
         data = request.get_json()
-        if len([key for key in data.keys() if key != "admin_uid"]) != 0:
-            return json_message("Incorrect data"), 400
+        if any(key != "admin_uid" for key in data.keys()):
+            return json_message("Incorrect data field given"), 400
         assistant = data.get("admin_uid")
         abort_if_not_teacher_or_none_assistant(course_id, assistant)
 
