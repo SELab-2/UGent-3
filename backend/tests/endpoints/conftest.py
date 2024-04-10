@@ -3,7 +3,7 @@
 import tempfile
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from typing import Tuple, List
+from typing import Any
 
 import pytest
 from pytest import fixture, FixtureRequest
@@ -19,25 +19,62 @@ from project.models.project import Project
 
 
 
-### AUTHENTICATION & AUTHORIZATION ###
+### DATA ###
 @fixture
-def auth_test(request: FixtureRequest, client: FlaskClient,
-        course: Course,
-        submission: Submission
-    ) -> Tuple:
-    """Add concrete test data"""
-    # endpoint, parameters, method, token, status
-    endpoint, parameters, method, *other = request.param
-
-    d = {
-        "course_id": course.course_id,
-        "submission_id": submission.submission_id
+def data_map(course: Course, submission: Submission) -> dict[str, Any]:
+    """Map an id to data"""
+    return {
+        "@course_id": course.course_id,
+        "@submission_id": submission.submission_id
     }
 
-    for index, parameter in enumerate(parameters):
-        endpoint = endpoint.replace(f"@{index}", str(d[parameter]))
+
+
+### AUTHENTICATION & AUTHORIZATION ###
+@fixture
+def auth_test(request: FixtureRequest, client: FlaskClient, data_map: dict[str, Any]) -> tuple:
+    """Add concrete test data to auth"""
+    # endpoint, method, token, allowed
+    endpoint, method, *other = request.param
+
+    for k, v in data_map.items():
+        endpoint = endpoint.replace(k, str(v))
 
     return endpoint, getattr(client, method), *other
+
+
+
+### DATA FIELD TYPE ###
+@fixture
+def data_field_type_test(
+        request: FixtureRequest, client: FlaskClient, data_map: dict[str, Any]
+    ) -> tuple[str, Any, str, dict[str, Any]]:
+    """Add concrete test data to the data_field tests"""
+    endpoint, method, token, data = request.param
+
+    for key, value in data_map.items():
+        endpoint = endpoint.replace(key, str(value))
+
+    for key, value in data.items():
+        if isinstance(value, list):
+            data[key] = [data_map.get(v,v) for v in value]
+        elif value in data_map.keys():
+            data[key] = data_map[value]
+
+    return endpoint, getattr(client, method), token, data
+
+
+
+### QUERY PARAMETER ###
+@fixture
+def query_parameter_test(request: FixtureRequest, client: FlaskClient, data_map: dict[str, Any]):
+    """Add concrete test data to the query_parameter tests"""
+    endpoint, method, token, wrong_parameter = request.param
+
+    for key, value in data_map.items():
+        endpoint = endpoint.replace(key, str(value))
+
+    return endpoint, getattr(client, method), token, wrong_parameter
 
 
 
@@ -62,11 +99,16 @@ def admin(session: Session) -> User:
     """Return an admin entry"""
     return session.get(User, "admin")
 
+@fixture
+def admin_other(session: Session) -> User:
+    """Return an admin entry"""
+    return session.get(User, "admin_other")
+
 
 
 ### COURSES ###
 @fixture
-def courses(session: Session, teacher: User) -> List[Course]:
+def courses(session: Session, teacher: User) -> list[Course]:
     """Return course entries"""
     courses = [Course(name=f"SEL{i}", teacher=teacher.uid) for i in range(1, 3)]
     session.add_all(courses)
@@ -93,14 +135,14 @@ def project(session: Session, course: Course) -> Project:
     project = Project(
         title="Test project",
         description="Used as a test project instance",
-        assignment_file="assignment.md",
-        deadline=datetime(2025, 1, 1, 0, 0, 0, tzinfo=ZoneInfo("GMT")),
+        deadlines=[{
+            "deadline": datetime(2025, 1, 1, 0, 0, 0, tzinfo=ZoneInfo("GMT")),
+            "description": "Final deadline"
+        }],
         course_id=course.course_id,
         visible_for_students=True,
         archived=False,
-        test_path="/tests",
-        script_name="project.sh",
-        regex_expressions=r".*"
+        regex_expressions=[r".*"]
     )
     session.add(project)
     session.commit()
@@ -215,13 +257,10 @@ def valid_project(course):
     data = {
         "title": "Project",
         "description": "Test project",
-        "assignment_file": "testfile",
-        "deadline": "2024-02-25T12:00:00",
+        "deadlines": [{"deadline": "2024-02-25T12:00:00", "description": "Deadline 1"}],
         "course_id": course.course_id,
         "visible_for_students": True,
         "archived": False,
-        "test_path": "tests",
-        "script_name": "script.sh",
         "regex_expressions": ["*.pdf", "*.txt"]
     }
     return data

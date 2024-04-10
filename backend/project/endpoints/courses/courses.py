@@ -15,6 +15,7 @@ from flask_restful import Resource
 from project.models.course import Course
 from project.utils.query_agent import query_selected_from_model, insert_into_model
 from project.utils.authentication import login_required, authorize_teacher
+from project.endpoints.courses.courses_utils import check_data
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -44,6 +45,11 @@ class CourseForUser(Resource):
         This function will create a new course
         if the body of the post contains a name and uid is an admin or teacher
         """
+
+        message, status = check_data(request.json, False)
+        if status != 200:
+            return message, status
+
         req = request.json
         req["teacher"] = teacher_id
         return insert_into_model(

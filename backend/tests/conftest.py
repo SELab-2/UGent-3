@@ -152,25 +152,19 @@ def projects(session):
         Project(
             title="B+ Trees",
             description="Implement B+ trees",
-            assignment_file="assignement.pdf",
-            deadline=datetime(2024,3,15,13,0,0),
+            deadlines=[("Deadline 1",datetime(2024,3,15,13,0,0))],
             course_id=course_id_ad3,
             visible_for_students=True,
             archived=False,
-            test_path="/tests",
-            script_name="script.sh",
             regex_expressions=["solution"]
         ),
         Project(
             title="Predicaten",
             description="Predicaten project",
-            assignment_file="assignment.pdf",
-            deadline=datetime(2023,3,15,13,0,0),
+            deadlines=[("Deadline 1", datetime(2023,3,15,13,0,0))],
             course_id=course_id_raf,
             visible_for_students=False,
             archived=True,
-            test_path="/tests",
-            script_name="script.sh",
             regex_expressions=[".*"]
         )
     ]

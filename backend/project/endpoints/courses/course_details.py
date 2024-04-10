@@ -18,6 +18,7 @@ from project.models.course import Course
 from project.models.course_relation import CourseAdmin, CourseStudent
 
 from project.db_in import db
+from project.endpoints.courses.courses_utils import check_data
 from project.utils.query_agent import delete_by_id_from_model, patch_by_id_from_model
 from project.utils.authentication import login_required, authorize_teacher_of_course
 
@@ -105,6 +106,10 @@ class CourseByCourseId(Resource):
         """
         This function will update the course with course_id
         """
+
+        message, status = check_data(request.json, True)
+        if status != 200:
+            return message, status
 
         return patch_by_id_from_model(
             Course,

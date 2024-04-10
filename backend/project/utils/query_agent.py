@@ -141,9 +141,10 @@ def query_selected_from_model(model: DeclarativeMeta,
     try:
         query: Query = model.query
         if filters:
-            filtered_filters = filter_model_fields(model, filters)
+            if not all(hasattr(model, key) for key in filters.keys()):
+                return {"message": "Unknown parameter", "url": response_url}, 400
             conditions: List[bool] = []
-            for key, value in filtered_filters.items():
+            for key, value in filters.items():
                 conditions.append(getattr(model, key) == value)
             query = query.filter(and_(*conditions))
 

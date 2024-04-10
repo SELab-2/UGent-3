@@ -6,7 +6,11 @@ from pytest import mark
 from flask.testing import FlaskClient
 from sqlalchemy.orm import Session
 
-from tests.endpoints.endpoint import TestEndpoint, authentication_tests, authorization_tests
+from tests.endpoints.endpoint import (
+    TestEndpoint,
+    authentication_tests,
+    authorization_tests,
+)
 from project.models.user import User
 from project.models.project import Project
 from project.models.submission import Submission
@@ -14,34 +18,32 @@ from project.models.submission import Submission
 class TestSubmissionsEndpoint(TestEndpoint):
     """Class to test the submissions API endpoint"""
 
-    ### AUTHENTICATION & AUTHORIZATION ###
+    ### AUTHENTICATION ###
     # Where is login required
-    # (endpoint, parameters, methods)
-    authentication = authentication_tests([
-        ("/submissions", [], ["get", "post"]),
-        ("/submissions/@0", ["submission_id"], ["get", "patch", "delete"])
-    ])
+    authentication_tests = \
+        authentication_tests("/submissions", ["get", "post"]) + \
+        authentication_tests("/submissions/@submission_id", ["get", "patch", "delete"])
 
-    # Who can access what
-    # (endpoint, parameters, method, allowed, disallowed)
-    authorization = authorization_tests([
-        ("/submissions", [], "get",
-            ["student", "teacher", "admin"], []),
-        ("/submissions", [], "post",
-            ["student"], ["student_other", "teacher", "admin"]),
-
-        ("/submissions/@0", ["submission_id"], "get",
-            ["student", "teacher", "admin"], ["student_other", "teacher_other", "admin_other"]),
-        ("/submissions/@0", ["submission_id"], "patch",
-            ["teacher", "admin"], ["student", "teacher_other", "admin_other"]),
-    ])
-
-    @mark.parametrize("auth_test", authentication, indirect=True)
+    @mark.parametrize("auth_test", authentication_tests, indirect=True)
     def test_authentication(self, auth_test: Tuple[str, any]):
         """Test the authentication"""
         super().authentication(auth_test)
 
-    @mark.parametrize("auth_test", authorization, indirect=True)
+
+
+    ### Authorization ###
+    # Who can access what
+    authorization_tests = \
+        authorization_tests("/submissions", "get",
+            ["student", "teacher", "admin"], []) + \
+        authorization_tests("/submissions", "post",
+            ["student"], ["student_other", "teacher", "admin"]) + \
+        authorization_tests("/submissions/@submission_id", "get",
+            ["student", "teacher", "admin"], ["student_other", "teacher_other", "admin_other"]) + \
+        authorization_tests("/submissions/@submission_id", "patch",
+            ["teacher", "admin"], ["student", "teacher_other", "admin_other"])
+
+    @mark.parametrize("auth_test", authorization_tests, indirect=True)
     def test_authorization(self, auth_test: Tuple[str, any, str, bool]):
         """Test the authorization"""
         super().authorization(auth_test)
@@ -117,12 +119,12 @@ class TestSubmissionsEndpoint(TestEndpoint):
         assert response.status_code == 200
         assert data["message"] == "Successfully fetched the submission"
         assert data["data"] == {
-            "id": f"{api_host}/submissions/{submission.submission_id}",
-            "user": f"{api_host}/users/student01",
-            "project": f"{api_host}/projects/{project.project_id}",
+            "submission_id": f"{api_host}/submissions/{submission.submission_id}",
+            "uid": f"{api_host}/users/student01",
+            "project_id": f"{api_host}/projects/{project.project_id}",
             "grading": 16,
-            "time": "Thu, 14 Mar 2024 12:00:00 GMT",
-            "status": 'SUCCESS'
+            "submission_time": "Thu, 14 Mar 2024 12:00:00 GMT",
+            "submission_status": 'SUCCESS'
         }
 
     ### PATCH SUBMISSION ###
