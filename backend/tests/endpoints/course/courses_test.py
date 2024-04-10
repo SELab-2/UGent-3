@@ -35,24 +35,36 @@ class TestCourseEndpoint(TestEndpoint):
     ### AUTHORIZATION ###
     # Who can access what
     authorization_tests = \
-        authorization_tests("/courses", "get", ["student", "teacher", "admin"], []) + \
-        authorization_tests("/courses", "post", ["teacher"], ["student", "admin"]) + \
+        authorization_tests("/courses", "get",
+            ["student", "student_other", "teacher", "teacher_other", "admin", "admin_other"],
+            []) + \
+        authorization_tests("/courses", "post",
+            ["teacher", "teacher_other"],
+            ["student", "student_other", "admin", "admin_other"]) + \
         authorization_tests("/courses/@course_id", "patch",
-            ["teacher"], ["student", "teacher_other", "admin"]) + \
+            ["teacher"],
+            ["student", "student_other", "teacher_other", "admin", "admin_other"]) + \
         authorization_tests("/courses/@course_id", "delete",
-            ["teacher"], ["student", "teacher_other", "admin"]) + \
+            ["teacher"],
+            ["student", "student_other", "teacher_other", "admin", "admin_other"]) + \
         authorization_tests("/courses/@course_id/students", "get",
-            ["student", "teacher", "admin"], []) + \
+            ["student", "student_other", "teacher", "teacher_other", "admin", "admin_other"],
+            []) + \
         authorization_tests("/courses/@course_id/students", "post",
-            ["teacher", "admin"], ["student", "teacher_other", "admin_other"]) + \
+            ["teacher", "admin"],
+            ["student", "student_other", "teacher_other", "admin_other"]) + \
         authorization_tests("/courses/@course_id/students", "delete",
-            ["teacher", "admin"], ["student", "teacher_other", "admin_other"]) + \
+            ["teacher", "admin"],
+            ["student", "student_other", "teacher_other", "admin_other"]) + \
         authorization_tests("/courses/@course_id/admins", "get",
-            ["teacher", "admin"], ["student", "teacher_other", "admin_other"]) + \
+            ["teacher", "admin"],
+            ["student", "student_other", "teacher_other", "admin_other"]) + \
         authorization_tests("/courses/@course_id/admins", "post",
-            ["teacher"], ["student", "admin"]) + \
+            ["teacher"],
+            ["student", "student_other", "teacher_other", "admin", "admin_other"]) + \
         authorization_tests("/courses/@course_id/admins", "delete",
-            ["teacher"], ["student", "teacher_other", "admin"])
+            ["teacher"],
+            ["student", "student_other", "teacher_other", "admin", "admin_other"])
 
     @mark.parametrize("auth_test", authorization_tests, indirect=True)
     def test_authorization(self, auth_test: tuple[str, Any, str, bool]):
