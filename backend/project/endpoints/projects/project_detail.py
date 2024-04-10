@@ -102,8 +102,8 @@ class ProjectDetail(Resource):
                 patch_values.append(update)
 
             sql_patch = f'''
-            UPDATE projects SET {', '.join(patch_values)} 
-            WHERE project_id = {project_id} 
+            UPDATE projects SET {', '.join(patch_values)}
+            WHERE project_id = {project_id}
             RETURNING ROW_TO_JSON(projects.*) AS updated_data;'''
             project = db.session.execute(text(sql_patch)).fetchone()
             if not project:
