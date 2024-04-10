@@ -18,10 +18,9 @@ from project.models.course import Course
 from project.models.course_relation import CourseAdmin, CourseStudent
 
 from project.db_in import db
-from project.endpoints.courses.courses_utils import execute_query_abort_if_db_error, json_message
+from project.endpoints.courses.courses_utils import check_data
 from project.utils.query_agent import delete_by_id_from_model, patch_by_id_from_model
 from project.utils.authentication import login_required, authorize_teacher_of_course
-from project.models.user import User, Role
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -108,28 +107,9 @@ class CourseByCourseId(Resource):
         This function will update the course with course_id
         """
 
-        if not all(hasattr(Course, key) for key in request.json.keys()):
-            return json_message("Incorrect data"), 400
-
-        if "name" in request.json.keys():
-            name = request.json.get("name")
-            if name is None or not isinstance(name, str):
-                return json_message("The name field does not have the correct type"), 400
-
-        if "ufora_id" in request.json.keys():
-            ufora_id = request.json.get("ufora_id")
-            if not isinstance(ufora_id, str):
-                return json_message("The ufora_id field does not have the correct type"), 400
-
-        if "teacher" in request.json.keys():
-            teacher = request.json.get("teacher")
-            if teacher is None or not isinstance(teacher, str):
-                return json_message("The teacher field does not have the correct type"), 400
-            user = execute_query_abort_if_db_error(User.query.filter_by(uid=teacher), RESPONSE_URL)
-            if user.role != Role.TEACHER:
-                return json_message(
-                    "The user given in the teacher field does not have the correct role"
-                ), 400
+        message, status = check_data(request.json, False)
+        if status != 200:
+            return message, status
 
         return patch_by_id_from_model(
             Course,
