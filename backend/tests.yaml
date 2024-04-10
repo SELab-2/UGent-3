@@ -35,6 +35,7 @@ services:
         condition: service_healthy
       auth-server:
         condition: service_started
+    privileged: true
     environment:
       POSTGRES_HOST: postgres  # Use the service name defined in Docker Compose
       POSTGRES_USER: test_user

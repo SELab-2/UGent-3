@@ -1,5 +1,6 @@
 [MASTER]
 init-hook='import sys; sys.path.append(".")'
+ignore-paths=tests/utils/submission_evaluators/resources/.*
 
 [MESSAGES CONTROL]
 disable=W0621, # Redefining name %r from outer scope (line %s)
