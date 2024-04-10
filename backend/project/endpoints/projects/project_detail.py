@@ -6,15 +6,13 @@ the corresponding project is 1
 import os
 import zipfile
 from urllib.parse import urljoin
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.sql import text
 
-from flask import request
+from flask import request, jsonify
 from flask_restful import Resource
 
 from project.db_in import db
-
-from project.models.project import Project
-from project.utils.query_agent import query_by_id_from_model, delete_by_id_from_model, \
-    patch_by_id_from_model
 from project.utils.authentication import authorize_teacher_or_project_admin, \
     authorize_teacher_of_project, authorize_project_visible
 
@@ -39,30 +37,87 @@ class ProjectDetail(Resource):
         filtered by id of that specific project
         the id fetched from the url with the reaparse
         """
+        try:
+            custom_sql_query = f'''
+                SELECT 
+                    ROW_TO_JSON(t) as json_data
+                FROM (
+                    SELECT
+                        project_id, 
+                        title, 
+                        description, 
+                        ARRAY_AGG(
+                            jsonb_build_object(
+                                'deadline_description', d.deadline_description, 
+                                'deadline', to_char(d.deadline, 'YYYY-MM-DD HH24:MI:SS TZ')
+                            ) 
+                        ) AS deadlines,
+                        p.course_id,
+                        p.visible_for_students,
+                        p.archived,
+                        p.regex_expressions
+                    FROM 
+                        projects p,
+                        unnest(p.deadlines) AS d(deadline_description, deadline)
+                    WHERE 
+                        p.project_id = {project_id}
+                    GROUP BY 
+                        project_id, 
+                        title, 
+                        description
+                ) t;
+            '''
 
-        return query_by_id_from_model(
-            Project,
-            "project_id",
-            project_id,
-            RESPONSE_URL)
+            project = db.session.execute(text(custom_sql_query)).fetchone()
+
+            if project:
+                return {
+                    "data": project[0],
+                    "message": "Project fetched succesfully",
+                    "url": f'{RESPONSE_URL}/{project_id}'
+                }, 200
+            return {
+                "message": f"Project with {project_id} not found",
+                "url": f'{RESPONSE_URL}'
+            }, 404
+        except SQLAlchemyError:
+            db.session.rollback()
+            return (jsonify({
+                "error": "Something went wrong while querying the database",
+                "url": f"{RESPONSE_URL}/{project_id}"
+            }), 500)
 
     @authorize_teacher_or_project_admin
-    def patch(self, project_id):
+    def patch(self, project_id): # pylint: disable=R0914
         """
         Update method for updating a specific project
         filtered by id of that specific project
         """
         project_json = parse_project_params()
 
-        output, status_code = patch_by_id_from_model(
-            Project,
-            "project_id",
-            project_id,
-            RESPONSE_URL,
-            project_json
-        )
-        if status_code != 200:
-            return output, status_code
+        try:
+            patch_values = []
+            for key, value in project_json.items():
+                update = f"{key} = '{value}'"
+                patch_values.append(update)
+
+            sql_patch = f'''
+            UPDATE projects SET {', '.join(patch_values)} 
+            WHERE project_id = {project_id} 
+            RETURNING ROW_TO_JSON(projects.*) AS updated_data;'''
+            project = db.session.execute(text(sql_patch)).fetchone()
+            if not project:
+                return (jsonify({
+                    "error": "Project was not found",
+                    "url": RESPONSE_URL
+                }), 404)
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            return (jsonify({
+                "error": "Something went wrong while updating the project",
+                "url": RESPONSE_URL
+            }, 500))
 
         if "assignment_file" in request.files:
             file = request.files["assignment_file"]
@@ -99,7 +154,10 @@ class ProjectDetail(Resource):
                         },
                         400)
 
-        return output, status_code
+        return (jsonify({
+            "message": "Project patched succesfully",
+            "data": project[0]
+        }), 200)
 
     @authorize_teacher_of_project
     def delete(self, project_id):
@@ -107,9 +165,20 @@ class ProjectDetail(Resource):
         Delete a project and all of its submissions in cascade
         done by project id
         """
-
-        return delete_by_id_from_model(
-            Project,
-            "project_id",
-            project_id,
-            RESPONSE_URL)
+        try:
+            delete_query = f'''
+                DELETE FROM projects WHERE project_id = {project_id} RETURNING project_id;
+            '''
+            deleted_project = db.session.execute(text(delete_query)).fetchone()
+            if deleted_project is None:
+                return (jsonify(
+                    {"message": f"Project with {project_id} doesn't exist",
+                     "url": RESPONSE_URL
+                     }, 404))
+            db.session.commit()
+            return (jsonify({"message": "Resource deleted successfully",
+                             "url": RESPONSE_URL}, 200))
+        except SQLAlchemyError:
+            db.session.rollback()
+            return {"error": "Something went wrong deleting",
+                    "url": RESPONSE_URL}, 500

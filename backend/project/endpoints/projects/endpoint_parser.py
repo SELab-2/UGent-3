@@ -15,7 +15,13 @@ parser.add_argument(
     help='Projects assignment file',
     location="form"
 )
-parser.add_argument('deadlines', type=str, help='Projects deadlines', location="form")
+parser.add_argument(
+    'deadlines',
+    type=str,
+    help='Projects deadlines',
+    location="form",
+    action='append'
+)
 parser.add_argument("course_id", type=str, help='Projects course_id', location="form")
 parser.add_argument(
     "visible_for_students",
@@ -28,7 +34,8 @@ parser.add_argument(
     "regex_expressions",
     type=str,
     help='Projects regex expressions',
-    location="form"
+    location="form",
+    action="append"
 )
 
 
@@ -37,25 +44,22 @@ def parse_project_params():
     Return a dict of every non None value in the param
     """
     args = parser.parse_args()
-    print("args")
-    print(args)
     result_dict = {}
     for key, value in args.items():
         if value is not None:
-            if "deadlines" == key:
-                deadlines_parsed = json.loads(value)
+            if key in ('deadlines', 'regex_expressions'):
                 new_deadlines = []
-                '''for deadline in deadlines_parsed:
-                    print(deadline)
-                    new_deadlines.append(
-                        (
-                            deadline["description"],
-                            deadline["deadline"]
-                        )
-                    )
-                result_dict[key] = new_deadlines'''
-                result_dict[key] = [{"deadline": "2024-02-25T12:00:00", "description": "D"}]
+                for entry in args[key]:
+                    if key == "deadlines":
+                        parsed_deadline = json.loads(entry)
+                        test = {
+                            "description": parsed_deadline["description"],
+                            "deadline": parsed_deadline["deadline"]
+                        }
+                        new_deadlines.append(test)
+                    else:
+                        new_deadlines.append(entry)
+                result_dict[key] = new_deadlines
             else:
                 result_dict[key] = value
-    print(result_dict)
     return result_dict

@@ -30,7 +30,7 @@ class Project(db.Model): # pylint: disable=too-many-instance-attributes
             CompositeType(
                 "deadline",
                 [
-                    Column("description", Text),
+                    Column("deadline_description", Text),
                     Column("deadline", DateTime(timezone=True))
                 ]
                 ),
