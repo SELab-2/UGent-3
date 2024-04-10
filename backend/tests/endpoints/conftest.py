@@ -3,7 +3,7 @@
 import tempfile
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from typing import Tuple, List, Dict
+from typing import Any
 
 import pytest
 from pytest import fixture, FixtureRequest
@@ -19,14 +19,14 @@ from project.models.project import Project
 
 ### AUTHENTICATION & AUTHORIZATION ###
 @fixture
-def data_map(course: Course) -> Dict[str, any]:
+def data_map(course: Course) -> dict[str, Any]:
     """Map an id to data"""
     return {
         "@course_id": course.course_id
     }
 
 @fixture
-def auth_test(request: FixtureRequest, client: FlaskClient, data_map: Dict[str, any]) -> Tuple:
+def auth_test(request: FixtureRequest, client: FlaskClient, data_map: dict[str, Any]) -> tuple:
     """Add concrete test data to auth"""
     # endpoint, method, token, allowed
     endpoint, method, *other = request.param
@@ -36,10 +36,13 @@ def auth_test(request: FixtureRequest, client: FlaskClient, data_map: Dict[str, 
 
     return endpoint, getattr(client, method), *other
 
+
+
+### DATA FIELD TYPE ###
 @fixture
 def data_field_type_test(
-        request: FixtureRequest, client: FlaskClient, data_map: Dict[str, any]
-    ) -> Tuple[str, any, str, Dict[str, any]]:
+        request: FixtureRequest, client: FlaskClient, data_map: dict[str, Any]
+    ) -> tuple[str, Any, str, dict[str, Any]]:
     """Add concrete test data to the data_field tests"""
     endpoint, method, token, data = request.param
 
@@ -53,6 +56,19 @@ def data_field_type_test(
             data[key] = data_map[value]
 
     return endpoint, getattr(client, method), token, data
+
+
+
+### QUERY PARAMETER ###
+@fixture
+def query_parameter_test(request: FixtureRequest, client: FlaskClient, data_map: dict[str, Any]):
+    """Add concrete test data to the query_parameter tests"""
+    endpoint, method, token, wrong_parameter = request.param
+
+    for key, value in data_map.items():
+        endpoint = endpoint.replace(key, str(value))
+
+    return endpoint, getattr(client, method), token, wrong_parameter
 
 
 
@@ -86,7 +102,7 @@ def admin_other(session: Session) -> User:
 
 ### COURSES ###
 @fixture
-def courses(session: Session, teacher: User) -> List[Course]:
+def courses(session: Session, teacher: User) -> list[Course]:
     """Return course entries"""
     courses = [Course(name=f"SEL{i}", teacher=teacher.uid) for i in range(1, 3)]
     session.add_all(courses)

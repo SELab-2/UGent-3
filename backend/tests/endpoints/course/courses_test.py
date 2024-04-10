@@ -1,13 +1,15 @@
 """Tests the courses API endpoint"""
 
 from typing import Any
+from dataclasses import fields
 from pytest import mark
 from flask.testing import FlaskClient
 from tests.endpoints.endpoint import (
     TestEndpoint,
     authentication_tests,
     authorization_tests,
-    data_field_type_tests
+    data_field_type_tests,
+    query_parameter_tests
 )
 from project.models.user import User
 from project.models.course import Course
@@ -59,9 +61,9 @@ class TestCourseEndpoint(TestEndpoint):
 
 
 
-    ### DATA ###
+    ### DATA FIELD TYPE ###
     # Test a data field by passing a list of values for which it should return bad request
-    data_fields = \
+    data_field_type_tests = \
         data_field_type_tests("/courses", "post", "teacher",
             {"name": "test", "ufora_id": "test"},
             {"name": [None, 0], "ufora_id": [0]}
@@ -87,10 +89,22 @@ class TestCourseEndpoint(TestEndpoint):
             {"admin_uid": [None, "no_user", "admin_other"]}
         )
 
-    @mark.parametrize("data_field_type_test", data_fields, indirect=True)
+    @mark.parametrize("data_field_type_test", data_field_type_tests, indirect=True)
     def test_data_fields(self, data_field_type_test: tuple[str, Any, str, dict[str, Any]]):
         """Test a data field typing"""
         super().data_field_type(data_field_type_test)
+
+
+
+    ### QUERY PARAMETER ###
+    # Test a query parameter, should return [] for wrong values
+    query_parameter_tests = \
+        query_parameter_tests("/courses", "get", "student", [f.name for f in fields(Course)])
+
+    @mark.parametrize("query_parameter_test", query_parameter_tests, indirect=True)
+    def test_query_parameters(self, query_parameter_test: tuple[str, Any, str, bool]):
+        """Test a query parameter"""
+        super().query_parameter(query_parameter_test)
 
 
 
@@ -102,17 +116,6 @@ class TestCourseEndpoint(TestEndpoint):
         data = [course["name"] for course in response.json["data"]]
         assert all(course.name in data for course in courses)
 
-    def test_get_courses_wrong_parameter(self, client: FlaskClient):
-        """Test getting courses for a wrong parameter"""
-        response = client.get("/courses?parameter=0", headers = {"Authorization": "student"})
-        assert response.status_code == 400
-
-    def test_get_courses_wrong_name(self, client: FlaskClient):
-        """Test getting courses for a wrong course name"""
-        response = client.get("/courses?name=no_name", headers = {"Authorization": "student"})
-        assert response.status_code == 200
-        assert response.json["data"] == []
-
     def test_get_courses_name(self, client: FlaskClient, course: Course):
         """Test getting courses for a given course name"""
         response = client.get(
@@ -122,15 +125,6 @@ class TestCourseEndpoint(TestEndpoint):
         assert response.status_code == 200
         assert response.json["data"][0]["name"] == course.name
 
-    def test_get_courses_wrong_ufora_id(self, client: FlaskClient):
-        """Test getting courses for a wrong ufora_id"""
-        response = client.get(
-            "/courses?ufora_id=no_ufora_id",
-            headers = {"Authorization": "student"}
-        )
-        assert response.status_code == 200
-        assert response.json["data"] == []
-
     def test_get_courses_ufora_id(self, client: FlaskClient, course: Course):
         """Test getting courses for a given ufora_id"""
         response = client.get(
@@ -139,15 +133,6 @@ class TestCourseEndpoint(TestEndpoint):
         )
         assert response.status_code == 200
         assert response.json["data"][0]["ufora_id"] == course.ufora_id
-
-    def test_get_courses_wrong_teacher(self, client: FlaskClient):
-        """Test getting courses for a wrong teacher"""
-        response = client.get(
-            "/courses?teacher=no_teacher",
-            headers = {"Authorization": "student"}
-        )
-        assert response.status_code == 200
-        assert response.json["data"] == []
 
     def test_get_courses_teacher(self, client: FlaskClient, course: Course):
         """Test getting courses for a given teacher"""

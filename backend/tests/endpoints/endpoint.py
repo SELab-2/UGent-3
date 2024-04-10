@@ -56,6 +56,28 @@ def data_field_type_tests(
 
     return tests
 
+def query_parameter_tests(
+        endpoint: str, method: str, token: str, parameters: list[str]
+    ) -> list[Any]:
+    """Transform the format to single query_parameter tests"""
+    tests = []
+
+    # Test with an incorrect parameter
+    new_endpoint = endpoint + "?parameter=0"
+    tests.append(param(
+        (new_endpoint, method, token, True),
+        id = f"{new_endpoint} {method.upper()} {token} (parameter 0 400)"
+    ))
+
+    for parameter in parameters:
+        new_endpoint = endpoint + f"?{parameter}=0"
+        tests.append(param(
+            (new_endpoint, method, token, False),
+            id = f"{new_endpoint} {method.upper()} {token} ({parameter} 0 200&[])"
+        ))
+
+    return tests
+
 class TestEndpoint:
     """Base class for endpoint tests"""
 
@@ -87,5 +109,15 @@ class TestEndpoint:
         endpoint, method, token, data = test
 
         response = method(endpoint, headers = {"Authorization": token}, json = data)
-        print("TESTING", response.status_code)
         assert response.status_code == 400
+
+    def query_parameter(self, test: tuple[str, Any, str, bool]):
+        """Test the query parameter"""
+
+        endpoint, method, token, wrong_parameter = test
+
+        response = method(endpoint, headers = {"Authorization": token})
+        assert wrong_parameter == (response.status_code == 400)
+
+        if not wrong_parameter:
+            assert response.json["data"] == []
