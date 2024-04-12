@@ -15,12 +15,16 @@ interface ShortSubmission {
   submission_time:Date,
   submission_status:string
 }
+interface Deadline {
+  description: string;
+  deadline: Date;
+}
 interface Project {
   project_id:string ,
   title :string,
   description:string,
   assignment_file:string,
-  deadline:Date,
+  deadlines:Deadline[],
   course_id:number,
   visible_for_students:boolean,
   archived:boolean,
@@ -45,14 +49,21 @@ interface DeadlineInfoProps {
   deadlines: Project[];
 }
 interface ProjectCardProps{
-  deadlines:Project[]
+  deadlines:Project[],
+  pred?: (deadline:Deadline) => boolean
 }
 type ExtendedPickersDayProps = PickersDayProps<Dayjs> & { highlightedDays?: number[] };
 
+/**
+ * Displays the deadlines on a given day
+ * @param selectedDay - The day of interest
+ * @param deadlines - All the deadlines to consider
+ * @returns Element
+ */
 const DeadlineInfo: React.FC<DeadlineInfoProps> = ({ selectedDay, deadlines }) => {
   const { t } = useTranslation('translation', { keyPrefix: 'student' });
   const deadlinesOnSelectedDay = deadlines.filter(
-    deadline => dayjs(deadline.deadline).isSame(selectedDay, 'day')
+    deadline => ( deadline.deadlines.map(d => dayjs(d.deadline).isSame(selectedDay, 'day')))
   );
   //list of the corresponding assignment
   return (
@@ -69,32 +80,41 @@ const DeadlineInfo: React.FC<DeadlineInfoProps> = ({ selectedDay, deadlines }) =
     </div>
   );
 };
-const ProjectCard: React.FC<ProjectCardProps> = ({  deadlines }) => {
+/**
+ * A clickable display of a project deadline
+ * @param deadlines - A list of all the deadlines
+ * @param pred - A predicate to filter the deadlines
+ * @returns Element
+ */
+const ProjectCard: React.FC<ProjectCardProps> = ({  deadlines, pred = () => true }) => {
   const { t } = useTranslation('translation', { keyPrefix: 'student' });
   //list of the corresponding assignment
   return (
     <Box>
       {deadlines.map((project, index) => (
-        <Card key={index} style={{margin: '10px 0'}}>
-          <CardActionArea component={Link} to={`/${project.project_id}`}>
-            <CardContent>
-              <Typography variant="h6" style={{color: project.short_submission ?
-                (project.short_submission.submission_status === 'SUCCESS' ? 'green' : 'red') : '#686868'}}>
-                {project.title}
-              </Typography>
-              <Typography variant="subtitle1">
-                {t('course')}: <Link to={`/courses/${project.course.course_id}`} style={{ color: 'inherit' }}>{project.course.name}</Link>
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                {t('last_submission')}: {project.short_submission ?
-                  t(project.short_submission.submission_status.toString()) : t('no_submission_yet')}
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                Deadline: {dayjs(project.deadline).format('MMMM D, YYYY')}
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
+        project.deadlines.filter(pred).map((deadline, ) => (
+          <Card key={index} style={{margin: '10px 0'}}>
+            <CardActionArea component={Link} to={`/${project.project_id}`}>
+              <CardContent>
+                <Typography variant="h6" style={{color: project.short_submission ?
+                  (project.short_submission.submission_status === 'SUCCESS' ? 'green' : 'red') : '#686868'}}>
+                  {project.title}
+                </Typography>
+                <Typography variant="subtitle1">
+                  {t('course')}: <Link to={`/courses/${project.course.course_id}`} style={{ color: 'inherit' }}>{project.course.name}</Link>
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {t('last_submission')}: {project.short_submission ?
+                    t(project.short_submission.submission_status.toString()) : t('no_submission_yet')}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Deadline: {dayjs(deadline.deadline).format('MMMM D, YYYY')}
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
+        ))
+
       ))}
     </Box>
   );
@@ -138,9 +158,12 @@ const handleMonthChange =(
   // projects are now only fetched on page load
   const hDays:number[] = []
   projects.map((project, ) => {
-    if(project.deadline.getMonth() == date.month() && project.deadline.getFullYear() == date.year()){
-      hDays.push(project.deadline.getDate())
-    }
+    project.deadlines.map((deadline,) => {
+      if(deadline.deadline.getMonth() == date.month() && deadline.deadline.getFullYear() == date.year()){
+        hDays.push(deadline.deadline.getDate())
+      }
+    })
+
   }
   );
   setHighlightedDays(hDays)
@@ -155,6 +178,7 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
   })
   const jsonData = await response.json();
   const formattedData: Project[] = await Promise.all( jsonData.data.map(async (item:Project) => {
+    console.log("project", item)
     const project_id:string = item.project_id.split("/")[1]// todo check if this does not change later
 
     const response_submissions = await (await fetch(encodeURI(`${apiUrl}/submissions?&project_id=${project_id}`), {
@@ -169,7 +193,7 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
     }
     )).sort((a:ShortSubmission, b:ShortSubmission) => b.submission_time.getTime() - a.submission_time.getTime())[0];
     // fetch the course id of the project
-    const project_item = await (await fetch(encodeURI(`${apiUrl}/${item.project_id}`), {
+    const project_item = await (await fetch(encodeURI(`${apiUrl}/${item.project_id}`), { //todo !
       headers:header
     })).json()
 
@@ -184,11 +208,11 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
       ufora_id: response_courses.data.ufora_id
     }
     return  {
-      project_id: item.project_id, // is not a number but a path
+      project_id: item.project_id, //todo is not a number but a path
       title: item.title,
       description: item.description,
       assignment_file: item.assignment_file,
-      deadline: new Date(item.deadline),
+      deadlines: [{description: "", deadline: new Date()}],
       course_id: Number(item.course_id),
       visible_for_students: Boolean(item.visible_for_students),
       archived: Boolean(item.archived),
@@ -234,22 +258,14 @@ export default function HomeStudent() {
             {t('myProjects')}
           </Typography>
 
-          <ProjectCard deadlines={projects
-            .filter((project) => dayjs(dayjs()).isBefore(project.deadline))
-            .sort((a, b) => dayjs(a.deadline).isBefore(dayjs(b.deadline)) ? -1 : 1)
-            .slice(0, 3)
-          } />
+          <ProjectCard pred = {(d) => (dayjs(dayjs()).isBefore(d.deadline))} deadlines={projects} />
 
         </Grid>
         <Grid item xs={6}>
           <Typography variant="body2">
             {t('deadlines')}
           </Typography>
-          <ProjectCard deadlines={projects
-            .filter((project) => dayjs(dayjs()).isAfter(project.deadline))
-            .sort((a, b) => dayjs(a.deadline).isAfter(dayjs(b.deadline)) ? -1 : 1)
-            .slice(-2)
-          } />
+          <ProjectCard pred={(d) => dayjs(dayjs()).isAfter(d.deadline)} deadlines={projects} />
         </Grid>
         <Grid item xs={6}>
           <Card>
