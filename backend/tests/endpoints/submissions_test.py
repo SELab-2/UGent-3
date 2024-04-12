@@ -33,7 +33,7 @@ class TestSubmissionsEndpoint:
     def test_get_submissions_project(self, client: FlaskClient, valid_submission_entry):
         """Test getting the submissions given a specific project"""
         response = client.get(f"/submissions?project_id={valid_submission_entry.project_id}",
-                              headers={"Authorization":"teacher2"})
+                              headers={"Authorization":"teacher"})
         data = response.json
         assert response.status_code == 200
         assert "message" in data

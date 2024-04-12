@@ -9,24 +9,24 @@ class TestCourseShareLinks:
     and everyone should be able to list all students assigned to a course
     """
 
-    def test_get_share_links(self, client, valid_course_entry):
+    def test_get_share_links(self, client, course):
         """Test whether the share links are accessible"""
-        response = client.get(f"courses/{valid_course_entry.course_id}/join_codes",
-                              headers={"Authorization":"teacher2"})
+        response = client.get(f"courses/{course.course_id}/join_codes",
+                              headers={"Authorization":"teacher"})
         assert response.status_code == 200
 
-    def test_post_share_links(self, client, valid_course_entry):
+    def test_post_share_links(self, client, course):
         """Test whether the share links are accessible to post to"""
         response = client.post(
-            f"courses/{valid_course_entry.course_id}/join_codes",
-            json={"for_admins": True}, headers={"Authorization":"teacher2"})
+            f"courses/{course.course_id}/join_codes",
+            json={"for_admins": True}, headers={"Authorization":"teacher"})
         assert response.status_code == 201
 
     def test_delete_share_links(self, client, share_code_admin):
         """Test whether the share links are accessible to delete"""
         response = client.delete(
             f"courses/{share_code_admin.course_id}/join_codes/{share_code_admin.join_code}",
-            headers={"Authorization":"teacher2"})
+            headers={"Authorization":"teacher"})
         assert response.status_code == 200
 
     def test_get_share_links_404(self, client):
@@ -41,9 +41,9 @@ class TestCourseShareLinks:
                                headers={"Authorization":"teacher2"})
         assert response.status_code == 404
 
-    def test_for_admins_required(self, client, valid_course_entry):
+    def test_for_admins_required(self, client, course):
         """Test whether the for_admins field is required"""
-        response = client.post(f"courses/{valid_course_entry.course_id}/join_codes",
+        response = client.post(f"courses/{course.course_id}/join_codes",
                                json={},
-                               headers={"Authorization":"teacher2"})
+                               headers={"Authorization":"teacher"})
         assert response.status_code == 400
