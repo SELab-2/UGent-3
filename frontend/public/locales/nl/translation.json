@@ -32,5 +32,28 @@
     "noDeadline": "Geen deadlines",
     "no_submission_yet" : "Nog geen indiening"
 
+  },
+  "projectView": {
+    "submitNetworkError": "Er is iets mislopen bij het opslaan van uw indiening. Probeer het later opnieuw.",
+    "selected": "Geselecteerd",
+    "submit": "Indienen",
+    "previousSubmissions": "Vorige indieningen",
+    "noFileSelected": "Er is geen bestand geselecteerd",
+    "submissionGrid": {
+      "late": "Te laat",
+      "fail": "Gefaald",
+      "success": "Succesvol",
+      "running": "Aan het uitvoeren",
+      "submitTime": "Indientijd",
+      "status": "Status"
+    }
+  },
+  "time": {
+    "yearsAgo": "jaren geleden",
+    "monthsAgo": "maanden geleden",
+    "daysAgo": "dagen geleden",
+    "hoursAgo": "uur geleden",
+    "minutesAgo": "minuten geleden",
+    "justNow": "Zonet"
   }
 }
