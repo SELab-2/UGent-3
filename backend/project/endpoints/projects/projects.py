@@ -57,12 +57,13 @@ class ProjectsEndpoint(Resource):
             '''
             projects = db.session.execute(text(custom_sql_query))
             projects_array = []
+            # disables because pylinter says it's not iterable while the alchemySQL type is iterable
             for project in projects: # pylint: disable=E1133
                 projects_array.append(project[0])
 
             respone = {
                 "data": projects_array,
-                "messsage": "Recourses fetched succesfully",
+                "messsage": "Recources fetched succesfully",
                 "url": response_url
             }
             return jsonify(respone), 200
@@ -81,7 +82,7 @@ class ProjectsEndpoint(Resource):
 
         project_json = parse_project_params()
         filename = None
-        # project_json["deadlines"] = json.dumps(project_json["deadlines"])
+
         if "assignment_file" in request.files:
             file = request.files["assignment_file"]
             filename = os.path.basename(file.filename)
