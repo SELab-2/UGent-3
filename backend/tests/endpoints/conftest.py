@@ -2,6 +2,7 @@
 
 import tempfile
 import os
+import json
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import pytest
@@ -15,7 +16,6 @@ from project.models.course_share_code import CourseShareCode
 from project import create_app_with_db
 from project.db_in import url, db
 from project.models.submission import Submission, SubmissionStatus
-from project.models.project import Project
 
 ### AUTHENTICATION & AUTHORIZATION ###
 @fixture
@@ -39,9 +39,11 @@ def valid_submission(valid_user_entry, valid_project_entry):
     """
     Returns a valid submission form
     """
+    data, _ = valid_project_entry
+
     return {
         "uid": valid_user_entry.uid,
-        "project_id": valid_project_entry.project_id,
+        "project_id": data['project_id'],
         "grading": 16,
         "submission_time": datetime(2024,3,14,12,0,0,tzinfo=ZoneInfo("GMT")),
         "submission_path": "/submission/1",
@@ -176,25 +178,33 @@ def course_ad(course_teacher_ad: User):
     return ad2
 
 @pytest.fixture
-def valid_project_entry(session, valid_project):
+def valid_project_entry(session, client, valid_project):
     """A project for testing, with the course as the course it belongs to"""
-    project = Project(**valid_project)
+    valid_project["deadlines"] = json.dumps(valid_project["deadlines"])
 
-    session.add(project)
-    session.commit()
-    return project
+    with open("tests/resources/testzip.zip", "rb") as zip_file:
+        valid_project["assignment_file"] = zip_file
+        # post the project
+        response = client.post(
+            "/projects",
+            data=valid_project,
+            content_type='multipart/form-data', headers={"Authorization": "teacher2"}
+        )
+    return response.json['data'], response.status_code
 
 @pytest.fixture
 def valid_project(valid_course_entry):
     """A function that return the json form data of a project"""
+
     data = {
         "title": "Project",
         "description": "Test project",
-        "deadlines": [{"deadline": "2024-02-25T12:00:00", "description": "Deadline 1"}],
+        "deadlines": {"deadline": "2024-02-25T12:00:00", "description": "Deadline 1"},
+        "deadlines": {"deadline": "2024-02-25T12:40:00", "description": "Deadline 2"},
         "course_id": valid_course_entry.course_id,
         "visible_for_students": True,
         "archived": False,
-        "regex_expressions": ["*.pdf", "*.txt"]
+        "regex_expressions": "*.pdf"
     }
     return data
 
