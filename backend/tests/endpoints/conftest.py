@@ -196,6 +196,8 @@ def valid_project_entry(session, client, valid_project):
 def valid_project(valid_course_entry):
     """A function that return the json form data of a project"""
 
+    # disables because multiform datatype requires multiple keys
+    # pylint: disable=duplicate-key
     data = {
         "title": "Project",
         "description": "Test project",
