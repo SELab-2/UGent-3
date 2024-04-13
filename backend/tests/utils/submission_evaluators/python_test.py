@@ -23,7 +23,7 @@ def evaluate_python(submission_root, project_path_succes):
     project_id = 1
     submission = Submission(submission_id=1, project_id=project_id)
     submission.submission_path = create_submission_folder(submission_root, project_id)
-    return evaluate(submission, project_path_succes, "python", False), submission.submission_path
+    return evaluate(submission, project_path_succes, "PYTHON", False), submission.submission_path
 
 def prep_submission_and_clear_after_py(tc_folder: str) -> tuple[Submission, Project]:
     """
@@ -64,13 +64,13 @@ def test_logs_output(evaluate_python):
 def test_with_dependency():
     """Test whether the evaluator works with a dependency."""
     submission, project = prep_submission_and_clear_after_py("tc_2")
-    exit_code = evaluate(submission, project, "python", False)
+    exit_code = evaluate(submission, project, "PYTHON", False)
     cleanup_after_test(submission.submission_path)
     assert exit_code == 0
 
 def test_dependency_manifest():
     """Test whether the evaluator works with a dependency manifest."""
     submission, project = prep_submission_and_clear_after_py("tc_3")
-    exit_code = evaluate(submission, project, "python", False)
+    exit_code = evaluate(submission, project, "PYTHON", False)
     cleanup_after_test(submission.submission_path)
     assert exit_code != 0
