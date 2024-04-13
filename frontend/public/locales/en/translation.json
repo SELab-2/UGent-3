@@ -14,7 +14,12 @@
     "assistantList": "List of co-teachers/assistants",
     "newTeacher": "New teacher",
     "studentList": "List of students",
-    "newStudent": "New student(s)"
+    "newStudent": "New student(s)",
+    "deadline": "Deadline",
+    "teacher": "Teacher",
+    "view:": "View:",
+    "admins": "Admins",
+    "students": "Students"
   },
   "allCoursesTeacher": {
     "courseForm": "Course Form",
@@ -24,7 +29,7 @@
     "cancel": "Cancel",
     "create": "Create",
     "activeCourses": "Active Courses",
-    "archivedCourses":"Archived Courses"
+    "archivedCourses":"Archived Courses"    
   },
   "courseForm": {
     "courseName": "Course Name",

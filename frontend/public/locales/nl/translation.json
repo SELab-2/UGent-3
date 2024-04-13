@@ -14,7 +14,12 @@
     "assistantList": "Lijst co-leerkrachten/assistenten",
     "newTeacher": "Nieuwe leerkracht",
     "studentList": "Lijst studenten",
-    "newStudent": "Nieuwe student(en)"
+    "newStudent": "Nieuwe student(en)",
+    "deadline": "Deadline",
+    "teacher": "Leerkracht",
+    "view": "Bekijk",
+    "admins": "Admins",
+    "students": "Studenten"
   },
   "allCoursesTeacher": {
     "courseForm": "Vak Form",

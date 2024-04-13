@@ -100,80 +100,71 @@ export function CourseDetailTeacher(): JSX.Element {
   }, [courseId]);
   
   return (
-    <Grid container direction="column" spacing={2}>
-      <Grid item>
+    <Grid container margin={"2rem"} direction={"column"}>
+      <Grid item marginBottom={"1rem"}>
         <Typography variant="h4">{course?.name}</Typography>
       </Grid>
       <Grid item>
-        <Grid container direction="row" justifyContent="space-between" alignItems="flex-start">
-          <Grid item>
-            <Grid container direction="column" spacing={2} style={{ minHeight: '100vh' }}>
-              <Grid item>
-                <Typography variant="h6">{t('projects')}</Typography>
+        <Grid container direction={"row"}>
+          <Grid item style={{width:"50%"}}>
+            <Paper elevation={0} style={{border:"1px solid black"}}>
+              <Typography variant="h5">{t('projects')}</Typography>
+              <Grid container direction={"row"}>
+                {
+                  projects.map((project) => (
+                    <Grid item margin={"2rem"}>
+                      <Card style={{background:"lightblue"}} key={project.project_id}>
+                        <CardHeader title={project.title}/>
+                        <CardContent>
+                          {
+                            project.deadline && 
+                        (
+                          <Typography variant="body1">
+                            {`${t('deadline')}: ${new Date(project.deadline).toLocaleDateString()}`}
+                          </Typography>
+                        )
+                          }
+                        </CardContent>
+                        <CardActions>
+                          <Button onClick={() => navigate(`/projects/${project.project_id}`)}>{t('view')}</Button>
+                        </CardActions>
+                      </Card>
+                    </Grid>
+                  ))
+                }
               </Grid>
-              <VerticaleScroller items={projects.map((project) => (
-                <Grid item key={project.project_id}>
-                  <Typography variant="body1" onClick={() => navigate(`/projects/${getIdFromLink(project.project_id)}`)} paragraph component="span">
-                    {project.title}
-                  </Typography>
-                </Grid>
-              ))}></VerticaleScroller>
-              <Grid item style={{ alignSelf: 'flex-end' }}>
-                <Button onClick={() => navigate(`/projects/create?courseId=${courseId}`)}>
-                  {t('newProject')}
-                </Button>
-              </Grid>
-            </Grid>
+            </Paper>
           </Grid>
-          <Grid item>
-            <Grid container direction="column" spacing={2}>
-              <Grid item>
-                <Typography variant="h6">{t('assistantList')}</Typography>
-              </Grid>
-              <VerticaleScroller items={admins.map((admin) => (
-                <Grid item key={admin.uid}>
-                  <Typography variant="body1">{admin.uid}</Typography>
+          <Grid item style={{marginLeft:"1rem"}}>
+            <Grid container direction={"column"}>
+              <Grid item height={"35vh"}>
+                <Typography variant="h5">{t('admins')}:</Typography>
+                <Grid container direction={"column"}>
+                  {
+                    admins.map((admin) => (
+                      <Grid item>
+                        <Typography variant="body1">{admin.uid}</Typography>
+                      </Grid>
+                    ))
+                  }
                 </Grid>
-              ))}></VerticaleScroller>
-              <Grid item>
-                <Button>{t('newTeacher')}</Button>
               </Grid>
-            </Grid>
-          </Grid>
-          <Grid item>
-            <Grid container direction="column" spacing={2}>
-              <Grid item>
-                <Typography variant="h6">{t('studentList')}</Typography>
-              </Grid>
-              <VerticaleScroller items={students.map((student) => (
-                <Grid item key={student.uid}>
-                  <Typography variant="body1">{student.uid}</Typography>
+              <Grid item height={"40vh"}>
+                <Typography variant="h5">{t('students')}:</Typography>
+                <Grid container direction={"column"}>
+                  {
+                    students.map((student) => (
+                      <Grid item>
+                        <Typography variant="body1">{student.uid}</Typography>
+                      </Grid>
+                    ))
+                  }
                 </Grid>
-              ))}></VerticaleScroller>
-              <Grid item>
-                <Button>{t('newStudent')}</Button>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
       </Grid>
-    </Grid>
-  );
-}
-
-/**
- * Renders a vertical scroller component.
- * @param props - The component props requiring the items that will be displayed in the scroller.
- * @returns The rendered vertical scroller component.
- */
-function VerticaleScroller({items}: {items: JSX.Element[]}): JSX.Element {
-  return (
-    <Grid item>
-      <Paper style={{maxWidth:"100%", maxHeight:600,height:600, overflowY: 'auto' }}>
-        <Grid container direction="column">
-          {items}
-        </Grid>
-      </Paper>
     </Grid>
   );
 }
@@ -191,7 +182,7 @@ export function AllCoursesTeacher(): JSX.Element {
   const navigate = useNavigate();
 
   const { t } = useTranslation('translation', { keyPrefix: 'allCoursesTeacher' });
-
+  
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -236,7 +227,7 @@ export function AllCoursesTeacher(): JSX.Element {
       <SideScrollableCourses courses={courses}></SideScrollableCourses>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{t('courseForm')}</DialogTitle>
-        <form onSubmit={handleSubmit}>
+        <form style={{margin:"2rem"}} onSubmit={handleSubmit}>
           <FormControl>
             <FormLabel htmlFor="course-name">{t('courseName')}</FormLabel>
             <TextField
@@ -251,7 +242,7 @@ export function AllCoursesTeacher(): JSX.Element {
             <Button onClick={handleClose}>{t('cancel')}</Button>
             <Button type="submit">{t('submit')}</Button>
           </DialogActions>
-        </form>
+        </form> 
       </Dialog>
       <Grid item style={{marginLeft:"2rem", marginTop:"2rem"}}>
         <Button onClick={handleClickOpen} >{t('create')}</Button>
@@ -286,6 +277,20 @@ function callToApi(path: string, data: string, method:string, navigate: Navigate
     });
 }
 
+function SearchBox({label,searchTerm,handleSearchChange}): JSX.Element {
+  return (
+    <Grid item>
+      <Box display="flex" marginBottom="1rem">
+        <TextField
+          variant="outlined"
+          label={label}
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+      </Box>
+    </Grid>
+  );
+}
 /**
  * We should reuse this in the student course view since it will be mainly the same except the create button.
  * @param props - The component props requiring the courses that will be displayed in the scroller.
@@ -295,6 +300,8 @@ function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Element {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [projects, setProjects] = useState<{ [courseId: string]: Project[] }>({});
+  const [uforaIdFilter, setUforaIdFilter] = useState('');
+  const [teacherNameFilter, setTeacherNameFilter] = useState('');
 
   useEffect(() => {
     // Fetch projects for each course
@@ -318,26 +325,34 @@ function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Element {
 
     fetchProjects();
   }, [courses]);
-
+  const { t } = useTranslation('translation', { keyPrefix: 'courseDetailTeacher' });
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
+  const handleUforaIdFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setUforaIdFilter(event.target.value);
+  };
+
+  const handleTeacherNameFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTeacherNameFilter(event.target.value);
+  };
+
   const filteredCourses = courses.filter(course => 
-    course.name.toLowerCase().includes(searchTerm.toLowerCase())
+    course.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (course.ufora_id ? course.ufora_id.toLowerCase().includes(uforaIdFilter.toLowerCase()) : !uforaIdFilter) &&
+    course.teacher.toLowerCase().includes(teacherNameFilter.toLowerCase())
   );
+
   const now = new Date();
 
   return (
     <Grid item xs={12} marginLeft="2rem">
-      <Box display="flex" marginBottom="1rem">
-        <TextField
-          variant="outlined"
-          label="Search"
-          value={searchTerm}
-          onChange={handleSearchChange}
-        />
-      </Box>
+      <Grid container direction="row" spacing={2}>
+        <SearchBox label={'name'} searchTerm={searchTerm} handleSearchChange={handleSearchChange}/>
+        <SearchBox label={'ufora id'} searchTerm={uforaIdFilter} handleSearchChange={handleUforaIdFilterChange}/>
+        <SearchBox label={'teacher'} searchTerm={teacherNameFilter} handleSearchChange={handleTeacherNameFilterChange}/>
+      </Grid>
       <Paper style={{width: '100%', height: '100%', overflowY: 'auto', boxShadow: 'none', display: 'flex', justifyContent: 'center' }}>
         <Grid container direction="row" spacing={5} alignItems="flex-start">
           {filteredCourses.map((course, index) => (
@@ -348,8 +363,8 @@ function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Element {
                   {course.ufora_id && (
                     <EpsilonTypography text={`Ufora_id:${course.ufora_id}`}/>
                   )}
-                  <EpsilonTypography text={`Teacher: ${course.teacher}`}/>
-                  <Typography variant="body1">Projects:</Typography>
+                  <EpsilonTypography text={`${t('teacher')}: ${course.teacher}`}/>
+                  <Typography variant="body1">{t('projects')}:</Typography>
                   {projects[getIdFromLink(course.course_id)] && projects[getIdFromLink(course.course_id)].slice(0, 3).map((project) => {
                     let timeLeft = '';
                     if (project.deadline != undefined) {
@@ -372,7 +387,7 @@ function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Element {
                   })}
                 </CardContent>
                 <CardActions>
-                  <Button onClick={() => navigate(`/courses/${getIdFromLink(course.course_id)}`)}>View</Button>
+                  <Button onClick={() => navigate(`/courses/${getIdFromLink(course.course_id)}`)}>{t('view')}</Button>
                 </CardActions>
               </Card>
             </Grid>
@@ -383,6 +398,9 @@ function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Element {
   );
 }
 
+/**
+ *
+ */
 function EpsilonTypography({text} : {text: string}): JSX.Element {
   return (
     <Typography variant="body1" style={{ maxWidth: '13rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{text}</Typography>
