@@ -11,8 +11,14 @@ export interface Course{
 export interface Project{
     title: string,
     project_id: string,
-    deadlines: Date[]
+    deadlines: Deadline[]
 }
+
+interface Deadline{
+  description:string,
+  deadline:string
+}
+
 export const apiHost = import.meta.env.VITE_API_HOST;
 /**
  * @returns The uid of the acces token of the logged in user
@@ -68,9 +74,9 @@ export function getIdFromLink(link: string): string {
  * @param dates - Array of dates
  * @returns The nearest future date
  */
-export function getNearestFutureDate(dates: Date[]): Date | null {
+export function getNearestFutureDate(dates: Deadline[]): Date | null {
   const now = new Date();
-  const futureDates = dates.map(date => new Date(date)).filter(date => date > now);
+  const futureDates = dates.map(date => new Date(date.deadline)).filter(date => date > now);
   if (futureDates.length === 0) return null;
   return futureDates.reduce((nearest, current) => current < nearest ? current : nearest);
 }
