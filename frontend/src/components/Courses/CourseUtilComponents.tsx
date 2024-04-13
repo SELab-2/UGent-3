@@ -98,7 +98,7 @@ export function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Eleme
         <Grid container direction="row" spacing={5} alignItems="flex-start">
           {filteredCourses.map((course, index) => (
             <Grid item key={index} xs={12} sm={6} md={4} lg={2}>
-              <Card variant='outlined'>
+              <Card variant='outlined' style={{width: '14vw'}}>
                 <CardHeader title={<EpsilonTypography text={course.name}/>}/>
                 <CardHeader subheader={
                   <>

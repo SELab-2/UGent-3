@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Course, Project, apiHost, loggedInToken, getIdFromLink, getNearestFutureDate } from "./CourseUtils";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { Title } from "../Header/Title";
 
 interface UserUid{
     uid: string
@@ -76,74 +77,69 @@ export function CourseDetailTeacher(): JSX.Element {
   }
   else {
     return (
-      <Grid container margin={"2rem"} direction={"column"}>
-        <Grid item marginBottom={"1rem"}>
-          <Typography variant="h4">{course.name}</Typography>
-        </Grid>
-        <Grid item>
-          <Grid container direction={"row"}>
-            <Grid item style={{width:"50%"}}>
-              <Paper elevation={0} style={{border:"1px solid black"}}>
-                <Typography variant="h5">{t('projects')}</Typography>
-                <Grid container direction={"row"}>
-                  {
-                    projects?.map((project) => (
+      <>
+        <Title title={t('title')}></Title>
+        <Grid container margin={"2rem"} direction={"column"}>
+          <Grid item marginBottom={"1rem"}>
+            <Typography variant="h4">{course.name}</Typography>
+          </Grid>
+          <Grid item>
+            <Grid container direction={"row"}>
+              <Grid item style={{ width: "50%" }}>
+                <Paper elevation={0} style={{ border: "1px solid black" }}>
+                  <Typography variant="h5">{t('projects')}</Typography>
+                  <Grid container direction={"row"}>
+                    {projects?.map((project) => (
                       <Grid item margin={"2rem"}>
-                        <Card style={{background:"lightblue"}} key={project.project_id}>
+                        <Card style={{ background: "lightblue" }} key={project.project_id}>
                           <Link to={`/projects/${getIdFromLink(project.project_id)}`}>
-                            <CardHeader title={project.title}/>
+                            <CardHeader title={project.title} />
                           </Link>
                           <CardContent>
-                            {
-                              getNearestFutureDate(project.deadlines) && 
-                          (
-                            <Typography variant="body1">
-                              {`${t('deadline')}: ${getNearestFutureDate(project.deadlines)?.toLocaleDateString()}`}
-                            </Typography>
-                          )
-                            }
+                            {getNearestFutureDate(project.deadlines) &&
+                            (
+                              <Typography variant="body1">
+                                {`${t('deadline')}: ${getNearestFutureDate(project.deadlines)?.toLocaleDateString()}`}
+                              </Typography>
+                            )}
                           </CardContent>
                           <CardActions>
                             <Button onClick={() => navigate(`/projects/${project.project_id}`)}>{t('view')}</Button>
                           </CardActions>
                         </Card>
                       </Grid>
-                    ))
-                  }
-                </Grid>
-              </Paper>
-            </Grid>
-            <Grid item style={{marginLeft:"1rem"}}>
-              <Grid container direction={"column"}>
-                <Grid item height={"35vh"}>
-                  <Typography variant="h5">{t('admins')}:</Typography>
-                  <Grid container direction={"column"}>
-                    {
-                      admins.map((admin) => (
+                    ))}
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item style={{ marginLeft: "1rem" }}>
+                <Grid container direction={"column"}>
+                  <Grid item height={"35vh"}>
+                    <Typography variant="h5">{t('admins')}:</Typography>
+                    <Grid container direction={"column"}>
+                      {admins.map((admin) => (
                         <Grid item>
                           <Typography variant="body1">{admin.uid}</Typography>
                         </Grid>
-                      ))
-                    }
+                      ))}
+                    </Grid>
                   </Grid>
-                </Grid>
-                <Grid item height={"40vh"}>
-                  <Typography variant="h5">{t('students')}:</Typography>
-                  <Grid container direction={"column"}>
-                    {
-                      students.map((student) => (
+                  <Grid item height={"40vh"}>
+                    <Typography variant="h5">{t('students')}:</Typography>
+                    <Grid container direction={"column"}>
+                      {students.map((student) => (
                         <Grid item>
                           <Typography variant="body1">{student.uid}</Typography>
                         </Grid>
-                      ))
-                    }
+                      ))}
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      </>
     );
   }
 }

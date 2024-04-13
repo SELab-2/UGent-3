@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { SideScrollableCourses } from "./CourseUtilComponents";
 import { Course, apiHost, loggedInToken, loggedInUid, callToApi } from "./CourseUtils";
+import { Title } from "../Header/Title";
 
 /**
  * @returns A jsx component representing all courses for a teacher
@@ -59,30 +60,33 @@ export function AllCoursesTeacher(): JSX.Element {
   };
 
   return (
-    <Grid container direction={'column'} style={{marginTop: '20px'}}>
-      <SideScrollableCourses courses={courses}></SideScrollableCourses>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{t('courseForm')}</DialogTitle>
-        <form style={{margin:"2rem"}} onSubmit={handleSubmit}>
-          <FormControl>
-            <FormLabel htmlFor="course-name">{t('courseName')}</FormLabel>
-            <TextField
-              value={courseName}
-              onChange={handleInputChange}
-              error={!!error} // Applying error style if there's an error message
-              helperText={error} // Displaying the error message
-              sx={{ borderColor: error ? 'red' : undefined }} // Changing border color to red if there's an error
-            />
-          </FormControl>
-          <DialogActions>
-            <Button onClick={handleClose}>{t('cancel')}</Button>
-            <Button type="submit">{t('submit')}</Button>
-          </DialogActions>
-        </form> 
-      </Dialog>
-      <Grid item style={{marginLeft:"2rem", marginTop:"2rem"}}>
-        <Button onClick={handleClickOpen} >{t('create')}</Button>
+    <>
+      <Title title={t('title')}></Title>
+      <Grid container direction={'column'} style={{marginTop: '1rem', width:'100vw', height: '80vh'}}>
+        <SideScrollableCourses courses={courses}></SideScrollableCourses>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>{t('courseForm')}</DialogTitle>
+          <form style={{margin:"2rem"}} onSubmit={handleSubmit}>
+            <FormControl>
+              <FormLabel htmlFor="course-name">{t('courseName')}</FormLabel>
+              <TextField
+                value={courseName}
+                onChange={handleInputChange}
+                error={!!error} // Applying error style if there's an error message
+                helperText={error} // Displaying the error message
+                sx={{ borderColor: error ? 'red' : undefined }} // Changing border color to red if there's an error
+              />
+            </FormControl>
+            <DialogActions>
+              <Button onClick={handleClose}>{t('cancel')}</Button>
+              <Button type="submit">{t('submit')}</Button>
+            </DialogActions>
+          </form> 
+        </Dialog>
+        <Grid item style={{position: "absolute", left: "2rem", bottom: "5rem"}}>
+          <Button onClick={handleClickOpen} >{t('create')}</Button>
+        </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 }

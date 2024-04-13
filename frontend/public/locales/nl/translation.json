@@ -11,6 +11,7 @@
     "homepage": "Homepage"
   },
   "courseDetailTeacher": {
+    "title": "Vak Details",
     "projects": "Projecten",
     "newProject": "Nieuw Project",
     "assistantList": "Lijst co-leerkrachten/assistenten",
@@ -24,6 +25,7 @@
     "students": "Studenten"
   },
   "allCoursesTeacher": {
+    "title": "Alle Vakken",
     "courseForm": "Vak Form",
     "courseName": "Vak Naam",
     "submit": "Opslaan",

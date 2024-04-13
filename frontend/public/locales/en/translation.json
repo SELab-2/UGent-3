@@ -11,6 +11,7 @@
     "homepage": "Homepage"
   },
   "courseDetailTeacher": {
+    "title": "Course Details",
     "projects": "Projects",
     "newProject": "New Project",
     "assistantList": "List of co-teachers/assistants",
@@ -24,6 +25,7 @@
     "students": "Students"
   },
   "allCoursesTeacher": {
+    "title": "All Courses",
     "courseForm": "Course Form",
     "courseName": "Course Name",
     "submit": "Submit",
