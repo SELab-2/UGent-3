@@ -1,57 +1,22 @@
 import { useTranslation } from "react-i18next";
-import {Card, CardContent, Typography, Grid, Container, Badge, Box} from '@mui/material';
+import {Card, CardContent, Typography, Grid, Container, Badge} from '@mui/material';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import {DayCalendarSkeleton, LocalizationProvider} from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { CardActionArea } from '@mui/material';
-import {Link } from "react-router-dom";
-
 import React, {useEffect, useState} from 'react';
 import dayjs, {Dayjs} from "dayjs";
 import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
+import {ProjectDeadlineCard} from "../project/projectDeadline/ProjectDeadlineCard.tsx";
+import {ProjectDeadline, ShortSubmission} from "../project/projectDeadline/ProjectDeadline.tsx";
 
-interface ShortSubmission {
-  submission_id:number,
-  submission_time:Date,
-  submission_status:string
-}
-interface Deadline {
-  description: string;
-  deadline: Date;
-}
-interface Project {
-  project_id:string ,
-  title :string,
-  description:string,
-  assignment_file:string,
-  deadlines:Deadline[],
-  course_id:number,
-  visible_for_students:boolean,
-  archived:boolean,
-  test_path:string,
-  script_name:string,
-  regex_expressions:string[],
-  short_submission: ShortSubmission,
-  course:Course
-
-}
-interface Course {
-  course_id: string;
-  name: string;
-  teacher: string;
-  ufora_id: string;
-}
 const apiUrl = import.meta.env.VITE_APP_API_URL
 const initialValue = dayjs(Date.now());
 
 interface DeadlineInfoProps {
   selectedDay: Dayjs;
-  deadlines: Project[];
+  deadlines: ProjectDeadline[];
 }
-interface ProjectCardProps{
-  deadlines:Project[],
-  pred?: (deadline:Deadline) => boolean
-}
+
 type ExtendedPickersDayProps = PickersDayProps<Dayjs> & { highlightedDays?: number[] };
 
 /**
@@ -76,47 +41,8 @@ const DeadlineInfo: React.FC<DeadlineInfoProps> = ({ selectedDay, deadlines }) =
             </Typography>
           </CardContent>
         </Card>
-      ) : <ProjectCard deadlines={deadlinesOnSelectedDay}/>}
+      ) : <ProjectDeadlineCard deadlines={deadlinesOnSelectedDay}/>}
     </div>
-  );
-};
-/**
- * A clickable display of a project deadline
- * @param deadlines - A list of all the deadlines
- * @param pred - A predicate to filter the deadlines
- * @returns Element
- */
-const ProjectCard: React.FC<ProjectCardProps> = ({  deadlines, pred = () => true }) => {
-  const { t } = useTranslation('translation', { keyPrefix: 'student' });
-  //list of the corresponding assignment
-  return (
-    <Box>
-      {deadlines.map((project, index) => (
-        project.deadlines.filter(pred).map((deadline, ) => (
-          <Card key={index} style={{margin: '10px 0'}}>
-            <CardActionArea component={Link} to={`/${project.project_id}`}>
-              <CardContent>
-                <Typography variant="h6" style={{color: project.short_submission ?
-                  (project.short_submission.submission_status === 'SUCCESS' ? 'green' : 'red') : '#686868'}}>
-                  {project.title}
-                </Typography>
-                <Typography variant="subtitle1">
-                  {t('course')}: <Link to={`/courses/${project.course.course_id}`} style={{ color: 'inherit' }}>{project.course.name}</Link>
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {t('last_submission')}: {project.short_submission ?
-                    t(project.short_submission.submission_status.toString()) : t('no_submission_yet')}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Deadline: {dayjs(deadline.deadline).format('MMMM D, YYYY')}
-                </Typography>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        ))
-
-      ))}
-    </Box>
   );
 };
 
@@ -150,7 +76,7 @@ function ServerDay(props: PickersDayProps<Dayjs> & { highlightedDays?: number[] 
 }
 const handleMonthChange =(
   date: Dayjs,
-  projects:Project[],
+  projects:ProjectDeadline[],
   setHighlightedDays: React.Dispatch<React.SetStateAction<number[]>>,
 ) => {
 
@@ -169,7 +95,7 @@ const handleMonthChange =(
   setHighlightedDays(hDays)
 
 };
-const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Project[]>>) => {
+const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<ProjectDeadline[]>>) => {
   const header  = {
     "Authorization": "teacher2" // todo add true authorization
   }
@@ -177,7 +103,7 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
     headers:header
   })
   const jsonData = await response.json();
-  const formattedData: Project[] = await Promise.all( jsonData.data.map(async (item:Project) => {
+  const formattedData: ProjectDeadline[] = await Promise.all( jsonData.data.map(async (item:ProjectDeadline) => {
     console.log("project", item)
     const project_id:string = item.project_id.split("/")[1]// todo check if this does not change later
 
@@ -233,7 +159,7 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
 export default function HomeStudent() {
   const { t } = useTranslation('translation', { keyPrefix: 'student' });
 
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<ProjectDeadline[]>([]);
 
   const [highlightedDays, setHighlightedDays] = React.useState<number[]>([]);
 
@@ -258,14 +184,14 @@ export default function HomeStudent() {
             {t('myProjects')}
           </Typography>
 
-          <ProjectCard pred = {(d) => (dayjs(dayjs()).isBefore(d.deadline))} deadlines={projects} />
+          <ProjectDeadlineCard pred = {(d) => (dayjs(dayjs()).isBefore(d.deadline))} deadlines={projects} />
 
         </Grid>
         <Grid item xs={6}>
           <Typography variant="body2">
             {t('deadlines')}
           </Typography>
-          <ProjectCard pred={(d) => dayjs(dayjs()).isAfter(d.deadline)} deadlines={projects} />
+          <ProjectDeadlineCard pred={(d) => dayjs(dayjs()).isAfter(d.deadline)} deadlines={projects} />
         </Grid>
         <Grid item xs={6}>
           <Card>
