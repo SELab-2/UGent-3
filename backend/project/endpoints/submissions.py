@@ -73,7 +73,6 @@ class SubmissionsEndpoint(Resource):
             filters=request.args
         )
 
-    @authorize_student_submission
     def post(self) -> dict[str, any]:
         """Post a new submission to a project
 
@@ -90,6 +89,7 @@ class SubmissionsEndpoint(Resource):
 
                 # User
                 uid = request.form.get("uid")
+                print(request.form)
                 valid, message = is_valid_user(session, uid)
                 if not valid:
                     data["message"] = message
@@ -122,6 +122,13 @@ class SubmissionsEndpoint(Resource):
                         "Not all required files were uploaded " \
                         f"(required files={','.join(project.regex_expressions)})"
                     return data, 400
+
+                deadlines = project.deadlines
+                print(deadlines)
+                for deadline in deadlines:
+                    if submission.submission_time > deadline:
+                        data["message"] = "Submission deadline has passed"
+                        return data, 400
 
                 # Submission_id needed for the file location
                 session.add(submission)
