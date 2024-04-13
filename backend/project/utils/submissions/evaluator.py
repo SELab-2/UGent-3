@@ -63,7 +63,23 @@ def evaluate(submission: Submission, project_path: str, evaluator: str, is_late:
 
     container.remove()
 
-    status_code = exit_code['StatusCode']
+    return exit_code['StatusCode']
+
+def run_evaluator(submission: Submission, project_path: str, evaluator: str, is_late: bool) -> int:
+    """
+    Run the evaluator for the submission.
+
+    Args:
+        submission (Submission): The submission to evaluate.
+        project_path (str): The path to the project.
+        evaluator (str): The evaluator to use.
+        is_late (bool): Whether the submission is late.
+
+    Returns:
+        int: The exit code of the evaluator.
+    """
+    status_code = evaluate(submission, project_path, evaluator, is_late)
+
     if not is_late:
         if status_code == 0:
             submission.submission_status = 'SUCCESS'
@@ -78,7 +94,8 @@ def evaluate(submission: Submission, project_path: str, evaluator: str, is_late:
     except SQLAlchemyError:
         pass
 
-    return exit_code['StatusCode']
+    return status_code
+
 
 def create_and_run_evaluator(docker_image: str,
                              submission_id: int,

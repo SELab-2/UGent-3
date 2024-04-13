@@ -21,7 +21,7 @@ from project.utils.authentication import authorize_submission_request, \
     authorize_submissions_request, authorize_grader, \
         authorize_student_submission, authorize_submission_author
 
-from project.utils.submissions.evaluator import evaluate
+from project.utils.submissions.evaluator import run_evaluator
 
 load_dotenv()
 API_HOST = getenv("API_HOST")
@@ -146,7 +146,7 @@ class SubmissionsEndpoint(Resource):
                 if project.runner:
                     submission.submission_status = SubmissionStatus.RUNNING
                     executor.submit(
-                        evaluate,
+                        run_evaluator,
                         submission,
                         path.join(UPLOAD_FOLDER, str(project.project_id)),
                         project.runner.value,
