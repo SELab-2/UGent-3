@@ -86,7 +86,7 @@ class ProjectsEndpoint(Resource):
 
                 if not new_project.runner and \
                     os.path.exists(os.path.join(project_upload_directory, "Dockerfile")):
-                    
+
                     new_project.runner = Runner.CUSTOM
             except zipfile.BadZipfile:
                 os.remove(os.path.join(project_upload_directory, filename))
