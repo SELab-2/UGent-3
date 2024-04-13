@@ -1,7 +1,7 @@
 import { Button, Card, CardActions, CardContent, CardHeader, Checkbox, Grid, IconButton, Paper, Typography } from "@mui/material";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Course, Project, apiHost, loggedInToken, getIdFromLink, getNearestFutureDate } from "./CourseUtils";
+import { Course, Project, apiHost, loggedInToken, getIdFromLink, getNearestFutureDate, getUserName } from "./CourseUtils";
 import { useParams, Link, useNavigate, NavigateFunction } from "react-router-dom";
 import { Title } from "../Header/Title";
 import ClearIcon from '@mui/icons-material/Clear';
@@ -145,11 +145,11 @@ export function CourseDetailTeacher(): JSX.Element {
           <Grid item>
             <Grid container direction={"row"}>
               <Grid item style={{ width: "50%" }}>
-                <Paper elevation={0} style={{ border: "1px solid black",height:"70vh", maxHeight:"70vh", overflowY:"auto"}}>
+                <Paper elevation={0} style={{ height:"70vh", maxHeight:"70vh", overflowY:"auto"}}>
                   <Typography variant="h5">{t('projects')}:</Typography>
                   <Grid container direction={"row"}>
                     {projects?.map((project) => (
-                      <Grid item margin={"2rem"}>
+                      <Grid item key={project.project_id} margin={"2rem"}>
                         <Card style={{ background: "lightblue" }} key={project.project_id}>
                           <Link to={`/projects/${getIdFromLink(project.project_id)}`}>
                             <CardHeader title={project.title} />
@@ -181,9 +181,9 @@ export function CourseDetailTeacher(): JSX.Element {
                       <Typography variant="h5">{t('admins')}:</Typography>
                       <Grid container direction={"column"}>
                         {admins.map((admin) => (
-                          <Grid item container alignItems="center" spacing={1}>
+                          <Grid item container alignItems="center" spacing={1} key={admin.uid}>
                             <Grid item>
-                              <Typography variant="body1">{admin.uid}</Typography>
+                              <Typography variant="body1">{getUserName(admin.uid)}</Typography>
                             </Grid>
                             <Grid item>
                               <IconButton onClick={() => handleDeleteAdmin(navigate,course.course_id,getIdFromLink(admin.uid))}>
@@ -209,7 +209,7 @@ export function CourseDetailTeacher(): JSX.Element {
                               />
                             </Grid>
                             <Grid item>
-                              <Typography variant="body1">{student.uid}</Typography>
+                              <Typography variant="body1">{getUserName(student.uid)}</Typography>
                             </Grid>
                           </Grid>
                         ))}
@@ -217,7 +217,7 @@ export function CourseDetailTeacher(): JSX.Element {
                     </Paper>
                     <IconButton style={{ position: "absolute", bottom:0, left:0}} onClick={() => handleDeleteStudent(navigate, course.course_id, selectedStudents)}>
                       <ClearIcon />
-                      <Typography variant="body1">Delete Selected</Typography>
+                      <Typography variant="body1">{t('deleteSelected')}</Typography>
                     </IconButton>
                     <Button style={{ position: "absolute", bottom: 0, right: 0 }}>{t('newStudent')}</Button>
                   </Grid>

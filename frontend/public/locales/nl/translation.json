@@ -12,6 +12,7 @@
   },
   "courseDetailTeacher": {
     "title": "Vak Details",
+    "deleteSelected": "Verwijder geselecteerde studenten",
     "projects": "Projecten",
     "newProject": "Nieuw Project",
     "assistantList": "Lijst co-leerkrachten/assistenten",

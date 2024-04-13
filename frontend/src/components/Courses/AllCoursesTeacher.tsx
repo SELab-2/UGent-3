@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogTitle, FormControl, FormLabel, Grid, TextField } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogTitle, FormControl, FormHelperText, FormLabel, Grid, Input, InputLabel, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -66,22 +66,23 @@ export function AllCoursesTeacher(): JSX.Element {
         <SideScrollableCourses courses={courses}></SideScrollableCourses>
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>{t('courseForm')}</DialogTitle>
-          <form style={{margin:"2rem"}} onSubmit={handleSubmit}>
+          <form style={{ margin: "2rem" }} onSubmit={handleSubmit}>
             <FormControl>
-              <FormLabel htmlFor="course-name">{t('courseName')}</FormLabel>
-              <TextField
+              <InputLabel htmlFor="course-name">{t('courseName')}</InputLabel>
+              <Input
+                id="course-name"
                 value={courseName}
                 onChange={handleInputChange}
-                error={!!error} // Applying error style if there's an error message
-                helperText={error} // Displaying the error message
-                sx={{ borderColor: error ? 'red' : undefined }} // Changing border color to red if there's an error
+                error={!!error}
+                aria-describedby="my-helper-text"
               />
+              {error && <FormHelperText id="my-helper-text">{error}</FormHelperText>}
             </FormControl>
             <DialogActions>
               <Button onClick={handleClose}>{t('cancel')}</Button>
               <Button type="submit">{t('submit')}</Button>
             </DialogActions>
-          </form> 
+          </form>
         </Dialog>
         <Grid item style={{position: "absolute", left: "2rem", bottom: "5rem"}}>
           <Button onClick={handleClickOpen} >{t('create')}</Button>
