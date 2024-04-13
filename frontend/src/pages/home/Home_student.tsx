@@ -28,7 +28,7 @@ type ExtendedPickersDayProps = PickersDayProps<Dayjs> & { highlightedDays?: numb
 const DeadlineInfo: React.FC<DeadlineInfoProps> = ({ selectedDay, deadlines }) => {
   const { t } = useTranslation('translation', { keyPrefix: 'student' });
   const deadlinesOnSelectedDay = deadlines.filter(
-    project => (dayjs(project.deadline.deadline).isSame(selectedDay, 'day'))
+    project => (dayjs(project.deadline).isSame(selectedDay, 'day'))
   );
   //list of the corresponding assignment
   return (
@@ -84,8 +84,8 @@ const handleMonthChange =(
   // projects are now only fetched on page load
   const hDays:number[] = []
   projects.map((project, ) => {
-    if(project.deadline.deadline.getMonth() == date.month() && project.deadline.deadline.getFullYear() == date.year()){
-      hDays.push(project.deadline.deadline.getDate())
+    if(project.deadline.getMonth() == date.month() && project.deadline.getFullYear() == date.year()){
+      hDays.push(project.deadline.getDate())
     }
 
   }
@@ -101,9 +101,9 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
     headers:header
   })
   const jsonData = await response.json();
-  const formattedData: ProjectDeadline[] = await Promise.all( jsonData.data.map(async (item:Project) => {
-    console.log("project", item)
-    const response_submissions = await (await fetch(encodeURI(`${apiUrl}/submissions?&project_id=${item.project_id}`), {
+  let formattedData: ProjectDeadline[] = await Promise.all( jsonData.data.map(async (item:Project) => {
+    const project_id = item.project_id.split('/')[1]
+    const response_submissions = await (await fetch(encodeURI(`${apiUrl}/submissions?&project_id=${project_id}`), {
       headers: header
     })).json()
 
@@ -115,7 +115,7 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
     }
     )).sort((a:ShortSubmission, b:ShortSubmission) => b.submission_time.getTime() - a.submission_time.getTime())[0];
     // fetch the course id of the project
-    const project_item = await (await fetch(encodeURI(`${apiUrl}/projects/${item.project_id}`), {
+    const project_item = await (await fetch(encodeURI(`${apiUrl}/${item.project_id}`), {
       headers:header
     })).json()
 
@@ -129,13 +129,14 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
       teacher: response_courses.data.teacher,
       ufora_id: response_courses.data.ufora_id
     }
-    return item.deadlines.map((d) => {
+    return item.deadlines.map((d:string[]) => {
       return  {
-        project_id: Number(item.project_id),
+        project_id: item.project_id,
         title: item.title,
         description: item.description,
         assignment_file: item.assignment_file,
-        deadline: d,
+        deadline: new Date(d[1]),
+        deadline_description: d[0],
         course_id: Number(item.course_id),
         visible_for_students: Boolean(item.visible_for_students),
         archived: Boolean(item.archived),
@@ -147,6 +148,7 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
       }
     })
   }));
+  formattedData = formattedData.flat()
   setProjects(formattedData);
   return formattedData
 }
@@ -185,8 +187,8 @@ export default function HomeStudent() {
 
           <ProjectDeadlineCard
             deadlines={projects
-              .filter((p) => (dayjs(dayjs()).isBefore(p.deadline.deadline)))
-              .sort((a, b) => dayjs(a.deadline.deadline).diff(dayjs(b.deadline.deadline)))
+              .filter((p) => (dayjs(dayjs()).isBefore(p.deadline)))
+              .sort((a, b) => dayjs(a.deadline).diff(dayjs(b.deadline)))
               .slice(0, 3) // only show the first 3
             } />
 
@@ -197,8 +199,8 @@ export default function HomeStudent() {
           </Typography>
           <ProjectDeadlineCard
             deadlines={projects
-              .filter((p) => dayjs(dayjs()).isAfter(p.deadline.deadline))
-              .sort((a, b) => dayjs(b.deadline.deadline).diff(dayjs(a.deadline.deadline)))
+              .filter((p) => dayjs(dayjs()).isAfter(p.deadline))
+              .sort((a, b) => dayjs(b.deadline).diff(dayjs(a.deadline)))
               .slice(0, 3) // only show the first 3
             } />
         </Grid>

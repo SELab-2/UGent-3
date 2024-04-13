@@ -3,7 +3,8 @@ export interface ProjectDeadline {
   title :string,
   description:string,
   assignment_file:string,
-  deadline:Deadline,
+  deadline:Date,
+  deadline_description:string,
   course_id:number,
   visible_for_students:boolean,
   archived:boolean,
@@ -19,7 +20,7 @@ export interface Project {
   title :string,
   description:string,
   assignment_file:string,
-  deadlines:Deadline[],
+  deadlines:string[][],
   course_id:number,
   visible_for_students:boolean,
   archived:boolean,
@@ -46,5 +47,3 @@ export interface ShortSubmission {
   submission_time:Date,
   submission_status:string
 }
-
-
