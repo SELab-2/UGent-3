@@ -56,10 +56,11 @@ class CourseForAdmins(Resource):
         Api endpoint for adding new admins to a course, can only be done by the teacher
         """
         abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
-        teacher = request.args.get("uid")
         data = request.get_json()
+        if any(key != "admin_uid" for key in data.keys()):
+            return json_message("Incorrect data field given"), 400
         assistant = data.get("admin_uid")
-        abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant)
+        abort_if_not_teacher_or_none_assistant(course_id, assistant)
 
         query = User.query.filter_by(uid=assistant)
         new_admin = execute_query_abort_if_db_error(query, abort_url)
@@ -67,7 +68,12 @@ class CourseForAdmins(Resource):
             message = (
                 "User to make admin was not found, please request with a valid uid"
             )
-            return json_message(message), 404
+            return json_message(message), 400
+
+        query = CourseAdmin.query.filter_by(uid=assistant)
+        new_admin = execute_query_abort_if_db_error(query, abort_url)
+        if new_admin:
+            return json_message("Admin already added to the course"), 400
 
         return insert_into_model(
             CourseAdmin,
@@ -82,16 +88,17 @@ class CourseForAdmins(Resource):
         Api endpoint for removing admins of a course, can only be done by the teacher
         """
         abort_url = urljoin(f"{RESPONSE_URL}/" , f"{str(course_id)}/", "admins")
-        teacher = request.args.get("uid")
         data = request.get_json()
+        if any(key != "admin_uid" for key in data.keys()):
+            return json_message("Incorrect data field given"), 400
         assistant = data.get("admin_uid")
-        abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant)
+        abort_if_not_teacher_or_none_assistant(course_id, assistant)
 
         query = CourseAdmin.query.filter_by(uid=assistant, course_id=course_id)
         admin_relation = execute_query_abort_if_db_error(query, abort_url)
         if not admin_relation:
             message = "Course with given admin not found"
-            return json_message(message), 404
+            return json_message(message), 400
 
         delete_abort_if_error(admin_relation, abort_url)
         commit_abort_if_error(abort_url)

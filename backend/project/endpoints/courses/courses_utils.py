@@ -12,7 +12,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from project.db_in import db
 from project.models.course_relation import CourseAdmin
-from project.models.user import User
+from project.models.user import User, Role
 from project.models.course import Course
 
 load_dotenv()
@@ -90,26 +90,19 @@ def commit_abort_if_error(url):
         abort(500, description=response)
 
 
-def abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant):
+def abort_if_not_teacher_or_none_assistant(course_id, assistant):
     """
     Check if the current user is authorized to appoint new admins to a course.
 
     Args:
         course_id (int): The ID of the course.
+        assistant (int): The UID of the person to be made an admin.
 
     Raises:
         HTTPException: If the current user is not authorized or
         if the UID of the person to be made an admin is missing in the request body.
     """
     url = f"{API_URL}/courses/{str(course_id)}/admins"
-    abort_if_uid_is_none(teacher, url)
-
-    course = get_course_abort_if_not_found(course_id)
-
-    if teacher != course.teacher:
-        response = json_message("Only the teacher of a course can appoint new admins")
-        response["url"] = url
-        abort(403, description=response)
 
     if not assistant:
         response = json_message(
@@ -120,7 +113,7 @@ def abort_if_not_teacher_or_none_assistant(course_id, teacher, assistant):
 
 
 def abort_if_none_uid_student_uids_or_non_existant_course_id(
-    course_id, uid, student_uids
+    course_id, student_uids
 ):
     """
     Check the request to assign new students to a course.
@@ -134,16 +127,6 @@ def abort_if_none_uid_student_uids_or_non_existant_course_id(
     """
     url = f"{API_URL}/courses/{str(course_id)}/students"
     get_course_abort_if_not_found(course_id)
-    abort_if_no_user_found_for_uid(uid, url)
-    query = CourseAdmin.query.filter_by(uid=uid, course_id=course_id)
-    admin_relation = execute_query_abort_if_db_error(query, url)
-    if not admin_relation:
-        message = "Not authorized to assign new students to course with id " + str(
-            course_id
-        )
-        response = json_message(message)
-        response["url"] = url
-        abort(403, description=response)
 
     if not student_uids:
         message = """To assign new students to a course,
@@ -233,3 +216,30 @@ def get_course_abort_if_not_found(course_id, url=f"{API_URL}/courses"):
         abort(404, description=response)
 
     return course
+
+def check_data(data: dict[str, str], check_teacher: bool):
+    """Check the data"""
+    if not all(hasattr(Course, key) for key in data.keys()):
+        return json_message("The data contains an incorrect field"), 400
+
+    if "name" in data.keys():
+        name = data.get("name")
+        if name is None or not isinstance(name, str):
+            return json_message("The name field does not have the correct type"), 400
+
+    if "ufora_id" in data.keys():
+        ufora_id = data.get("ufora_id")
+        if not isinstance(ufora_id, str):
+            return json_message("The ufora_id field does not have the correct type"), 400
+
+    if check_teacher and "teacher" in data.keys():
+        teacher = data.get("teacher")
+        if teacher is None or not isinstance(teacher, str):
+            return json_message("The teacher field does not have the correct type"), 400
+        user = execute_query_abort_if_db_error(User.query.filter_by(uid=teacher), RESPONSE_URL)
+        if user.role != Role.TEACHER:
+            return json_message(
+                "The user given in the teacher field does not have the correct role"
+            ), 400
+
+    return json_message("ok"), 200

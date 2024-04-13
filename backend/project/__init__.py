@@ -4,6 +4,7 @@ This file is the base of the Flask API. It contains the basic structure of the A
 
 from flask import Flask
 from flask_cors import CORS
+from sqlalchemy_utils import register_composites
 from .db_in import db
 from .endpoints.index.index import index_bp
 from .endpoints.users import users_bp
@@ -45,5 +46,9 @@ def create_app_with_db(db_uri: str):
     app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     app.config["UPLOAD_FOLDER"] = "/"
     db.init_app(app)
+    with app.app_context():
+        # Getting a connection from the scoped session
+        connection = db.session.connection()
+        register_composites(connection)
     CORS(app)
     return app

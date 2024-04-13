@@ -38,7 +38,7 @@ class ProjectsEndpoint(Resource):
         return query_selected_from_model(
             Project,
             response_url,
-            select_values=["project_id", "title", "description"],
+            select_values=["project_id", "title", "description", "deadlines"],
             url_mapper={"project_id": response_url},
             filters=request.args
         )
@@ -55,7 +55,6 @@ class ProjectsEndpoint(Resource):
         if "assignment_file" in request.files:
             file = request.files["assignment_file"]
             filename = os.path.basename(file.filename)
-            project_json["assignment_file"] = filename
 
         # save the file that is given with the request
         try:
@@ -81,9 +80,9 @@ class ProjectsEndpoint(Resource):
         os.makedirs(project_upload_directory, exist_ok=True)
         if filename is not None:
             try:
-                file.save(os.path.join(project_upload_directory, filename))
-                zip_location = os.path.join(project_upload_directory, filename)
-                with zipfile.ZipFile(zip_location) as upload_zip:
+                file_path = os.path.join(project_upload_directory, filename)
+                file.save(file_path)
+                with zipfile.ZipFile(file_path) as upload_zip:
                     upload_zip.extractall(project_upload_directory)
             except zipfile.BadZipfile:
                 os.remove(os.path.join(project_upload_directory, filename))

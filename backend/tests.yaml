@@ -35,6 +35,7 @@ services:
         condition: service_healthy
       auth-server:
         condition: service_started
+    privileged: true
     environment:
       POSTGRES_HOST: postgres  # Use the service name defined in Docker Compose
       POSTGRES_USER: test_user
@@ -43,7 +44,7 @@ services:
       API_HOST: http://api_is_here
       AUTHENTICATION_URL: http://auth-server:5001 # Use the service name defined in Docker Compose
       UPLOAD_URL: /data/assignments
-      DOCS_JSON_PATH: static/OpenAPI_Object.json
+      DOCS_JSON_PATH: static/OpenAPI_Object.yaml
       DOCS_URL: /docs
     volumes:
       - .:/app
