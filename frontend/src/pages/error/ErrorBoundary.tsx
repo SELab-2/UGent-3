@@ -10,17 +10,19 @@ export function ErrorBoundary() {
   if (isRouteErrorResponse(error)) {
     if (error.status == 404) {
       return (
-        <ErrorPage statusCode={"404"} statusTitle={"Page Not Found"} message={"page_not_found_message"} />
+        <ErrorPage statusCode={"404"} statusTitle={"error.pageNotFound"} message={"error.pageNotFoundMessage"} />
       );
-    }
-    if (error.status == 403) {
+    } else if (error.status == 403) {
       return (
-        <ErrorPage statusCode={"403"} statusTitle={"Forbidden"} message={"forbidden_message"} />
+        <ErrorPage statusCode={"403"} statusTitle={"error.forbidden"} message={"error.forbiddenMessage"} />
       );
-    }
-    if (error.status >= 500 && error.status <= 599) {
+    } else if (error.status >= 400 && error.status <= 499) {
       return (
-        <ErrorPage statusCode={error.statusText} statusTitle={"Server Error"} message={"server_error_message"} />
+        <ErrorPage statusCode={error.statusText} statusTitle={"error.clientError"} message={"error.clientErrorMessage"} />
+      );
+    } else if (error.status >= 500 && error.status <= 599) {
+      return (
+        <ErrorPage statusCode={error.statusText} statusTitle={"error.serverError"} message={"error.serverErrorMessage"} />
       );
     }
   }

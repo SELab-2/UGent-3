@@ -1,5 +1,4 @@
 import { Grid, Typography } from "@mui/material";
-import { Image } from "mui-image"; 
 import { useTranslation } from "react-i18next";
 
 /**
@@ -11,7 +10,7 @@ import { useTranslation } from "react-i18next";
  */
 export function ErrorPage(
   { statusCode, statusTitle, message }: { statusCode: string, statusTitle: string, message: string }
-): JSX.Element {
+): React.JSX.Element {
 
   const { t } = useTranslation();
 
@@ -37,13 +36,13 @@ export function ErrorPage(
             </Typography>
           </Grid>
           <Grid item>
-            <Image src="/error_pigeon.png" height="20vh" alt="icon" />
+            <img src="/img/error_pigeon.png" height="150vh" alt="icon" />
           </Grid>
         </Grid>
       </Grid>
       <Grid item>
         <Typography variant="h3">
-          { statusTitle }
+          { t(statusTitle) }
         </Typography>
       </Grid>
       <Grid item>

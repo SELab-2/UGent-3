@@ -8,7 +8,7 @@ describe('Error page test', () => {
           body: {name: "fail"},
           failOnStatusCode: false
         }).then(response => {
-          expect(response.status).to.be.gt(299) // is supposed to be 404
+          expect(response.status).to.be(404) // is supposed to be 404
         })
       }
     )
