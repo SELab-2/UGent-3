@@ -5,6 +5,7 @@ This file is the base of the Flask API. It contains the basic structure of the A
 from flask import Flask
 from flask_cors import CORS
 from sqlalchemy_utils import register_composites
+from .executor import executor
 from .db_in import db
 from .endpoints.index.index import index_bp
 from .endpoints.users import users_bp
@@ -22,6 +23,7 @@ def create_app():
     """
 
     app = Flask(__name__)
+    executor.init_app(app)
     app.register_blueprint(index_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(courses_bp)

@@ -8,16 +8,18 @@ The evaluator is run in the container and the
 exit code is returned. The output of the evaluator is written to a log file
 in the submission output folder.
 """
-from os import path
+from os import path, makedirs
 import docker
+from sqlalchemy.exc import SQLAlchemyError
+from project.db_in import db
 from project.models.submission import Submission
 
 DOCKER_IMAGE_MAPPER = {
-    "python": path.join(path.dirname(__file__), "evaluators", "python"),
+    "PYTHON": path.join(path.dirname(__file__), "evaluators", "python"),
 }
 
 
-def evaluate(submission: Submission, project_path: str, evaluator: str) -> int:
+def evaluate(submission: Submission, project_path: str, evaluator: str, is_late: bool) -> int:
     """
     Evaluate a submission using the evaluator.
 
@@ -51,6 +53,7 @@ def evaluate(submission: Submission, project_path: str, evaluator: str) -> int:
                                          submission_solution_path)
 
     submission_output_path = path.join(submission_path, "output")
+    makedirs(submission_output_path, exist_ok=True)
     test_output_path = path.join(submission_output_path, "test_output.log")
 
     exit_code = container.wait()
@@ -59,6 +62,21 @@ def evaluate(submission: Submission, project_path: str, evaluator: str) -> int:
         output_file.write(container.logs().decode('utf-8'))
 
     container.remove()
+
+    status_code = exit_code['StatusCode']
+    if not is_late:
+        if status_code == 0:
+            submission.submission_status = 'SUCCESS'
+        else:
+            submission.submission_status = 'FAIL'
+    else:
+        submission.submission_status = 'LATE'
+
+    try:
+        db.session.merge(submission)
+        db.session.commit()
+    except SQLAlchemyError:
+        pass
 
     return exit_code['StatusCode']
 

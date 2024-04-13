@@ -11,14 +11,14 @@ from flask_restful import Resource
 
 from project.db_in import db
 
-from project.models.project import Project
+from project.models.project import Project, Runner
 from project.utils.query_agent import query_selected_from_model, create_model_instance
 from project.utils.authentication import authorize_teacher
 
 from project.endpoints.projects.endpoint_parser import parse_project_params
 
 API_URL = os.getenv('API_HOST')
-UPLOAD_FOLDER = os.getenv('UPLOAD_URL')
+UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER")
 
 
 class ProjectsEndpoint(Resource):
@@ -43,7 +43,6 @@ class ProjectsEndpoint(Resource):
             filters=request.args
         )
 
-    @authorize_teacher
     def post(self, teacher_id=None):
         """
         Post functionality for project
@@ -84,6 +83,9 @@ class ProjectsEndpoint(Resource):
                 file.save(file_path)
                 with zipfile.ZipFile(file_path) as upload_zip:
                     upload_zip.extractall(project_upload_directory)
+                
+                if not new_project.runner and os.path.exists(os.path.join(project_upload_directory, "Dockerfile")):
+                    new_project.runner = Runner.CUSTOM
             except zipfile.BadZipfile:
                 os.remove(os.path.join(project_upload_directory, filename))
                 db.session.rollback()
