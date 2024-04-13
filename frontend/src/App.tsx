@@ -9,12 +9,12 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />} errorElement={<ErrorBoundary />}>
       <Route index element={<Home />} />
-        <Route path=":lang" element={<LanguagePath/>}>
-          <Route path="home" element={<Home />} />
-          <Route path="project" >
-            <Route path=":projectId" element={<ProjectView />}/>
-          </Route>
+      <Route path=":lang" element={<LanguagePath/>}>
+        <Route path="home" element={<Home />} />
+        <Route path="project" >
+          <Route path=":projectId" element={<ProjectView />}/>
         </Route>
+      </Route>
     </Route>
   )
 );
