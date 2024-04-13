@@ -1,5 +1,5 @@
 """
-Endpoint parser for the projects arguments
+Parser for the argument when posting or patching a project
 """
 
 import json
@@ -15,13 +15,7 @@ parser.add_argument(
     help='Projects assignment file',
     location="form"
 )
-parser.add_argument(
-    'deadlines',
-    type=str,
-    help='Projects deadlines',
-    location="form",
-    action='append'
-)
+parser.add_argument('deadlines', type=str, help='Projects deadlines', location="form")
 parser.add_argument("course_id", type=str, help='Projects course_id', location="form")
 parser.add_argument(
     "visible_for_students",
@@ -34,8 +28,7 @@ parser.add_argument(
     "regex_expressions",
     type=str,
     help='Projects regex expressions',
-    location="form",
-    action="append"
+    location="form"
 )
 
 
@@ -47,19 +40,18 @@ def parse_project_params():
     result_dict = {}
     for key, value in args.items():
         if value is not None:
-            if key in ('deadlines', 'regex_expressions'):
+            if "deadlines" == key:
+                deadlines_parsed = json.loads(value)
                 new_deadlines = []
-                for entry in args[key]:
-                    if key == "deadlines":
-                        parsed_deadline = json.loads(entry)
-                        test = {
-                            "description": parsed_deadline["description"],
-                            "deadline": parsed_deadline["deadline"]
-                        }
-                        new_deadlines.append(test)
-                    else:
-                        new_deadlines.append(entry)
+                for deadline in deadlines_parsed:
+                    new_deadlines.append(
+                        (
+                            deadline["description"],
+                            deadline["deadline"]
+                        )
+                    )
                 result_dict[key] = new_deadlines
             else:
                 result_dict[key] = value
+
     return result_dict

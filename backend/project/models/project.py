@@ -5,7 +5,6 @@ from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, St
 from sqlalchemy_utils import CompositeType
 from project.db_in import db
 
-
 @dataclass
 class Project(db.Model): # pylint: disable=too-many-instance-attributes
     """This class describes the projects table,
@@ -25,16 +24,15 @@ class Project(db.Model): # pylint: disable=too-many-instance-attributes
     project_id: int = Column(Integer, primary_key=True)
     title: str = Column(String(50), nullable=False, unique=False)
     description: str = Column(Text, nullable=False)
-    deadlines: list = Column(
-        ARRAY(
-            CompositeType(
-                "deadline",
-                [
-                    Column("deadline_description", Text),
-                    Column("deadline", DateTime(timezone=True))
-                ]
-                ),
-            dimensions=1
+    deadlines: list = Column(ARRAY(
+        CompositeType(
+            "deadline",
+            [
+                Column("description", Text),
+                Column("deadline", DateTime(timezone=True))
+            ]
+            ),
+        dimensions=1
         )
     )
     course_id: int = Column(Integer, ForeignKey("courses.course_id"), nullable=False)
