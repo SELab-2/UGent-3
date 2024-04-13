@@ -18,10 +18,9 @@ from project.db_in import db
 
 class Runner(str, Enum):
     """Enum for submission status"""
-    SUCCESS = 'SUCCESS'
-    LATE = 'LATE'
-    FAIL = 'FAIL'
-    RUNNING = 'RUNNING'
+    PYTHON = 'PYTHON'
+    GENERAL = 'GENERAL'
+    CUSTOM = 'CUSTOM'
 
 @dataclass
 class Project(db.Model): # pylint: disable=too-many-instance-attributes
