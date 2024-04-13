@@ -83,8 +83,10 @@ class ProjectsEndpoint(Resource):
                 file.save(file_path)
                 with zipfile.ZipFile(file_path) as upload_zip:
                     upload_zip.extractall(project_upload_directory)
-                
-                if not new_project.runner and os.path.exists(os.path.join(project_upload_directory, "Dockerfile")):
+
+                if not new_project.runner and \
+                    os.path.exists(os.path.join(project_upload_directory, "Dockerfile")):
+                    
                     new_project.runner = Runner.CUSTOM
             except zipfile.BadZipfile:
                 os.remove(os.path.join(project_upload_directory, filename))

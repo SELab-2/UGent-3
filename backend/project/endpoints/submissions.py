@@ -1,7 +1,6 @@
 """Submission API endpoint"""
 
 from urllib.parse import urljoin
-from multiprocessing import Process
 from datetime import datetime
 from os import getenv, path, makedirs
 from shutil import rmtree
@@ -77,6 +76,7 @@ class SubmissionsEndpoint(Resource):
             filters=request.args
         )
 
+    @authorize_student_submission
     def post(self) -> dict[str, any]:
         """Post a new submission to a project
 
@@ -145,7 +145,12 @@ class SubmissionsEndpoint(Resource):
 
                 if project.runner:
                     submission.submission_status = SubmissionStatus.RUNNING
-                    executor.submit(evaluate, submission, path.join(UPLOAD_FOLDER, str(project.project_id)), project.runner.value, False)                     
+                    executor.submit(
+                        evaluate,
+                        submission,
+                        path.join(UPLOAD_FOLDER, str(project.project_id)),
+                        project.runner.value,
+                        False)
 
                 data["message"] = "Successfully fetched the submissions"
                 data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
@@ -167,6 +172,7 @@ class SubmissionsEndpoint(Resource):
 class SubmissionEndpoint(Resource):
     """API endpoint for the submission"""
 
+    @authorize_submission_request
     def get(self, submission_id: int) -> dict[str, any]:
         """Get the submission given an submission ID
 
@@ -256,7 +262,7 @@ class SubmissionEndpoint(Resource):
                 }
                 return data, 200
 
-        except exc.SQLAlchemyError as e:
+        except exc.SQLAlchemyError:
             session.rollback()
             data["message"] = \
                 f"An error occurred while patching submission (submission_id={submission_id})"
