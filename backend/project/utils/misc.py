@@ -61,7 +61,6 @@ def models_to_dict(instances: List[DeclarativeMeta]) -> List[Dict[str, str]]:
     """
     return [model_to_dict(instance) for instance in instances]
 
-
 def filter_model_fields(model: DeclarativeMeta, data: Dict[str, str]):
     """
     Filters the data to only contain the fields of the model.

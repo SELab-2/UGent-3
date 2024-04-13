@@ -125,7 +125,7 @@ class TestUserEndpoint:
         response = client.get(f"users/{valid_user_entry.uid}", headers={"Authorization":"wrong"})
         assert response.status_code == 401
 
-    def test_patch_user_not_authorized(self, client, valid_admin_entry, valid_user_entry):
+    def test_patch_user_not_authorized(self, client, admin, valid_user_entry):
         """Test updating a user."""
 
         if valid_user_entry.role == Role.TEACHER:
@@ -140,7 +140,7 @@ class TestUserEndpoint:
         }, headers={"Authorization":"student01"})
         assert response.status_code == 403 # Patching a user is not allowed as a not-admin
 
-    def test_patch_user(self, client, valid_admin_entry, valid_user_entry):
+    def test_patch_user(self, client, admin, valid_user_entry):
         """Test updating a user."""
 
         if valid_user_entry.role == Role.TEACHER:
@@ -152,17 +152,17 @@ class TestUserEndpoint:
         new_role = new_role.name
         response = client.patch(f"/users/{valid_user_entry.uid}", json={
             'role': new_role
-        }, headers={"Authorization":"admin1"})
+        }, headers={"Authorization":"admin"})
         assert response.status_code == 200
 
-    def test_patch_non_existent(self, client, valid_admin_entry):
+    def test_patch_non_existent(self, client, admin):
         """Test updating a non-existent user."""
         response = client.patch("/users/-20", json={
             'role': Role.TEACHER.name
-        }, headers={"Authorization":"admin1"})
+        }, headers={"Authorization":"admin"})
         assert response.status_code == 404
 
-    def test_patch_non_json(self, client, valid_admin_entry, valid_user_entry):
+    def test_patch_non_json(self, client, admin, valid_user_entry):
         """Test sending a non-JSON patch request."""
         valid_user_form = asdict(valid_user_entry)
         if valid_user_form["role"] == Role.TEACHER.name:
@@ -171,7 +171,7 @@ class TestUserEndpoint:
             valid_user_form["role"] = Role.TEACHER.name
 
         response = client.patch(f"/users/{valid_user_form['uid']}", data=valid_user_form,
-                                headers={"Authorization":"admin1"})
+                                headers={"Authorization":"admin"})
         assert response.status_code == 415
 
     def test_get_users_with_query(self, client, valid_user_entries):
