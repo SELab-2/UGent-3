@@ -4,6 +4,7 @@ import Home from "./pages/home/Home.tsx"
 import { Header } from "./components/Header/Header";
 import LanguagePath from "./components/LanguagePath";
 import ProjectView from "./pages/project/projectView/ProjectView";
+import ProjectOverView from "./pages/project/projectOverview.tsx";
 
 /**
  * This component is the main application component that will be rendered by the ReactDOM. 
@@ -20,6 +21,7 @@ function App(): JSX.Element {
           <Route path="project" >
             <Route path=":projectId" element={<ProjectView />}/>
           </Route>
+          <Route path="projects" element={<ProjectOverView/>}/>
           <Route path="student" element={<HomeStudent />} />
         </Route>
       </Routes>
