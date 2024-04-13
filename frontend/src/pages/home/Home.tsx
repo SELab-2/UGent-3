@@ -8,7 +8,6 @@ import {Link } from "react-router-dom";
  */
 export default function Home() {
   const { t } = useTranslation('translation', { keyPrefix: 'home' });
-  //console.log("log env", process.env.REACT_APP_LOGIN_LINK)
   const login_redirect:string =import.meta.env.VITE_LOGIN_LINK
   return (
     <Container maxWidth="sm">
