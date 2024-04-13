@@ -4,6 +4,7 @@ import {fetchProjects} from "./fetchProjects.tsx";
 import {Container, Grid, Link, Typography} from "@mui/material";
 import {ProjectDeadlineCard} from "./projectDeadline/ProjectDeadlineCard.tsx";
 import { useTranslation } from "react-i18next";
+import {Title} from "../../components/Header/Title.tsx";
 
 /**
  *
@@ -26,8 +27,9 @@ export default function ProjectOverView() {
   console.log(projectsByCourse)
   return (
     <Container style={{ paddingTop: '50px' }}>
-      {Object.entries(projectsByCourse).map(([courseId, courseProjects]) => (
-        <Grid container key={courseId} spacing={2}>
+      <Title title={"Projects Overview"}/>
+      {Object.entries(projectsByCourse).map(([, courseProjects]) => (
+        <Grid container spacing={2}>
           <Grid item xs={12}>
             <Link href={`/${i18n.language}/course/${courseProjects[0].course.course_id}`} style={{color: 'inherit'}}
               sx={{ textDecorationColor: 'currentColor' }}>
@@ -35,7 +37,7 @@ export default function ProjectOverView() {
 
             </Link>
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={8}>
             <ProjectDeadlineCard deadlines={courseProjects} />
           </Grid>
         </Grid>
