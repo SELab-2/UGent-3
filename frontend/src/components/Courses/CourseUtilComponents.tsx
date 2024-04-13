@@ -1,6 +1,6 @@
 import { Box, Button, Card, CardActions, CardContent, CardHeader, Grid, Paper, TextField, Typography } from "@mui/material";
 import { Course, Project, apiHost, getIdFromLink, getNearestFutureDate, loggedInToken } from "./CourseUtils";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 /**
@@ -40,10 +40,40 @@ export function SearchBox({label,searchTerm,handleSearchChange}: {label: string,
  * @returns A component to display courses in horizontal scroller where each course is a card containing its name.
  */
 export function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Element {
-  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get initial state from URL
+  const urlParams = new URLSearchParams(location.search);
+  const initialSearchTerm = urlParams.get('name') || '';
+  const initialUforaIdFilter = urlParams.get('ufora_id') || '';
+  const initialTeacherNameFilter = urlParams.get('teacher') || '';
+
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
+  const [uforaIdFilter, setUforaIdFilter] = useState(initialUforaIdFilter);
+  const [teacherNameFilter, setTeacherNameFilter] = useState(initialTeacherNameFilter);
   const [projects, setProjects] = useState<{ [courseId: string]: Project[] }>({});
-  const [uforaIdFilter, setUforaIdFilter] = useState('');
-  const [teacherNameFilter, setTeacherNameFilter] = useState('');
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newSearchTerm = event.target.value;
+    setSearchTerm(newSearchTerm);
+    urlParams.set('name', newSearchTerm);
+    navigate(`${location.pathname}?${urlParams.toString()}`);
+  };
+
+  const handleUforaIdFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newUforaIdFilter = event.target.value;
+    setUforaIdFilter(newUforaIdFilter);
+    urlParams.set('ufora_id', newUforaIdFilter);
+    navigate(`${location.pathname}?${urlParams.toString()}`);
+  };
+
+  const handleTeacherNameFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newTeacherNameFilter = event.target.value;
+    setTeacherNameFilter(newTeacherNameFilter);
+    urlParams.set('teacher', newTeacherNameFilter);
+    navigate(`${location.pathname}?${urlParams.toString()}`);
+  };
 
   useEffect(() => {
     // Fetch projects for each course
@@ -67,17 +97,6 @@ export function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Eleme
     fetchProjects();
   }, [courses]);
   const { t } = useTranslation('translation', { keyPrefix: 'courseDetailTeacher' });
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const handleUforaIdFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUforaIdFilter(event.target.value);
-  };
-
-  const handleTeacherNameFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTeacherNameFilter(event.target.value);
-  };
 
   const filteredCourses = courses.filter(course => 
     course.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
