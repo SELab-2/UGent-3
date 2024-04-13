@@ -14,6 +14,22 @@ export interface ProjectDeadline {
   course:Course
 
 }
+export interface Project {
+  project_id:string ,
+  title :string,
+  description:string,
+  assignment_file:string,
+  deadlines:Deadline[],
+  course_id:number,
+  visible_for_students:boolean,
+  archived:boolean,
+  test_path:string,
+  script_name:string,
+  regex_expressions:string[],
+  short_submission: ShortSubmission,
+  course:Course
+
+}
 export interface Deadline {
   description: string;
   deadline: Date;

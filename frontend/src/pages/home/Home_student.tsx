@@ -7,7 +7,7 @@ import React, {useEffect, useState} from 'react';
 import dayjs, {Dayjs} from "dayjs";
 import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
 import {ProjectDeadlineCard} from "../project/projectDeadline/ProjectDeadlineCard.tsx";
-import {ProjectDeadline, ShortSubmission} from "../project/projectDeadline/ProjectDeadline.tsx";
+import {ProjectDeadline, ShortSubmission, Project} from "../project/projectDeadline/ProjectDeadline.tsx";
 
 const apiUrl = import.meta.env.VITE_APP_API_URL
 const initialValue = dayjs(Date.now());
@@ -28,7 +28,7 @@ type ExtendedPickersDayProps = PickersDayProps<Dayjs> & { highlightedDays?: numb
 const DeadlineInfo: React.FC<DeadlineInfoProps> = ({ selectedDay, deadlines }) => {
   const { t } = useTranslation('translation', { keyPrefix: 'student' });
   const deadlinesOnSelectedDay = deadlines.filter(
-    deadline => ( deadline.deadlines.map(d => dayjs(d.deadline).isSame(selectedDay, 'day')))
+    project => (dayjs(project.deadline.deadline).isSame(selectedDay, 'day'))
   );
   //list of the corresponding assignment
   return (
@@ -84,11 +84,9 @@ const handleMonthChange =(
   // projects are now only fetched on page load
   const hDays:number[] = []
   projects.map((project, ) => {
-    project.deadlines.map((deadline,) => {
-      if(deadline.deadline.getMonth() == date.month() && deadline.deadline.getFullYear() == date.year()){
-        hDays.push(deadline.deadline.getDate())
-      }
-    })
+    if(project.deadline.deadline.getMonth() == date.month() && project.deadline.deadline.getFullYear() == date.year()){
+      hDays.push(project.deadline.deadline.getDate())
+    }
 
   }
   );
@@ -103,11 +101,9 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
     headers:header
   })
   const jsonData = await response.json();
-  const formattedData: ProjectDeadline[] = await Promise.all( jsonData.data.map(async (item:ProjectDeadline) => {
+  const formattedData: ProjectDeadline[] = await Promise.all( jsonData.data.map(async (item:Project) => {
     console.log("project", item)
-    const project_id:string = item.project_id.split("/")[1]// todo check if this does not change later
-
-    const response_submissions = await (await fetch(encodeURI(`${apiUrl}/submissions?&project_id=${project_id}`), {
+    const response_submissions = await (await fetch(encodeURI(`${apiUrl}/submissions?&project_id=${item.project_id}`), {
       headers: header
     })).json()
 
@@ -119,7 +115,7 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
     }
     )).sort((a:ShortSubmission, b:ShortSubmission) => b.submission_time.getTime() - a.submission_time.getTime())[0];
     // fetch the course id of the project
-    const project_item = await (await fetch(encodeURI(`${apiUrl}/${item.project_id}`), { //todo !
+    const project_item = await (await fetch(encodeURI(`${apiUrl}/projects/${item.project_id}`), {
       headers:header
     })).json()
 
@@ -133,21 +129,24 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
       teacher: response_courses.data.teacher,
       ufora_id: response_courses.data.ufora_id
     }
-    return  {
-      project_id: item.project_id, //todo is not a number but a path
-      title: item.title,
-      description: item.description,
-      assignment_file: item.assignment_file,
-      deadlines: [{description: "", deadline: new Date()}],
-      course_id: Number(item.course_id),
-      visible_for_students: Boolean(item.visible_for_students),
-      archived: Boolean(item.archived),
-      test_path: item.test_path,
-      script_name: item.script_name,
-      regex_expressions: item.regex_expressions,
-      short_submission: latest_submission,
-      course: course
-    }}));
+    return item.deadlines.map((d) => {
+      return  {
+        project_id: Number(item.project_id),
+        title: item.title,
+        description: item.description,
+        assignment_file: item.assignment_file,
+        deadline: d,
+        course_id: Number(item.course_id),
+        visible_for_students: Boolean(item.visible_for_students),
+        archived: Boolean(item.archived),
+        test_path: item.test_path,
+        script_name: item.script_name,
+        regex_expressions: item.regex_expressions,
+        short_submission: latest_submission,
+        course: course
+      }
+    })
+  }));
   setProjects(formattedData);
   return formattedData
 }
@@ -184,14 +183,24 @@ export default function HomeStudent() {
             {t('myProjects')}
           </Typography>
 
-          <ProjectDeadlineCard pred = {(d) => (dayjs(dayjs()).isBefore(d.deadline))} deadlines={projects} />
+          <ProjectDeadlineCard
+            deadlines={projects
+              .filter((p) => (dayjs(dayjs()).isBefore(p.deadline.deadline)))
+              .sort((a, b) => dayjs(a.deadline.deadline).diff(dayjs(b.deadline.deadline)))
+              .slice(0, 3) // only show the first 3
+            } />
 
         </Grid>
         <Grid item xs={6}>
           <Typography variant="body2">
             {t('deadlines')}
           </Typography>
-          <ProjectDeadlineCard pred={(d) => dayjs(dayjs()).isAfter(d.deadline)} deadlines={projects} />
+          <ProjectDeadlineCard
+            deadlines={projects
+              .filter((p) => dayjs(dayjs()).isAfter(p.deadline.deadline))
+              .sort((a, b) => dayjs(b.deadline.deadline).diff(dayjs(a.deadline.deadline)))
+              .slice(0, 3) // only show the first 3
+            } />
         </Grid>
         <Grid item xs={6}>
           <Card>
