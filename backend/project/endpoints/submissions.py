@@ -92,7 +92,6 @@ class SubmissionsEndpoint(Resource):
 
                 # User
                 uid = request.form.get("uid")
-                print(request.form)
                 valid, message = is_valid_user(session, uid)
                 if not valid:
                     data["message"] = message
