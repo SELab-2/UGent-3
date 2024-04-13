@@ -1,6 +1,7 @@
 CREATE TYPE role AS ENUM ('STUDENT', 'TEACHER', 'ADMIN');
 
 CREATE TYPE submission_status AS ENUM ('SUCCESS', 'LATE', 'FAIL', 'RUNNING');
+CREATE TYPE runner AS ENUM ('PYTHON', 'GENERAL', 'CUSTOM');
 
 CREATE TABLE users (
 	uid VARCHAR(255),
@@ -52,6 +53,7 @@ CREATE TABLE projects (
 	visible_for_students BOOLEAN NOT NULL,
 	archived BOOLEAN NOT NULL,
 	regex_expressions VARCHAR(50)[],
+	runner runner,
 	PRIMARY KEY(project_id),
 	CONSTRAINT fk_course FOREIGN KEY(course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );
