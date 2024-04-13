@@ -1,7 +1,4 @@
 {
-  "home": {
-    "title": "Homepagina"
-  },
   "header": {
     "myProjects": "Mijn Projecten",
     "myCourses": "Mijn Vakken",
@@ -11,8 +8,8 @@
     "homepage": "Homepage"
   },
   "home": {
-    "homepage": "Homepage",
-    "welcomeDescription": "Welkom bij Peristerónas het online indieningsplatform van UGent",
+    "homepage": "Homepagina",
+    "welcomeDescription": "Welkom bij Peristerónas, het online indieningsplatform van UGent",
     "login": "Aanmelden"
   },
   "courseForm": {

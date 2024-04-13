@@ -95,7 +95,7 @@ const handleMonthChange =(
 };
 const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<ProjectDeadline[]>>) => {
   const header  = {
-    "Authorization": "teacher2" // todo add true authorization
+    "Authorization": "teacher2"
   }
   const response = await fetch(`${apiUrl}/projects`, {
     headers:header
