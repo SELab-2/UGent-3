@@ -127,10 +127,10 @@ class SubmissionsEndpoint(Resource):
                     return data, 400
 
                 deadlines = project.deadlines
-                submission.submission_status = SubmissionStatus.LATE
+                is_late = False
                 for deadline in deadlines:
                     if submission.submission_time < deadline.deadline:
-                        submission.submission_status = SubmissionStatus.RUNNING
+                        is_late = True
 
                 # Submission_id needed for the file location
                 session.add(submission)
@@ -157,6 +157,9 @@ class SubmissionsEndpoint(Resource):
                         path.join(UPLOAD_FOLDER, str(project.project_id)),
                         project.runner.value,
                         False)
+                else:
+                    submission.submission_status = SubmissionStatus.LATE if is_late \
+                        else SubmissionStatus.SUCCESS
 
                 data["message"] = "Successfully fetched the submissions"
                 data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
