@@ -1,19 +1,20 @@
-import { Button, Dialog, DialogActions, DialogTitle, FormControl, FormHelperText, Grid, Input, InputLabel, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Button, Dialog, DialogActions, DialogTitle, FormControl, FormHelperText, Grid, Input, InputLabel } from "@mui/material";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { SideScrollableCourses } from "./CourseUtilComponents";
-import { Course, apiHost, loggedInToken, loggedInUid, callToApi } from "./CourseUtils";
+import { Course, apiHost, callToApi } from "./CourseUtils";
 import { Title } from "../Header/Title";
+import { useLoaderData } from "react-router-dom";
 
 /**
  * @returns A jsx component representing all courses for a teacher
  */
 export function AllCoursesTeacher(): JSX.Element {
-  const [courses, setActiveCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
+  //const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
 
+  const courses: Course[] = useLoaderData() as Course[];
   const [courseName, setCourseName] = useState('');
   const [error, setError] = useState('');
 
@@ -28,21 +29,6 @@ export function AllCoursesTeacher(): JSX.Element {
   const handleClose = () => {
     setOpen(false);
   };
-
-  useEffect(() => {
-    const params = new URLSearchParams({ teacher: loggedInUid() });
-    fetch(`${apiHost}/courses?${params}`, {
-      headers: {
-        "Authorization": loggedInToken()
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        setActiveCourses(data.data);
-        setLoading(false);
-      })
-      .catch(error => console.error('Error:', error));
-  }, []);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCourseName(event.target.value);
@@ -60,44 +46,35 @@ export function AllCoursesTeacher(): JSX.Element {
     const data = { name: courseName };
     callToApi(`${apiHost}/courses`, JSON.stringify(data), 'POST', navigate);
   };
-  if(loading) {
-    return (
-      <>
-        <Typography variant="h1">Loading Courses</Typography>
-      </>
-    );
-  }
-  else {
-    return (
-      <>
-        <Title title={t('title')}></Title>
-        <Grid container direction={'column'} style={{marginTop: '1rem', width:'100vw', height: '80vh'}}>
-          <SideScrollableCourses courses={courses}></SideScrollableCourses>
-          <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>{t('courseForm')}</DialogTitle>
-            <form style={{ margin: "2rem" }} onSubmit={handleSubmit}>
-              <FormControl>
-                <InputLabel htmlFor="course-name">{t('courseName')}</InputLabel>
-                <Input
-                  id="course-name"
-                  value={courseName}
-                  onChange={handleInputChange}
-                  error={!!error}
-                  aria-describedby="my-helper-text"
-                />
-                {error && <FormHelperText id="my-helper-text">{error}</FormHelperText>}
-              </FormControl>
-              <DialogActions>
-                <Button onClick={handleClose}>{t('cancel')}</Button>
-                <Button type="submit">{t('submit')}</Button>
-              </DialogActions>
-            </form>
-          </Dialog>
-          <Grid item style={{position: "absolute", left: "2rem", bottom: "5rem"}}>
-            <Button onClick={handleClickOpen} >{t('create')}</Button>
-          </Grid>
+  return (
+    <>
+      <Title title={t('title')}></Title>
+      <Grid container direction={'column'} style={{marginTop: '1rem', width:'100vw', height: '80vh'}}>
+        <SideScrollableCourses courses={courses}></SideScrollableCourses>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>{t('courseForm')}</DialogTitle>
+          <form style={{ margin: "2rem" }} onSubmit={handleSubmit}>
+            <FormControl>
+              <InputLabel htmlFor="course-name">{t('courseName')}</InputLabel>
+              <Input
+                id="course-name"
+                value={courseName}
+                onChange={handleInputChange}
+                error={!!error}
+                aria-describedby="my-helper-text"
+              />
+              {error && <FormHelperText id="my-helper-text">{error}</FormHelperText>}
+            </FormControl>
+            <DialogActions>
+              <Button onClick={handleClose}>{t('cancel')}</Button>
+              <Button type="submit">{t('submit')}</Button>
+            </DialogActions>
+          </form>
+        </Dialog>
+        <Grid item style={{position: "absolute", left: "2rem", bottom: "5rem"}}>
+          <Button onClick={handleClickOpen} >{t('create')}</Button>
         </Grid>
-      </>
-    );
-  }
+      </Grid>
+    </>
+  );
 }

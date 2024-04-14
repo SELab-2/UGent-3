@@ -84,3 +84,21 @@ export function getNearestFutureDate(dates: string[][]): Date | null {
   if (futureDates.length === 0) return null;
   return futureDates.reduce((nearest, current) => current < nearest ? current : nearest);
 }
+
+/**
+ * Load courses for courses teacher page, this filters courses on logged in teacher uid
+ * @returns A Promise that resolves to the loaded courses data.
+ */
+export async function loaderCourses() {
+  const params = new URLSearchParams({ teacher: loggedInUid()});
+  fetch(`${apiHost}/courses?${params}`, {
+    headers: {
+      "Authorization": loggedInToken()
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      return data.data;
+    })
+    .catch(error => {throw new Response(error.message, { status: error.status });});
+}

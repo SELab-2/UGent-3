@@ -2,6 +2,7 @@ import { BrowserRouter,Route,Routes } from "react-router-dom";
 import { Header } from "./components/Header/Header";
 import { AllCoursesTeacher } from "./components/Courses/AllCoursesTeacher";
 import { CourseDetailTeacher } from "./components/Courses/CourseDetailTeacher";
+import { loaderCourses } from "./components/Courses/CourseUtils";
 import Home from "./pages/home/Home";
 import LanguagePath from "./components/LanguagePath";
 import ProjectView from "./pages/project/projectView/ProjectView";
@@ -22,7 +23,7 @@ function App(): JSX.Element {
             <Route path=":projectId" element={<ProjectView />}/>
           </Route>
           <Route path="courses">
-            <Route index element={<AllCoursesTeacher />} />
+            <Route index element={<AllCoursesTeacher />} loader={loaderCourses}/>
             <Route path=":courseId" element={<CourseDetailTeacher />} />
           </Route>
         </Route>
@@ -30,4 +31,5 @@ function App(): JSX.Element {
     </BrowserRouter>
   );
 }
+
 export default App;
