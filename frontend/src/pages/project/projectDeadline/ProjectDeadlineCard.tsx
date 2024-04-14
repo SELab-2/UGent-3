@@ -28,7 +28,7 @@ export const ProjectDeadlineCard: React.FC<ProjectCardProps> = ({  deadlines }) 
       {deadlines.map((project, index) => (
        
         <Card key={index} style={{margin: '10px 0'}}>
-          <CardActionArea component={Link} to={`/${i18n.language}/${project.project_id}`}>
+          <CardActionArea component={Link} to={`/${i18n.language}/projects/${project.project_id}`}>
             <CardContent>
               <Typography variant="h6" style={{color: project.short_submission ?
                 (project.short_submission.submission_status === 'SUCCESS' ? 'green' : 'red') : '#686868'}}>
