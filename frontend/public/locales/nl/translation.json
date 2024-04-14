@@ -55,6 +55,7 @@
   },
   "projectsOverview": {
     "past_deadline": "Verlopen Projecten",
-    "future_deadline": "Opkomende Projecten"
+    "future_deadline": "Opkomende Projecten",
+    "no_projects": "Geen projecten"
   }
 }

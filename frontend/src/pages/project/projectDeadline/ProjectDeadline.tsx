@@ -45,5 +45,6 @@ export interface Course {
 export interface ShortSubmission {
   submission_id:number,
   submission_time:Date,
-  submission_status:string
+  submission_status:string,
+  grading: number
 }

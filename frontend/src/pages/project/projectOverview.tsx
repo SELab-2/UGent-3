@@ -44,35 +44,46 @@ export default function ProjectOverView() {
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <Typography variant="h5" style={{ color: '#3f51b5' }}>{t("future_deadline")}:</Typography>
-          {Object.entries(futureProjectsByCourse).map(([index, courseProjects]) => (
-            <Grid container spacing={2} key={index}>
-              <Grid item xs={12}>
-                <Link href={`/${i18n.language}/course/${courseProjects[0].course.course_id}`} style={{color: 'inherit'}}
-                  underline={'none'}>
-                  <Typography variant="h6">{courseProjects[0].course.name} {courseProjects[0].course.ufora_id}</Typography>
-                </Link>
+          {Object.keys(futureProjectsByCourse).length === 0 ? (
+            <Typography variant="body1">
+              {t('no_projects')}
+            </Typography>
+          ) :(
+            Object.entries(futureProjectsByCourse).map(([index, courseProjects]) => (
+              <Grid container spacing={2} key={index}>
+                <Grid item xs={12}>
+                  <Link href={`/${i18n.language}/course/${courseProjects[0].course.course_id}`} style={{color: 'inherit'}}
+                    underline={'none'}>
+                    <Typography variant="h6">{courseProjects[0].course.name} {courseProjects[0].course.ufora_id}</Typography>
+                  </Link>
+                </Grid>
+                <Grid item xs={8}>
+                  <ProjectDeadlineCard deadlines={courseProjects} />
+                </Grid>
               </Grid>
-              <Grid item xs={8}>
-                <ProjectDeadlineCard deadlines={courseProjects} />
-              </Grid>
-            </Grid>
-          ))}
+            )))}
         </Grid>
         <Grid item xs={6}>
           <Typography variant="h5" style={{ color: '#3f51b5' }}>{t("past_deadline")}:</Typography>
-          {Object.entries(pastProjectsByCourse).map(([index, courseProjects]) => (
-            <Grid container spacing={2} key={index}>
-              <Grid item xs={12}>
-                <Link href={`/${i18n.language}/course/${courseProjects[0].course.course_id}`} style={{color: 'inherit'}}
-                  underline={'none'}>
-                  <Typography variant="h6">{courseProjects[0].course.name} {courseProjects[0].course.ufora_id}</Typography>
-                </Link>
-              </Grid>
-              <Grid item xs={8}>
-                <ProjectDeadlineCard deadlines={courseProjects} />
-              </Grid>
-            </Grid>
-          ))}
+          {
+            Object.keys(futureProjectsByCourse).length === 0 ? (
+              <Typography variant="body1">
+                {t('no_projects')}
+              </Typography>
+            ):(
+              Object.entries(pastProjectsByCourse).map(([index, courseProjects]) => (
+                <Grid container spacing={2} key={index}>
+                  <Grid item xs={12}>
+                    <Link href={`/${i18n.language}/course/${courseProjects[0].course.course_id}`} style={{color: 'inherit'}}
+                      underline={'none'}>
+                      <Typography variant="h6">{courseProjects[0].course.name} {courseProjects[0].course.ufora_id}</Typography>
+                    </Link>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <ProjectDeadlineCard deadlines={courseProjects} />
+                  </Grid>
+                </Grid>
+              )))}
         </Grid>
       </Grid>
     </Container>

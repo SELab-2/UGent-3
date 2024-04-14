@@ -21,7 +21,8 @@ export const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAc
     const latest_submission = response_submissions.data.map((submission:ShortSubmission) => ({
       submission_id: submission.submission_id,//this is the path 
       submission_time: new Date(submission.submission_time),
-      submission_status: submission.submission_status
+      submission_status: submission.submission_status,
+      grading: Number(submission.grading)
     }
     )).sort((a:ShortSubmission, b:ShortSubmission) => b.submission_time.getTime() - a.submission_time.getTime())[0];
     // fetch the course id of the project
