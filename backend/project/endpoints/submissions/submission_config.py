@@ -1,3 +1,8 @@
+"""
+This module is responsible for creating the submissions blueprint and
+adding the submission endpoints to it.
+"""
+
 from flask import Blueprint
 from project.endpoints.submissions.submissions import SubmissionsEndpoint
 from project.endpoints.submissions.submission_detail import SubmissionEndpoint

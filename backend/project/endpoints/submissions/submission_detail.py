@@ -1,3 +1,7 @@
+"""
+This module contains the API endpoint for the submission detail
+"""
+
 from os import getenv
 from urllib.parse import urljoin
 from flask import request
@@ -40,16 +44,20 @@ class SubmissionEndpoint(Resource):
                     data["message"] = f"Submission (submission_id={submission_id}) not found"
                     return data, 404
 
-                data["message"] = "Successfully fetched the submission"
-                data["data"] = {
-                    "submission_id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
-                    "uid": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
-                    "project_id": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
-                    "grading": submission.grading,
-                    "submission_time": submission.submission_time,
-                    "submission_status": submission.submission_status
-                }
-                return data, 200
+                return {
+                    "data": {
+                        "submission_id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
+                        "uid": urljoin(f"{API_HOST}/", f"/users/{str(submission.uid)}"),
+                        "project_id": urljoin(
+                            f"{API_HOST}/",
+                            f"/projects/{str(submission.project_id)}"),
+                        "grading": submission.grading,
+                        "submission_time": submission.submission_time,
+                        "submission_status": submission.submission_status
+                        },
+                    "message": "Successfully fetched the submission",
+                    "url": urljoin(f"{BASE_URL}/", str(submission.submission_id))
+                }, 200
 
         except exc.SQLAlchemyError:
             data["message"] = \

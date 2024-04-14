@@ -1,3 +1,7 @@
+"""
+This module contains the API endpoint for the submissions
+"""
+
 from os import path, makedirs, getenv
 from urllib.parse import urljoin
 from datetime import datetime
@@ -69,6 +73,7 @@ class SubmissionsEndpoint(Resource):
             filters=request.args
         )
 
+    @authorize_student_submission
     def post(self) -> dict[str, any]:
         """Post a new submission to a project
 
@@ -84,12 +89,11 @@ class SubmissionsEndpoint(Resource):
                 submission = Submission()
 
                 # User
-                uid = request.form.get("uid")
-                valid, message = is_valid_user(session, uid)
+                valid, message = is_valid_user(session, request.form.get("uid"))
                 if not valid:
                     data["message"] = message
                     return data, 400
-                submission.uid = uid
+                submission.uid = request.form.get("uid")
 
                 # Project
                 project_id = request.form.get("project_id")
@@ -153,9 +157,6 @@ class SubmissionsEndpoint(Resource):
                         path.join(UPLOAD_FOLDER, str(project.project_id)),
                         project.runner.value,
                         False)
-                else:
-                    submission.submission_status = SubmissionStatus.LATE if is_late \
-                        else SubmissionStatus.SUCCESS
 
                 data["message"] = "Successfully fetched the submissions"
                 data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
