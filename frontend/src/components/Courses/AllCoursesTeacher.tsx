@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogTitle, FormControl, FormHelperText, Grid, Input, InputLabel } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogTitle, FormControl, FormHelperText, Grid, Input, InputLabel, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import { Title } from "../Header/Title";
  */
 export function AllCoursesTeacher(): JSX.Element {
   const [courses, setActiveCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
 
   const [courseName, setCourseName] = useState('');
@@ -38,6 +39,7 @@ export function AllCoursesTeacher(): JSX.Element {
       .then(response => response.json())
       .then(data => {
         setActiveCourses(data.data);
+        setLoading(false);
       })
       .catch(error => console.error('Error:', error));
   }, []);
@@ -58,36 +60,44 @@ export function AllCoursesTeacher(): JSX.Element {
     const data = { name: courseName };
     callToApi(`${apiHost}/courses`, JSON.stringify(data), 'POST', navigate);
   };
-
-  return (
-    <>
-      <Title title={t('title')}></Title>
-      <Grid container direction={'column'} style={{marginTop: '1rem', width:'100vw', height: '80vh'}}>
-        <SideScrollableCourses courses={courses}></SideScrollableCourses>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>{t('courseForm')}</DialogTitle>
-          <form style={{ margin: "2rem" }} onSubmit={handleSubmit}>
-            <FormControl>
-              <InputLabel htmlFor="course-name">{t('courseName')}</InputLabel>
-              <Input
-                id="course-name"
-                value={courseName}
-                onChange={handleInputChange}
-                error={!!error}
-                aria-describedby="my-helper-text"
-              />
-              {error && <FormHelperText id="my-helper-text">{error}</FormHelperText>}
-            </FormControl>
-            <DialogActions>
-              <Button onClick={handleClose}>{t('cancel')}</Button>
-              <Button type="submit">{t('submit')}</Button>
-            </DialogActions>
-          </form>
-        </Dialog>
-        <Grid item style={{position: "absolute", left: "2rem", bottom: "5rem"}}>
-          <Button onClick={handleClickOpen} >{t('create')}</Button>
+  if(loading) {
+    return (
+      <>
+        <Typography variant="h1">Loading Courses</Typography>
+      </>
+    );
+  }
+  else {
+    return (
+      <>
+        <Title title={t('title')}></Title>
+        <Grid container direction={'column'} style={{marginTop: '1rem', width:'100vw', height: '80vh'}}>
+          <SideScrollableCourses courses={courses}></SideScrollableCourses>
+          <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>{t('courseForm')}</DialogTitle>
+            <form style={{ margin: "2rem" }} onSubmit={handleSubmit}>
+              <FormControl>
+                <InputLabel htmlFor="course-name">{t('courseName')}</InputLabel>
+                <Input
+                  id="course-name"
+                  value={courseName}
+                  onChange={handleInputChange}
+                  error={!!error}
+                  aria-describedby="my-helper-text"
+                />
+                {error && <FormHelperText id="my-helper-text">{error}</FormHelperText>}
+              </FormControl>
+              <DialogActions>
+                <Button onClick={handleClose}>{t('cancel')}</Button>
+                <Button type="submit">{t('submit')}</Button>
+              </DialogActions>
+            </form>
+          </Dialog>
+          <Grid item style={{position: "absolute", left: "2rem", bottom: "5rem"}}>
+            <Button onClick={handleClickOpen} >{t('create')}</Button>
+          </Grid>
         </Grid>
-      </Grid>
-    </>
-  );
+      </>
+    );
+  }
 }
