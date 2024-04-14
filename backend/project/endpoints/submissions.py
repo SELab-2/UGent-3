@@ -127,10 +127,10 @@ class SubmissionsEndpoint(Resource):
                     return data, 400
 
                 deadlines = project.deadlines
-                is_late = False
+                is_late = True
                 for deadline in deadlines:
                     if submission.submission_time < deadline.deadline:
-                        is_late = True
+                        is_late = False
 
                 # Submission_id needed for the file location
                 session.add(submission)
