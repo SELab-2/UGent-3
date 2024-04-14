@@ -51,5 +51,9 @@
     "deadlinesOnDay": "Deadlines on: ",
     "noDeadline": "No deadlines",
     "no_submission_yet" : "No submission yet"
+  },
+  "projectsOverview": {
+    "past_deadline": "Past Projects",
+    "future_deadline": "Upcoming Projects"
   }
 }
