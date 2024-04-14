@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardActions, CardContent, CardHeader, Grid, Paper, TextField, Typography } from "@mui/material";
 import { Course, Project, apiHost, getIdFromLink, getNearestFutureDate, loggedInToken } from "./CourseUtils";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import debounce from 'debounce';
 /**
@@ -41,11 +41,12 @@ export function SearchBox({label,searchTerm,handleSearchChange}: {label: string,
  * @returns A component to display courses in horizontal scroller where each course is a card containing its name.
  */
 export function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Element {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Get initial state from URL
-  const urlParams = new URLSearchParams(location.search);
+  const urlParams = useMemo(() => new URLSearchParams(location.search), [location.search]); //useMemo so only recompute when location.search changes
   const initialSearchTerm = urlParams.get('name') || '';
   const initialUforaIdFilter = urlParams.get('ufora_id') || '';
   const initialTeacherNameFilter = urlParams.get('teacher') || '';
@@ -55,28 +56,38 @@ export function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Eleme
   const [teacherNameFilter, setTeacherNameFilter] = useState(initialTeacherNameFilter);
   const [projects, setProjects] = useState<{ [courseId: string]: Project[] }>({});
 
-  // Debounce the handleSearchChange function
-  const debouncedHandleSearchChange = debounce((key:string, value: string) => {
-    urlParams.set(key, value);
-    navigate(`${location.pathname}?${urlParams.toString()}`);
-  }, 300); // load the changes every 300 milliseconds
+  const debouncedHandleSearchChange = useMemo(() =>
+    debounce((key: string, value: string) => {
+      urlParams.set(key, value);
+      const newUrl = `${location.pathname}?${urlParams.toString()}`;
+      navigate(newUrl, { replace: true });
+    }, 500), [urlParams, navigate, location.pathname]);
+
+  useEffect(() => {
+    debouncedHandleSearchChange('name', searchTerm);
+  }, [searchTerm, debouncedHandleSearchChange]);
+
+  useEffect(() => {
+    debouncedHandleSearchChange('ufora_id', uforaIdFilter);
+  }, [uforaIdFilter, debouncedHandleSearchChange]);
+
+  useEffect(() => {
+    debouncedHandleSearchChange('teacher', teacherNameFilter);
+  }, [teacherNameFilter, debouncedHandleSearchChange]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSearchTerm = event.target.value;
     setSearchTerm(newSearchTerm);
-    debouncedHandleSearchChange('name', newSearchTerm);
   };
 
   const handleUforaIdFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newUforaIdFilter = event.target.value;
     setUforaIdFilter(newUforaIdFilter);
-    debouncedHandleSearchChange('ufora_id', newUforaIdFilter);
   };
 
   const handleTeacherNameFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newTeacherNameFilter = event.target.value;
     setTeacherNameFilter(newTeacherNameFilter);
-    debouncedHandleSearchChange('teacher', newTeacherNameFilter);
   };
 
   useEffect(() => {
