@@ -3,7 +3,7 @@ export interface ProjectDeadline {
   title :string,
   description:string,
   assignment_file:string,
-  deadline:Date,
+  deadline:Date|undefined,
   deadline_description:string,
   course_id:number,
   visible_for_students:boolean,

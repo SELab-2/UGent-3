@@ -55,9 +55,12 @@ export const ProjectDeadlineCard: React.FC<ProjectCardProps> = ({  deadlines }) 
                 {t('last_submission')}: {project.short_submission ?
                   t(project.short_submission.submission_status.toString()) : t('no_submission_yet')}
               </Typography>
-              <Typography variant="body2" color="textSecondary">
+              {project.deadline && (
+                <Typography variant="body2" color="textSecondary">
                   Deadline: {dayjs(project.deadline).format('MMMM D, YYYY')}
-              </Typography>
+                </Typography>
+              )}
+
             </CardContent>
           </CardActionArea>
         </Card>
