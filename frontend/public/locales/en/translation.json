@@ -50,6 +50,8 @@
     "FAIL": "Fail",
     "deadlinesOnDay": "Deadlines on: ",
     "noDeadline": "No deadlines",
-    "no_submission_yet" : "No submission yet"
+    "no_submission_yet" : "No submission yet",
+    "loading": "Loading...",
+    "no_projects": "There are no projects."
   }
 }

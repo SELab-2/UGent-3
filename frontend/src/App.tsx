@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import HomeStudent from "./pages/home/Home_student.tsx";
+import HomeStudent from "./pages/home/HomeStudent.tsx";
 import Home from "./pages/home/Home.tsx"
 import { Header } from "./components/Header/Header";
 import LanguagePath from "./components/LanguagePath";

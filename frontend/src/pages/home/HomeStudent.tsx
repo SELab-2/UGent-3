@@ -9,7 +9,7 @@ import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
 import {ProjectDeadlineCard} from "../project/projectDeadline/ProjectDeadlineCard.tsx";
 import {ProjectDeadline, ShortSubmission, Project} from "../project/projectDeadline/ProjectDeadline.tsx";
 
-const apiUrl = import.meta.env.VITE_APP_API_URL
+const API_URL = import.meta.env.VITE_APP_API_URL
 const initialValue = dayjs(Date.now());
 
 interface DeadlineInfoProps {
@@ -97,13 +97,13 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
   const header  = {
     "Authorization": "teacher2"
   }
-  const response = await fetch(`${apiUrl}/projects`, {
+  const response = await fetch(`${API_URL}/projects`, {
     headers:header
   })
   const jsonData = await response.json();
   let formattedData: ProjectDeadline[] = await Promise.all( jsonData.data.map(async (item:Project) => {
     const project_id = item.project_id.split('/')[1]
-    const response_submissions = await (await fetch(encodeURI(`${apiUrl}/submissions?&project_id=${project_id}`), {
+    const response_submissions = await (await fetch(encodeURI(`${API_URL}/submissions?&project_id=${project_id}`), {
       headers: header
     })).json()
 
@@ -115,12 +115,12 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
     }
     )).sort((a:ShortSubmission, b:ShortSubmission) => b.submission_time.getTime() - a.submission_time.getTime())[0];
     // fetch the course id of the project
-    const project_item = await (await fetch(encodeURI(`${apiUrl}/${item.project_id}`), {
+    const project_item = await (await fetch(encodeURI(`${API_URL}/${item.project_id}`), {
       headers:header
     })).json()
 
     //fetch the course
-    const response_courses = await (await fetch(encodeURI(`${apiUrl}/courses/${project_item.data.course_id}`), {
+    const response_courses = await (await fetch(encodeURI(`${API_URL}/courses/${project_item.data.course_id}`), {
       headers: header
     })).json()
     const course = {
@@ -165,10 +165,12 @@ export default function HomeStudent() {
   const [highlightedDays, setHighlightedDays] = React.useState<number[]>([]);
 
   const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs(Date.now()));
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchProjects(setProjects).then(p => {
       handleMonthChange(initialValue, p,setHighlightedDays)
+      setIsLoading(false)
     })
   }, []);
 
@@ -180,58 +182,69 @@ export default function HomeStudent() {
   return (
     <Container style={{ paddingTop: '50px' }}>
       <Grid container spacing={2} wrap="nowrap">
-        <Grid item xs={6}>
-          <Typography variant="body2">
-            {t('myProjects')}
+        {isLoading ? (
+          <Typography variant="body1">
+            {t('loading')}
           </Typography>
-
-          <ProjectDeadlineCard
-            deadlines={projects
-              .filter((p) => (dayjs(dayjs()).isBefore(p.deadline)))
-              .sort((a, b) => dayjs(a.deadline).diff(dayjs(b.deadline)))
-              .slice(0, 3) // only show the first 3
-            } />
-
-        </Grid>
-        <Grid item xs={6}>
-          <Typography variant="body2">
-            {t('deadlines')}
+        ) : projects.length === 0 ? (
+          <Typography variant="body1">
+            {t('no_projects')}
           </Typography>
-          <ProjectDeadlineCard
-            deadlines={projects
-              .filter((p) => dayjs(dayjs()).isAfter(p.deadline))
-              .sort((a, b) => dayjs(b.deadline).diff(dayjs(a.deadline)))
-              .slice(0, 3) // only show the first 3
-            } />
-        </Grid>
-        <Grid item xs={6}>
-          <Card>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateCalendar
-                value={selectedDay}
-                onMonthChange={(date:Dayjs) => {handleMonthChange(date, projects,
-                  setHighlightedDays)}}
-                onChange={handleDaySelect}
-                renderLoading={() => <DayCalendarSkeleton />}
-                slots={{
-                  day: ServerDay,
-                }}
-                slotProps={{
-                  day: {
-                    highlightedDays,
-                  } as ExtendedPickersDayProps,
-                }}
-              />
-            </LocalizationProvider>
-            <CardContent>
+        ) : (
+          <>
+            <Grid item xs={6}>
               <Typography variant="body2">
-                {t('deadlinesOnDay')} {selectedDay.format('MMMM D, YYYY')}
+                {t('myProjects')}
               </Typography>
-              <DeadlineInfo selectedDay={selectedDay} deadlines={projects} />
-            </CardContent>
 
-          </Card>
-        </Grid>
+              <ProjectDeadlineCard
+                deadlines={projects
+                  .filter((p) => (dayjs(dayjs()).isBefore(p.deadline)))
+                  .sort((a, b) => dayjs(a.deadline).diff(dayjs(b.deadline)))
+                  .slice(0, 3) // only show the first 3
+                } />
+
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body2">
+                {t('deadlines')}
+              </Typography>
+              <ProjectDeadlineCard
+                deadlines={projects
+                  .filter((p) => dayjs(dayjs()).isAfter(p.deadline))
+                  .sort((a, b) => dayjs(b.deadline).diff(dayjs(a.deadline)))
+                  .slice(0, 3) // only show the first 3
+                } />
+            </Grid>
+            <Grid item xs={6}>
+              <Card>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateCalendar
+                    value={selectedDay}
+                    onMonthChange={(date: Dayjs) => { handleMonthChange(date, projects, setHighlightedDays) }}
+                    onChange={handleDaySelect}
+                    renderLoading={() => <DayCalendarSkeleton />}
+                    slots={{
+                      day: ServerDay,
+                    }}
+                    slotProps={{
+                      day: {
+                        highlightedDays,
+                      } as ExtendedPickersDayProps,
+                    }}
+                  />
+                </LocalizationProvider>
+                <CardContent>
+                  <Typography variant="body2">
+                    {t('deadlinesOnDay')} {selectedDay.format('MMMM D, YYYY')}
+                  </Typography>
+                  <DeadlineInfo selectedDay={selectedDay} deadlines={projects} />
+                </CardContent>
+
+              </Card>
+            </Grid>
+          </>
+        )}
       </Grid>
     </Container>
   );
