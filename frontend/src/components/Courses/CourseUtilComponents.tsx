@@ -3,6 +3,7 @@ import { Course, Project, apiHost, getIdFromLink, getNearestFutureDate, loggedIn
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import debounce from 'debounce';
 /**
  * @param text - The text to be displayed
  * @returns Typography that overflow into ... when text is too long
@@ -54,25 +55,28 @@ export function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Eleme
   const [teacherNameFilter, setTeacherNameFilter] = useState(initialTeacherNameFilter);
   const [projects, setProjects] = useState<{ [courseId: string]: Project[] }>({});
 
+  // Debounce the handleSearchChange function
+  const debouncedHandleSearchChange = debounce((key:string, value: string) => {
+    urlParams.set(key, value);
+    navigate(`${location.pathname}?${urlParams.toString()}`);
+  }, 300); // load the changes every 300 milliseconds
+
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSearchTerm = event.target.value;
     setSearchTerm(newSearchTerm);
-    urlParams.set('name', newSearchTerm);
-    navigate(`${location.pathname}?${urlParams.toString()}`);
+    debouncedHandleSearchChange('name', newSearchTerm);
   };
 
   const handleUforaIdFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newUforaIdFilter = event.target.value;
     setUforaIdFilter(newUforaIdFilter);
-    urlParams.set('ufora_id', newUforaIdFilter);
-    navigate(`${location.pathname}?${urlParams.toString()}`);
+    debouncedHandleSearchChange('ufora_id', newUforaIdFilter);
   };
 
   const handleTeacherNameFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newTeacherNameFilter = event.target.value;
     setTeacherNameFilter(newTeacherNameFilter);
-    urlParams.set('teacher', newTeacherNameFilter);
-    navigate(`${location.pathname}?${urlParams.toString()}`);
+    debouncedHandleSearchChange('teacher', newTeacherNameFilter);
   };
 
   useEffect(() => {
