@@ -1,5 +1,4 @@
 import { Grid, Typography } from "@mui/material";
-import { useTranslation } from "react-i18next";
 
 /**
  * This component will be rendered when an error occurs.
@@ -11,9 +10,6 @@ import { useTranslation } from "react-i18next";
 export function ErrorPage(
   { statusCode, statusTitle, message }: { statusCode: string, statusTitle: string, message: string }
 ): React.JSX.Element {
-
-  const { t } = useTranslation();
-
   return (
     <Grid
       container
@@ -42,12 +38,12 @@ export function ErrorPage(
       </Grid>
       <Grid item>
         <Typography variant="h3">
-          { t(statusTitle) }
+          { statusTitle }
         </Typography>
       </Grid>
       <Grid item>
         <Typography variant="body1">
-          { t(message) }
+          { message }
         </Typography>
       </Grid>
     </Grid>
