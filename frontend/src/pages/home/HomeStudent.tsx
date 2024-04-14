@@ -134,7 +134,7 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
       if(item.deadlines){
         return item.deadlines.map((d:string[]) => {
           return  {
-            project_id: item.project_id,
+            project_id: project_id,
             title: item.title,
             description: item.description,
             assignment_file: item.assignment_file,
@@ -153,7 +153,7 @@ const fetchProjects = async (setProjects: React.Dispatch<React.SetStateAction<Pr
       }
       // contains no dealine:
       return [{
-        project_id: item.project_id,
+        project_id: project_id,
         title: item.title,
         description: item.description,
         assignment_file: item.assignment_file,
