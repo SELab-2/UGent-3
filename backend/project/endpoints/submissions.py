@@ -3,6 +3,7 @@
 from urllib.parse import urljoin
 from datetime import datetime
 from os import getenv, path, makedirs
+from zoneinfo import ZoneInfo
 from shutil import rmtree
 from dotenv import load_dotenv
 from flask import Blueprint, request
@@ -27,6 +28,8 @@ load_dotenv()
 API_HOST = getenv("API_HOST")
 UPLOAD_FOLDER = getenv("UPLOAD_FOLDER")
 BASE_URL =  urljoin(f"{API_HOST}/", "/submissions")
+
+TIMEZONE = getenv("TIMEZONE", "GMT")
 
 submissions_bp = Blueprint("submissions", __name__)
 
@@ -108,10 +111,7 @@ class SubmissionsEndpoint(Resource):
                 submission.project_id = int(project_id)
 
                 # Submission time
-                submission.submission_time = datetime.now()
-
-                # Submission status
-                submission.submission_status = SubmissionStatus.RUNNING
+                submission.submission_time = datetime.now(ZoneInfo(TIMEZONE))
 
                 # Submission files
                 submission.submission_path = "" # Must be set on creation
@@ -125,6 +125,12 @@ class SubmissionsEndpoint(Resource):
                         "Not all required files were uploaded " \
                         f"(required files={','.join(project.regex_expressions)})"
                     return data, 400
+
+                deadlines = project.deadlines
+                is_late = True
+                for deadline in deadlines:
+                    if submission.submission_time < deadline.deadline:
+                        is_late = False
 
                 # Submission_id needed for the file location
                 session.add(submission)
@@ -151,6 +157,9 @@ class SubmissionsEndpoint(Resource):
                         path.join(UPLOAD_FOLDER, str(project.project_id)),
                         project.runner.value,
                         False)
+                else:
+                    submission.submission_status = SubmissionStatus.LATE if is_late \
+                        else SubmissionStatus.SUCCESS
 
                 data["message"] = "Successfully fetched the submissions"
                 data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
