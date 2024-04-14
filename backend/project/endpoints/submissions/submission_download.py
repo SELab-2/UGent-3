@@ -48,12 +48,10 @@ class SubmissionDownload(Resource):
                             zf.write(file_path, path.relpath(file_path, start=submission_path))
 
                 memory_file.seek(0)
-
-                while True:
-                    data = memory_file.read(4096)
-                    if not data:
-                        break
+                data = memory_file.read(4096)
+                while data:
                     yield data
+                    data = memory_file.read(4096)
 
         response = Response(stream_with_context(zip_directory_stream()), mimetype='application/zip')
         response.headers['Content-Disposition'] = \
