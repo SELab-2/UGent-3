@@ -1,6 +1,6 @@
 import {Button, IconButton, Stack, TextField, Tooltip, Typography} from "@mui/material";
 import {useTranslation} from "react-i18next";
-import React, {useState} from "react";
+import {useState} from "react";
 import {Link} from "react-router-dom";
 import {InfoOutlined} from "@mui/icons-material";
 
