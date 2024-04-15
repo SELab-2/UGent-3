@@ -1,6 +1,6 @@
-import { RouterProvider, createBrowserRouter, createRoutesFromElements, Route } from "react-router-dom";
-import Home from "./pages/home/Home.tsx";
-import { Layout } from "./Layout.tsx";
+import { Route,RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
+import Layout from "./components/Header/Layout";
+import Home from "./pages/home/Home";
 import LanguagePath from "./components/LanguagePath";
 import ProjectView from "./pages/project/projectView/ProjectView";
 import { ErrorBoundary } from "./pages/error/ErrorBoundary.tsx";
