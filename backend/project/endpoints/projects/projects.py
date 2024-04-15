@@ -1,25 +1,28 @@
 """
 Module that implements the /projects endpoint of the API
 """
+
 import os
 from urllib.parse import urljoin
 import zipfile
-from sqlalchemy.exc import SQLAlchemyError
 
+from sqlalchemy.exc import SQLAlchemyError
 from flask import request, jsonify
 from flask_restful import Resource
 
 from project.db_in import db
-
+from project.models.user import User, Role
+from project.models.course import Course
+from project.models.course_relation import CourseStudent, CourseAdmin
 from project.models.project import Project, Runner
-from project.utils.query_agent import query_selected_from_model, create_model_instance
-from project.utils.authentication import authorize_teacher
-
+from project.utils.query_agent import query_selected_from_model, query_by_id_from_model, create_model_instance
+from project.utils.authentication import login_required_return_uid, authorize_teacher
+from project.utils.models.user_utils import is_teacher, is_admin
+from project.utils.models.course_utils import is_teacher_of_course, is_admin_of_course, is_student_of_course
 from project.endpoints.projects.endpoint_parser import parse_project_params
 
 API_URL = os.getenv('API_HOST')
 UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER")
-
 
 class ProjectsEndpoint(Resource):
     """
@@ -28,21 +31,106 @@ class ProjectsEndpoint(Resource):
     for implementing get method
     """
 
-    @authorize_teacher
-    def get(self, teacher_id=None):
+    @login_required_return_uid
+    def get(self, uid=None):
         """
         Get method for listing all available projects
         that are currently in the API
         """
+
         response_url = urljoin(API_URL, "projects")
-        return query_selected_from_model(
+
+        # Get all project
+        projects = query_selected_from_model(
             Project,
             response_url,
-            select_values=["project_id", "title", "description", "deadlines"],
-            url_mapper={"project_id": response_url},
+            select_values=["project_id", "course_id", "visible_for_students"],
             filters=request.args
-        )
+        )[0].json["data"]
 
+        if is_teacher(uid):
+            projects = [project for project in projects if is_teacher_of_course(uid, project["course_id"])]
+        elif is_admin(uid):
+            projects = [project for project in projects if is_admin_of_course(uid, project["course_id"])]
+        else:
+            projects = [project for project in projects if
+                is_student_of_course(uid, project["course_id"])
+                and project["visible_for_students"]
+            ]
+
+        filtered_projects = []
+        for project in projects:
+            response = query_by_id_from_model(
+                Project,
+                "project_id",
+                project["project_id"],
+                response_url
+            )
+            if response[1] != 200:
+                return response
+            filtered_projects.append(response[0]["data"])
+        
+        return {
+            "url": urljoin(f"{API_URL}/", response_url),
+            "message": "Successfully fetched the projects",
+            "data": filtered_projects
+        }
+
+
+        # # Filter on 1 course
+        # if "course" in filters:
+        #     return query_selected_from_model(
+        #         Project,
+        #         response_url,
+        #         select_values=["project_id", "title", "description", "deadlines"],
+        #         url_mapper={"project_id": response_url},
+        #         filters=filters
+        #     )
+
+        # # Projects of all courses
+        # else:
+        #     # Get the courses for the user
+        #     if role is not Role.TEACHER:
+        #         response = query_selected_from_model(
+        #             CourseStudent if role is Role.STUDENT else CourseAdmin,
+        #             response_url,
+        #             select_values=["course_id"],
+        #             filters={"uid": uid}
+        #         )
+        #     else:
+        #         response = query_selected_from_model(
+        #             Course,
+        #             response_url,
+        #             select_values=["course_id"],
+        #             filters={"teacher": uid}
+        #         )
+        #     if response[1] != 200:
+        #         return response
+        #     courses = response[0].json["data"]
+
+        #     # Find all projects based on the courses that the user is part of
+        #     projects = []
+        #     for course in courses:
+        #         filters["course_id"] = course
+        #         response = query_selected_from_model(
+        #             Project,
+        #             response_url,
+        #             select_values=["project_id", "title", "description", "deadlines"],
+        #             url_mapper={"project_id", response_url},
+        #             filters=filters
+        #         )
+        #         if response[1] != 200:
+        #             return response
+        #         projects += response.json["data"]
+            
+        #     # Return the projects
+        #     return {
+        #         "url": urljoin(f"{API_URL}/", response_url),
+        #         "message": "Successfully fetched the projects",
+        #         "data": projects
+        #     }
+
+    @authorize_teacher
     def post(self, teacher_id=None):
         """
         Post functionality for project
