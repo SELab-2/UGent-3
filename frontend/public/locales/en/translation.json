@@ -12,6 +12,12 @@
   },
   "courseDetailTeacher": {
     "title": "Course Details",
+    "joinCodes": "Join Codes",
+    "forAdmins": "For Admins",
+    "forStudents": "For Students",
+    "noExpiryDate": "No expiry date",
+    "expiryDate": "Expiry Date",
+    "newJoinCode": "New Join Code",
     "deleteSelected": "Delete Selected Students",
     "projects": "Projects",
     "newProject": "New Project",
@@ -62,6 +68,11 @@
     "daysAgo": "days ago",
     "hoursAgo": "hours ago",
     "minutesAgo": "minutes ago",
-    "justNow": "just now"
+    "justNow": "just now",
+    "yearsLater": "years later",
+    "monthsLater": "months later",
+    "daysLater": "days later",
+    "hoursLater": "hours later",
+    "minutesLater": "minutes later"
   }
 }

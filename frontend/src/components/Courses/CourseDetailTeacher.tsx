@@ -1,10 +1,11 @@
-import { Button, Card, CardActions, CardContent, CardHeader, Checkbox, Grid, IconButton, Paper, Typography } from "@mui/material";
-import { ChangeEvent, useState } from "react";
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Checkbox, FormControlLabel, Grid, IconButton, Input, Menu, MenuItem, Paper, Typography } from "@mui/material";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Course, Project, apiHost, loggedInToken, getIdFromLink, getNearestFutureDate, getUserName } from "./CourseUtils";
 import { Link, useNavigate, NavigateFunction, useLoaderData } from "react-router-dom";
 import { Title } from "../Header/Title";
 import ClearIcon from '@mui/icons-material/Clear';
+import { timeDifference } from "../../utils/date-utils";
 
 interface UserUid{
     uid: string
@@ -21,9 +22,9 @@ function handleDeleteAdmin(navigate: NavigateFunction, courseId: string, uid: st
     method: 'DELETE',
     headers: {
       "Authorization": loggedInToken(),
-      "Content-Type": "application/json" // Add this line
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify({ // Convert the body object to JSON
+    body: JSON.stringify({
       "admin_uid": uid
     })
   })
@@ -44,9 +45,9 @@ function handleDeleteStudent(navigate: NavigateFunction, courseId: string, uids:
     method: 'DELETE',
     headers: {
       "Authorization": loggedInToken(),
-      "Content-Type": "application/json" // Add this line
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify({ // Convert the body object to JSON
+    body: JSON.stringify({
       "students": uids
     })
   })
@@ -61,6 +62,15 @@ function handleDeleteStudent(navigate: NavigateFunction, courseId: string, uids:
  */
 export function CourseDetailTeacher(): JSX.Element {
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  const [anchorEl, setAnchorElStudent] = useState<null | HTMLElement>(null);
+  const openCodes = Boolean(anchorEl);
+
+  const handleClickCodes = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorElStudent(event.currentTarget);
+  };
+  const handleCloseCodes = () => {
+    setAnchorElStudent(null);
+  };
 
   const courseDetail = useLoaderData() as {
     course: Course ,
@@ -143,7 +153,6 @@ export function CourseDetailTeacher(): JSX.Element {
                         </Grid>
                       ))}
                     </Grid>
-                    <Button style={{ position: "absolute", bottom: 0, right: 0 }}>{t('newTeacher')}</Button>
                   </Paper>
                 </Grid>
                 <Grid item position={"relative"} height={"35vh"} width={"35vw"}>
@@ -169,7 +178,10 @@ export function CourseDetailTeacher(): JSX.Element {
                     <ClearIcon />
                     <Typography variant="body1">{t('deleteSelected')}</Typography>
                   </IconButton>
-                  <Button style={{ position: "absolute", bottom: 0, right: 0 }}>{t('newStudent')}</Button>
+                </Grid>
+                <Grid item>
+                  <Button onClick={handleClickCodes}>{t('joinCodes')}</Button>
+                  <JoinCodeMenu courseId={course.course_id} open={openCodes} handleClose={handleCloseCodes} anchorEl={anchorEl}/>
                 </Grid>
               </Grid>
             </Grid>
@@ -179,4 +191,164 @@ export function CourseDetailTeacher(): JSX.Element {
     </>
   );
 
+}
+
+interface JoinCode{
+  join_code: string,
+  expiry_time: string,
+  for_admins: boolean
+}
+
+/**
+ * Renders the JoinCodeMenu component.
+ * @param open - Whether the dialog is open or not.
+ * @param handleClose - Function to handle the dialog close event.
+ * @param handleNewCode - Function to handle the creation of a new join code.
+ * @param handleDeleteCode - Function to handle the deletion of a join code.
+ * @param getCodes - Function to get the list of join codes.
+ * @returns The rendered JoinCodeDialog component.
+ */
+function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, open: boolean, handleClose : () => void, anchorEl: HTMLElement | null}) {
+  const { t } = useTranslation('translation', { keyPrefix: 'courseDetailTeacher' });
+
+  const [codes, setCodes] = useState<JoinCode[]>([]);
+  const [expiry_time, setExpiryTime] = useState<Date | null>(null);
+  const [for_admins, setForAdmins] = useState<boolean>(false);
+  
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setExpiryTime(new Date(event.target.value));
+  };
+
+  const handleCopyToClipboard = (join_code: string) => {
+    navigator.clipboard.writeText(`${apiHost}/join-course?code=${join_code}`)
+      .catch((error) => {
+        console.error('Error copying text to clipboard:', error);
+      });
+  };
+
+  const getCodes = useCallback(() => {
+    fetch(`${apiHost}/courses/${courseId}/join_codes`, {
+      method: 'GET',
+      headers: {
+        'Authorization': loggedInToken()
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        const filteredData = data.data.filter((code: JoinCode) => {
+          // Filter out expired codes and codes not for admins if for_admins is true
+          let expired = false;
+          if(code.expiry_time !== null){
+            const expiryTime = new Date(code.expiry_time);
+            const now = new Date();
+            expired = expiryTime < now;
+          }
+          
+          return !expired;
+        });
+        setCodes(filteredData);
+      })
+      .catch(error => console.error('Error:', error));
+  }, [courseId])
+
+  const handleNewCode = () => {
+    
+    const bodyContent: { for_admins: boolean, expiry_time?: string } = { "for_admins": for_admins };
+    if (expiry_time !== null) {
+      bodyContent.expiry_time = expiry_time.toISOString();
+    }
+
+    fetch(`${apiHost}/courses/${courseId}/join_codes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': loggedInToken()
+      },
+      body: JSON.stringify(bodyContent)
+    })
+      .then(() => getCodes())
+      .catch(error => console.error('Error:', error));
+  }
+
+  const handleDeleteCode = (joinCode: string) => {
+    fetch(`${apiHost}/courses/${courseId}/join_codes/${joinCode}`,
+      {
+        method: 'DELETE',
+        headers: {
+          "Authorization": loggedInToken(),
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "join_code": joinCode
+        })
+      })
+      .then(() => getCodes())
+      .catch(error => console.error('Error:', error));
+  }
+
+  useEffect(() => {
+    getCodes();
+  }, [t, getCodes ]);
+
+  return (
+    <Box>
+      <Menu 
+        open={open} 
+        onClose={handleClose} 
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+      >
+        <MenuItem disabled>
+          <Typography variant="h6">{t('joinCodes')}</Typography>
+        </MenuItem>
+        <Paper elevation={0} style={{margin:"1rem", width:"30vw" ,maxHeight: "20vh", height: "20vh", overflowY:"auto" }}>
+          {codes.map((code:JoinCode) => (
+            <MenuItem onClick={() => handleCopyToClipboard(code.join_code)} key={code.join_code}>
+              <Grid container direction={"row"}>
+                <Grid width={"7vw"} marginRight={"1rem"} item>
+                  <Typography variant="body1">{code.expiry_time ? timeDifference(code.expiry_time) : t('noExpiryDate')}</Typography>
+                </Grid>
+                <Grid item width={"7vw"}>
+                  <Typography variant="body1">{code.for_admins ? t('forAdmins') : t('forStudents')}</Typography>
+                </Grid>
+                <Grid item>
+                  <IconButton onClick={() => handleDeleteCode(code.join_code)}>
+                    <ClearIcon />
+                  </IconButton>
+                </Grid>
+              </Grid>
+            </MenuItem>
+          ))}
+        </Paper>
+        <MenuItem style={{marginTop:"1rem"}}>
+          <Input
+            id="expiry-date"
+            type="datetime-local"
+            value={expiry_time ? expiry_time.toISOString().substring(0, 16) : ''}
+            onChange={handleInputChange}
+            style={{marginRight:"2rem"}}
+          />
+          <FormControlLabel
+            label={t('forAdmins')}
+            control={
+              <Checkbox
+                checked={for_admins}
+                onChange={(event) => setForAdmins(event.target.checked)}
+                name="forAdmins"
+                color="primary"
+              />
+            }
+          />
+          <Button onClick={handleNewCode}>{t('newJoinCode')}</Button>
+        </MenuItem>
+      </Menu>
+    </Box>
+  );
 }

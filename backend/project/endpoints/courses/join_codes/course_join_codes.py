@@ -21,7 +21,7 @@ class CourseJoinCodes(Resource):
     """
     This class will handle get and post queries to
     the /courses/course_id/join_codes url, only an admin of a course can do this
-    """
+    """ 
 
     @authorize_teacher_of_course
     def get(self, course_id):
@@ -34,7 +34,7 @@ class CourseJoinCodes(Resource):
         return query_selected_from_model(
             CourseShareCode,
             urljoin(f"{RESPONSE_URL}/", f"{str(course_id)}/", "join_codes"),
-            select_values=["join_code", "expiry_time"],
+            select_values=["join_code", "expiry_time", "for_admins"],
             filters={"course_id": course_id}
         )
 

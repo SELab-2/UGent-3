@@ -12,6 +12,12 @@
   },
   "courseDetailTeacher": {
     "title": "Vak Details",
+    "joinCodes": "Join Codes",
+    "forAdmins": "Voor Admins",
+    "forStudents": "Voor Studenten",
+    "noExpiryDate": "Geen vervaldatum",
+    "expiryDate": "Vervaldatum",
+    "newJoinCode": "Nieuwe Join Code",
     "deleteSelected": "Verwijder geselecteerde studenten",
     "projects": "Projecten",
     "newProject": "Nieuw Project",
@@ -62,6 +68,11 @@
     "daysAgo": "dagen geleden",
     "hoursAgo": "uur geleden",
     "minutesAgo": "minuten geleden",
-    "justNow": "Zonet"
+    "justNow": "Zonet",
+    "yearsLater": "jaren later",
+    "monthsLater": "maanden later",
+    "daysLater": "dagen later",
+    "hoursLater": "uur later",
+    "minutesLater": "minuten later"
   }
 }
