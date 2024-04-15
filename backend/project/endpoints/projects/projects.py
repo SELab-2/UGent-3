@@ -28,7 +28,7 @@ class ProjectsEndpoint(Resource):
     for implementing get method
     """
 
-    # @authorize_teacher
+    @authorize_teacher
     def get(self, teacher_id=None):
         """
         Get method for listing all available projects

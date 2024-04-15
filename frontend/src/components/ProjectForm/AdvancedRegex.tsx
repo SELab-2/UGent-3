@@ -10,7 +10,7 @@ interface Props {
 }
 
 /**
- *
+ * @returns Component for adding advanced regexes
  */
 export default function AdvancedRegex({ handleSubmit, regexError } : Props) {
 

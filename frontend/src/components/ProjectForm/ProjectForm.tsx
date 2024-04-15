@@ -78,7 +78,7 @@ export default function ProjectForm() {
   const [advanced, setAdvanced] = useState('1');
 
   useEffect(() => {
-    // fetchCourses();
+    fetchCourses();
   }, [regexError]);
 
   const handleTabSwitch = (_event: React.SyntheticEvent, newAdvanced: string) => {

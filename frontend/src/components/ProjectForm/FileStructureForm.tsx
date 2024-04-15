@@ -8,7 +8,7 @@ interface Props {
 }
 
 /**
- *
+ * @returns Component for adding file restrictions
  */
 export default function FileStuctureForm({ handleSubmit, regexError } : Props) {
 
