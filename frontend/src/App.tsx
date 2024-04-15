@@ -1,27 +1,30 @@
-import { BrowserRouter,Route,Routes } from "react-router-dom";
-import { Header } from "./components/Header/Header";
+import { Route,RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
+import Layout from "./components/Header/Layout";
 import Home from "./pages/home/Home";
 import LanguagePath from "./components/LanguagePath";
 import ProjectView from "./pages/project/projectView/ProjectView";
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<Layout />}>
+      <Route index element={<Home />} />
+      <Route path=":lang" element={<LanguagePath/>}>
+        <Route path="home" element={<Home />} />
+        <Route path="project" >
+          <Route path=":projectId" element={<ProjectView />}/>
+        </Route>
+      </Route>
+    </Route>
+  )
+);
 
 /**
  * This component is the main application component that will be rendered by the ReactDOM. 
  * @returns - The main application component
  */
-function App(): JSX.Element {
+export default function App(): React.JSX.Element {
   return (
-    <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route index element={<Home />} />
-        <Route path=":lang" element={<LanguagePath/>}>
-          <Route path="home" element={<Home />} />
-          <Route path="project" >
-            <Route path=":projectId" element={<ProjectView />}/>
-          </Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <RouterProvider router={router}>
+    </RouterProvider>
   );
 }
-export default App;

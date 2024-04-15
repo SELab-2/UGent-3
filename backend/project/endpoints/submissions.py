@@ -3,11 +3,13 @@
 from urllib.parse import urljoin
 from datetime import datetime
 from os import getenv, path, makedirs
+from zoneinfo import ZoneInfo
 from shutil import rmtree
 from dotenv import load_dotenv
 from flask import Blueprint, request
 from flask_restful import Resource
 from sqlalchemy import exc
+from project.executor import executor
 from project.db_in import db
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
@@ -20,10 +22,14 @@ from project.utils.authentication import authorize_submission_request, \
     authorize_submissions_request, authorize_grader, \
         authorize_student_submission, authorize_submission_author
 
+from project.utils.submissions.evaluator import run_evaluator
+
 load_dotenv()
 API_HOST = getenv("API_HOST")
 UPLOAD_FOLDER = getenv("UPLOAD_FOLDER")
 BASE_URL =  urljoin(f"{API_HOST}/", "/submissions")
+
+TIMEZONE = getenv("TIMEZONE", "GMT")
 
 submissions_bp = Blueprint("submissions", __name__)
 
@@ -105,10 +111,7 @@ class SubmissionsEndpoint(Resource):
                 submission.project_id = int(project_id)
 
                 # Submission time
-                submission.submission_time = datetime.now()
-
-                # Submission status
-                submission.submission_status = SubmissionStatus.RUNNING
+                submission.submission_time = datetime.now(ZoneInfo(TIMEZONE))
 
                 # Submission files
                 submission.submission_path = "" # Must be set on creation
@@ -123,6 +126,12 @@ class SubmissionsEndpoint(Resource):
                         f"(required files={','.join(project.regex_expressions)})"
                     return data, 400
 
+                deadlines = project.deadlines
+                is_late = True
+                for deadline in deadlines:
+                    if submission.submission_time < deadline.deadline:
+                        is_late = False
+
                 # Submission_id needed for the file location
                 session.add(submission)
                 session.commit()
@@ -132,12 +141,25 @@ class SubmissionsEndpoint(Resource):
                     "submissions", str(submission.submission_id))
                 try:
                     makedirs(submission.submission_path, exist_ok=True)
+                    input_folder = path.join(submission.submission_path, "submission")
+                    makedirs(input_folder, exist_ok=True)
                     for file in files:
-                        file.save(path.join(submission.submission_path, file.filename))
-                    session.commit()
+                        file.save(path.join(input_folder, file.filename))
                 except OSError:
                     rmtree(submission.submission_path)
                     session.rollback()
+
+                if project.runner:
+                    submission.submission_status = SubmissionStatus.RUNNING
+                    executor.submit(
+                        run_evaluator,
+                        submission,
+                        path.join(UPLOAD_FOLDER, str(project.project_id)),
+                        project.runner.value,
+                        False)
+                else:
+                    submission.submission_status = SubmissionStatus.LATE if is_late \
+                        else SubmissionStatus.SUCCESS
 
                 data["message"] = "Successfully fetched the submissions"
                 data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
@@ -149,7 +171,7 @@ class SubmissionsEndpoint(Resource):
                     "submission_time": submission.submission_time,
                     "submission_status": submission.submission_status
                 }
-                return data, 201
+                return data, 202
 
         except exc.SQLAlchemyError:
             session.rollback()
