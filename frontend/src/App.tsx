@@ -1,12 +1,9 @@
-import { BrowserRouter,Route,Routes } from "react-router-dom";
-import { Header } from "./components/Header/Header";
-import ProjectCreateHome from "./pages/create_project/ProjectCreateHome.tsx";
-
-import { Route,RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
+import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 import Layout from "./components/Header/Layout";
 import Home from "./pages/home/Home";
 import LanguagePath from "./components/LanguagePath";
 import ProjectView from "./pages/project/projectView/ProjectView";
+import ProjectCreateHome from "./pages/create_project/ProjectCreateHome.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -16,8 +13,8 @@ const router = createBrowserRouter(
         <Route path="home" element={<Home />} />
         <Route path="project" >
           <Route path=":projectId" element={<ProjectView />}/>
-          <Route path":create" element={<ProjectCreateHome />}></Route>
         </Route>
+        <Route path=":creates" element={<ProjectCreateHome />} />
       </Route>
     </Route>
   )

@@ -13,7 +13,7 @@ import {
   TableCell,
   TableHead,
   TableBody, Paper,
-  Tooltip, IconButton,
+  Tooltip, IconButton, Tabs, Tab,
 } from "@mui/material";
 import React, {useEffect, useState} from "react";
 import JSZip from 'jszip';
@@ -24,6 +24,10 @@ import { Deadline } from "../../types/deadline";
 import {InfoOutlined} from "@mui/icons-material";
 import {Link} from "react-router-dom";
 import FolderDragDrop from "../FolderUpload/FolderUpload.tsx";
+import TabPanel from "@mui/lab/TabPanel";
+import {TabContext} from "@mui/lab";
+import FileStuctureForm from "./FileStructureForm.tsx";
+import AdvancedRegex from "./AdvancedRegex.tsx";
 
 interface Course {
   course_id: string;
@@ -59,7 +63,6 @@ export default function ProjectForm() {
 
   const [visibleForStudents, setVisibleForStudents] = useState(false);
 
-  const [regex, setRegex] = useState<string>("");
   const [regexExpressions, setRegexExpressions] = useState<RegexData[]>([]);
   const [regexError, setRegexError] = useState(false);
 
@@ -72,9 +75,15 @@ export default function ProjectForm() {
 
   const [containsTests, setContainsTests] = useState(true);
 
+  const [advanced, setAdvanced] = useState('1');
+
   useEffect(() => {
-    fetchCourses();
+    // fetchCourses();
   }, [regexError]);
+
+  const handleTabSwitch = (_event: React.SyntheticEvent, newAdvanced: string) => {
+    setAdvanced(newAdvanced);
+  };
 
   const handleFileUpload2 = async (file: File) => {
     const zip = await JSZip.loadAsync(file);
@@ -106,12 +115,14 @@ export default function ProjectForm() {
       },
     })
     const jsonData = await response.json();
-    setCourses(jsonData.data);
+    if (jsonData.data) {
+      setCourses(jsonData.data);
+    }
   }
 
-  const appendRegex = () => {
-
-    if (regex == '' || regexExpressions.some(reg => reg.regex == regex)) {
+  const appendRegex = (r: string) => {
+    console.log(r);
+    if (r == '' || regexExpressions.some(reg => reg.regex == r)) {
       setRegexError(true);
       return;
     }
@@ -124,7 +135,7 @@ export default function ProjectForm() {
       index = lastRegex.key+1;
     }
 
-    const newRegexExpressions = [...regexExpressions, { key: index, regex: regex}];
+    const newRegexExpressions = [...regexExpressions, { key: index, regex: r}];
     setRegexExpressions(newRegexExpressions);
   };
 
@@ -191,12 +202,6 @@ export default function ProjectForm() {
   const handleDeadlineChange = (deadlines: Deadline[]) => {
     setDeadlines(deadlines);
   }
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter') {
-      appendRegex();
-    }
-  };
 
   const removeRegex = (regexToDelete: RegexData) => () => {
     setRegexExpressions((regexes) => regexes.filter((regex) => regex.key !== regexToDelete.key));
@@ -327,21 +332,14 @@ export default function ProjectForm() {
             )}
           </Grid>
           <Grid item>
-            <TextField
-              required
-              id="outlined-title"
-              label="regex"
-              placeholder={t("regexStructure")}
-              error={regexError}
-              helperText={regexError ? t("helperRegexText") : ''}
-              onChange={event => setRegex(event.target.value)}
-              onKeyPress={event => handleKeyDown(event)}
-            />
-          </Grid>
-          <Grid item>
-            <Button variant="contained" onClick={appendRegex}>
-              {t("regex")}
-            </Button>
+            <TabContext value={advanced}>
+              <Tabs value={advanced} onChange={handleTabSwitch}>
+                <Tab label="File restrictions" value="1"/>
+                <Tab label="Advanced mode" value="0"/>
+              </Tabs>
+              <TabPanel value="1"><FileStuctureForm handleSubmit={appendRegex} regexError={regexError}/></TabPanel>
+              <TabPanel value="0"><AdvancedRegex handleSubmit={appendRegex} regexError={regexError} /></TabPanel>
+            </TabContext>
           </Grid>
           <Grid item>
             <TableContainer component={Paper}>
@@ -358,8 +356,8 @@ export default function ProjectForm() {
                       <TableRow key={regexData.key}>
                         <TableCell>{regexData.regex}</TableCell>
                         <TableCell align="right">
-                          <IconButton>
-                            <DeleteIcon onClick={removeRegex(regexData)}/>
+                          <IconButton onClick={removeRegex(regexData)}>
+                            <DeleteIcon/>
                           </IconButton>
                         </TableCell>
                       </TableRow>

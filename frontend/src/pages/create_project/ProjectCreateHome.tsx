@@ -22,7 +22,7 @@ export default function ProjectCreateHome() {
       }}
     >
       <Title title={t("projectHeader")}/>
-      <ProjectForm />
+      <ProjectForm/>
     </Box>
   )
   ;
