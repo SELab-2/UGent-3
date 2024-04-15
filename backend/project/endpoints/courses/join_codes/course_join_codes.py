@@ -21,7 +21,7 @@ class CourseJoinCodes(Resource):
     """
     This class will handle get and post queries to
     the /courses/course_id/join_codes url, only an admin of a course can do this
-    """ 
+    """
 
     @authorize_teacher_of_course
     def get(self, course_id):
