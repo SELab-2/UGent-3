@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardActions, CardContent, CardHeader, Checkbox, FormControlLabel, Grid, IconButton, Input, Menu, MenuItem, Paper, Typography } from "@mui/material";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Course, Project, apiHost, loggedInToken, getIdFromLink, getNearestFutureDate, getUserName } from "./CourseUtils";
+import { Course, Project, apiHost, loggedInToken, getIdFromLink, getNearestFutureDate, getUserName, appHost } from "./CourseUtils";
 import { Link, useNavigate, NavigateFunction, useLoaderData } from "react-router-dom";
 import { Title } from "../Header/Title";
 import ClearIcon from '@mui/icons-material/Clear';
@@ -220,7 +220,7 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
   };
 
   const handleCopyToClipboard = (join_code: string) => {
-    navigator.clipboard.writeText(`${apiHost}/join-course?code=${join_code}`)
+    navigator.clipboard.writeText(`${appHost}/join-course?code=${join_code}`)
       .catch((error) => {
         console.error('Error copying text to clipboard:', error);
       });
@@ -236,7 +236,7 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
       .then(response => response.json())
       .then(data => {
         const filteredData = data.data.filter((code: JoinCode) => {
-          // Filter out expired codes and codes not for admins if for_admins is true
+          // Filter out expired codes
           let expired = false;
           if(code.expiry_time !== null){
             const expiryTime = new Date(code.expiry_time);

@@ -15,6 +15,7 @@ export interface Project{
 }
 
 export const apiHost = import.meta.env.VITE_API_HOST;
+export const appHost = import.meta.env.VITE_APP_HOST;
 /**
  * @returns The uid of the acces token of the logged in user
  */
