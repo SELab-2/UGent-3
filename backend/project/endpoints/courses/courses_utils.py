@@ -12,7 +12,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from project.db_in import db
 from project.models.course_relation import CourseAdmin
-from project.models.user import User
+from project.models.user import User, Role
 from project.models.course import Course
 
 load_dotenv()
@@ -216,3 +216,30 @@ def get_course_abort_if_not_found(course_id, url=f"{API_URL}/courses"):
         abort(404, description=response)
 
     return course
+
+def check_data(data: dict[str, str], check_teacher: bool):
+    """Check the data"""
+    if not all(hasattr(Course, key) for key in data.keys()):
+        return json_message("The data contains an incorrect field"), 400
+
+    if "name" in data.keys():
+        name = data.get("name")
+        if name is None or not isinstance(name, str):
+            return json_message("The name field does not have the correct type"), 400
+
+    if "ufora_id" in data.keys():
+        ufora_id = data.get("ufora_id")
+        if not isinstance(ufora_id, str):
+            return json_message("The ufora_id field does not have the correct type"), 400
+
+    if check_teacher and "teacher" in data.keys():
+        teacher = data.get("teacher")
+        if teacher is None or not isinstance(teacher, str):
+            return json_message("The teacher field does not have the correct type"), 400
+        user = execute_query_abort_if_db_error(User.query.filter_by(uid=teacher), RESPONSE_URL)
+        if user.role != Role.TEACHER:
+            return json_message(
+                "The user given in the teacher field does not have the correct role"
+            ), 400
+
+    return json_message("ok"), 200

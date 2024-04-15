@@ -38,6 +38,8 @@ parser.add_argument(
     action="append"
 )
 
+parser.add_argument("runner", type=str, help='Projects runner', location="form")
+
 
 def parse_project_params():
     """
