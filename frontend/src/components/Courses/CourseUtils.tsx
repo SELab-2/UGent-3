@@ -1,4 +1,4 @@
-import { NavigateFunction } from 'react-router-dom';
+import { NavigateFunction, Params } from 'react-router-dom';
 
 export interface Course{
     course_id: string,
@@ -89,16 +89,52 @@ export function getNearestFutureDate(dates: string[][]): Date | null {
  * Load courses for courses teacher page, this filters courses on logged in teacher uid
  * @returns A Promise that resolves to the loaded courses data.
  */
-export async function loaderCourses() {
-  const params = new URLSearchParams({ teacher: loggedInUid()});
-  fetch(`${apiHost}/courses?${params}`, {
+
+const fetchData = async (url: string, params?: URLSearchParams) => {
+  const res = await fetch(`${apiHost}/${url}?${params}`, {
     headers: {
       "Authorization": loggedInToken()
     }
-  })
-    .then(response => response.json())
-    .then(data => {
-      return data.data;
-    })
-    .catch(error => {throw new Response(error.message, { status: error.status });});
-}
+  });
+  if(res.status !== 200){
+    throw new Response("Not Found", { status: res.status });
+  }
+  const jsonResult = await res.json();
+
+  return jsonResult.data;
+};
+
+export const dataLoaderCourses = async () => {
+  const params = new URLSearchParams({ 'teacher': loggedInUid() });
+  return fetchData(`courses`, params);
+};
+
+const dataLoaderCourse = async (courseId: string) => {
+  return fetchData(`courses/${courseId}`);
+};
+
+const dataLoaderProjects = async (courseId: string) => {
+  const params = new URLSearchParams({ course_id: courseId });
+  return fetchData(`projects`, params);
+};
+
+const dataLoaderAdmins = async (courseId: string) => {
+  return fetchData(`courses/${courseId}/admins`);
+};
+
+const dataLoaderStudents = async (courseId: string) => {
+  return fetchData(`courses/${courseId}/students`);
+};
+
+export const dataLoaderCourseDetail = async ({ params } : { params:Params}) => {
+  const { courseId } = params;
+  if (!courseId) {
+    throw new Error("Course ID is undefined.");
+  }
+  const course = await dataLoaderCourse(courseId);
+  const projects = await dataLoaderProjects(courseId);
+  const admins = await dataLoaderAdmins(courseId);
+  const students = await dataLoaderStudents(courseId);
+
+  return { course, projects, admins, students };
+};

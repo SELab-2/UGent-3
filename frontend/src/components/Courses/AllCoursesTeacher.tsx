@@ -11,17 +11,16 @@ import { useLoaderData } from "react-router-dom";
  * @returns A jsx component representing all courses for a teacher
  */
 export function AllCoursesTeacher(): JSX.Element {
-  //const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const courses = (useLoaderData() as Course[]);
 
-  const courses: Course[] = useLoaderData() as Course[];
   const [courseName, setCourseName] = useState('');
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
 
   const { t } = useTranslation('translation', { keyPrefix: 'allCoursesTeacher' });
-  
+
   const handleClickOpen = () => {
     setOpen(true);
   };

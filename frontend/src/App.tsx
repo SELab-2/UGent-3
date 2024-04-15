@@ -2,7 +2,7 @@ import { Route,RouterProvider, createBrowserRouter, createRoutesFromElements } f
 import Layout from "./components/Header/Layout";
 import { AllCoursesTeacher } from "./components/Courses/AllCoursesTeacher";
 import { CourseDetailTeacher } from "./components/Courses/CourseDetailTeacher";
-import { loaderCourses } from "./components/Courses/CourseUtils";
+import { dataLoaderCourseDetail, dataLoaderCourses } from "./components/Courses/CourseUtils";
 import Home from "./pages/home/Home";
 import LanguagePath from "./components/LanguagePath";
 import ProjectView from "./pages/project/projectView/ProjectView";
@@ -17,8 +17,8 @@ const router = createBrowserRouter(
           <Route path=":projectId" element={<ProjectView />}/>
         </Route>
         <Route path="courses">
-          <Route index element={<AllCoursesTeacher />} loader={loaderCourses}/>
-          <Route path=":courseId" element={<CourseDetailTeacher />} />
+          <Route index element={<AllCoursesTeacher />} loader={dataLoaderCourses}/>
+          <Route path=":courseId" element={<CourseDetailTeacher />} loader={dataLoaderCourseDetail} />
         </Route>
       </Route>
     </Route>
