@@ -66,6 +66,8 @@ def test_post_project(client, valid_project):
     # check if the project with the id is present
     project_id = response.json["data"]["project_id"]
     response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher"})
+    print("project yallah")
+    print(response.data)
 
     assert response.status_code == 200
 
@@ -75,6 +77,8 @@ def test_remove_project(client, valid_project_entry):
     project_id = valid_project_entry.project_id
     response = client.delete(f"/projects/{project_id}", headers={"Authorization":"teacher"})
     assert response.status_code == 200
+    print("project yallah")
+    print(response.data)
 
     # check if the project isn't present anymore and the delete indeed went through
     response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher"})
