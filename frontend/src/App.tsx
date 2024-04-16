@@ -4,17 +4,18 @@ import Home from "./pages/home/Home";
 import HomeStudent from "./pages/home/HomeStudent.tsx";
 import LanguagePath from "./components/LanguagePath";
 import ProjectView from "./pages/project/projectView/ProjectView";
+import {fetchProjects} from "./pages/project/FetchProjects.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
       <Route index element={<Home />} />
       <Route path=":lang" element={<LanguagePath/>}>
+        <Route path="student" element={<HomeStudent />} loader={fetchProjects}/>
         <Route path="home" element={<Home />} />
         <Route path="project" >
           <Route path=":projectId" element={<ProjectView />}/>
         </Route>
-        <Route path="student" element={<HomeStudent />} />
       </Route>
     </Route>
   )
