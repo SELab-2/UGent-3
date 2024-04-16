@@ -128,8 +128,10 @@ export default function ProjectForm() {
 
     if (runner === "CUSTOM") {
       setValidRunner(constainsDocker);
+      setValidSubmission(constainsDocker);
     } else {
       setValidRunner(containsRuntest);
+      setValidSubmission(containsRuntest);
     }
   }
 
