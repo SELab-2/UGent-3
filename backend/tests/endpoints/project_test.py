@@ -50,9 +50,8 @@ def test_getting_all_projects(client):
 
 def test_post_project(client, valid_project):
     """Test posting a project to the database and testing if it's present"""
-    print("valid project")
-    print(valid_project)
     valid_project["deadlines"] = json.dumps(valid_project["deadlines"])
+
     with open("tests/resources/testzip.zip", "rb") as zip_file:
         valid_project["assignment_file"] = zip_file
         # post the project
@@ -76,7 +75,6 @@ def test_remove_project(client, valid_project_entry):
     project_id = valid_project_entry.project_id
     response = client.delete(f"/projects/{project_id}", headers={"Authorization":"teacher"})
     assert response.status_code == 200
-    print(response.data)
 
     # check if the project isn't present anymore and the delete indeed went through
     response = client.get(f"/projects/{project_id}", headers={"Authorization":"teacher"})

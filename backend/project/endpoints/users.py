@@ -21,7 +21,7 @@ API_URL = getenv("API_HOST")
 class Users(Resource):
     """Api endpoint for the /users route"""
 
-    # @login_required
+    @login_required
     def get(self):
         """
         This function will respond to get requests made to /users.

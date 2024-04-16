@@ -15,7 +15,12 @@ parser.add_argument(
     help='Projects assignment file',
     location="form"
 )
-parser.add_argument('deadlines', type=str, help='Projects deadlines', location="form", action="append")
+parser.add_argument(
+    'deadlines',
+    type=str,
+    help='Projects deadlines',
+    location="form", action="append"
+)
 parser.add_argument("course_id", type=str, help='Projects course_id', location="form")
 parser.add_argument(
     "visible_for_students",
@@ -40,7 +45,7 @@ def parse_project_params():
     Return a dict of every non None value in the param
     """
     args = parser.parse_args()
-    
+
     result_dict = {}
     for key, value in args.items():
         if value is not None:
@@ -48,7 +53,6 @@ def parse_project_params():
                 deadlines_parsed = value
                 new_deadlines = []
                 for deadline in deadlines_parsed:
-                    print(type(deadline))
                     deadline = json.loads(deadline)
                     new_deadlines.append(
                         (
@@ -59,6 +63,5 @@ def parse_project_params():
                 result_dict[key] = new_deadlines
             else:
                 result_dict[key] = value
-    print("results")
-    print(result_dict)
+
     return result_dict

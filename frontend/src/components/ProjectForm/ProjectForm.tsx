@@ -87,7 +87,6 @@ export default function ProjectForm() {
   }, [regexError]);
 
   const handleRunnerSwitch = (newRunner: string) => {
-    console.log(validRunner);
     if (newRunner === t('clearSelected')) {
       setRunner('');
     } else {
@@ -202,7 +201,6 @@ export default function ProjectForm() {
     if (runner !== '') {
       formData.append("runner", runner);
     }
-    console.log(formData);
 
     const response = await fetch(`${apiUrl}/projects`, {
       method: "post",

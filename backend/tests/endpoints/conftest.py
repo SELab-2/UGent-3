@@ -4,7 +4,6 @@ import tempfile
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from typing import Any
-
 import pytest
 from pytest import fixture, FixtureRequest
 from flask.testing import FlaskClient
@@ -235,6 +234,7 @@ def course_ad(course_teacher_ad: User):
 @pytest.fixture
 def valid_project_entry(session, valid_project):
     """A project for testing, with the course as the course it belongs to"""
+    valid_project["deadlines"] = [valid_project["deadlines"]]
     project = Project(**valid_project)
 
     session.add(project)
@@ -248,11 +248,11 @@ def valid_project(course):
     data = {
         "title": "Project",
         "description": "Test project",
-        "deadlines": [{"deadline": "2024-02-25T12:00:00", "description": "Deadline 1"}],
+        "deadlines": {"deadline": "2024-02-25T12:00:00", "description": "Deadline 1"},
         "course_id": course.course_id,
         "visible_for_students": True,
         "archived": False,
-        "regex_expressions": ["*.pdf", "*.txt"]
+        "regex_expressions": "*.pdf"
     }
     return data
 

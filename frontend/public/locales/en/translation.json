@@ -69,6 +69,6 @@
     "noFilesPlaceholder": "No assignment files given yet",
     "noRegexPlaceholder": "No regex added yet",
     "clearSelected": "Clear Selection",
-    "faultySubmission": "Some field were left open or there is no valid runner/file combination"
+    "faultySubmission": "Some fields were left open or there is no valid runner/file combination"
   }
 }
