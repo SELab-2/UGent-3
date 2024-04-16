@@ -10,12 +10,14 @@ from flask import Flask
 from flask_jwt_extended import JWTManager, get_jwt, get_jwt_identity,\
       create_access_token, set_access_cookies
 from flask_cors import CORS
+from sqlalchemy_utils import register_composites
+from .executor import executor
 from .db_in import db
 from .endpoints.index.index import index_bp
 from .endpoints.users import users_bp
 from .endpoints.courses.courses_config import courses_bp
 from .endpoints.projects.project_endpoint import project_bp
-from .endpoints.submissions import submissions_bp
+from .endpoints.submissions.submission_config import submissions_bp
 from .endpoints.courses.join_codes.join_codes_config import join_codes_bp
 from .endpoints.docs.docs_endpoint import swagger_ui_blueprint
 from .endpoints.authentication.auth import auth_bp
@@ -38,6 +40,7 @@ def create_app():
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=3)
     app.config["JWT_ACCESS_COOKIE_NAME"] = "peristeronas_access_token"
     app.config["JWT_SESSION_COOKIE"] = False
+    executor.init_app(app)
     app.register_blueprint(index_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(courses_bp)
@@ -65,6 +68,10 @@ def create_app_with_db(db_uri: str):
     app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     app.config["UPLOAD_FOLDER"] = "/"
     db.init_app(app)
+    with app.app_context():
+        # Getting a connection from the scoped session
+        connection = db.session.connection()
+        register_composites(connection)
     CORS(app, supports_credentials=True)
     return app
 
