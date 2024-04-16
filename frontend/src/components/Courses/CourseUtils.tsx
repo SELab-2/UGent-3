@@ -40,16 +40,14 @@ export function loggedInUid(){
 }
 
 /**
- * On a succesfull fetch the function will redirect to the data.url of the response
- * @param path - path to backend api endpoint
- * @param data - optional data to send to the api
- * @param method - POST, GET, PATCH, DELETE
+ * On a succesfull post the function will redirect to the data.url of the response, this should point to the detail page
+ * @param data - course data to send to the api
  * @param navigate - function that allows the app to redirect
  */
-export function callToApi(path: string, data: string, method:string, navigate: NavigateFunction){
+export function callToApiToCreateCourse(data: string, navigate: NavigateFunction){
   
-  fetch(path, {
-    method: method,
+  fetch(`${apiHost}/courses`, {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': loggedInToken()
@@ -58,6 +56,15 @@ export function callToApi(path: string, data: string, method:string, navigate: N
   })
     .then(response => response.json())
     .then(data => {
+      //But first also make sure that teacher is in the course admins list
+      fetch(`${apiHost}/courses/${getIdFromLink(data.url)}/admins`, {
+        method: 'POST',
+        headers: {
+          'Authorization': loggedInToken(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({admin_uid: loggedInUid()})
+      });
       navigate(getIdFromLink(data.url)); // navigate to data.url
     })
     .catch((error) => {

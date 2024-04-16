@@ -12,6 +12,9 @@
   },
   "courseDetailTeacher": {
     "title": "Vak Details",
+    "noCoursesFound": "Geen vakken gevonden",
+    "noProjects": "Geen projecten",
+    "noStudents": "Geen studenten voor dit vak",
     "joinCodes": "Join Codes",
     "forAdmins": "Voor Admins",
     "forStudents": "Voor Studenten",

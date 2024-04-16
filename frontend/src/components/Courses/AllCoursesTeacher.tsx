@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { SideScrollableCourses } from "./CourseUtilComponents";
-import { Course, apiHost, callToApi } from "./CourseUtils";
+import { Course, callToApiToCreateCourse } from "./CourseUtils";
 import { Title } from "../Header/Title";
 import { useLoaderData } from "react-router-dom";
 
@@ -43,7 +43,7 @@ export function AllCoursesTeacher(): JSX.Element {
     }
 
     const data = { name: courseName };
-    callToApi(`${apiHost}/courses`, JSON.stringify(data), 'POST', navigate);
+    callToApiToCreateCourse(JSON.stringify(data), navigate);
   };
   return (
     <>

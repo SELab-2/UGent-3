@@ -12,6 +12,9 @@
   },
   "courseDetailTeacher": {
     "title": "Course Details",
+    "noCoursesFound": "No courses found",
+    "noProjects": "No projects",
+    "noStudents": "No students in this course",
     "joinCodes": "Join Codes",
     "forAdmins": "For Admins",
     "forStudents": "For Students",

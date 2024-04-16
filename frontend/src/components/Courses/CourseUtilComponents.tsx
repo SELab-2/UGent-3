@@ -58,7 +58,11 @@ export function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Eleme
 
   const debouncedHandleSearchChange = useMemo(() =>
     debounce((key: string, value: string) => {
-      urlParams.set(key, value);
+      if (value === '') {
+        urlParams.delete(key);
+      } else {
+        urlParams.set(key, value);
+      }
       const newUrl = `${location.pathname}?${urlParams.toString()}`;
       navigate(newUrl, { replace: true });
     }, 500), [urlParams, navigate, location.pathname]);
@@ -111,15 +115,12 @@ export function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Eleme
 
     fetchProjects();
   }, [courses]);
-  const { t } = useTranslation('translation', { keyPrefix: 'courseDetailTeacher' });
 
   const filteredCourses = courses.filter(course => 
     course.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
     (course.ufora_id ? course.ufora_id.toLowerCase().includes(uforaIdFilter.toLowerCase()) : !uforaIdFilter) &&
     course.teacher.toLowerCase().includes(teacherNameFilter.toLowerCase())
   );
-
-  const now = new Date();
 
   return (
     <Grid item xs={12} marginLeft="2rem">
@@ -128,54 +129,90 @@ export function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Eleme
         <SearchBox label={'ufora id'} searchTerm={uforaIdFilter} handleSearchChange={handleUforaIdFilterChange}/>
         <SearchBox label={'teacher'} searchTerm={teacherNameFilter} handleSearchChange={handleTeacherNameFilterChange}/>
       </Grid>
-      <Paper style={{width: '100%', height: '100%', maxHeight:'65vh', overflowY: 'auto', boxShadow: 'none', display: 'flex', justifyContent: 'center' }}>
-        <Grid container direction="row" spacing={5} alignItems="flex-start">
-          {filteredCourses.map((course, index) => (
-            <Grid item key={index} xs={12} sm={6} md={4} lg={2}>
-              <Card variant='outlined' style={{width: '14vw'}}>
-                <CardHeader title={<EpsilonTypography text={course.name}/>}/>
-                <CardHeader subheader={
-                  <>
-                    {course.ufora_id && (
-                      <>
-                      Ufora_id: {course.ufora_id}<br />
-                      </>
-                    )}
-                  Teacher: {course.teacher}
-                  </>
-                }/>
-                <CardContent style={{margin:"0.5rem", height:"12vh"}}>
-                  <Typography variant="body1">{t('projects')}:</Typography>
-                  {projects[getIdFromLink(course.course_id)] && projects[getIdFromLink(course.course_id)].slice(0, 3).map((project) => {
-                    let timeLeft = '';
-                    if (project.deadlines != undefined) {
-                      const deadlineDate = getNearestFutureDate(project.deadlines);
-                      if(deadlineDate == null){
-                        return <></>
-                      }
-                      const diffTime = Math.abs(deadlineDate.getTime() - now.getTime());
-                      const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-                      const diffDays = Math.ceil(diffHours * 24);
-                      
-                      timeLeft = diffDays > 1 ? `${diffDays} days` : `${diffHours} hours`;
-                    }
-                    return (
-                      <Grid item key={project.project_id}>
-                        <Link to={`/projects/${getIdFromLink(project.project_id)}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                          <EpsilonTypography text={`${project.title} ${timeLeft ? ` - ${timeLeft}` : ''}`}/>
-                        </Link>
-                      </Grid>
-                    );
-                  })}
-                </CardContent>
-                <CardActions>
-                  <Link to={`${getIdFromLink(course.course_id)}`}><Button>{t('view')}</Button></Link>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </Paper>
+      <EmptyOrNotFilteredCourses filteredCourses={filteredCourses} projects={projects}/>
     </Grid>
   );
+}
+
+/**
+ * Empty or not. 
+ * @returns either a place holder or the actual content.
+ */
+function EmptyOrNotFilteredCourses({filteredCourses, projects}: {filteredCourses: Course[], projects: { [courseId: string]: Project[] }}): JSX.Element {
+  const { t } = useTranslation('translation', { keyPrefix: 'courseDetailTeacher' });
+  if(filteredCourses.length === 0){
+    return (
+      <Typography variant="h5" style={{marginLeft: '2rem'}}>{t('noCoursesFound')}</Typography>
+    );
+  }
+
+  return (
+    <Paper style={{width: '100%', height: '100%', maxHeight:'65vh', overflowY: 'auto', boxShadow: 'none', display: 'flex', justifyContent: 'center' }}>
+      <Grid container direction="row" spacing={5} alignItems="flex-start">
+        {filteredCourses.map((course, index) => (
+          <Grid item key={index} xs={12} sm={6} md={4} lg={2}>
+            <Card variant='outlined' style={{width: '14vw'}}>
+              <CardHeader title={<EpsilonTypography text={course.name}/>}/>
+              <CardHeader subheader={
+                <>
+                  {course.ufora_id && (
+                    <>
+                      Ufora_id: {course.ufora_id}<br />
+                    </>
+                  )}
+                  Teacher: {course.teacher}
+                </>
+              }/>
+              <CardContent style={{margin:"0.5rem", height:"12vh"}}>
+                <Typography variant="body1">{t('projects')}:</Typography>
+                <EmptyOrNotProjects projects={projects[getIdFromLink(course.course_id)]} noProjectsText={t('noProjects')} />
+              </CardContent>
+              <CardActions>
+                <Link to={`${getIdFromLink(course.course_id)}`}><Button>{t('view')}</Button></Link>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Paper>
+  );
+}
+/**
+ * @param projects - The projects to be displayed if not empty 
+ * @returns either a place holder with text for no projects or the projects
+ */
+function EmptyOrNotProjects({projects, noProjectsText}: {projects: Project[], noProjectsText:string}): JSX.Element {
+  if(projects === undefined || projects.length === 0){
+    return (
+      <Typography variant="body2" style={{marginLeft: '1rem', marginTop: '0.5rem'}}>{noProjectsText}</Typography>
+    );
+  }
+  else{
+    const now = new Date();
+    return (
+      <>
+        {projects.slice(0, 3).map((project) => {
+          let timeLeft = '';
+          if (project.deadlines != undefined) {
+            const deadlineDate = getNearestFutureDate(project.deadlines);
+            if(deadlineDate == null){
+              return <></>
+            }
+            const diffTime = Math.abs(deadlineDate.getTime() - now.getTime());
+            const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+            const diffDays = Math.ceil(diffHours * 24);
+                      
+            timeLeft = diffDays > 1 ? `${diffDays} days` : `${diffHours} hours`;
+          }
+          return (
+            <Grid item key={project.project_id}>
+              <Link to={`/projects/${getIdFromLink(project.project_id)}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <EpsilonTypography text={`${project.title} ${timeLeft ? ` - ${timeLeft}` : ''}`}/>
+              </Link>
+            </Grid>
+          );
+        })}
+      </>
+    );
+  }
 }

@@ -107,30 +107,7 @@ export function CourseDetailTeacher(): JSX.Element {
             <Grid item style={{ width: "50%" }}>
               <Paper elevation={0} style={{ height:"70vh", maxHeight:"70vh", overflowY:"auto"}}>
                 <Typography variant="h5">{t('projects')}:</Typography>
-                <Grid container direction={"row"}>
-                  {projects?.map((project) => (
-                    <Grid item key={project.project_id} margin={"2rem"}>
-                      <Card style={{ background: "lightblue" }} key={project.project_id}>
-                        <Link to={`/projects/${getIdFromLink(project.project_id)}`}>
-                          <CardHeader title={project.title} />
-                        </Link>
-                        <CardContent>
-                          {getNearestFutureDate(project.deadlines) &&
-                            (
-                              <Typography variant="body1">
-                                {`${t('deadline')}: ${getNearestFutureDate(project.deadlines)?.toLocaleDateString()}`}
-                              </Typography>
-                            )}
-                        </CardContent>
-                        <CardActions>
-                          <Link to={`/projects/${project.project_id}`}>
-                            <Button>{t('view')}</Button>
-                          </Link>
-                        </CardActions>
-                      </Card>
-                    </Grid>
-                  ))}
-                </Grid>
+                <EmptyOrNotProjects projects={projects}/>
               </Paper>
               <Link to={`/${lang}/projects/create?course_id=${course.course_id}`}><Button>{t('newProject')}</Button></Link>
             </Grid>
@@ -140,16 +117,12 @@ export function CourseDetailTeacher(): JSX.Element {
                   <Paper elevation={0} style={{maxHeight:"35vh", overflowY:"auto"}}>
                     <Typography variant="h5">{t('admins')}:</Typography>
                     <Grid container direction={"column"}>
-                      {admins.map((admin) => (
+                      {admins.map((admin) => ( 
                         <Grid item container alignItems="center" spacing={1} key={admin.uid}>
                           <Grid item>
                             <Typography variant="body1">{getUserName(admin.uid)}</Typography>
                           </Grid>
-                          <Grid item>
-                            <IconButton onClick={() => handleDeleteAdmin(navigate,course.course_id,getIdFromLink(admin.uid))}>
-                              <ClearIcon />
-                            </IconButton>
-                          </Grid>
+                          <EitherDeleteIconOrNothing admin={admin} course={course} navigate={navigate}/>
                         </Grid>
                       ))}
                     </Grid>
@@ -158,21 +131,7 @@ export function CourseDetailTeacher(): JSX.Element {
                 <Grid item position={"relative"} height={"35vh"} width={"35vw"}>
                   <Typography variant="h5">{t('students')}:</Typography>
                   <Paper elevation={0} style={{maxHeight:"25vh", overflowY:"auto"}}>
-                    <Grid container direction="column">
-                      {students.map((student) => (
-                        <Grid item container alignItems="center" spacing={1} key={student.uid}>
-                          <Grid item>
-                            <Checkbox
-                              checked={selectedStudents.includes(getIdFromLink(student.uid))}
-                              onChange={(event) => handleCheckboxChange(event, getIdFromLink(student.uid))}
-                            />
-                          </Grid>
-                          <Grid item>
-                            <Typography variant="body1">{getUserName(student.uid)}</Typography>
-                          </Grid>
-                        </Grid>
-                      ))}
-                    </Grid>
+                    <EmptyOrNotStudents students={students} selectedStudents={selectedStudents} handleCheckboxChange={handleCheckboxChange}/>
                   </Paper>
                   <IconButton style={{ position: "absolute", bottom:0, left:0}} onClick={() => handleDeleteStudent(navigate, course.course_id, selectedStudents)}>
                     <ClearIcon />
@@ -190,7 +149,101 @@ export function CourseDetailTeacher(): JSX.Element {
       </Grid>
     </>
   );
+}
 
+/**
+ * @param projects - The array of projects.
+ * @returns Either a place holder for no projects or a grid of cards describing the projects.
+ */
+function EmptyOrNotProjects({projects}: {projects: Project[]}): JSX.Element {
+  const { t } = useTranslation('translation', { keyPrefix: 'courseDetailTeacher' });
+  if(projects === undefined || projects.length === 0){
+    return (
+      <Typography variant="h6" style={{marginLeft: '5rem', marginTop: '2rem'}}>{t('noProjects')}</Typography>
+    );
+  }
+  else{
+    return (
+      <Grid container direction={"row"}>
+        {projects?.map((project) => (
+          <Grid item key={project.project_id} margin={"2rem"}>
+            <Card style={{ background: "lightblue" }} key={project.project_id}>
+              <Link to={`/projects/${getIdFromLink(project.project_id)}`}>
+                <CardHeader title={project.title} />
+              </Link>
+              <CardContent>
+                {getNearestFutureDate(project.deadlines) &&
+                (
+                  <Typography variant="body1">
+                    {`${t('deadline')}: ${getNearestFutureDate(project.deadlines)?.toLocaleDateString()}`}
+                  </Typography>
+                )}
+              </CardContent>
+              <CardActions>
+                <Link to={`/projects/${project.project_id}`}>
+                  <Button>{t('view')}</Button>
+                </Link>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    );
+  }
+}
+
+/**
+ * @param navigate - The navigate function from react-router-dom.
+ * @param course - The course against which we will check if the uid is of the teacher.
+ * @param admin - The admin in question.
+ * @returns Either nothing, if the admin uid is of teacher or a delete button.
+ */
+function EitherDeleteIconOrNothing({admin, course, navigate} : {admin:UserUid, course:Course, navigate: NavigateFunction}) : JSX.Element{
+  if(course.teacher === getIdFromLink(admin.uid)){
+    return <></>;
+  }
+  else{
+    return (
+      <Grid item>
+        <IconButton onClick={() => handleDeleteAdmin(navigate,course.course_id,getIdFromLink(admin.uid))}>
+          <ClearIcon />
+        </IconButton>
+      </Grid>
+    );
+  }
+}
+
+/**
+ * @param students - The array of students.
+ * @param selectedStudents - The array of selected students.
+ * @param handleCheckboxChange - The function to handle the checkbox change.
+ * @returns Either a place holder for no students or a grid of checkboxes for the students.
+ */
+function EmptyOrNotStudents({students, selectedStudents, handleCheckboxChange}: {students: UserUid[], selectedStudents: string[], handleCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>, studentId: string) => void}): JSX.Element {
+  if(students.length === 0){
+    return (
+      <Typography variant="h6" style={{marginLeft: '5rem', marginTop: '2rem'}}>No students found</Typography>
+    );
+  }
+  else{
+    return (
+      <Grid container direction="column">
+        {students.map((student) => (
+          <Grid item container alignItems="center" spacing={1} key={student.uid}>
+            <Grid item>
+              <Checkbox
+                checked={selectedStudents.includes(getIdFromLink(student.uid))}
+                onChange={(event) => handleCheckboxChange(event, getIdFromLink(student.uid))}
+              />
+            </Grid>
+            <Grid item>
+              <Typography variant="body1">{getUserName(student.uid)}</Typography>
+            </Grid>
+          </Grid>
+        ))}
+      </Grid>
+    );
+  }
 }
 
 interface JoinCode{
