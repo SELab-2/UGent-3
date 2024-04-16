@@ -3,14 +3,13 @@ import {Card, CardContent, Typography, Grid, Container, Badge} from '@mui/materi
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import {DayCalendarSkeleton, LocalizationProvider} from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import dayjs, {Dayjs} from "dayjs";
 import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
 import {ProjectDeadlineCard} from "../project/projectDeadline/ProjectDeadlineCard.tsx";
-import {ProjectDeadline} from "../project/projectDeadline/ProjectDeadline.tsx";
-import {fetchProjects} from "../project/fetchProjects.tsx";
-import {Title} from "../../components/Header/Title.tsx";
+import {ProjectDeadline, ShortSubmission, Project} from "../project/projectDeadline/ProjectDeadline.tsx";
 
+const apiUrl = import.meta.env.VITE_APP_API_URL
 const initialValue = dayjs(Date.now());
 
 interface DeadlineInfoProps {
@@ -29,7 +28,7 @@ type ExtendedPickersDayProps = PickersDayProps<Dayjs> & { highlightedDays?: numb
 const DeadlineInfo: React.FC<DeadlineInfoProps> = ({ selectedDay, deadlines }) => {
   const { t } = useTranslation('translation', { keyPrefix: 'student' });
   const deadlinesOnSelectedDay = deadlines.filter(
-    project => (dayjs(project.deadline).isSame(selectedDay, 'day'))
+    project => (project.deadline && dayjs(project.deadline).isSame(selectedDay, 'day'))
   );
   //list of the corresponding assignment
   return (
@@ -85,7 +84,7 @@ const handleMonthChange =(
   // projects are now only fetched on page load
   const hDays:number[] = []
   projects.map((project, ) => {
-    if(project.deadline.getMonth() == date.month() && project.deadline.getFullYear() == date.year()){
+    if(project.deadline && project.deadline.getMonth() == date.month() && project.deadline.getFullYear() == date.year()){
       hDays.push(project.deadline.getDate())
     }
 
@@ -102,58 +101,71 @@ const handleMonthChange =(
 export default function HomeStudent() {
   const { t } = useTranslation('translation', { keyPrefix: 'student' });
 
-  const [projects, setProjects] = useState<ProjectDeadline[]>([]);
-
   const [highlightedDays, setHighlightedDays] = React.useState<number[]>([]);
 
   const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs(Date.now()));
-
-  useEffect(() => {
-    fetchProjects(setProjects).then(p => {
-      handleMonthChange(initialValue, p,setHighlightedDays)
-    })
-  }, []);
-
+  const projects = useLoaderData() as ProjectDeadline[]
   // Update selectedDay state when a day is selected
   const handleDaySelect = (day: Dayjs) => {
     setSelectedDay(day);
   };
+  const futureProjects = projects
+    .filter((p) => (p.deadline && dayjs(dayjs()).isBefore(p.deadline)))
+    .sort((a, b) => dayjs(a.deadline).diff(dayjs(b.deadline)))
+    .slice(0, 3) // only show the first 3
 
+  const pastDeadlines = projects
+    .filter((p) => p.deadline && (dayjs()).isAfter(p.deadline))
+    .sort((a, b) => dayjs(b.deadline).diff(dayjs(a.deadline)))
+    .slice(0, 3) // only show the first 3
+  const noDeadlineProject = projects.filter((p) => p.deadline === undefined)
   return (
     <Container style={{ paddingTop: '50px' }}>
-      <Title title={"Home"}/>
       <Grid container spacing={2} wrap="nowrap">
         <Grid item xs={6}>
-          <Typography variant="body2">
-            {t('myProjects')}
-          </Typography>
-
-          <ProjectDeadlineCard
-            deadlines={projects
-              .filter((p) => (dayjs(dayjs()).isBefore(p.deadline)))
-              .sort((a, b) => dayjs(a.deadline).diff(dayjs(b.deadline)))
-              .slice(0, 3) // only show the first 3
-            } />
-
+          <Card>
+            <CardContent>
+              <Typography variant="body1">
+                {t('myProjects')}
+              </Typography>
+              {futureProjects.length + noDeadlineProject.length > 0? (
+                <>
+                  <ProjectDeadlineCard deadlines={futureProjects} />
+                  <ProjectDeadlineCard deadlines={noDeadlineProject}/>
+                </>
+              ) : (
+                <Typography variant="body1">
+                  {t('no_projects')}
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
         </Grid>
+
         <Grid item xs={6}>
-          <Typography variant="body2">
-            {t('deadlines')}
-          </Typography>
-          <ProjectDeadlineCard
-            deadlines={projects
-              .filter((p) => dayjs(dayjs()).isAfter(p.deadline))
-              .sort((a, b) => dayjs(b.deadline).diff(dayjs(a.deadline)))
-              .slice(0, 3) // only show the first 3
-            } />
+          <Card>
+
+            <CardContent>
+              <Typography variant="body1">
+                {t('deadlines')}
+              </Typography>
+              {pastDeadlines.length > 0 ? (
+                <ProjectDeadlineCard deadlines={pastDeadlines} />
+              ) : (
+                <Typography variant="body1">
+                  {t('no_projects')}
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
         </Grid>
+
         <Grid item xs={6}>
           <Card>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateCalendar
                 value={selectedDay}
-                onMonthChange={(date:Dayjs) => {handleMonthChange(date, projects,
-                  setHighlightedDays)}}
+                onMonthChange={(date: Dayjs) => { handleMonthChange(date, projects, setHighlightedDays) }}
                 onChange={handleDaySelect}
                 renderLoading={() => <DayCalendarSkeleton />}
                 slots={{
@@ -175,6 +187,7 @@ export default function HomeStudent() {
 
           </Card>
         </Grid>
+
       </Grid>
     </Container>
   );

@@ -27,7 +27,9 @@
     "FAIL": "Gefaald",
     "deadlinesOnDay": "Deadlines op: ",
     "noDeadline": "Geen deadlines",
-    "no_submission_yet" : "Nog geen indiening"
+    "no_submission_yet" : "Nog geen indiening",
+    "loading": "Laden...",
+    "no_projects": "Er zijn hier geen projecten."
 
   },
   "projectView": {
