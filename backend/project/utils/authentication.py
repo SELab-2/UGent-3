@@ -8,7 +8,7 @@ from functools import wraps
 from dotenv import load_dotenv
 
 from flask import abort, request, make_response
-import requests
+from flask_jwt_extended import get_jwt, get_jwt_identity, verify_jwt_in_request
 from sqlalchemy.exc import SQLAlchemyError
 
 from project import db
@@ -18,7 +18,6 @@ from project.utils.models.course_utils import is_admin_of_course, \
     is_student_of_course, is_teacher_of_course
 from project.utils.models.project_utils import get_course_of_project, project_visible
 from project.utils.models.submission_utils import get_submission, get_course_of_submission
-from project.utils.models.user_utils import is_admin, is_teacher
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -34,58 +33,24 @@ def not_allowed(f):
 
 
 def return_authenticated_user_id():
-    """This function will authenticate the request and check whether the authenticated user
-    is already in the database, if not, they will be added
+    """This function will authenticate the request and ensure the user was added to the database,
+    otherwise it will prompt them to login again
     """
-    authentication = request.headers.get("Authorization")
-    if not authentication:
-        abort(
-            make_response((
-                {"message":
-                 "No authorization given, you need an access token to use this API"},
-                 401)))
-
-    auth_header = {"Authorization": authentication}
+    verify_jwt_in_request()
+    uid = get_jwt_identity()
     try:
-        response = requests.get(
-            AUTHENTICATION_URL, headers=auth_header, timeout=5)
-    except TimeoutError:
-        abort(make_response(
-            ({"message": "Request to Microsoft timed out"}, 500)))
-    if not response or response.status_code != 200:
-        abort(make_response(({"message":
-                              "An error occured while trying to authenticate your access token"},
-                               401)))
-
-    user_info = response.json()
-    auth_user_id = user_info["id"]
-    try:
-        user = db.session.get(User, auth_user_id)
+        user = db.session.get(User, uid)
     except SQLAlchemyError:
         db.session.rollback()
         abort(make_response(({"message":
-                              "An unexpected database error occured while fetching the user"},
-                               500)))
+                            "An unexpected database error occured while fetching the user"},
+                            500)))
 
-    if user:
-        return auth_user_id
-
-    # Use the Enum here
-    role = Role.STUDENT
-    if user_info["jobTitle"] is not None:
-        role = Role.TEACHER
-
-    # add user if not yet in database
-    try:
-        new_user = User(uid=auth_user_id, role=role)
-        db.session.add(new_user)
-        db.session.commit()
-    except SQLAlchemyError:
-        db.session.rollback()
+    if not user:
         abort(make_response(({"message":
-                              """An unexpected database error occured 
-                        while creating the user during authentication"""}, 500)))
-    return auth_user_id
+                            "Something went wrong with adding the user to the database during login, please log in again"},
+                            500)))
+    return uid
 
 
 def login_required(f):
@@ -107,8 +72,8 @@ def authorize_admin(f):
     """
     @wraps(f)
     def wrap(*args, **kwargs):
-        auth_user_id = return_authenticated_user_id()
-        if is_admin(auth_user_id):
+        return_authenticated_user_id()
+        if get_jwt["is_admin"]:
             return f(*args, **kwargs)
         abort(make_response(({"message":
                               """You are not authorized to perfom this action,
@@ -124,7 +89,7 @@ def authorize_teacher(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
-        if is_teacher(auth_user_id):
+        if get_jwt["is_teacher"]:
             kwargs["teacher_id"] = auth_user_id
             return f(*args, **kwargs)
         abort(make_response(({"message":
