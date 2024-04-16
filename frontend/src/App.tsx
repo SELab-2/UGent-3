@@ -13,7 +13,7 @@ const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path=":lang" element={<LanguagePath/>}>
         <Route path="student" element={<HomeStudent />} loader={fetchProjects}/>
-        <Route path="projects" element={<ProjectOverView/>}/>
+        <Route path="projects" element={<ProjectOverView/>} loader={fetchProjects}/>
         <Route path="home" element={<Home />} />
         <Route path="project" >
           <Route path=":projectId" element={<ProjectView />}/>
@@ -33,4 +33,3 @@ export default function App(): React.JSX.Element {
     </RouterProvider>
   );
 }
-export default App;

@@ -7,10 +7,8 @@ import React, {useState} from 'react';
 import dayjs, {Dayjs} from "dayjs";
 import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
 import {ProjectDeadlineCard} from "../project/projectDeadline/ProjectDeadlineCard.tsx";
-import {ProjectDeadline, ShortSubmission, Project} from "../project/projectDeadline/ProjectDeadline.tsx";
-
-const apiUrl = import.meta.env.VITE_APP_API_URL
-const initialValue = dayjs(Date.now());
+import {ProjectDeadline} from "../project/projectDeadline/ProjectDeadline.tsx";
+import {useLoaderData} from "react-router-dom";
 
 interface DeadlineInfoProps {
   selectedDay: Dayjs;

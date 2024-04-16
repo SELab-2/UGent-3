@@ -1,10 +1,10 @@
-import {useEffect, useState} from "react";
 import {ProjectDeadline} from "./projectDeadline/ProjectDeadline.tsx";
-import {fetchProjects} from "./fetchProjects.tsx";
 import {Container, Grid, Link, Typography} from "@mui/material";
 import {ProjectDeadlineCard} from "./projectDeadline/ProjectDeadlineCard.tsx";
 import { useTranslation } from "react-i18next";
 import {Title} from "../../components/Header/Title.tsx";
+import {useLoaderData} from "react-router-dom";
+import dayjs from "dayjs";
 
 /**
  *
@@ -12,56 +12,52 @@ import {Title} from "../../components/Header/Title.tsx";
 export default function ProjectOverView() {
   const {i18n} = useTranslation()
   const { t } = useTranslation('translation', { keyPrefix: 'projectsOverview' });
-  const [projects, setProjects] = useState<ProjectDeadline[]>([]);
-  useEffect(() => {
-    fetchProjects(setProjects).then(() => {})
-      .catch((error) => {
-        console.error('Error fetching projects:', error);
-      });
-  }, []);
-  const currentDate = new Date();
-
+  const projects = useLoaderData() as ProjectDeadline[] 
+  
+  const projectReducer = (acc: {[key: string]: ProjectDeadline[]}, project: ProjectDeadline) => {
+    (acc[project.course.course_id] = acc[project.course.course_id] || []).push(project);
+    return acc;
+  }
   const futureProjectsByCourse = projects
-    .filter((p) => new Date(p.deadline) >= currentDate)
-    .sort((a, b) =>
-      new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
-    .reduce((acc: {[key: string]: ProjectDeadline[]}, project) => {
-      (acc[project.course.course_id] = acc[project.course.course_id] || []).push(project);
-      return acc;
-    }, {});
+    .filter((p) => (p.deadline && dayjs(dayjs()).isBefore(p.deadline)))
+    .sort((a, b) => dayjs(a.deadline).diff(dayjs(b.deadline)))
+    .reduce(projectReducer, {});
   const pastProjectsByCourse = projects
-    .filter((p) => new Date(p.deadline) < currentDate)
-    .sort((a, b) =>
-      new Date(b.deadline).getTime() - new Date(a.deadline).getTime())
-    .reduce((acc: {[key: string]: ProjectDeadline[]}, project) => {
-      (acc[project.course.course_id] = acc[project.course.course_id] || []).push(project);
-      return acc;
-    }, {});
-
+    .filter((p) => p.deadline && (dayjs()).isAfter(p.deadline))
+    .sort((a, b) => dayjs(b.deadline).diff(dayjs(a.deadline)))
+    .reduce(projectReducer, {});
+  const noDeadlineProject = projects.filter((p) => p.deadline === undefined)
+    .reduce(projectReducer,{});
+  
+  const projectItem = ([index, courseProjects] : [string, ProjectDeadline[]]) =>{
+    return (
+      <Grid container spacing={2} key={index}>
+        <Grid item xs={12}>
+          <Link href={`/${i18n.language}/course/${courseProjects[0].course.course_id}`} style={{color: 'inherit'}}
+            underline={'none'}>
+            <Typography variant="h6">{courseProjects[0].course.name} {courseProjects[0].course.ufora_id}</Typography>
+          </Link>
+        </Grid>
+        <Grid item xs={8}>
+          <ProjectDeadlineCard deadlines={courseProjects} />
+        </Grid>
+      </Grid>
+    )
+  }
   return (
     <Container style={{ paddingTop: '50px' }}>
       <Title title={"Projects Overview"}/>
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <Typography variant="h5" style={{ color: '#3f51b5' }}>{t("future_deadline")}:</Typography>
-          {Object.keys(futureProjectsByCourse).length === 0 ? (
+          {Object.keys(futureProjectsByCourse).length + Object.keys(noDeadlineProject).length === 0 ? (
             <Typography variant="body1">
               {t('no_projects')}
             </Typography>
           ) :(
-            Object.entries(futureProjectsByCourse).map(([index, courseProjects]) => (
-              <Grid container spacing={2} key={index}>
-                <Grid item xs={12}>
-                  <Link href={`/${i18n.language}/course/${courseProjects[0].course.course_id}`} style={{color: 'inherit'}}
-                    underline={'none'}>
-                    <Typography variant="h6">{courseProjects[0].course.name} {courseProjects[0].course.ufora_id}</Typography>
-                  </Link>
-                </Grid>
-                <Grid item xs={8}>
-                  <ProjectDeadlineCard deadlines={courseProjects} />
-                </Grid>
-              </Grid>
-            )))}
+            [...Object.entries(futureProjectsByCourse), 
+              ...Object.entries(noDeadlineProject)].map(projectItem)
+          )}
         </Grid>
         <Grid item xs={6}>
           <Typography variant="h5" style={{ color: '#3f51b5' }}>{t("past_deadline")}:</Typography>
@@ -71,19 +67,9 @@ export default function ProjectOverView() {
                 {t('no_projects')}
               </Typography>
             ):(
-              Object.entries(pastProjectsByCourse).map(([index, courseProjects]) => (
-                <Grid container spacing={2} key={index}>
-                  <Grid item xs={12}>
-                    <Link href={`/${i18n.language}/course/${courseProjects[0].course.course_id}`} style={{color: 'inherit'}}
-                      underline={'none'}>
-                      <Typography variant="h6">{courseProjects[0].course.name} {courseProjects[0].course.ufora_id}</Typography>
-                    </Link>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <ProjectDeadlineCard deadlines={courseProjects} />
-                  </Grid>
-                </Grid>
-              )))}
+              Object.entries(pastProjectsByCourse).map(projectItem)
+            )
+          }
         </Grid>
       </Grid>
     </Container>
