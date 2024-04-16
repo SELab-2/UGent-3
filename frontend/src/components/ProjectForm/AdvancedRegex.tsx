@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 import {InfoOutlined} from "@mui/icons-material";
 
 interface Props {
-  handleSubmit: (regex: string) => void;
+  handleSubmit: (regex: string) => boolean;
   regexError: boolean;
 }
 
@@ -17,6 +17,13 @@ export default function AdvancedRegex({ handleSubmit, regexError } : Props) {
   const [regex, setRegex] = useState("");
   
   const {t} = useTranslation('projectformTranslation', {keyPrefix: 'advancedRegex'});
+
+  const handleAdvancedSubmit = () => {
+    const result = handleSubmit(regex);
+    if (result) {
+      setRegex("");
+    }
+  }
 
   return (
     <Stack
@@ -31,6 +38,7 @@ export default function AdvancedRegex({ handleSubmit, regexError } : Props) {
           placeholder="Regex"
           error={regexError}
           helperText={regexError ? t("helperRegexText") : ''}
+          value={regex}
           onChange={event => setRegex(event.target.value)}
         ></TextField>
         <Tooltip title={<Typography>{t("regexInfo")} <Link to="https://cheatography.com/davechild/cheat-sheets/regular-expressions/">{t("cheatsheet")}</Link></Typography>}>
@@ -39,7 +47,7 @@ export default function AdvancedRegex({ handleSubmit, regexError } : Props) {
           </IconButton>
         </Tooltip>
       </Stack>
-      <Button variant="contained" onClick={() => handleSubmit(regex)}>Add custom regex</Button>
+      <Button variant="contained" onClick={() => handleAdvancedSubmit()}>Add custom regex</Button>
     </Stack>
   )
 }

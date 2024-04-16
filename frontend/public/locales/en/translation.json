@@ -64,6 +64,11 @@
     "helperRegexText": "Regex can't be empty or already added",
     "fileInfo": "The uploaded file must be a .zip file, if you want automatic tests you should include a Dockerfile or a run_tests.sh.\n For more info you should see",
     "userDocs": "user guide",
-    "visibleForStudentsTooltip": "If this is checked the project will be visible to the students after upload"
+    "visibleForStudentsTooltip": "If this is checked the project will be visible to the students after upload",
+    "noDeadlinesPlaceholder": "No deadlines present yet",
+    "noFilesPlaceholder": "No assignment files given yet",
+    "noRegexPlaceholder": "No regex added yet",
+    "clearSelected": "Clear Selection",
+    "faultySubmission": "Some field were left open or there is no valid runner/file combination"
   }
 }

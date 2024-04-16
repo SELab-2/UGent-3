@@ -33,7 +33,10 @@
     "helperText": "Selecteer een geldige deadline voor het project",
     "uploadProject": "Upload project",
     "regexStructure": "Regex structuur",
-    "uploadError": "Project is niet goed geformatteerd"
+    "uploadError": "Project is niet goed geformatteerd",
+    "noDeadlinesPlaceholder": "Nog geen opgegeven deadlines",
+    "noFilesPlaceholder": "Nog geen opgave bestanden geupload",
+    "noRegexPlaceholder": "Nog geen regex toegevoegd"
   },
   "projectView": {
     "submitNetworkError": "Er is iets mislopen bij het opslaan van uw indiening. Probeer het later opnieuw.",

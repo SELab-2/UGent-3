@@ -1,0 +1,15 @@
+{
+  "filestructure": {
+    "title": "Vul de gewenste bestand restrictie in",
+    "startsWith": "Bestandnaam start met",
+    "endsWith": "Bestandnaam eindigt met",
+    "contains": "Bestandnaam bevat",
+    "helperRegexText": "De gegeven regex mag niet leeg of al toegevoegd zijn"
+  },
+  "advancedRegex": {
+    "title": "Vul de gewenste regex in",
+    "helperRegexText": "De gegeven regex mag niet leeg of al toegevoegd zijn",
+    "regexInfo": "Indien moeilijkheden worden ondervonden met regex, bekijk deze",
+    "cheatsheet": "cheatsheet"
+  }
+}

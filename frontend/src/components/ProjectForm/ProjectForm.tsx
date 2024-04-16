@@ -28,6 +28,7 @@ import TabPanel from "@mui/lab/TabPanel";
 import {TabContext} from "@mui/lab";
 import FileStuctureForm from "./FileStructureForm.tsx";
 import AdvancedRegex from "./AdvancedRegex.tsx";
+import RunnerSelecter from "./RunnerSelecter.tsx";
 
 interface Course {
   course_id: string;
@@ -73,39 +74,64 @@ export default function ProjectForm() {
   const [courseId, setCourseId] = useState<string>('');
   const [courseName, setCourseName] = useState<string>('');
 
-  const [containsTests, setContainsTests] = useState(true);
+  const [containsDockerfile, setContainsDockerfile] = useState(false);
+  const [containsRuntest, setContainsRuntest] = useState(false);
 
   const [advanced, setAdvanced] = useState('1');
+  const [runner, setRunner] = useState<string>('');
+  const [validRunner, setValidRunner] = useState(true);
+  const [validSubmission, setValidSubmission] = useState(true);
 
   useEffect(() => {
     fetchCourses();
   }, [regexError]);
+
+  const handleRunnerSwitch = (newRunner: string) => {
+    console.log(validRunner);
+    if (newRunner === t('clearSelected')) {
+      setRunner('');
+    } else {
+      setRunner(newRunner);
+    }
+  }
 
   const handleTabSwitch = (_event: React.SyntheticEvent, newAdvanced: string) => {
     setAdvanced(newAdvanced);
   };
 
   const handleFileUpload2 = async (file: File) => {
+    setFiles([]);
+    setContainsRuntest(false);
+    setContainsDockerfile(false);
     const zip = await JSZip.loadAsync(file);
-    const newFiles = files.slice();
+    const newFiles = [];
 
-    let containsTestsFlag = false; // Initialize flag
+    let constainsDocker = false;
+    let containsRuntest = false;
     for (const [, zipEntry] of Object.entries(zip.files)) {
       if (!zipEntry.dir) {
-        // Check if the file is a Dockerfile
-        if (zipEntry.name.trim().toLowerCase() === 'dockerfile' || zipEntry.name.trim().toLowerCase() == 'run_tests.sh') {
-          containsTestsFlag = true;
+        if (zipEntry.name.trim().toLowerCase() === 'dockerfile') {
+          constainsDocker = true;
+        }
+        if (zipEntry.name.trim().toLowerCase() == 'run_tests.sh') {
+          containsRuntest = true;
         }
         newFiles.push(zipEntry.name);
       }
     }
 
     setFiles(newFiles);
-    setContainsTests(containsTestsFlag);
+    setContainsDockerfile(constainsDocker)
+    setContainsRuntest(containsRuntest);
     const {name} = file;
     setAssignmentFile(file)
     setFilename(name);
 
+    if (runner === "CUSTOM") {
+      setValidRunner(constainsDocker);
+    } else {
+      setValidRunner(containsRuntest);
+    }
   }
 
   const fetchCourses = async () => {
@@ -121,10 +147,9 @@ export default function ProjectForm() {
   }
 
   const appendRegex = (r: string) => {
-    console.log(r);
     if (r == '' || regexExpressions.some(reg => reg.regex == r)) {
       setRegexError(true);
-      return;
+      return false;
     }
     setRegexError(false);
     let index;
@@ -137,6 +162,8 @@ export default function ProjectForm() {
 
     const newRegexExpressions = [...regexExpressions, { key: index, regex: r}];
     setRegexExpressions(newRegexExpressions);
+
+    return true;
   };
 
   const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
@@ -145,13 +172,12 @@ export default function ProjectForm() {
     description == '' ? setDescriptionError(true) : setDescriptionError(false);
     title == '' ? setTitleError(true) : setTitleError(false);
 
-    if (!assignmentFile) {
+    if (!assignmentFile || !validRunner) {
+      setValidSubmission(false);
       return;
     }
 
     const assignmentFileBlob = new Blob([assignmentFile], { type: assignmentFile.type });
-    console.log("blob");
-    console.log(assignmentFileBlob);
 
     const formData = new FormData();
 
@@ -173,7 +199,10 @@ export default function ProjectForm() {
         })
       );
     });
-    console.log(formData)
+    if (runner !== '') {
+      formData.append("runner", runner);
+    }
+    console.log(formData);
 
     const response = await fetch(`${apiUrl}/projects`, {
       method: "post",
@@ -278,12 +307,18 @@ export default function ProjectForm() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {deadlines.map((deadline, index) => (
-                    <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                      <TableCell component="th" scope="row">{deadline.deadline}</TableCell>
-                      <TableCell align="right">{deadline.description}</TableCell>
+                  {deadlines.length === 0 ? ( // Check if deadlines is empty
+                    <TableRow>
+                      <TableCell colSpan={2} align="center">{t("noDeadlinesPlaceholder")}</TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    deadlines.map((deadline, index) => (
+                      <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                        <TableCell component="th" scope="row">{deadline.deadline}</TableCell>
+                        <TableCell align="right">{deadline.description}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -301,7 +336,7 @@ export default function ProjectForm() {
           <Grid item>
           </Grid>
           <Grid item>
-            <Stack direction="row" style={{display: "flex", alignItems:"center"}}>
+            <Stack direction="row" style={{display: "flex", alignItems:"center", paddingBottom: "40px"}}>
               <FolderDragDrop onFileDrop={file => handleFileUpload2(file)} regexRequirements={[]} />
               <Tooltip style={{ height: "40%" }} title={<Typography variant="h6">{t("fileInfo")}: <Link to="/">{t("userDocs")}</Link></Typography>}>
                 <IconButton>
@@ -317,21 +352,27 @@ export default function ProjectForm() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {files.map((file, index) => (
-                    <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                      <TableCell component="th" scope="row">{file}</TableCell>
+                  {files.length === 0 ? ( // Check if files is empty
+                    <TableRow>
+                      <TableCell colSpan={1} align="center">{t("noFilesPlaceholder")}</TableCell> {/* Placeholder row */}
                     </TableRow>
-                  ))}
+                  ) : (
+                    files.map((file, index) => (
+                      <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                        <TableCell component="th" scope="row">{file}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>
-            {filename !== "" && !containsTests && (
+            {filename !== "" && (!containsRuntest && !containsDockerfile) && (
               <Typography style={{color: 'orange', paddingTop: "20px" }}>
                 {t("testWarning")} ⚠️
               </Typography>
             )}
           </Grid>
-          <Grid item>
+          <Grid item sx={{ minWidth: "722px" }}>
             <TabContext value={advanced}>
               <Tabs value={advanced} onChange={handleTabSwitch}>
                 <Tab label="File restrictions" value="1"/>
@@ -351,8 +392,12 @@ export default function ProjectForm() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {regexExpressions.map((regexData: RegexData) => {
-                    return (
+                  {regexExpressions.length === 0 ? ( // Check if regexExpressions is empty
+                    <TableRow>
+                      <TableCell colSpan={2} align="center">{t("noRegexPlaceholder")}</TableCell> {/* Placeholder row */}
+                    </TableRow>
+                  ) : (
+                    regexExpressions.map((regexData: RegexData) => (
                       <TableRow key={regexData.key}>
                         <TableCell>{regexData.regex}</TableCell>
                         <TableCell align="right">
@@ -361,18 +406,27 @@ export default function ProjectForm() {
                           </IconButton>
                         </TableCell>
                       </TableRow>
-                    )
-                  })
-                  }
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>
+          </Grid>
+          <Grid item>
+            <RunnerSelecter handleSubmit={handleRunnerSwitch} runner={runner} containsDocker={containsDockerfile} containsRuntests={containsRuntest} isValid={validRunner} setIsValid={setValidRunner} />
           </Grid>
           <Grid item>
             <Button variant="contained" onClick={e => {
               return handleSubmit(e);
             }
             }>{t("uploadProject")}</Button>
+            {
+              !validSubmission && (
+                <Typography style={{color: 'red', paddingTop: "20px" }}>
+                  {t("faultySubmission")} ⚠️
+                </Typography>
+              )
+            }
           </Grid>
         </Grid>
       </FormControl>

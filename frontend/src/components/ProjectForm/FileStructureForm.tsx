@@ -3,7 +3,7 @@ import {useState} from "react";
 import {useTranslation} from "react-i18next";
 
 interface Props {
-  handleSubmit: (regex: string) => void;
+  handleSubmit: (regex: string) => boolean;
   regexError: boolean;
 }
 
@@ -28,7 +28,6 @@ export default function FileStuctureForm({ handleSubmit, regexError } : Props) {
   }
 
   const handleRegexSubmit = () => {
-    // if (startsWith == "" && endsWith == "" && contains == "" && extension == "") return;
     let regex = "";
     if (startsWith) {
       regex += "^" + startsWith
@@ -43,7 +42,13 @@ export default function FileStuctureForm({ handleSubmit, regexError } : Props) {
     } else if (endsWith != "") {
       regex += endsWith + "$";
     }
-    handleSubmit(regex);
+    const result = handleSubmit(regex);
+    if (result) {
+      setStartsWith("");
+      setExtension("");
+      setEndsWith("");
+      setContains("");
+    }
   }
 
   return (
@@ -57,6 +62,7 @@ export default function FileStuctureForm({ handleSubmit, regexError } : Props) {
         label={t("startsWith")}
         placeholder={t("startsWith")}
         error={regexError}
+        value={startsWith}
         onChange={e => setStartsWith(e.target.value)}
       />
       <TextField
@@ -65,21 +71,24 @@ export default function FileStuctureForm({ handleSubmit, regexError } : Props) {
         label={t("endsWith")}
         placeholder={t("endsWith")}
         error={regexError}
+        value={endsWith}
         onChange={e => setEndsWith(e.target.value)}
       />
       <TextField
         sx={{minWidth: 650}}
         id="contains"
-        label="yallah"
-        placeholder="yallah"
+        label="contains"
+        placeholder="contains"
         error={regexError}
+        value={contains}
         onChange={e => setContains(e.target.value)}
       />
       <Autocomplete
         id="extension"
         freeSolo
+        value={extension}
         onChange={(_event, value) => handleExtensionChange(value)}
-        renderInput={(params) => <TextField {...params} label="file extension" error={regexError} helperText={regexError ? t("helperRegexText") : ''}/>}
+        renderInput={(params) => <TextField {...params} label="file extension" error={regexError} helperText={regexError ? t("helperRegexText") : ''} />}
         options={extensions.map((t) => t)}
       />
       <Button variant="contained" onClick={() => handleRegexSubmit()}>
