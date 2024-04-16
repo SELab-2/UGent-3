@@ -9,15 +9,12 @@ from dotenv import load_dotenv
 
 from flask import abort, request, make_response
 from flask_jwt_extended import get_jwt, get_jwt_identity, verify_jwt_in_request
-from sqlalchemy.exc import SQLAlchemyError
 
-from project import db
-
-from project.models.user import User, Role
 from project.utils.models.course_utils import is_admin_of_course, \
     is_student_of_course, is_teacher_of_course
 from project.utils.models.project_utils import get_course_of_project, project_visible
 from project.utils.models.submission_utils import get_submission, get_course_of_submission
+from project.utils.models.user_utils import get_user
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -38,18 +35,7 @@ def return_authenticated_user_id():
     """
     verify_jwt_in_request()
     uid = get_jwt_identity()
-    try:
-        user = db.session.get(User, uid)
-    except SQLAlchemyError:
-        db.session.rollback()
-        abort(make_response(({"message":
-                            "An unexpected database error occured while fetching the user"},
-                            500)))
-
-    if not user:
-        abort(make_response(({"message":
-                            "Something went wrong with adding the user to the database during login, please log in again"},
-                            500)))
+    get_user(uid)
     return uid
 
 
@@ -73,7 +59,7 @@ def authorize_admin(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         return_authenticated_user_id()
-        if get_jwt["is_admin"]:
+        if get_jwt()["is_admin"]:
             return f(*args, **kwargs)
         abort(make_response(({"message":
                               """You are not authorized to perfom this action,
@@ -89,7 +75,7 @@ def authorize_teacher(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
-        if get_jwt["is_teacher"]:
+        if get_jwt()["is_teacher"]:
             kwargs["teacher_id"] = auth_user_id
             return f(*args, **kwargs)
         abort(make_response(({"message":

@@ -3,7 +3,6 @@ from os import getenv
 
 from dotenv import load_dotenv
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import get_jwt_identity, get_jwt
 from flask_restful import Resource, Api
 from sqlalchemy.exc import SQLAlchemyError
 

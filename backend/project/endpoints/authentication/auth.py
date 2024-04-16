@@ -22,9 +22,16 @@ AUTHENTICATION_URL = getenv("AUTHENTICATION_URL")
 CLIENT_ID = getenv("CLIENT_ID")
 CLIENT_SECRET = getenv("CLIENT_SECRET")
 CODE_VERIFIER = getenv("CODE_VERIFIER")
+HOMEPAGE_URL = getenv("HOMEPAGE_URL")
 TENANT_ID = getenv("TENANT_ID")
 
 def microsoft_authentication():
+    """
+    This function will handle a microsoft based login,
+    creating a new user profile in the process and
+    return a valid access token as a cookie.
+    Redirects to the homepage of the website
+    """
     code = request.args.get("code")
     if code is None:
         return {"message":"This endpoint is only used for authentication."}, 400
@@ -36,17 +43,21 @@ def microsoft_authentication():
             "grant_type":"authorization_code",
             "code_verifier":CODE_VERIFIER,
             "client_secret":CLIENT_SECRET}
-    try: 
-        res = requests.post(f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token", 
-                            data=data, 
+    try:
+        res = requests.post(f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token",
+                            data=data,
                             timeout=5)
         token = res.json()["access_token"]
-        profile_res = requests.get("https://graph.microsoft.com/v1.0/me", 
+        profile_res = requests.get("https://graph.microsoft.com/v1.0/me",
                                     headers={"Authorization":f"Bearer {token}"},
                                     timeout=5)
         auth_user_id = profile_res.json()["id"]
-    except:
-        return {"message":"An error occured while trying to access the Microsoft servers"}, 500
+    except TimeoutError:
+        return {"message":"Request to Microsoft timed out"}, 500
+    if not profile_res or profile_res.status_code != 200:
+        abort(make_response(({"message":
+                              "An error occured while trying to authenticate your access token"},
+                               500)))
     try:
         user = db.session.get(User, auth_user_id)
     except SQLAlchemyError:
@@ -69,30 +80,41 @@ def microsoft_authentication():
         except SQLAlchemyError:
             db.session.rollback()
             abort(make_response(({"message":
-                                    """An unexpected database error occured 
+                                    """An unexpected database error occured
                                 while creating the user during authentication"""}, 500)))
-    resp = redirect("http://localhost:5173", code=303) # hier nog .env variable voor homepage
+    resp = redirect(HOMEPAGE_URL, code=303)
     additional_claims = {"is_teacher":user.role == Role.TEACHER,
                          "is_admin":user.role == Role.ADMIN}
-    set_access_cookies(resp, create_access_token(identity=profile_res.json()["id"], additional_claims=additional_claims))
+    set_access_cookies(resp,
+                       create_access_token(identity=profile_res.json()["id"],
+                                           additional_claims=additional_claims))
     return resp
 
 
 def test_authentication():
+    """
+    This function will handle the logins done using our
+    own authentication server for testing purposes
+    """
     code = request.args.get("code")
-    if code is not None:
-        profile_res = requests.get(AUTHENTICATION_URL, headers={"Authorization":f"{code}"})
-        print(profile_res.json())
-        resp = redirect("http://localhost:5173", code=303) # hier nog .env variable voor homepage
-        set_access_cookies(resp, create_access_token(identity=profile_res.json()["id"]))
-        return resp
-    return {"message":"Not yet"}, 500
+    if code is None:
+        return {"message":"Not yet"}, 500
+    profile_res = requests.get(AUTHENTICATION_URL, headers={"Authorization":f"{code}"}, timeout=5)
+    resp = redirect(HOMEPAGE_URL, code=303)
+    set_access_cookies(resp, create_access_token(identity=profile_res.json()["id"]))
+    return resp
+
 
 class Auth(Resource):
+    """Api endpoint for the /auth route"""
+
     def get(self):
+        """
+        Will handle the request according to the method defined in the .env variables.
+        Currently only Microsoft and our test authentication are supported
+        """
         if AUTH_METHOD == "Microsoft":
             return microsoft_authentication()
-        else:
-            return test_authentication()
+        return test_authentication()
 
 auth_api.add_resource(Auth, "/auth")
