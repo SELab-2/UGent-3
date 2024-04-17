@@ -11,17 +11,20 @@ from flask_restful import Resource
 from sqlalchemy import exc
 from project.executor import executor
 from project.db_in import db
+from project.models.course import Course
+from project.models.course_relation import CourseAdmin
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
-from project.models.user import User
+from project.models.user import User, Role
 from project.utils.files import all_files_uploaded
 from project.utils.user import is_valid_user
 from project.utils.project import is_valid_project
 from project.utils.query_agent import query_selected_from_model, delete_by_id_from_model
 from project.utils.authentication import authorize_submission_request, \
-    authorize_submissions_request, authorize_grader, \
+    login_required_return_uid, authorize_grader, \
         authorize_student_submission, authorize_submission_author
-
+from project.utils.models.user_utils import get_user
+from project.utils.models.project_utils import get_course_of_project
 from project.utils.submissions.evaluator import run_evaluator
 
 load_dotenv()
@@ -36,8 +39,8 @@ submissions_bp = Blueprint("submissions", __name__)
 class SubmissionsEndpoint(Resource):
     """API endpoint for the submissions"""
 
-    @authorize_submissions_request
-    def get(self) -> dict[str, any]:
+    @login_required_return_uid
+    def get(self, uid=None) -> dict[str, any]:
         """Get all the submissions from a user for a project
 
         Returns:
@@ -47,11 +50,50 @@ class SubmissionsEndpoint(Resource):
         data = {
             "url": BASE_URL
         }
+
+        role = get_user(uid).role
+
+        # User should only get its own submissions
+        if role is Role.STUDENT:
+            filters = dict(request.args)
+            filters["uid"] = uid
+            return query_selected_from_model(
+                Submission,
+                urljoin(f"{API_HOST}/", "/submissions"),
+                select_values=[
+                    "submission_id", "uid",
+                    "project_id", "grading",
+                    "submission_time", "submission_status"],
+                url_mapper={
+                    "submission_id": BASE_URL,
+                    "project_id": urljoin(f"{API_HOST}/", "projects"),
+                    "uid": urljoin(f"{API_HOST}/", "users")},
+                filters=filters
+            )
+
         try:
-            # Filter by uid
-            uid = request.args.get("uid")
-            if uid is not None and (not uid.isdigit() or not User.query.filter_by(uid=uid).first()):
-                data["message"] = f"Invalid user (uid={uid})"
+            # The teacher or admin should only get the submissions for their courses
+            courses = []
+            if role is Role.TEACHER:
+                courses = query_selected_from_model(
+                    Course,
+                    "courses",
+                    select_values=["course_id"],
+                    filters={"teacher": uid}
+                )[0].json["data"]
+            else:
+                courses = query_selected_from_model(
+                    CourseAdmin,
+                    "courses",
+                    select_values=["course_id"],
+                    filters={"uid": uid}
+                )[0].json["data"]
+
+            # Filter by user_id
+            user_id = request.args.get("uid")
+            if user_id is not None and \
+                (not user_id.isdigit() or not User.query.filter_by(uid=user_id).first()):
+                data["message"] = f"Invalid user (uid={user_id})"
                 return data, 400
 
             # Filter by project_id
@@ -65,7 +107,7 @@ class SubmissionsEndpoint(Resource):
             data["message"] = "An error occurred while fetching the submissions"
             return data, 500
 
-        return query_selected_from_model(
+        response = query_selected_from_model(
             Submission,
             urljoin(f"{API_HOST}/", "/submissions"),
             select_values=[
@@ -78,6 +120,14 @@ class SubmissionsEndpoint(Resource):
                 "uid": urljoin(f"{API_HOST}/", "users")},
             filters=request.args
         )
+        if response[1] != 200:
+            return response
+        filtered_submissions = [
+            project for project in response[0].json["data"]
+            if get_course_of_project(project["project_id"].split("/")[-1]) in courses
+        ]
+        response[0].json["data"] = filtered_submissions
+        return response
 
     @authorize_student_submission
     def post(self) -> dict[str, any]:
@@ -276,24 +326,6 @@ class SubmissionEndpoint(Resource):
             data["message"] = \
                 f"An error occurred while patching submission (submission_id={submission_id})"
             return data, 500
-
-    @authorize_submission_author
-    def delete(self, submission_id: int) -> dict[str, any]:
-        """Delete a submission given a submission ID
-
-        Args:
-            submission_id (int): Submission ID
-
-        Returns:
-            dict[str, any]: A message
-        """
-
-        return delete_by_id_from_model(
-            Submission,
-            "submission_id",
-            submission_id,
-            BASE_URL
-        )
 
 submissions_bp.add_url_rule("/submissions", view_func=SubmissionsEndpoint.as_view("submissions"))
 submissions_bp.add_url_rule(
