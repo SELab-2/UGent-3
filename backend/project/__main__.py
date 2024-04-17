@@ -11,7 +11,6 @@ DEBUG=getenv("DEBUG")
 
 if __name__ == "__main__":
     app = create_app_with_db(url)
-    CORS(app)
 
     if DEBUG and DEBUG.lower() == "true":
         app.run(debug=True, host='0.0.0.0')
