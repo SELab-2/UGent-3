@@ -8,6 +8,8 @@
     "projectCreate": "Create Project",
     "login": "Login",
     "home": "Home",
+    "tag": "en",
+    "homepage": "Homepage",
     "projectUploadForm": "Project upload form"
   },
   "home": {

@@ -14,7 +14,7 @@ const router = createBrowserRouter(
         <Route path="project" >
           <Route path=":projectId" element={<ProjectView />}/>
         </Route>
-        <Route path=":creates" element={<ProjectCreateHome />} />
+        <Route path="projects/create" element={<ProjectCreateHome />} />
       </Route>
     </Route>
   )
