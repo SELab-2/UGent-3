@@ -1,40 +1,35 @@
-"""Submission API endpoint"""
+"""
+This module contains the API endpoint for the submissions
+"""
 
+from os import path, makedirs, getenv
 from urllib.parse import urljoin
 from datetime import datetime
-from os import getenv, path, makedirs
 from zoneinfo import ZoneInfo
 from shutil import rmtree
-from dotenv import load_dotenv
-from flask import Blueprint, request
+from flask import request
 from flask_restful import Resource
 from sqlalchemy import exc
 from project.executor import executor
 from project.db_in import db
-from project.models.course import Course
-from project.models.course_relation import CourseAdmin
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 from project.models.user import User, Role
+from project.models.course import Course
+from project.models.course_relation import CourseAdmin
 from project.utils.files import all_files_uploaded
 from project.utils.user import is_valid_user
 from project.utils.project import is_valid_project
-from project.utils.query_agent import query_selected_from_model, delete_by_id_from_model
-from project.utils.authentication import authorize_submission_request, \
-    login_required_return_uid, authorize_grader, \
-        authorize_student_submission, authorize_submission_author
+from project.utils.query_agent import query_selected_from_model
+from project.utils.authentication import authorize_student_submission, login_required_return_uid
+from project.utils.submissions.evaluator import run_evaluator
 from project.utils.models.user_utils import get_user
 from project.utils.models.project_utils import get_course_of_project
-from project.utils.submissions.evaluator import run_evaluator
 
-load_dotenv()
 API_HOST = getenv("API_HOST")
 UPLOAD_FOLDER = getenv("UPLOAD_FOLDER")
 BASE_URL =  urljoin(f"{API_HOST}/", "/submissions")
-
 TIMEZONE = getenv("TIMEZONE", "GMT")
-
-submissions_bp = Blueprint("submissions", __name__)
 
 class SubmissionsEndpoint(Resource):
     """API endpoint for the submissions"""
@@ -145,12 +140,11 @@ class SubmissionsEndpoint(Resource):
                 submission = Submission()
 
                 # User
-                uid = request.form.get("uid")
-                valid, message = is_valid_user(session, uid)
+                valid, message = is_valid_user(session, request.form.get("uid"))
                 if not valid:
                     data["message"] = message
                     return data, 400
-                submission.uid = uid
+                submission.uid = request.form.get("uid")
 
                 # Project
                 project_id = request.form.get("project_id")
@@ -177,10 +171,17 @@ class SubmissionsEndpoint(Resource):
                     return data, 400
 
                 deadlines = project.deadlines
-                is_late = True
-                for deadline in deadlines:
-                    if submission.submission_time < deadline.deadline:
-                        is_late = False
+                is_late = deadlines is not None
+                if deadlines:
+                    for deadline in deadlines:
+                        if submission.submission_time < deadline.deadline:
+                            is_late = False
+
+                if project.runner:
+                    submission.submission_status = SubmissionStatus.RUNNING
+                else:
+                    submission.submission_status = SubmissionStatus.LATE if is_late \
+                        else SubmissionStatus.SUCCESS
 
                 # Submission_id needed for the file location
                 session.add(submission)
@@ -207,9 +208,6 @@ class SubmissionsEndpoint(Resource):
                         path.join(UPLOAD_FOLDER, str(project.project_id)),
                         project.runner.value,
                         False)
-                else:
-                    submission.submission_status = SubmissionStatus.LATE if is_late \
-                        else SubmissionStatus.SUCCESS
 
                 data["message"] = "Successfully fetched the submissions"
                 data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
@@ -223,112 +221,8 @@ class SubmissionsEndpoint(Resource):
                 }
                 return data, 202
 
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
+            print(e)
             session.rollback()
             data["message"] = "An error occurred while creating a new submission"
             return data, 500
-
-class SubmissionEndpoint(Resource):
-    """API endpoint for the submission"""
-
-    @authorize_submission_request
-    def get(self, submission_id: int) -> dict[str, any]:
-        """Get the submission given an submission ID
-
-        Args:
-            submission_id (int): Submission ID
-
-        Returns:
-            dict[str, any]: The submission
-        """
-
-        data = {
-            "url": urljoin(f"{BASE_URL}/", str(submission_id))
-        }
-        try:
-            with db.session() as session:
-                submission = session.get(Submission, submission_id)
-                if submission is None:
-                    data["url"] = urljoin(f"{API_HOST}/", "/submissions")
-                    data["message"] = f"Submission (submission_id={submission_id}) not found"
-                    return data, 404
-
-                data["message"] = "Successfully fetched the submission"
-                data["data"] = {
-                    "submission_id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
-                    "uid": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
-                    "project_id": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
-                    "grading": submission.grading,
-                    "submission_time": submission.submission_time,
-                    "submission_status": submission.submission_status
-                }
-                return data, 200
-
-        except exc.SQLAlchemyError:
-            data["message"] = \
-                f"An error occurred while fetching the submission (submission_id={submission_id})"
-            return data, 500
-
-    @authorize_grader
-    def patch(self, submission_id:int) -> dict[str, any]:
-        """Update some fields of a submission given a submission ID
-
-        Args:
-            submission_id (int): Submission ID
-
-        Returns:
-            dict[str, any]: A message
-        """
-
-        data = {
-            "url": urljoin(f"{BASE_URL}/", str(submission_id))
-        }
-        try:
-            with db.session() as session:
-                # Get the submission
-                submission = session.get(Submission, submission_id)
-                if submission is None:
-                    data["url"] = urljoin(f"{API_HOST}/", "/submissions")
-                    data["message"] = f"Submission (submission_id={submission_id}) not found"
-                    return data, 404
-
-                # Update the grading field
-                grading = request.form.get("grading")
-                if grading is not None:
-                    try:
-                        grading_float = float(grading)
-                        if 0 <= grading_float <= 20:
-                            submission.grading = grading_float
-                        else:
-                            data["message"] = "Invalid grading (grading=0-20)"
-                            return data, 400
-                    except ValueError:
-                        data["message"] = "Invalid grading (not a valid float)"
-                        return data, 400
-
-                # Save the submission
-                session.commit()
-
-                data["message"] = f"Submission (submission_id={submission_id}) patched"
-                data["url"] = urljoin(f"{BASE_URL}/", str(submission.submission_id))
-                data["data"] = {
-                    "id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
-                    "user": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
-                    "project": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
-                    "grading": submission.grading,
-                    "time": submission.submission_time,
-                    "status": submission.submission_status
-                }
-                return data, 200
-
-        except exc.SQLAlchemyError:
-            session.rollback()
-            data["message"] = \
-                f"An error occurred while patching submission (submission_id={submission_id})"
-            return data, 500
-
-submissions_bp.add_url_rule("/submissions", view_func=SubmissionsEndpoint.as_view("submissions"))
-submissions_bp.add_url_rule(
-    "/submissions/<int:submission_id>",
-    view_func=SubmissionEndpoint.as_view("submission")
-)

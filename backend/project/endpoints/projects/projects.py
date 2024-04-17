@@ -11,14 +11,13 @@ from flask import request, jsonify
 from flask_restful import Resource
 
 from project.db_in import db
-from project.models.user import User, Role
-from project.models.course import Course
-from project.models.course_relation import CourseStudent, CourseAdmin
 from project.models.project import Project, Runner
-from project.utils.query_agent import query_selected_from_model, query_by_id_from_model, create_model_instance
+from project.utils.query_agent import query_selected_from_model, query_by_id_from_model, \
+    create_model_instance
 from project.utils.authentication import login_required_return_uid, authorize_teacher
 from project.utils.models.user_utils import is_teacher, is_admin
-from project.utils.models.course_utils import is_teacher_of_course, is_admin_of_course, is_student_of_course
+from project.utils.models.course_utils import is_teacher_of_course, is_admin_of_course, \
+    is_student_of_course
 from project.endpoints.projects.endpoint_parser import parse_project_params
 
 API_URL = os.getenv('API_HOST')
