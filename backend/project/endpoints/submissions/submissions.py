@@ -36,7 +36,7 @@ class SubmissionsEndpoint(Resource):
 
     @login_required_return_uid
     def get(self, uid=None) -> dict[str, any]:
-        """Get all the submissions from a user for a project
+        """Get all the submissions from a user
 
         Returns:
             dict[str, any]: The list of submission URLs
@@ -221,8 +221,7 @@ class SubmissionsEndpoint(Resource):
                 }
                 return data, 202
 
-        except exc.SQLAlchemyError as e:
-            print(e)
+        except exc.SQLAlchemyError:
             session.rollback()
             data["message"] = "An error occurred while creating a new submission"
             return data, 500
