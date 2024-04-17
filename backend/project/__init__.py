@@ -11,7 +11,7 @@ from .endpoints.index.index import index_bp
 from .endpoints.users import users_bp
 from .endpoints.courses.courses_config import courses_bp
 from .endpoints.projects.project_endpoint import project_bp
-from .endpoints.submissions import submissions_bp
+from .endpoints.submissions.submission_config import submissions_bp
 from .endpoints.courses.join_codes.join_codes_config import join_codes_bp
 from .endpoints.docs.docs_endpoint import swagger_ui_blueprint
 
