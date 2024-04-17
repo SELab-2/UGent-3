@@ -1,5 +1,5 @@
 import {ProjectDeadline} from "./projectDeadline/ProjectDeadline.tsx";
-import {Container, Grid, Link, Typography} from "@mui/material";
+import {Card, CardContent, Container, Grid, Link, Typography} from "@mui/material";
 import {ProjectDeadlineCard} from "./projectDeadline/ProjectDeadlineCard.tsx";
 import { useTranslation } from "react-i18next";
 import {Title} from "../../components/Header/Title.tsx";
@@ -39,7 +39,7 @@ export default function ProjectOverView() {
           </Link>
         </Grid>
         <Grid item xs={8}>
-          <ProjectDeadlineCard deadlines={courseProjects} />
+          <ProjectDeadlineCard deadlines={courseProjects} showCourse={false} />
         </Grid>
       </Grid>
     )
@@ -48,28 +48,37 @@ export default function ProjectOverView() {
     <Container style={{ paddingTop: '50px' }}>
       <Title title={"Projects Overview"}/>
       <Grid container spacing={2}>
-        <Grid item xs={6}>
-          <Typography variant="h5" style={{ color: '#3f51b5' }}>{t("future_deadline")}:</Typography>
-          {Object.keys(futureProjectsByCourse).length + Object.keys(noDeadlineProject).length === 0 ? (
-            <Typography variant="body1">
-              {t('no_projects')}
-            </Typography>
-          ) :(
-            [...Object.entries(futureProjectsByCourse), 
-              ...Object.entries(noDeadlineProject)].map(projectItem)
-          )}
+        <Grid item xs={5}>
+          <Card>
+            <CardContent>
+              <Typography variant="h5" style={{ color: '#3f51b5' }}>{t("future_deadline")}:</Typography>
+              {Object.keys(futureProjectsByCourse).length + Object.keys(noDeadlineProject).length === 0 ? (
+                <Typography variant="body1">
+                  {t('no_projects')}
+                </Typography>
+              ) :(
+                [...Object.entries(futureProjectsByCourse),
+                  ...Object.entries(noDeadlineProject)].map(projectItem)
+              )}
+            </CardContent>
+          </Card>
+
         </Grid>
-        <Grid item xs={6}>
-          <Typography variant="h5" style={{ color: '#3f51b5' }}>{t("past_deadline")}:</Typography>
-          {
-            Object.keys(futureProjectsByCourse).length === 0 ? (
-              <Typography variant="body1">
-                {t('no_projects')}
-              </Typography>
-            ):(
-              Object.entries(pastProjectsByCourse).map(projectItem)
-            )
-          }
+        <Grid item xs={5}>
+          <Card>
+            <CardContent>
+              <Typography variant="h5" style={{ color: '#3f51b5' }}>{t("past_deadline")}:</Typography>
+              {
+                Object.keys(pastProjectsByCourse).length === 0 ? (
+                  <Typography variant="body1">
+                    {t('no_projects')}
+                  </Typography>
+                ):(
+                  Object.entries(pastProjectsByCourse).map(projectItem)
+                )
+              }
+            </CardContent>
+          </Card>
         </Grid>
       </Grid>
     </Container>
