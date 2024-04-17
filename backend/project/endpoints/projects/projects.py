@@ -49,9 +49,15 @@ class ProjectsEndpoint(Resource):
         )[0].json["data"]
 
         if is_teacher(uid):
-            projects = [project for project in projects if is_teacher_of_course(uid, project["course_id"])]
+            projects = [
+                project for project in projects
+                if is_teacher_of_course(uid, project["course_id"])
+            ]
         elif is_admin(uid):
-            projects = [project for project in projects if is_admin_of_course(uid, project["course_id"])]
+            projects = [
+                project for project in projects
+                if is_admin_of_course(uid, project["course_id"])
+            ]
         else:
             projects = [project for project in projects if
                 is_student_of_course(uid, project["course_id"])
@@ -69,66 +75,12 @@ class ProjectsEndpoint(Resource):
             if response[1] != 200:
                 return response
             filtered_projects.append(response[0]["data"])
-        
+
         return {
             "url": urljoin(f"{API_URL}/", response_url),
             "message": "Successfully fetched the projects",
             "data": filtered_projects
         }
-
-
-        # # Filter on 1 course
-        # if "course" in filters:
-        #     return query_selected_from_model(
-        #         Project,
-        #         response_url,
-        #         select_values=["project_id", "title", "description", "deadlines"],
-        #         url_mapper={"project_id": response_url},
-        #         filters=filters
-        #     )
-
-        # # Projects of all courses
-        # else:
-        #     # Get the courses for the user
-        #     if role is not Role.TEACHER:
-        #         response = query_selected_from_model(
-        #             CourseStudent if role is Role.STUDENT else CourseAdmin,
-        #             response_url,
-        #             select_values=["course_id"],
-        #             filters={"uid": uid}
-        #         )
-        #     else:
-        #         response = query_selected_from_model(
-        #             Course,
-        #             response_url,
-        #             select_values=["course_id"],
-        #             filters={"teacher": uid}
-        #         )
-        #     if response[1] != 200:
-        #         return response
-        #     courses = response[0].json["data"]
-
-        #     # Find all projects based on the courses that the user is part of
-        #     projects = []
-        #     for course in courses:
-        #         filters["course_id"] = course
-        #         response = query_selected_from_model(
-        #             Project,
-        #             response_url,
-        #             select_values=["project_id", "title", "description", "deadlines"],
-        #             url_mapper={"project_id", response_url},
-        #             filters=filters
-        #         )
-        #         if response[1] != 200:
-        #             return response
-        #         projects += response.json["data"]
-            
-        #     # Return the projects
-        #     return {
-        #         "url": urljoin(f"{API_URL}/", response_url),
-        #         "message": "Successfully fetched the projects",
-        #         "data": projects
-        #     }
 
     @authorize_teacher
     def post(self, teacher_id=None):

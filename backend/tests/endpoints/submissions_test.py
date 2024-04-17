@@ -21,7 +21,7 @@ class TestSubmissionsEndpoint:
         """Test getting submissions for a non-existing project"""
         response = client.get("/submissions?project_id=123456789",
                               headers={"Authorization":"teacher1"})
-        assert response.status_code == 400 # can't find course of project in authorization
+        assert response.status_code == 400
         assert "message" in response.json
 
     def test_get_submissions_wrong_project_type(self, client: FlaskClient):
