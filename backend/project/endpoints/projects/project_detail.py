@@ -32,7 +32,7 @@ class ProjectDetail(Resource):
     for implementing get, delete and put methods
     """
 
-    # @authorize_project_visible
+    @authorize_project_visible
     def get(self, project_id):
         """
         Get method for listing a specific project
