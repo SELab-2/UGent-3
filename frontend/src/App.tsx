@@ -4,6 +4,7 @@ import Home from "./pages/home/Home";
 import LanguagePath from "./components/LanguagePath";
 import ProjectView from "./pages/project/projectView/ProjectView";
 import ProjectCreateHome from "./pages/create_project/ProjectCreateHome.tsx";
+import SubmissionsOverview from "./pages/submission_overview/SubmissionsOverview.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -11,8 +12,10 @@ const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path=":lang" element={<LanguagePath/>}>
         <Route path="home" element={<Home />} />
-        <Route path="project" >
-          <Route path=":projectId" element={<ProjectView />}/>
+        <Route path="project/:projectId/overview" element={<SubmissionsOverview/>}/>
+        <Route path="project">
+          <Route path=":projectId" element={<ProjectView />}>
+          </Route>
         </Route>
         <Route path="projects">
           <Route path="create" element={<ProjectCreateHome />} />
