@@ -25,9 +25,9 @@ class Me(Resource):
         """
         uid = get_jwt_identity
 
-        return query_by_id_from_model(User, 
-                                      "uid", 
-                                      uid, 
+        return query_by_id_from_model(User,
+                                      "uid",
+                                      uid,
                                       "Could not find you in the database, please log in again")
 
 me_api.add_resource(Me, "/me")
