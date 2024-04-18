@@ -1,7 +1,6 @@
 """Main entry point for the application."""
 from dotenv import load_dotenv
-from flask import Flask
-from flask import Blueprint, request
+from flask import Flask, Blueprint, request
 from flask_restful import Resource, Api
 
 
@@ -10,47 +9,76 @@ index_endpoint = Api(index_bp)
 
 # Take the key the same as the id, uid can then be used in backend
 token_dict = {
+    "teacher1":{
+        "id":"Gunnar",
+        "jobTitle":"teacher"
+    },
+    "teacher2":{
+        "id":"Bart",
+        "jobTitle":"teacher"
+    },
+    "student1":{
+        "id":"w_student",
+        "jobTitle":None
+    },
+    "student01":{
+        "id":"student01",
+        "jobTitle":None
+    },
+    "course_admin1":{
+        "id":"Rien",
+        "jobTitle":None
+    },
+    "del_user":{
+        "id":"del",
+        "jobTitle":None
+    },
+    "ad3_teacher":{
+        "id":"brinkmann",
+        "jobTitle0":"teacher"
+    },
+    "student02":{
+        "id":"student02",
+        "jobTitle":None
+    },
+    "admin1":{
+        "id":"admin_person",
+        "jobTitle":"admin"
+    },
     # Lowest authorized user to test login requirement
     "login": {
         "id": "login",
-        "jobTitle": None,
-        "displayName":"Login User"
+        "jobTitle": None
     },
     # Student authorization access, associated with valid_...
     "student": {
         "id": "student",
-        "jobTitle": None,
-        "displayName":"Student User"
+        "jobTitle": None
     },
     # Student authorization access, other
     "student_other": {
         "id": "student_other",
-        "jobTitle": None,
-        "displayName":"Other Student"
+        "jobTitle": None
     },
     # Teacher authorization access, associated with valid_...
     "teacher": {
         "id": "teacher",
-        "jobTitle": "teacher",
-        "displayName":"Teacher User"
+        "jobTitle": "teacher"
     },
     # Teacher authorization access, other
     "teacher_other": {
         "id": "teacher_other",
-        "jobTitle": "teacher",
-        "displayName":"Other Teacher"
+        "jobTitle": "teacher"
     },
     # Admin authorization access, associated with valid_...
     "admin": {
         "id": "admin",
-        "jobTitle": "admin",
-        "displayName":"Admin User"
+        "jobTitle": "admin"
     },
     # Admin authorization access, other
     "admin_other": {
         "id": "admin_other",
-        "jobTitle": "admin",
-        "displayName":"Other Admin"
+        "jobTitle": "admin"
     }
 }
 
