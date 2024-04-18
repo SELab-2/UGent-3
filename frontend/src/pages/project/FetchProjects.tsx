@@ -10,6 +10,7 @@ export const fetchProjectPage = async () => {
 }
 
 export const fetchMe = async () => {
+  return "STUDENT"
   try {
     const response = await fetch(`${API_URL}/me`, {
       headers:header
@@ -62,21 +63,21 @@ export const fetchProjects = async () => {
           teacher: response_courses.data.teacher,
           ufora_id: response_courses.data.ufora_id
         }
-        if(item.deadlines){
-          return item.deadlines.map((d:string[]) => {
+        if(project_item.data.deadlines){
+          return project_item.data.deadlines.map((d:string[]) => {
             return  {
               project_id: project_id,
-              title: item.title,
-              description: item.description,
-              assignment_file: item.assignment_file,
+              title: project_item.data.title,
+              description: project_item.data.description,
+              assignment_file: project_item.data.assignment_file,
               deadline: new Date(d[1]),
               deadline_description: d[0],
-              course_id: Number(item.course_id),
-              visible_for_students: Boolean(item.visible_for_students),
-              archived: Boolean(item.archived),
-              test_path: item.test_path,
-              script_name: item.script_name,
-              regex_expressions: item.regex_expressions,
+              course_id: Number(project_item.data.course_id),
+              visible_for_students: Boolean(project_item.data.visible_for_students),
+              archived: Boolean(project_item.data.archived),
+              test_path: project_item.data.test_path,
+              script_name: project_item.data.script_name,
+              regex_expressions: project_item.data.regex_expressions,
               short_submission: latest_submission,
               course: course
             }
