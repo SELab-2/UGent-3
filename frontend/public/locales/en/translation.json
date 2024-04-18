@@ -12,7 +12,9 @@
   "home": {
     "home": "Home",
     "tag": "en",
-    "homepage": "Homepage"
+    "homepage": "Homepage",
+    "welcomeDescription": "Welcome to Peristerónas, the online submission platform of UGent",
+    "login": "Login"
   },
   "courseForm": {
     "courseName": "Course Name",
@@ -79,5 +81,19 @@
     "noRegexPlaceholder": "No regex added yet",
     "clearSelected": "Clear Selection",
     "faultySubmission": "Some fields were left open or there is no valid runner/file combination"
+  },
+  "student" : {
+    "myProjects": "My Projects",
+    "myCourses": "My Courses",
+    "deadlines": "Past deadlines",
+    "last_submission" : "Last submission",
+    "course": "Course",
+    "SUCCESS": "Success",
+    "FAIL": "Fail",
+    "deadlinesOnDay": "Deadlines on: ",
+    "noDeadline": "No deadlines",
+    "no_submission_yet" : "No submission yet",
+    "loading": "Loading...",
+    "no_projects": "There are no projects here."
   }
 }
