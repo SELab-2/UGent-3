@@ -2,7 +2,7 @@
 This file is the base of the Flask API. It contains the basic structure of the API.    
 """
 from os import getenv
-from datetime import timedelta, timezone, datetime
+from datetime import timedelta
 
 from dotenv import load_dotenv
 
