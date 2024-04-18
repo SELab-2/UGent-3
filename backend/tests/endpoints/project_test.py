@@ -11,20 +11,18 @@ def test_assignment_download(client, valid_project):
     with open("tests/resources/testzip.zip", "rb") as zip_file:
         valid_project["assignment_file"] = zip_file
         # post the project
-        response = client.get("/auth?code=teacher")
-        cookies = response.headers.getlist('Set-Cookie')
-        for key, value in cookies:
-            client.set_cookie("", key, value)
-        response = client.post(
-            "/projects",
-            data=valid_project,
-            content_type='multipart/form-data',
-        )
-    assert response.status_code == 201
-    project_id = response.json["data"]["project_id"]
-    response = client.get(f"/projects/{project_id}/assignment")
-    # 404 because the file is not found, no assignment.md in zip file
-    assert response.status_code == 404
+        with client:
+            response = client.get("/auth?code=teacher")
+            response = client.post(
+                "/projects",
+                data=valid_project,
+                content_type='multipart/form-data',
+            )
+            assert response.status_code == 201
+            project_id = response.json["data"]["project_id"]
+            response = client.get(f"/projects/{project_id}/assignment")
+            # 404 because the file is not found, no assignment.md in zip file
+            assert response.status_code == 404
 
 
 def test_not_found_download(client):
