@@ -5,6 +5,7 @@ CREATE TYPE runner AS ENUM ('PYTHON', 'GENERAL', 'CUSTOM');
 
 CREATE TABLE users (
 	uid VARCHAR(255),
+	display_name VARCHAR(255),
 	role role NOT NULL,
 	PRIMARY KEY(uid)
 );

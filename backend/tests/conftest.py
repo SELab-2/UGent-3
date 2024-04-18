@@ -73,13 +73,13 @@ def auth_tokens(session: Session) -> None:
     """Add the authenticated users to the database"""
 
     session.add_all([
-        User(uid="login", role=Role.STUDENT),
-        User(uid="student", role=Role.STUDENT),
-        User(uid="student_other", role=Role.STUDENT),
-        User(uid="teacher", role=Role.TEACHER),
-        User(uid="teacher_other", role=Role.TEACHER),
-        User(uid="admin", role=Role.ADMIN),
-        User(uid="admin_other", role=Role.ADMIN)
+        User(uid="login", role=Role.STUDENT, display_name="Login User"),
+        User(uid="student", role=Role.STUDENT, display_name="Student Person"),
+        User(uid="student_other", role=Role.STUDENT, display_name="Student Other Person"),
+        User(uid="teacher", role=Role.TEACHER, display_name="Teacher Person"),
+        User(uid="teacher_other", role=Role.TEACHER, display_name="Teacher Other"),
+        User(uid="admin", role=Role.ADMIN, display_name="Admin Man"),
+        User(uid="admin_other", role=Role.ADMIN, display_name="Admin Woman")
     ])
     session.commit()
 
@@ -117,10 +117,10 @@ def db_session():
 def users():
     """Return a list of users to populate the database"""
     return [
-        User(uid="brinkmann", role=Role.ADMIN),
-        User(uid="laermans", role=Role.ADMIN),
-        User(uid="student01", role=Role.STUDENT),
-        User(uid="student02", role=Role.STUDENT)
+        User(uid="brinkmann", role=Role.ADMIN, display_name="Gunnar Brinkmann"),
+        User(uid="laermans", role=Role.ADMIN, display_name="Eric Laermans"),
+        User(uid="student01", role=Role.STUDENT, display_name="Student Zero One"),
+        User(uid="student02", role=Role.STUDENT, display_name="Student Zero Two")
     ]
 
 def courses():
