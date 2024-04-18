@@ -167,6 +167,38 @@ def submission(session: Session, student: User, project: Project) -> Submission:
 
 
 
+### FILES ###
+@fixture
+def file_empty():
+    """Return an empty file"""
+    descriptor, name = tempfile.mkstemp()
+    with open(descriptor, "rb") as temp:
+        yield temp, name
+
+@fixture
+def file_no_name():
+    """Return a file with no name"""
+    descriptor, name = tempfile.mkstemp()
+    with open(descriptor, "w", encoding="UTF-8") as temp:
+        temp.write("This is a test file.")
+    with open(name, "rb") as temp:
+        yield temp, ""
+
+@fixture
+def files():
+    """Return a temporary file"""
+    descriptor01, name01 = tempfile.mkstemp()
+    with open(descriptor01, "w", encoding="UTF-8") as temp:
+        temp.write("This is a test file.")
+    descriptor02, name02 = tempfile.mkstemp()
+    with open(descriptor02, "w", encoding="UTF-8") as temp:
+        temp.write("This is a test file.")
+    with open(name01, "rb") as temp01:
+        with open(name02, "rb") as temp02:
+            yield [(temp01, name01), (temp02, name02)]
+
+
+
 ### OTHER ###
 @pytest.fixture
 def valid_user():
@@ -211,35 +243,6 @@ def valid_user_entries(session):
     session.commit()
 
     return users
-
-@pytest.fixture
-def file_empty():
-    """Return an empty file"""
-    descriptor, name = tempfile.mkstemp()
-    with open(descriptor, "rb") as temp:
-        yield temp, name
-
-@pytest.fixture
-def file_no_name():
-    """Return a file with no name"""
-    descriptor, name = tempfile.mkstemp()
-    with open(descriptor, "w", encoding="UTF-8") as temp:
-        temp.write("This is a test file.")
-    with open(name, "rb") as temp:
-        yield temp, ""
-
-@pytest.fixture
-def files():
-    """Return a temporary file"""
-    descriptor01, name01 = tempfile.mkstemp()
-    with open(descriptor01, "w", encoding="UTF-8") as temp:
-        temp.write("This is a test file.")
-    descriptor02, name02 = tempfile.mkstemp()
-    with open(descriptor02, "w", encoding="UTF-8") as temp:
-        temp.write("This is a test file.")
-    with open(name01, "rb") as temp01:
-        with open(name02, "rb") as temp02:
-            yield [(temp01, name01), (temp02, name02)]
 
 @pytest.fixture
 def valid_project_entry(session, valid_project):

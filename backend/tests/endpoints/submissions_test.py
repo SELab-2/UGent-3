@@ -102,14 +102,15 @@ class TestSubmissionsEndpoint(TestEndpoint):
 
 
     ### POST SUBMISSIONS ###
-    def test_post_submission(self, client: FlaskClient, student: User, project: Project):
+    def test_post_submission(self, client: FlaskClient, student: User, project: Project, files):
         """Test posting a submission"""
         response = client.post(
             "/submissions",
             headers = {"Authorization": "student"},
-            json = {
+            data = {
                 "uid": student.uid,
-                "project_id": project.project_id
+                "project_id": project.project_id,
+                "files": files
             }
         )
         assert response.status_code == 201
@@ -122,7 +123,7 @@ class TestSubmissionsEndpoint(TestEndpoint):
         """Test getting a submission"""
         response = client.get(
             f"/submissions/{submission.submission_id}",
-            headers = {"Authorization"}
+            headers = {"Authorization": "student"}
         )
         assert response.status_code == 200
         assert response.json["data"]["submission_id"] == \

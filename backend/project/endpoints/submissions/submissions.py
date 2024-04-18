@@ -192,7 +192,7 @@ class SubmissionsEndpoint(Resource):
                     "submission_time": submission.submission_time,
                     "submission_status": submission.submission_status
                 }
-                return data, 202
+                return data, 201
 
         except exc.SQLAlchemyError:
             session.rollback()
