@@ -13,9 +13,9 @@ export default function HomePages() {
     me: string
   }
   const me = loader.me
-  if (me === 'LOGGED_IN') {
-    return <HomePage />;
-  } else {
+  if (me === 'UNKNOWN') {
     return <Home />;
+  } else {
+    return <HomePage />;
   }
 }
