@@ -106,8 +106,8 @@ class ProjectsEndpoint(Resource):
 
         if status_code == 400:
             return new_project, status_code
-
         project_upload_directory = os.path.join(f"{UPLOAD_FOLDER}", f"{new_project.project_id}")
+
         os.makedirs(project_upload_directory, exist_ok=True)
         if filename is not None:
             try:
