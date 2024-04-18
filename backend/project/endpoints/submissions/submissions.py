@@ -84,7 +84,7 @@ class SubmissionsEndpoint(Resource):
             # Return the submissions
             data["message"] = "Successfully fetched the submissions"
             data["data"] = [{
-                "submission_id": urljoin(BASE_URL, str(s.submission_id)),
+                "submission_id": urljoin(f"{API_HOST}/", f"submissions/{s.submission_id}"),
                 "uid": urljoin(f"{API_HOST}/", f"users/{s.uid}"),
                 "project_id": urljoin(f"{API_HOST}/", f"projects/{s.project_id}"),
                 "grading": s.grading,
