@@ -85,6 +85,16 @@
     "hoursLater": "hours later",
     "minutesLater": "minutes later"
   },
+  "error": {
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundMessage": "The requested page was not found.",
+    "forbidden": "Forbidden",
+    "forbiddenMessage": "You don't have access to this resource.",
+    "clientError": "Client Error",
+    "clientErrorMessage": "A client error has occured.",
+    "serverError": "Server Error",
+    "serverErrorMessage": "A server error has occured."
+  },
   "projectForm": {
     "projectTitle": "Title",
     "projectDescription": "Project description",
