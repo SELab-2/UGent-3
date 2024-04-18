@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
  */
 export function ErrorBoundary() {
   const error = useRouteError();
-  const { t } = useTranslation('translation', { keyPrefix: 'projectView' });
+  const { t } = useTranslation('translation', { keyPrefix: 'error' });
 
   if (isRouteErrorResponse(error)) {
     if (error.status == 404) {
