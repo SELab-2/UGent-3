@@ -22,13 +22,13 @@ export default function Home() {
           gap: 3,
         }}
       >
-        <Box   component="img"src="/logo_ugent.png" alt="University Logo"
+        <Box   component="img"src="/img/logo_ugent.png" alt="University Logo"
           sx={{ width: 100, height: 100 }} />
 
         <Typography variant="h2" component="h1" gutterBottom  >
           <Box
             component="img"
-            src="/logo_app.png"
+            src="/img/logo_app.png"
             alt="University Logo"
             sx={{
               position: 'relative',

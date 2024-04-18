@@ -1,10 +1,31 @@
 import {Project, ProjectDeadline, ShortSubmission} from "./projectDeadline/ProjectDeadline.tsx";
-const API_URL = import.meta.env.VITE_APP_API_URL
+const API_URL = import.meta.env.VITE_APP_API_HOST
+const header  = {
+  "Authorization": "teacher2"
+}
+export const fetchProjectPage = async () => {
+  const projects = await fetchProjects()
+  const me = await fetchMe()
+  return {projects, me}
+}
 
-export const fetchProjects = async () => {
-  const header  = {
-    "Authorization": "teacher2"
+export const fetchMe = async () => {
+  try {
+    const response = await fetch(`${API_URL}/me`, {
+      headers:header
+    })
+    if(response.status == 200){
+      return "LOGGED_IN"
+    }else {
+      return "UNKNOWN"
+    }
+  } catch (e){
+    return "UNKNOWN"
   }
+
+}
+export const fetchProjects = async () => {
+
   try{
     const response = await fetch(`${API_URL}/projects`, {
       headers:header

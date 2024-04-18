@@ -15,6 +15,7 @@ from  project.endpoints.courses.courses import CourseForUser
 from  project.endpoints.courses.course_details import CourseByCourseId
 from  project.endpoints.courses.course_admin_relation import CourseForAdmins
 from  project.endpoints.courses.course_student_relation import CourseToAddStudents
+from  project.endpoints.courses.join import CourseJoin
 
 courses_bp = Blueprint("courses", __name__)
 courses_api = Api(courses_bp)
@@ -30,3 +31,5 @@ courses_bp.add_url_rule("/courses/<int:course_id>/admins",
 
 courses_bp.add_url_rule("/courses/<int:course_id>/students",
                         view_func=CourseToAddStudents.as_view('course_students'))
+
+courses_bp.add_url_rule("/courses/join", view_func=CourseJoin.as_view('course_join'))

@@ -40,6 +40,7 @@ module.exports = {
     "jsdoc/require-param": 0,
     "jsdoc/require-param-description": 1,
     "jsdoc/require-param-name": 1,
+    "jsdoc/require-param-type": 0,
     "jsdoc/require-property": 1,
     "jsdoc/require-property-description": 1,
     "jsdoc/require-property-name": 1,
@@ -50,5 +51,6 @@ module.exports = {
     "jsdoc/require-yields-check": 1,
     "jsdoc/tag-lines": 1,
     "jsdoc/valid-types": 1,
+    "no-console": "error"
   },
 };
