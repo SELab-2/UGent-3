@@ -12,6 +12,8 @@ from flask_restful import Resource
 
 from project.db_in import db
 from project.models.project import Project, Runner
+from project.models.course import Course
+from project.models.course_relation import CourseStudent, CourseAdmin
 from project.utils.query_agent import query_selected_from_model, query_by_id_from_model, \
     create_model_instance
 from project.utils.authentication import login_required_return_uid, authorize_teacher
@@ -19,6 +21,7 @@ from project.utils.models.user_utils import is_teacher, is_admin
 from project.utils.models.course_utils import is_teacher_of_course, is_admin_of_course, \
     is_student_of_course
 from project.endpoints.projects.endpoint_parser import parse_project_params
+from project.utils.models.project_utils import get_course_of_project
 
 API_URL = os.getenv('API_HOST')
 UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER")
@@ -37,49 +40,39 @@ class ProjectsEndpoint(Resource):
         that are currently in the API
         """
 
-        response_url = urljoin(API_URL, "projects")
-
-        # Get all project
-        projects = query_selected_from_model(
-            Project,
-            response_url,
-            select_values=["project_id", "course_id", "visible_for_students"],
-            filters=request.args
-        )[0].json["data"]
-
-        if is_teacher(uid):
-            projects = [
-                project for project in projects
-                if is_teacher_of_course(uid, project["course_id"])
-            ]
-        elif is_admin(uid):
-            projects = [
-                project for project in projects
-                if is_admin_of_course(uid, project["course_id"])
-            ]
-        else:
-            projects = [project for project in projects if
-                is_student_of_course(uid, project["course_id"])
-                and project["visible_for_students"]
-            ]
-
-        filtered_projects = []
-        for project in projects:
-            response = query_by_id_from_model(
-                Project,
-                "project_id",
-                project["project_id"],
-                response_url
-            )
-            if response[1] != 200:
-                return response
-            filtered_projects.append(response[0]["data"])
-
-        return {
-            "url": urljoin(f"{API_URL}/", response_url),
-            "message": "Successfully fetched the projects",
-            "data": filtered_projects
+        data = {
+            "url": urljoin(f"{API_URL}/", "projects")
         }
+        try:
+            # Get all the courses a user is part of
+            courses = CourseStudent.query.filter_by(uid=uid).\
+                with_entities(CourseStudent.course_id).all()
+            courses += CourseAdmin.query.filter_by(uid=uid).\
+                with_entities(CourseAdmin.course_id).all()
+            courses += Course.query.filter_by(teacher=uid).with_entities(Course.course_id).all()
+            courses = [c[0] for c in courses] # Remove the tuple wrapping the course_id
+
+            # Get the projects
+            projects = Project.query.all()
+            projects = [p for p in projects if get_course_of_project(p.project_id) in courses]
+
+            # Filter the projects based on the query parameters
+            filters = dict(request.args)
+            for key, value in filters.items():
+                projects = [p for p in projects if getattr(p, key) == value]
+
+            # Return the projects
+            data["message"] = "Successfully fetched the projects"
+            data["data"] = [{
+                "project_id": urljoin(f"{API_URL}/", f"projects/{p.project_id}"),
+                "title": p.title,
+                "course_id": urljoin(f"{API_URL}/", f"courses/{p.course_id}")
+            } for p in projects]
+            return data
+
+        except SQLAlchemyError:
+            data["message"] = "An error occurred while fetching the projects"
+            return data, 500
 
     @authorize_teacher
     def post(self, teacher_id=None):
