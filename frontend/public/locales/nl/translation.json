@@ -1,7 +1,4 @@
 {
-  "home": {
-    "title": "Homepagina"
-  },
   "header": {
     "myProjects": "Mijn Projecten",
     "myCourses": "Mijn Vakken",
@@ -12,15 +9,31 @@
     "projectUploadForm": "Project uploaden"
   },
   "home": {
-    "login": "Aanmelden",
     "home": "Home",
     "tag": "nl",
-    "homepage": "Homepage"
+    "homepage": "Homepagina",
+    "welcomeDescription": "Welkom bij Peristerónas, het online indieningsplatform van UGent",
+    "login": "Aanmelden"
   },
   "courseForm": {
     "courseName": "Vak Naam",
     "submit": "Opslaan",
     "emptyCourseNameError": "Vak naam mag niet leeg zijn"
+  },
+  "student": {
+    "myProjects": "Mijn Projecten",
+    "myCourses": "Mijn Vakken",
+    "deadlines": "Verlopen Deadlines",
+    "course": "Vak",
+    "last_submission": "Laatste indiening",
+    "SUCCESS": "Geslaagd",
+    "FAIL": "Gefaald",
+    "deadlinesOnDay": "Deadlines op: ",
+    "noDeadline": "Geen deadlines",
+    "no_submission_yet" : "Nog geen indiening",
+    "loading": "Laden...",
+    "no_projects": "Er zijn hier geen projecten."
+
   },
   "projectForm": {
     "projectTitle": "Titel",
@@ -62,6 +75,12 @@
     "hoursAgo": "uur geleden",
     "minutesAgo": "minuten geleden",
     "justNow": "Zonet"
+  },
+  "projectsOverview": {
+    "past_deadline": "Verlopen Projecten",
+    "future_deadline": "Opkomende Deadlines",
+    "no_projects": "Er zijn hier geen projecten.",
+    "new_project": "Nieuw Project"
   },
   "error": {
     "pageNotFound": "Pagina Niet Gevonden",
