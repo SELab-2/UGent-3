@@ -85,17 +85,17 @@ export const fetchProjects = async () => {
         // contains no dealine:
         return [{
           project_id: project_id,
-          title: item.title,
-          description: item.description,
-          assignment_file: item.assignment_file,
+          title: project_item.data.title,
+          description: project_item.data.description,
+          assignment_file: project_item.data.assignment_file,
           deadline: undefined,
           deadline_description: undefined,
-          course_id: Number(item.course_id),
-          visible_for_students: Boolean(item.visible_for_students),
-          archived: Boolean(item.archived),
-          test_path: item.test_path,
-          script_name: item.script_name,
-          regex_expressions: item.regex_expressions,
+          course_id: Number(project_item.data.course_id),
+          visible_for_students: Boolean(project_item.data.visible_for_students),
+          archived: Boolean(project_item.data.archived),
+          test_path: project_item.data.test_path,
+          script_name: project_item.data.script_name,
+          regex_expressions: project_item.data.regex_expressions,
           short_submission: latest_submission,
           course: course
         }]
