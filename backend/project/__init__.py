@@ -20,7 +20,7 @@ from .endpoints.submissions.submission_config import submissions_bp
 from .endpoints.courses.join_codes.join_codes_config import join_codes_bp
 from .endpoints.docs.docs_endpoint import swagger_ui_blueprint
 from .endpoints.authentication.auth import auth_bp
-from init_auth import auth_init
+from .init_auth import auth_init
 
 load_dotenv()
 JWT_SECRET_KEY = getenv("JWT_SECRET_KEY")
