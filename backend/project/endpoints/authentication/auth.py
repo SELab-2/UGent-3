@@ -21,7 +21,6 @@ AUTH_METHOD = getenv("AUTH_METHOD")
 AUTHENTICATION_URL = getenv("AUTHENTICATION_URL")
 CLIENT_ID = getenv("CLIENT_ID")
 CLIENT_SECRET = getenv("CLIENT_SECRET")
-CODE_VERIFIER = getenv("CODE_VERIFIER")
 HOMEPAGE_URL = getenv("HOMEPAGE_URL")
 TENANT_ID = getenv("TENANT_ID")
 
@@ -41,7 +40,6 @@ def microsoft_authentication():
             "code":code,
             "redirect_uri":f"{API_URL}/auth",
             "grant_type":"authorization_code",
-            "code_verifier":CODE_VERIFIER,
             "client_secret":CLIENT_SECRET}
     try:
         res = requests.post(f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token",
