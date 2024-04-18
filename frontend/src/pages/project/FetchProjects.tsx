@@ -1,5 +1,5 @@
 import {Project, ProjectDeadline, ShortSubmission} from "./projectDeadline/ProjectDeadline.tsx";
-const API_URL = import.meta.env.VITE_APP_API_URL
+const API_URL = import.meta.env.VITE_APP_API_HOST
 
 export const fetchProjects = async () => {
   const header  = {
