@@ -42,6 +42,7 @@ class ProjectsEndpoint(Resource):
             filters=request.args
         )
 
+    @authorize_teacher
     def post(self, teacher_id=None):
         """
         Post functionality for project
