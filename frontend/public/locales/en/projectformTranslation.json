@@ -1,0 +1,21 @@
+{
+  "filestructure": {
+    "title": "Fill in the file restrictions below",
+    "startsWith": "Filename starts with",
+    "endsWith": "Filename ends with",
+    "contains": "Filename contains string",
+    "helperRegexText": "Regex can't be empty or already added"
+  },
+  "advancedRegex": {
+    "title": "Please fill in the desired Regex",
+    "helperRegexText": "Restriction can't be empty or already added",
+    "regexInfo": "If your're having trouble with regex please refer to this",
+    "cheatsheet": "cheatsheet"
+  },
+  "runnerComponent": {
+    "testWarning": "No appropriate test file found, can't upload project",
+    "clearSelected": "Clear Selection",
+    "tooltipRunner": "If you're having trouble figuring out the runner please refer to the docs",
+    "userDocs": "runner user docs"
+  }
+}

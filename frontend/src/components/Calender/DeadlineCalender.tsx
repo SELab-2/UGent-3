@@ -172,7 +172,6 @@ function DeadlineDescriptionMenu({
       let newDeadline = day.clone();
       newDeadline = newDeadline.hour(time.hour());
       newDeadline = newDeadline.minute(time.minute());
-      console.log(newDeadline.isSame(day, "day"));
       onNewDeadline({ deadline: newDeadline.toString(), description });
     }
     setDescription("");
