@@ -2,8 +2,8 @@
 from os import getenv
 
 from dotenv import load_dotenv
-from flask import Blueprint, request, redirect, abort, make_response
-from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
+from flask import Blueprint
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restful import Resource, Api
 
 from project.models.user import User
