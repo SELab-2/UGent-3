@@ -21,16 +21,14 @@ API_URL = getenv("API_HOST")
 
 class CourseJoin(Resource):
     """
-    Class that will respond to the /courses/course_id/students link
-    teachers should be able to assign and remove students from courses,
-    and everyone should be able to list all students assigned to a course
+    Class that will respond to the /courses/join link
+    students or admins with a join code can join a course
     """
 
     def post(self, uid=None): # pylint: disable=too-many-return-statements
         """
-        Post function at /courses/course_id/students
-        to assign a student to a course
-        only teachers and admins can do this
+        Post function for /courses/join
+        students or admins with a join code can join a course
         """
 
         response = {
