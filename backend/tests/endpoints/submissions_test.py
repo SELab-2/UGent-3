@@ -14,19 +14,19 @@ class TestSubmissionsEndpoint:
     ### GET SUBMISSIONS ###
     def test_get_submissions_wrong_user(self, client: FlaskClient):
         """Test getting submissions for a non-existing user"""
-        response = client.get("/submissions?uid=-20", headers={"Authorization":"teacher1"})
+        response = client.get("/submissions?uid=-20", headers={"Authorization":"teacher"})
         assert response.status_code == 400
 
     def test_get_submissions_wrong_project(self, client: FlaskClient):
         """Test getting submissions for a non-existing project"""
         response = client.get("/submissions?project_id=123456789",
-                              headers={"Authorization":"teacher1"})
+                              headers={"Authorization":"teacher"})
         assert response.status_code == 400
         assert "message" in response.json
 
     def test_get_submissions_wrong_project_type(self, client: FlaskClient):
         """Test getting submissions for a non-existing project of the wrong type"""
-        response = client.get("/submissions?project_id=zero", headers={"Authorization":"teacher1"})
+        response = client.get("/submissions?project_id=zero", headers={"Authorization":"teacher"})
         assert response.status_code == 400
         assert "message" in response.json
 

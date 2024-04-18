@@ -14,16 +14,14 @@ from project.executor import executor
 from project.db_in import db
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
-from project.models.user import User, Role
+from project.models.user import User
 from project.models.course import Course
 from project.models.course_relation import CourseAdmin
 from project.utils.files import all_files_uploaded
 from project.utils.user import is_valid_user
 from project.utils.project import is_valid_project
-from project.utils.query_agent import query_selected_from_model
 from project.utils.authentication import authorize_student_submission, login_required_return_uid
 from project.utils.submissions.evaluator import run_evaluator
-from project.utils.models.user_utils import get_user
 from project.utils.models.project_utils import get_course_of_project
 
 API_HOST = getenv("API_HOST")
@@ -46,83 +44,55 @@ class SubmissionsEndpoint(Resource):
             "url": BASE_URL
         }
 
-        role = get_user(uid).role
-
-        # User should only get its own submissions
-        if role is Role.STUDENT:
-            filters = dict(request.args)
-            filters["uid"] = uid
-            return query_selected_from_model(
-                Submission,
-                urljoin(f"{API_HOST}/", "/submissions"),
-                select_values=[
-                    "submission_id", "uid",
-                    "project_id", "grading",
-                    "submission_time", "submission_status"],
-                url_mapper={
-                    "submission_id": BASE_URL,
-                    "project_id": urljoin(f"{API_HOST}/", "projects"),
-                    "uid": urljoin(f"{API_HOST}/", "users")},
-                filters=filters
-            )
-
         try:
-            # The teacher or admin should only get the submissions for their courses
-            courses = []
-            if role is Role.TEACHER:
-                courses = query_selected_from_model(
-                    Course,
-                    "courses",
-                    select_values=["course_id"],
-                    filters={"teacher": uid}
-                )[0].json["data"]
-            else:
-                courses = query_selected_from_model(
-                    CourseAdmin,
-                    "courses",
-                    select_values=["course_id"],
-                    filters={"uid": uid}
-                )[0].json["data"]
+            # A user (teacher/admin/student) should get their own submissions
+            submissions = Submission.query.filter_by(uid=uid).all()
 
-            # Filter by user_id
-            user_id = request.args.get("uid")
-            if user_id is not None and \
-                (not user_id.isdigit() or not User.query.filter_by(uid=user_id).first()):
+            # If the logged in user has the correct role, he will get access to the
+            # submissions from everyone for all projects of that course
+            courses = Course.query.filter_by(teacher=uid).with_entities(Course.course_id).all()
+            courses += CourseAdmin.query.filter_by(uid=uid).\
+                with_entities(CourseAdmin.course_id).all()
+            submissions = Submission.query.all()
+            submissions = [s for s in submissions if get_course_of_project(s.project_id) in courses]
+
+            filters = dict(request.args)
+            # Check the uid query parameter
+            user_id = filters.get("uid")
+            if user_id and not User.query.filter_by(uid=user_id).all():
                 data["message"] = f"Invalid user (uid={user_id})"
                 return data, 400
 
-            # Filter by project_id
-            project_id = request.args.get("project_id")
-            if project_id is not None \
-                and (not project_id.isdigit() or
-                     not Project.query.filter_by(project_id=project_id).first()):
+            # Check the project_id query parameter
+            project_id = filters.get("project_id")
+            if project_id and not (
+                    project_id.isdigit() and
+                    Project.query.filter_by(project_id=project_id).all()
+                ):
                 data["message"] = f"Invalid project (project_id={project_id})"
                 return data, 400
+            if project_id:
+                filters["project_id"] = int(project_id)
+
+            # Filter the courses based on the query parameters
+            for key, value in filters.items():
+                submissions = [s for s in submissions if getattr(s, key) == value]
+
+            # Return the submissions
+            data["message"] = "Successfully fetched the submissions"
+            data["data"] = [{
+                "submission_id": urljoin(BASE_URL, s.submission_id),
+                "uid": urljoin(f"{API_HOST}/", f"users/{s.uid}"),
+                "project_id": urljoin(f"{API_HOST}/", f"projects/{s.project_id}"),
+                "grading": s.grading,
+                "submission_time": s.submission_time,
+                "submission_status": s.submission_status
+            } for s in submissions]
+            return data
+
         except exc.SQLAlchemyError:
             data["message"] = "An error occurred while fetching the submissions"
             return data, 500
-
-        response = query_selected_from_model(
-            Submission,
-            urljoin(f"{API_HOST}/", "/submissions"),
-            select_values=[
-                "submission_id", "uid",
-                "project_id", "grading",
-                "submission_time", "submission_status"],
-            url_mapper={
-                "submission_id": BASE_URL,
-                "project_id": urljoin(f"{API_HOST}/", "projects"),
-                "uid": urljoin(f"{API_HOST}/", "users")},
-            filters=request.args
-        )
-        if response[1] != 200:
-            return response
-        filtered_submissions = [
-            project for project in response[0].json["data"]
-            if get_course_of_project(project["project_id"].split("/")[-1]) in courses
-        ]
-        response[0].json["data"] = filtered_submissions
-        return response
 
     @authorize_student_submission
     def post(self) -> dict[str, any]:
