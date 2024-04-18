@@ -15,7 +15,7 @@
   "runnerComponent": {
     "testWarning": "Geen compatibele testen gevonden met de runner",
     "clearSelected": "Deselecteer keuze",
-    "tooltipRunner": "Als je moeilijkheden ondervindt om de runner te gebruik, gebruik volgende documentatie",
+    "tooltipRunner": "Als je moeilijkheden ondervindt om de runner te gebruiken, gebruik volgende documentatie",
     "userDocs": "runner user docs"
   }
 }
