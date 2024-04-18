@@ -43,20 +43,8 @@ class SubmissionsEndpoint(Resource):
         data = {
             "url": BASE_URL
         }
-
+        filters = dict(request.args)
         try:
-            # A user (teacher/admin/student) should get their own submissions
-            submissions = Submission.query.filter_by(uid=uid).all()
-
-            # If the logged in user has the correct role, he will get access to the
-            # submissions from everyone for all projects of that course
-            courses = Course.query.filter_by(teacher=uid).with_entities(Course.course_id).all()
-            courses += CourseAdmin.query.filter_by(uid=uid).\
-                with_entities(CourseAdmin.course_id).all()
-            submissions = Submission.query.all()
-            submissions = [s for s in submissions if get_course_of_project(s.project_id) in courses]
-
-            filters = dict(request.args)
             # Check the uid query parameter
             user_id = filters.get("uid")
             if user_id and not User.query.filter_by(uid=user_id).all():
@@ -65,14 +53,26 @@ class SubmissionsEndpoint(Resource):
 
             # Check the project_id query parameter
             project_id = filters.get("project_id")
-            if project_id and not (
-                    project_id.isdigit() and
-                    Project.query.filter_by(project_id=project_id).all()
-                ):
-                data["message"] = f"Invalid project (project_id={project_id})"
-                return data, 400
             if project_id:
+                if not project_id.isdigit() or \
+                    not Project.query.filter_by(project_id=project_id).all():
+                    data["message"] = f"Invalid project (project_id={project_id})"
+                    return data, 400
                 filters["project_id"] = int(project_id)
+
+            # Get the courses
+            courses = Course.query.filter_by(teacher=uid).\
+                with_entities(Course.course_id).all()
+            courses += CourseAdmin.query.filter_by(uid=uid).\
+                with_entities(CourseAdmin.course_id).all()
+            courses = [c[0] for c in courses] # Remove the tuple wrapping the course_id
+
+            # Get the submissions
+            submissions = Submission.query.all()
+            submissions = [
+                s for s in submissions if
+                s.uid == uid or get_course_of_project(s.project_id) in courses
+            ]
 
             # Filter the courses based on the query parameters
             for key, value in filters.items():
@@ -81,7 +81,7 @@ class SubmissionsEndpoint(Resource):
             # Return the submissions
             data["message"] = "Successfully fetched the submissions"
             data["data"] = [{
-                "submission_id": urljoin(BASE_URL, s.submission_id),
+                "submission_id": urljoin(BASE_URL, str(s.submission_id)),
                 "uid": urljoin(f"{API_HOST}/", f"users/{s.uid}"),
                 "project_id": urljoin(f"{API_HOST}/", f"projects/{s.project_id}"),
                 "grading": s.grading,

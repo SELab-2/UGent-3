@@ -14,12 +14,8 @@ from project.db_in import db
 from project.models.project import Project, Runner
 from project.models.course import Course
 from project.models.course_relation import CourseStudent, CourseAdmin
-from project.utils.query_agent import query_selected_from_model, query_by_id_from_model, \
-    create_model_instance
+from project.utils.query_agent import create_model_instance
 from project.utils.authentication import login_required_return_uid, authorize_teacher
-from project.utils.models.user_utils import is_teacher, is_admin
-from project.utils.models.course_utils import is_teacher_of_course, is_admin_of_course, \
-    is_student_of_course
 from project.endpoints.projects.endpoint_parser import parse_project_params
 from project.utils.models.project_utils import get_course_of_project
 
