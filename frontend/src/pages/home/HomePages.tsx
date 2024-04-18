@@ -1,19 +1,21 @@
-import HomeStudent from './HomeStudent';
+import HomePage from './HomePage.tsx';
 import Home from "./Home.tsx";
-import Cookies from 'js-cookie';
+import {useLoaderData} from "react-router-dom";
+import {ProjectDeadline} from "../project/projectDeadline/ProjectDeadline.tsx";
 
 /**
  * Gives the requested home page based on the login status
  * @returns - The home page component 
  */
 export default function HomePages() {
-  const loginStatus = Cookies.get('login_status');
-
-  if (loginStatus === 'STUDENT') {
-    return <HomeStudent />;
-  } /*else if (loginStatus === 'TEACHER') {
-    return <HomeTeacher />;
-  }*/ else {
+  const loader = useLoaderData() as {
+    projects: ProjectDeadline[],
+    me: string
+  }
+  const me = loader.me
+  if (me === 'LOGGED_IN') {
+    return <HomePage />;
+  } else {
     return <Home />;
   }
 }

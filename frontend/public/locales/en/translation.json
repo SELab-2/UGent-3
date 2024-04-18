@@ -10,6 +10,8 @@
     "projectUploadForm": "Project upload form"
   },
   "home": {
+    "home": "Home",
+    "tag": "en",
     "homepage": "Homepage",
     "welcomeDescription": "Welcome to Peristerónas, the online submission platform of UGent",
     "login": "Login"

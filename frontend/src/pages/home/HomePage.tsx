@@ -96,13 +96,18 @@ const handleMonthChange =(
  * This component is the home page component that will be rendered when on the index route.
  * @returns - The home page component
  */
-export default function HomeStudent() {
+export default function HomePage() {
   const { t } = useTranslation('translation', { keyPrefix: 'student' });
 
   const [highlightedDays, setHighlightedDays] = React.useState<number[]>([]);
 
   const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs(Date.now()));
-  const projects = useLoaderData() as ProjectDeadline[]
+  const loader = useLoaderData() as {
+    projects: ProjectDeadline[],
+    me: string
+  }
+  const projects = loader.projects
+
   // Update selectedDay state when a day is selected
   const handleDaySelect = (day: Dayjs) => {
     setSelectedDay(day);
