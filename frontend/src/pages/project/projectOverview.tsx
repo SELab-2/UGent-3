@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 
 /**
  * Displays all the projects
+ * @returns the project page
  */
 export default function ProjectOverView() {
   const {i18n} = useTranslation()
