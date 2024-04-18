@@ -1,0 +1,41 @@
+{
+  "home": {
+    "title": "Homepage"
+  },
+  "header": {
+    "myProjects": "My Projects",
+    "myCourses": "My Courses",
+    "login": "Login",
+    "home": "Home",
+    "tag": "en",
+    "homepage": "Homepage"
+  },
+  "courseForm": {
+    "courseName": "Course Name",
+    "submit": "Submit",
+    "emptyCourseNameError": "Course name should not be empty"
+  },
+  "projectView": {
+    "submitNetworkError": "Failed to upload file, please try again.",
+    "selected": "Selected",
+    "submit": "Submit",
+    "previousSubmissions": "Previous Submissions",
+    "noFileSelected": "No file selected",
+    "submissionGrid": {
+      "late": "Late",
+      "fail": "Fail",
+      "success": "Success",
+      "running": "Running",
+      "submitTime": "Time submitted",
+      "status": "Status"
+    }
+  },
+  "time": {
+    "yearsAgo": "years ago",
+    "monthsAgo": "months ago",
+    "daysAgo": "days ago",
+    "hoursAgo": "hours ago",
+    "minutesAgo": "minutes ago",
+    "justNow": "just now"
+  }
+}

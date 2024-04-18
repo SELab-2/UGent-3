@@ -61,7 +61,7 @@ def create_model_instance(model: DeclarativeMeta,
     if required_fields is None:
         required_fields = []
     # Check if all non-nullable fields are present in the data
-    missing_fields = [field for field in required_fields if field not in data]
+    missing_fields = [field for field in required_fields if field not in data or data[field] == '']
 
     if missing_fields:
         return {"error": f"Missing required fields: {', '.join(missing_fields)}",
@@ -141,9 +141,10 @@ def query_selected_from_model(model: DeclarativeMeta,
     try:
         query: Query = model.query
         if filters:
-            filtered_filters = filter_model_fields(model, filters)
+            if not all(hasattr(model, key) for key in filters.keys()):
+                return {"message": "Unknown parameter", "url": response_url}, 400
             conditions: List[bool] = []
-            for key, value in filtered_filters.items():
+            for key, value in filters.items():
                 conditions.append(getattr(model, key) == value)
             query = query.filter(and_(*conditions))
 

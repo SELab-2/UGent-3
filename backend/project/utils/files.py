@@ -1,26 +1,12 @@
 """Utility functions for files"""
 
-from os.path import getsize
 from re import match
-from typing import List, Union
+from typing import List, Optional
 from io import BytesIO
-from zipfile import ZipFile, ZIP_DEFLATED
+from zipfile import ZipFile, ZIP_DEFLATED, is_zipfile
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 
-def filter_files(files: List[FileStorage]) -> List[FileStorage]:
-    """Filter out bad files
-
-    Args:
-        files (List[FileStorage]): A list of files to filter on
-
-    Returns:
-        List[FileStorage]: The filtered list
-    """
-    return list(filter(lambda file:
-        file and file.filename != "" and getsize(file.filename) > 0,
-        files
-    ))
 
 def all_files_uploaded(files: List[FileStorage], regexes: List[str]) -> bool:
     """Check if all the required files are uploaded
@@ -33,15 +19,24 @@ def all_files_uploaded(files: List[FileStorage], regexes: List[str]) -> bool:
         bool: Are all required files uploaded
     """
 
-    all_uploaded = True
-    for regex in regexes:
-        match_found = any(match(regex, file.filename) is not None for file in files)
-        if not match_found:
-            all_uploaded = False
-            break
-    return all_uploaded
+    all_filenames = []
+    for file in files:
+        # Zip
+        if is_zipfile(file):
+            with ZipFile(file, "r") as zip_file:
+                all_filenames += zip_file.namelist()
+        # File
+        else:
+            all_filenames.append(file.filename)
 
-def zip_files(name: str, files: List[FileStorage]) -> Union[FileStorage, None]:
+    for regex in regexes:
+        match_found = any(match(regex, name) is not None for name in all_filenames)
+        if not match_found:
+            return False
+
+    return True
+
+def zip_files(name: str, files: List[FileStorage]) -> Optional[FileStorage]:
     """Zip a dictionary of files
 
     Args:

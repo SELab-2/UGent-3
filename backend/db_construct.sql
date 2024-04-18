@@ -1,9 +1,11 @@
+CREATE TYPE role AS ENUM ('STUDENT', 'TEACHER', 'ADMIN');
+
 CREATE TYPE submission_status AS ENUM ('SUCCESS', 'LATE', 'FAIL', 'RUNNING');
+CREATE TYPE runner AS ENUM ('PYTHON', 'GENERAL', 'CUSTOM');
 
 CREATE TABLE users (
 	uid VARCHAR(255),
-	is_teacher BOOLEAN,
-	is_admin BOOLEAN,
+	role role NOT NULL,
 	PRIMARY KEY(uid)
 );
 
@@ -37,18 +39,21 @@ CREATE TABLE course_students (
 	PRIMARY KEY(course_id, uid)
 );
 
+CREATE TYPE deadline AS(
+	description TEXT,
+	deadline TIMESTAMP WITH TIME ZONE
+);
+
 CREATE TABLE projects (
 	project_id INT GENERATED ALWAYS AS IDENTITY,
 	title VARCHAR(50) NOT NULL,
 	description TEXT NOT NULL,
-	assignment_file VARCHAR(50),
-	deadline TIMESTAMP WITH TIME ZONE,
+	deadlines deadline[],
 	course_id INT NOT NULL,
 	visible_for_students BOOLEAN NOT NULL,
 	archived BOOLEAN NOT NULL,
-	test_path VARCHAR(50),
-	script_name VARCHAR(50),
 	regex_expressions VARCHAR(50)[],
+	runner runner,
 	PRIMARY KEY(project_id),
 	CONSTRAINT fk_course FOREIGN KEY(course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );

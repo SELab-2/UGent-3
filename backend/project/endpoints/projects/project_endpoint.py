@@ -8,6 +8,8 @@ from flask import Blueprint
 from project.endpoints.projects.projects import ProjectsEndpoint
 from project.endpoints.projects.project_detail import ProjectDetail
 from project.endpoints.projects.project_assignment_file import ProjectAssignmentFiles
+from project.endpoints.projects.project_submissions_download import SubmissionDownload
+
 
 project_bp = Blueprint('project_endpoint', __name__)
 
@@ -22,6 +24,11 @@ project_bp.add_url_rule(
 )
 
 project_bp.add_url_rule(
-    '/projects/<int:project_id>/assignments',
-    view_func=ProjectAssignmentFiles.as_view('project_assignments')
+    '/projects/<int:project_id>/assignment',
+    view_func=ProjectAssignmentFiles.as_view('project_assignment')
+)
+
+project_bp.add_url_rule(
+    '/projects/<int:project_id>/submissions-download',
+    view_func=SubmissionDownload.as_view('project_submissions')
 )

@@ -89,7 +89,7 @@ class ProjectDetail(Resource):
                 zip_location = os.path.join(project_upload_directory, filename)
                 with zipfile.ZipFile(zip_location) as upload_zip:
                     upload_zip.extractall(project_upload_directory)
-                project_json["assignment_file"] = filename
+
             except zipfile.BadZipfile:
                 db.session.rollback()
                 return ({

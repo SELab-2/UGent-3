@@ -1,9 +1,14 @@
 flask~=3.0.2
+flask-cors
 flask-restful
 flask-sqlalchemy
+sqlalchemy_utils
 python-dotenv~=1.0.1
 psycopg2-binary
+docker
 pytest~=8.0.1
 SQLAlchemy~=2.0.27
 requests>=2.31.0
 waitress
+flask_swagger_ui
+flask_executor

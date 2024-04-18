@@ -33,7 +33,7 @@ class TestSubmissionsEndpoint:
     def test_get_submissions_project(self, client: FlaskClient, valid_submission_entry):
         """Test getting the submissions given a specific project"""
         response = client.get(f"/submissions?project_id={valid_submission_entry.project_id}",
-                              headers={"Authorization":"teacher2"})
+                              headers={"Authorization":"teacher"})
         data = response.json
         assert response.status_code == 200
         assert "message" in data
@@ -59,13 +59,12 @@ class TestSubmissionsEndpoint:
         assert response.status_code == 200
         assert data["message"] == "Successfully fetched the submission"
         assert data["data"] == {
-            "id": submission.submission_id,
-            "user": f"{API_HOST}/users/student01",
-            "project": f"{API_HOST}/projects/{project.project_id}",
+            "submission_id": f"{API_HOST}/submissions/{submission.submission_id}",
+            "uid": f"{API_HOST}/users/student01",
+            "project_id": f"{API_HOST}/projects/{project.project_id}",
             "grading": 16,
-            "time": "Thu, 14 Mar 2024 12:00:00 GMT",
-            "path": "/submissions/1",
-            "status": 'SUCCESS'
+            "submission_time": "Thu, 14 Mar 2024 12:00:00 GMT",
+            "submission_status": 'SUCCESS'
         }
 
     ### PATCH SUBMISSION ###
@@ -117,12 +116,11 @@ class TestSubmissionsEndpoint:
         assert data["message"] == f"Submission (submission_id={submission.submission_id}) patched"
         assert data["url"] == f"{API_HOST}/submissions/{submission.submission_id}"
         assert data["data"] == {
-            "id": submission.submission_id,
+            "id": f"{API_HOST}/submissions/{submission.submission_id}",
             "user": f"{API_HOST}/users/student02",
             "project": f"{API_HOST}/projects/{project.project_id}",
             "grading": 20,
             "time": 'Thu, 14 Mar 2024 23:59:59 GMT',
-            "path": "/submissions/2",
             "status": 'FAIL'
         }
 
@@ -144,7 +142,7 @@ class TestSubmissionsEndpoint:
                                  headers={"Authorization":"student01"})
         data = response.json
         assert response.status_code == 200
-        assert data["message"] == f"Submission (submission_id={submission.submission_id}) deleted"
+        assert data["message"] == "Resource deleted successfully"
         assert submission.submission_id not in list(map(
             lambda s: s.submission_id, session.query(Submission).all()
         ))
