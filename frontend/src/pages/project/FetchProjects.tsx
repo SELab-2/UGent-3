@@ -10,7 +10,6 @@ export const fetchProjectPage = async () => {
 }
 
 export const fetchMe = async () => {
-  return "STUDENT"
   try {
     const response = await fetch(`${API_URL}/me`, {
       headers:header
