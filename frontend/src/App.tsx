@@ -7,6 +7,7 @@ import ProjectCreateHome from "./pages/create_project/ProjectCreateHome.tsx";
 import SubmissionsOverview from "./pages/submission_overview/SubmissionsOverview.tsx";
 import {fetchProjectPage} from "./pages/project/FetchProjects.tsx";
 import HomePages from "./pages/home/HomePages.tsx";
+import ProjectOverView from "./pages/project/projectOverview.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -20,6 +21,7 @@ const router = createBrowserRouter(
           </Route>
         </Route>
         <Route path="projects">
+          <Route index element={<ProjectOverView/>} loader={fetchProjectPage}/>
           <Route path="create" element={<ProjectCreateHome />} />
         </Route>
       </Route>

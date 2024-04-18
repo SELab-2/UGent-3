@@ -76,6 +76,12 @@
     "minutesAgo": "minuten geleden",
     "justNow": "Zonet"
   },
+  "projectsOverview": {
+    "past_deadline": "Verlopen Projecten",
+    "future_deadline": "Opkomende Deadlines",
+    "no_projects": "Er zijn hier geen projecten.",
+    "new_project": "Nieuw Project"
+  },
   "error": {
     "pageNotFound": "Pagina Niet Gevonden",
     "pageNotFoundMessage": "De opgevraagde pagina werd niet gevonden.",

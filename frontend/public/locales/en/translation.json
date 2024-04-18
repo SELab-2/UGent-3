@@ -95,5 +95,11 @@
     "no_submission_yet" : "No submission yet",
     "loading": "Loading...",
     "no_projects": "There are no projects here."
+  },
+  "projectsOverview": {
+    "past_deadline": "Past Projects",
+    "future_deadline": "Upcoming Deadlines",
+    "no_projects": "There are no projects here.",
+    "new_project": "New Project"
   }
 }
