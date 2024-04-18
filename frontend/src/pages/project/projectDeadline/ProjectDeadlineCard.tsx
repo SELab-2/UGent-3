@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 interface ProjectCardProps{
   deadlines:ProjectDeadline[],
-  showCourse:boolean
+  showCourse?:boolean
 }
 
 /**
