@@ -31,7 +31,14 @@ function handleDeleteAdmin(navigate: NavigateFunction, courseId: string, uid: st
     .then(() => {
       navigate(0);
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+      if(error.status === 403){
+        alert('You are unauthorized to perform this action.');
+      }
+      else{
+        throw new Response(error);
+      }
+    });
 }
 
 /**
@@ -54,8 +61,42 @@ function handleDeleteStudent(navigate: NavigateFunction, courseId: string, uids:
     .then(() => {
       navigate(0);
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+      if(error.status === 403){
+        alert('You are unauthorized to perform this action.');
+      }
+      else{
+        throw new Response(error);
+      }
+    });
 }
+
+/**
+ * Handles the deletion of a course.
+ * @param navigate - The navigate function from react-router-dom.
+ * @param courseId - The ID of the course.
+ */
+function handleDeleteCourse(navigate: NavigateFunction, courseId: string): void {
+  fetch(`${apiHost}/courses/${courseId}`, {
+    method: 'DELETE',
+    headers: {
+      "Authorization": loggedInToken()
+    }
+  }).then(() => {
+    navigate(-1);
+  }).catch(error => {
+    if(error.status === 404){
+      navigate(-1);
+    }
+    else if(error.status === 403){
+      alert('You are unauthorized to perform this action.');
+    }
+    else{
+      throw new Response(error);
+    }
+  });
+}
+
 /**
  * 
  * @returns A jsx component representing the course detail page for a teacher
@@ -97,52 +138,48 @@ export function CourseDetailTeacher(): JSX.Element {
     
   return (
     <>
-      <Title title={t('title')}></Title>
-      <Grid container margin={"1rem"} direction={"column"}>
-        <Grid item marginBottom={"0.5rem"}>
-          <Typography variant="h4">{course.name}</Typography>
+      <Title title={course.name}></Title>
+      <Grid container direction={"row"} margin={"1rem"}>
+        <Grid item style={{ width: "50%" }}>
+          <Paper elevation={0} style={{ height:"70vh", maxHeight:"70vh", overflowY:"auto"}}>
+            <Typography variant="h5">{t('projects')}:</Typography>
+            <EmptyOrNotProjects projects={projects}/>
+          </Paper>
+          <Link to={`/${lang}/projects/create?course_id=${course.course_id}`}><Button>{t('newProject')}</Button></Link>
         </Grid>
-        <Grid item>
-          <Grid container direction={"row"}>
-            <Grid item style={{ width: "50%" }}>
-              <Paper elevation={0} style={{ height:"70vh", maxHeight:"70vh", overflowY:"auto"}}>
-                <Typography variant="h5">{t('projects')}:</Typography>
-                <EmptyOrNotProjects projects={projects}/>
-              </Paper>
-              <Link to={`/${lang}/projects/create?course_id=${course.course_id}`}><Button>{t('newProject')}</Button></Link>
-            </Grid>
-            <Grid item style={{ marginLeft: "1rem" }}>
-              <Grid container direction={"column"}>
-                <Grid item position={"relative"} height={"35vh"} width={"35vw"}>
-                  <Paper elevation={0} style={{maxHeight:"35vh", overflowY:"auto"}}>
-                    <Typography variant="h5">{t('admins')}:</Typography>
-                    <Grid container direction={"column"}>
-                      {admins.map((admin) => ( 
-                        <Grid item container alignItems="center" spacing={1} key={admin.uid}>
-                          <Grid item>
-                            <Typography variant="body1">{getUserName(admin.uid)}</Typography>
-                          </Grid>
-                          <EitherDeleteIconOrNothing admin={admin} course={course} navigate={navigate}/>
-                        </Grid>
-                      ))}
+        <Grid item style={{ marginLeft: "1rem" }}>
+          <Grid container direction={"column"}>
+            <Grid item position={"relative"} height={"35vh"} width={"35vw"}>
+              <Paper elevation={0} style={{maxHeight:"35vh", overflowY:"auto"}}>
+                <Typography variant="h5">{t('admins')}:</Typography>
+                <Grid container direction={"column"}>
+                  {admins.map((admin) => ( 
+                    <Grid item container alignItems="center" spacing={1} key={admin.uid}>
+                      <Grid item>
+                        <Typography variant="body1">{getUserName(admin.uid)}</Typography>
+                      </Grid>
+                      <EitherDeleteIconOrNothing admin={admin} course={course} navigate={navigate}/>
                     </Grid>
-                  </Paper>
+                  ))}
                 </Grid>
-                <Grid item position={"relative"} height={"35vh"} width={"35vw"}>
-                  <Typography variant="h5">{t('students')}:</Typography>
-                  <Paper elevation={0} style={{maxHeight:"25vh", overflowY:"auto"}}>
-                    <EmptyOrNotStudents students={students} selectedStudents={selectedStudents} handleCheckboxChange={handleCheckboxChange}/>
-                  </Paper>
-                  <IconButton style={{ position: "absolute", bottom:0, left:0}} onClick={() => handleDeleteStudent(navigate, course.course_id, selectedStudents)}>
-                    <ClearIcon />
-                    <Typography variant="body1">{t('deleteSelected')}</Typography>
-                  </IconButton>
-                </Grid>
-                <Grid item>
-                  <Button onClick={handleClickCodes}>{t('joinCodes')}</Button>
-                  <JoinCodeMenu courseId={course.course_id} open={openCodes} handleClose={handleCloseCodes} anchorEl={anchorEl}/>
-                </Grid>
-              </Grid>
+              </Paper>
+            </Grid>
+            <Grid item position={"relative"} height={"35vh"} width={"35vw"}>
+              <Typography variant="h5">{t('students')}:</Typography>
+              <Paper elevation={0} style={{maxHeight:"25vh", overflowY:"auto"}}>
+                <EmptyOrNotStudents students={students} selectedStudents={selectedStudents} handleCheckboxChange={handleCheckboxChange}/>
+              </Paper>
+              <IconButton style={{ position: "absolute", bottom:0, left:0}} onClick={() => handleDeleteStudent(navigate, course.course_id, selectedStudents)}>
+                <ClearIcon />
+                <Typography variant="body1">{t('deleteSelected')}</Typography>
+              </IconButton>
+            </Grid>
+            <Grid item>
+              <Button onClick={handleClickCodes}>{t('joinCodes')}</Button>
+              <JoinCodeMenu courseId={course.course_id} open={openCodes} handleClose={handleCloseCodes} anchorEl={anchorEl}/>
+            </Grid>
+            <Grid item>
+              <Button onClick={() => handleDeleteCourse(navigate, course.course_id)}>{t('deleteCourse')}</Button>
             </Grid>
           </Grid>
         </Grid>

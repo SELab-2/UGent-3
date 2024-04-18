@@ -1,4 +1,4 @@
-import { Route,RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
+import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 import Layout from "./components/Header/Layout";
 import { AllCoursesTeacher } from "./components/Courses/AllCoursesTeacher";
 import { CourseDetailTeacher } from "./components/Courses/CourseDetailTeacher";
@@ -6,6 +6,7 @@ import { dataLoaderCourseDetail, dataLoaderCourses } from "./components/Courses/
 import Home from "./pages/home/Home";
 import LanguagePath from "./components/LanguagePath";
 import ProjectView from "./pages/project/projectView/ProjectView";
+import ProjectCreateHome from "./pages/create_project/ProjectCreateHome.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -20,13 +21,16 @@ const router = createBrowserRouter(
           <Route index element={<AllCoursesTeacher />} loader={dataLoaderCourses}/>
           <Route path=":courseId" element={<CourseDetailTeacher />} loader={dataLoaderCourseDetail} />
         </Route>
+        <Route path="projects">
+          <Route path="create" element={<ProjectCreateHome />} />
+        </Route>
       </Route>
     </Route>
   )
 );
 
 /**
- * This component is the main application component that will be rendered by the ReactDOM. 
+ * This component is the main application component that will be rendered by the ReactDOM.
  * @returns - The main application component
  */
 export default function App(): React.JSX.Element {

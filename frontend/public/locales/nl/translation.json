@@ -1,20 +1,25 @@
 {
-  "home": {
-    "title": "Homepagina"
-  },
   "header": {
     "myProjects": "Mijn Projecten",
     "myCourses": "Mijn Vakken",
     "login": "Aanmelden",
     "home": "Home",
     "tag": "nl",
-    "homepage": "Homepage"
+    "homepage": "Homepage",
+    "projectUploadForm": "Project uploaden"
+  },
+  "home": {
+    "login": "Aanmelden",
+    "home": "Home",
+    "tag": "nl",
+    "title": "Homepage"
   },
   "courseDetailTeacher": {
     "title": "Vak Details",
     "noCoursesFound": "Geen vakken gevonden",
     "noProjects": "Geen projecten",
     "noStudents": "Geen studenten voor dit vak",
+    "deleteCourse": "Verwijder vak",
     "joinCodes": "Join Codes",
     "forAdmins": "Voor Admins",
     "forStudents": "Voor Studenten",
@@ -49,6 +54,24 @@
     "courseName": "Vak Naam",
     "submit": "Opslaan",
     "emptyCourseNameError": "Vak naam mag niet leeg zijn"
+  },
+  "projectForm": {
+    "projectTitle": "Titel",
+    "projectDescription": "Beschrijving",
+    "projectCourse": "Vak",
+    "projectDeadline": "Project deadline",
+    "visibleForStudents": "Zichtbaar voor studenten",
+    "uploadFile": "Upload bestand",
+    "regex": "Voeg Regex toe",
+    "selectCourseText": "Selecteer een vak",
+    "testWarning": "Opgelet: Deze opgave bevat geen tests",
+    "helperText": "Selecteer een geldige deadline voor het project",
+    "uploadProject": "Upload project",
+    "regexStructure": "Regex structuur",
+    "uploadError": "Project is niet goed geformatteerd",
+    "noDeadlinesPlaceholder": "Nog geen opgegeven deadlines",
+    "noFilesPlaceholder": "Nog geen opgave bestanden geupload",
+    "noRegexPlaceholder": "Nog geen regex toegevoegd"
   },
   "projectView": {
     "submitNetworkError": "Er is iets mislopen bij het opslaan van uw indiening. Probeer het later opnieuw.",

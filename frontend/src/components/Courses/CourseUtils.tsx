@@ -68,7 +68,7 @@ export function callToApiToCreateCourse(data: string, navigate: NavigateFunction
       navigate(getIdFromLink(data.url)); // navigate to data.url
     })
     .catch((error) => {
-      console.error('Error:', error); //should redirect to error page
+      //should redirect to error page
     });
 }
   
