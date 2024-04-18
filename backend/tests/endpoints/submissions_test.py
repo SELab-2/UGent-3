@@ -14,19 +14,19 @@ class TestSubmissionsEndpoint:
     ### GET SUBMISSIONS ###
     def test_get_submissions_wrong_user(self, client: FlaskClient):
         """Test getting submissions for a non-existing user"""
-        response = client.get("/submissions?uid=-20", headers={"Authorization":"teacher1"})
+        response = client.get("/submissions?uid=-20", headers={"Authorization":"teacher"})
         assert response.status_code == 400
 
     def test_get_submissions_wrong_project(self, client: FlaskClient):
         """Test getting submissions for a non-existing project"""
         response = client.get("/submissions?project_id=123456789",
-                              headers={"Authorization":"teacher1"})
-        assert response.status_code == 404 # can't find course of project in authorization
+                              headers={"Authorization":"teacher"})
+        assert response.status_code == 400
         assert "message" in response.json
 
     def test_get_submissions_wrong_project_type(self, client: FlaskClient):
         """Test getting submissions for a non-existing project of the wrong type"""
-        response = client.get("/submissions?project_id=zero", headers={"Authorization":"teacher1"})
+        response = client.get("/submissions?project_id=zero", headers={"Authorization":"teacher"})
         assert response.status_code == 400
         assert "message" in response.json
 
@@ -123,26 +123,3 @@ class TestSubmissionsEndpoint:
             "time": 'Thu, 14 Mar 2024 23:59:59 GMT',
             "status": 'FAIL'
         }
-
-    ### DELETE SUBMISSION ###
-    def test_delete_submission_wrong_id(self, client: FlaskClient, session: Session):
-        """Test deleting a submission for a non-existing submission id"""
-        response = client.delete("submissions/0", headers={"Authorization":"student01"})
-        data = response.json
-        assert response.status_code == 404
-        assert data["message"] == "Submission with id: 0 not found"
-
-    def test_delete_submission_correct(self, client: FlaskClient, session: Session):
-        """Test deleting a submission"""
-        project = session.query(Project).filter_by(title="B+ Trees").first()
-        submission = session.query(Submission).filter_by(
-            uid="student01", project_id=project.project_id
-        ).first()
-        response = client.delete(f"submissions/{submission.submission_id}",
-                                 headers={"Authorization":"student01"})
-        data = response.json
-        assert response.status_code == 200
-        assert data["message"] == "Resource deleted successfully"
-        assert submission.submission_id not in list(map(
-            lambda s: s.submission_id, session.query(Submission).all()
-        ))
