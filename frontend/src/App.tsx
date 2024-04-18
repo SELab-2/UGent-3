@@ -6,6 +6,7 @@ import { ErrorBoundary } from "./pages/error/ErrorBoundary.tsx";
 import ProjectCreateHome from "./pages/create_project/ProjectCreateHome.tsx";
 import {fetchProjectPage} from "./pages/project/FetchProjects.tsx";
 import HomePages from "./pages/home/HomePages.tsx";
+import ProjectOverView from "./pages/project/projectOverview.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -16,7 +17,7 @@ const router = createBrowserRouter(
         <Route path="project" >
           <Route path=":projectId" element={<ProjectView />}/>
         </Route>
-        <Route path="projects">
+        <Route path="projects" element={<ProjectOverView/>} loader={fetchProjectPage}>
           <Route path="create" element={<ProjectCreateHome />} />
         </Route>
       </Route>

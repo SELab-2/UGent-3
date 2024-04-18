@@ -7,12 +7,16 @@ import {useLoaderData} from "react-router-dom";
 import dayjs from "dayjs";
 
 /**
- *
+ * Displays all the projects
  */
 export default function ProjectOverView() {
   const {i18n} = useTranslation()
   const { t } = useTranslation('translation', { keyPrefix: 'projectsOverview' });
-  const projects = useLoaderData() as ProjectDeadline[] 
+  const loader = useLoaderData() as {
+    projects: ProjectDeadline[],
+    me: string
+  }
+  const projects = loader.projects
   
   const projectReducer = (acc: {[key: string]: ProjectDeadline[]}, project: ProjectDeadline) => {
     (acc[project.course.course_id] = acc[project.course.course_id] || []).push(project);

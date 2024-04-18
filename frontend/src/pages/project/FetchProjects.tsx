@@ -47,8 +47,7 @@ export const fetchProjects = async () => {
           grading: submission.grading
         }
         )).sort((a:ShortSubmission, b:ShortSubmission) => b.submission_time.getTime() - a.submission_time.getTime())[0];
-        console.log(response_submissions)
-          // fetch the course id of the project
+        // fetch the course id of the project
         const project_item = await (await fetch(encodeURI(`${API_URL}/projects/${project_id}`), {
           headers:header
         })).json()
