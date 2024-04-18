@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 from shutil import rmtree
 from flask import request
 from flask_restful import Resource
-from sqlalchemy import exc
+from sqlalchemy import exc, and_
 from project.executor import executor
 from project.db_in import db
 from project.models.submission import Submission, SubmissionStatus
@@ -67,16 +67,19 @@ class SubmissionsEndpoint(Resource):
                 with_entities(CourseAdmin.course_id).all()
             courses = [c[0] for c in courses] # Remove the tuple wrapping the course_id
 
+            # Filter the courses based on the query parameters
+            conditions = []
+            for key, value in filters.items():
+                conditions.append(getattr(Submission, key) == value)
+
             # Get the submissions
-            submissions = Submission.query.all()
+            submissions = Submission.query
+            submissions = submissions.filter(and_(*conditions)) if conditions else submissions
+            submissions = submissions.all()
             submissions = [
                 s for s in submissions if
                 s.uid == uid or get_course_of_project(s.project_id) in courses
             ]
-
-            # Filter the courses based on the query parameters
-            for key, value in filters.items():
-                submissions = [s for s in submissions if getattr(s, key) == value]
 
             # Return the submissions
             data["message"] = "Successfully fetched the submissions"

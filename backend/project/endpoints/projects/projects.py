@@ -6,6 +6,7 @@ import os
 from urllib.parse import urljoin
 import zipfile
 
+from sqlalchemy import and_
 from sqlalchemy.exc import SQLAlchemyError
 from flask import request, jsonify
 from flask_restful import Resource
@@ -48,14 +49,17 @@ class ProjectsEndpoint(Resource):
             courses += Course.query.filter_by(teacher=uid).with_entities(Course.course_id).all()
             courses = [c[0] for c in courses] # Remove the tuple wrapping the course_id
 
-            # Get the projects
-            projects = Project.query.all()
-            projects = [p for p in projects if get_course_of_project(p.project_id) in courses]
-
             # Filter the projects based on the query parameters
             filters = dict(request.args)
+            conditions = []
             for key, value in filters.items():
-                projects = [p for p in projects if getattr(p, key) == value]
+                conditions.append(getattr(Project, key) == value)
+
+            # Get the projects
+            projects = Project.query
+            projects = projects.filter(and_(*conditions)) if conditions else projects
+            projects = projects.all()
+            projects = [p for p in projects if get_course_of_project(p.project_id) in courses]
 
             # Return the projects
             data["message"] = "Successfully fetched the projects"
@@ -102,8 +106,8 @@ class ProjectsEndpoint(Resource):
 
         if status_code == 400:
             return new_project, status_code
-
         project_upload_directory = os.path.join(f"{UPLOAD_FOLDER}", f"{new_project.project_id}")
+
         os.makedirs(project_upload_directory, exist_ok=True)
         if filename is not None:
             try:
