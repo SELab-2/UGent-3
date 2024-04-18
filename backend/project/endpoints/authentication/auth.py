@@ -51,13 +51,13 @@ def microsoft_authentication():
         profile_res = requests.get("https://graph.microsoft.com/v1.0/me",
                                     headers={"Authorization":f"Bearer {token}"},
                                     timeout=5)
-        auth_user_id = profile_res.json()["id"]
     except TimeoutError:
         return {"message":"Request to Microsoft timed out"}, 500
     if not profile_res or profile_res.status_code != 200:
         abort(make_response(({"message":
                               "An error occured while trying to authenticate your access token"},
                                500)))
+    auth_user_id = profile_res.json()["id"]
     try:
         user = db.session.get(User, auth_user_id)
     except SQLAlchemyError:
