@@ -67,7 +67,7 @@ class CourseJoin(Resource):
                 return response, 400
         except SQLAlchemyError:
             response["message"] = "Internal server error"
-            return response, 400
+            return response, 500
 
         course_relation = course_relation(course_id=course_id, uid=uid)
 
@@ -77,4 +77,4 @@ class CourseJoin(Resource):
             return response, 201
         except SQLAlchemyError:
             response["message"] = "Internal server error"
-            return response, 400
+            return response, 500
