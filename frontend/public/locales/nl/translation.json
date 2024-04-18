@@ -62,5 +62,15 @@
     "hoursAgo": "uur geleden",
     "minutesAgo": "minuten geleden",
     "justNow": "Zonet"
+  },
+  "error": {
+    "pageNotFound": "Pagina Niet Gevonden",
+    "pageNotFoundMessage": "De opgevraagde pagina werd niet gevonden.",
+    "forbidden": "Verboden",
+    "forbiddenMessage": "Je hebt geen toegang tot deze bron.",
+    "clientError": "Client Fout",
+    "clientErrorMessage": "Er is een client fout opgetreden.",
+    "serverError": "Server Fout",
+    "serverErrorMessage": "Er is een server fout opgetreden."
   }
 }

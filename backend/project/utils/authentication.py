@@ -99,6 +99,17 @@ def login_required(f):
         return f(*args, **kwargs)
     return wrap
 
+def login_required_return_uid(f):
+    """
+    This function will check if the person sending a request to the API is logged in
+    and additionally create their user entry in the database if necessary
+    """
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        uid = return_authenticated_user_id()
+        kwargs["uid"] = uid
+        return f(*args, **kwargs)
+    return wrap
 
 def authorize_admin(f):
     """
@@ -247,7 +258,6 @@ def authorize_project_visible(f):
         abort(make_response(
             ({"message": "You're not authorized to perform this action"}, 403)))
     return wrap
-
 
 def authorize_submissions_request(f):
     """This function will check if the person sending a request to the API is logged in,

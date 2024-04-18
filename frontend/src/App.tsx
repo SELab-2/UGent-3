@@ -3,12 +3,13 @@ import Layout from "./components/Header/Layout";
 import Home from "./pages/home/Home";
 import LanguagePath from "./components/LanguagePath";
 import ProjectView from "./pages/project/projectView/ProjectView";
+import { ErrorBoundary } from "./pages/error/ErrorBoundary.tsx";
 import ProjectCreateHome from "./pages/create_project/ProjectCreateHome.tsx";
 import SubmissionsOverview from "./pages/submission_overview/SubmissionsOverview.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<Layout />}>
+    <Route path="/" element={<Layout />} errorElement={<ErrorBoundary />}>
       <Route index element={<Home />} />
       <Route path=":lang" element={<LanguagePath/>}>
         <Route path="home" element={<Home />} />
@@ -30,8 +31,5 @@ const router = createBrowserRouter(
  * @returns - The main application component
  */
 export default function App(): React.JSX.Element {
-  return (
-    <RouterProvider router={router}>
-    </RouterProvider>
-  );
+  return <RouterProvider router={router} />;
 }

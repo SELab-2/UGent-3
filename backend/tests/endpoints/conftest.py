@@ -153,7 +153,8 @@ def valid_user():
     """
     return {
         "uid": "w_student",
-        "role": Role.STUDENT.name
+        "role": Role.STUDENT.name,
+        "display_name": "Valid User"
     }
 
 @pytest.fixture
@@ -180,10 +181,10 @@ def valid_user_entries(session):
     Returns a list of users that are in the database
     """
     users = [
-        User(uid="del", role=Role.TEACHER),
-        User(uid="pat", role=Role.TEACHER),
-        User(uid="u_get", role=Role.TEACHER),
-        User(uid="query_user", role=Role.ADMIN)]
+        User(uid="del", role=Role.TEACHER, display_name="Peter Deleter"),
+        User(uid="pat", role=Role.TEACHER, display_name="Patrick Patcher"),
+        User(uid="u_get", role=Role.TEACHER, display_name="User Getter"),
+        User(uid="query_user", role=Role.ADMIN, display_name="Quentin Query")]
 
     session.add_all(users)
     session.commit()
@@ -222,7 +223,7 @@ def files():
 @pytest.fixture
 def course_teacher_ad():
     """A user that's a teacher for testing"""
-    ad_teacher = User(uid="Gunnar", role=Role.TEACHER)
+    ad_teacher = User(uid="Gunnar", role=Role.TEACHER, display_name="Gunnar Brinckmann")
     return ad_teacher
 
 @pytest.fixture
