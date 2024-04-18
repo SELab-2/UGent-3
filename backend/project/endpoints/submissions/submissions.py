@@ -24,6 +24,7 @@ from project.utils.authentication import authorize_student_submission, login_req
 from project.utils.submissions.evaluator import run_evaluator
 from project.utils.models.project_utils import get_course_of_project
 
+
 API_HOST = getenv("API_HOST")
 UPLOAD_FOLDER = getenv("UPLOAD_FOLDER")
 BASE_URL =  urljoin(f"{API_HOST}/", "/submissions")
