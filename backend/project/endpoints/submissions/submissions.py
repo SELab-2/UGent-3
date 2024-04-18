@@ -15,12 +15,14 @@ from project.db_in import db
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 from project.models.user import User
+from project.models.course import Course
+from project.models.course_relation import CourseAdmin
 from project.utils.files import all_files_uploaded
 from project.utils.user import is_valid_user
 from project.utils.project import is_valid_project
-from project.utils.query_agent import query_selected_from_model
-from project.utils.authentication import authorize_student_submission, authorize_submissions_request
+from project.utils.authentication import authorize_student_submission, login_required_return_uid
 from project.utils.submissions.evaluator import run_evaluator
+from project.utils.models.project_utils import get_course_of_project
 
 API_HOST = getenv("API_HOST")
 UPLOAD_FOLDER = getenv("UPLOAD_FOLDER")
@@ -30,9 +32,9 @@ TIMEZONE = getenv("TIMEZONE", "GMT")
 class SubmissionsEndpoint(Resource):
     """API endpoint for the submissions"""
 
-    @authorize_submissions_request
-    def get(self) -> dict[str, any]:
-        """Get all the submissions from a user for a project
+    @login_required_return_uid
+    def get(self, uid=None) -> dict[str, any]:
+        """Get all the submissions from a user
 
         Returns:
             dict[str, any]: The list of submission URLs
@@ -41,37 +43,56 @@ class SubmissionsEndpoint(Resource):
         data = {
             "url": BASE_URL
         }
+        filters = dict(request.args)
         try:
-            # Filter by uid
-            uid = request.args.get("uid")
-            if uid is not None and (not uid.isdigit() or not User.query.filter_by(uid=uid).first()):
-                data["message"] = f"Invalid user (uid={uid})"
+            # Check the uid query parameter
+            user_id = filters.get("uid")
+            if user_id and not User.query.filter_by(uid=user_id).all():
+                data["message"] = f"Invalid user (uid={user_id})"
                 return data, 400
 
-            # Filter by project_id
-            project_id = request.args.get("project_id")
-            if project_id is not None \
-                and (not project_id.isdigit() or
-                     not Project.query.filter_by(project_id=project_id).first()):
-                data["message"] = f"Invalid project (project_id={project_id})"
-                return data, 400
+            # Check the project_id query parameter
+            project_id = filters.get("project_id")
+            if project_id:
+                if not project_id.isdigit() or \
+                    not Project.query.filter_by(project_id=project_id).all():
+                    data["message"] = f"Invalid project (project_id={project_id})"
+                    return data, 400
+                filters["project_id"] = int(project_id)
+
+            # Get the courses
+            courses = Course.query.filter_by(teacher=uid).\
+                with_entities(Course.course_id).all()
+            courses += CourseAdmin.query.filter_by(uid=uid).\
+                with_entities(CourseAdmin.course_id).all()
+            courses = [c[0] for c in courses] # Remove the tuple wrapping the course_id
+
+            # Get the submissions
+            submissions = Submission.query.all()
+            submissions = [
+                s for s in submissions if
+                s.uid == uid or get_course_of_project(s.project_id) in courses
+            ]
+
+            # Filter the courses based on the query parameters
+            for key, value in filters.items():
+                submissions = [s for s in submissions if getattr(s, key) == value]
+
+            # Return the submissions
+            data["message"] = "Successfully fetched the submissions"
+            data["data"] = [{
+                "submission_id": urljoin(BASE_URL, str(s.submission_id)),
+                "uid": urljoin(f"{API_HOST}/", f"users/{s.uid}"),
+                "project_id": urljoin(f"{API_HOST}/", f"projects/{s.project_id}"),
+                "grading": s.grading,
+                "submission_time": s.submission_time,
+                "submission_status": s.submission_status
+            } for s in submissions]
+            return data
+
         except exc.SQLAlchemyError:
             data["message"] = "An error occurred while fetching the submissions"
             return data, 500
-
-        return query_selected_from_model(
-            Submission,
-            urljoin(f"{API_HOST}/", "/submissions"),
-            select_values=[
-                "submission_id", "uid",
-                "project_id", "grading",
-                "submission_time", "submission_status"],
-            url_mapper={
-                "submission_id": BASE_URL,
-                "project_id": urljoin(f"{API_HOST}/", "projects"),
-                "uid": urljoin(f"{API_HOST}/", "users")},
-            filters=request.args
-        )
 
     @authorize_student_submission
     def post(self) -> dict[str, any]:
@@ -170,8 +191,7 @@ class SubmissionsEndpoint(Resource):
                 }
                 return data, 202
 
-        except exc.SQLAlchemyError as e:
-            print(e)
+        except exc.SQLAlchemyError:
             session.rollback()
             data["message"] = "An error occurred while creating a new submission"
             return data, 500
