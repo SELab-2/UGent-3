@@ -12,16 +12,16 @@ def test_assignment_download(client, valid_project):
         valid_project["assignment_file"] = zip_file
         # post the project
         response = client.get("/auth?code=teacher")
-        #cookies = response.headers.getlist('Set-Cookie')
+        cookies = response.headers.getlist('Set-Cookie')
         response = client.post(
             "/projects",
             data=valid_project,
             content_type='multipart/form-data',
+            cookies=cookies
         )
     assert response.status_code == 201
     project_id = response.json["data"]["project_id"]
-    response = client.get("/auth?code=teacher")
-    response = client.get(f"/projects/{project_id}/assignment")
+    response = client.get(f"/projects/{project_id}/assignment", cookies=cookies)
     # 404 because the file is not found, no assignment.md in zip file
     assert response.status_code == 404
 
