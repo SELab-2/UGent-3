@@ -65,7 +65,8 @@ def valid_user():
     """
     return {
         "uid": "w_student",
-        "role": Role.STUDENT.name
+        "role": Role.STUDENT.name,
+        "display_name": "Willem Student"
     }
 
 @pytest.fixture
@@ -86,6 +87,7 @@ def valid_admin():
     return {
         "uid": "admin_person",
         "role": Role.ADMIN,
+        "display_name": "Admin Man"
     }
 
 @pytest.fixture
@@ -112,10 +114,10 @@ def valid_user_entries(session):
     Returns a list of users that are in the database
     """
     users = [
-        User(uid="del", role=Role.TEACHER),
-        User(uid="pat", role=Role.TEACHER),
-        User(uid="u_get", role=Role.TEACHER),
-        User(uid="query_user", role=Role.ADMIN)]
+        User(uid="del", role=Role.TEACHER, display_name="User Deleter"),
+        User(uid="pat", role=Role.TEACHER, display_name="Patrick"),
+        User(uid="u_get", role=Role.TEACHER, display_name="User Getter"),
+        User(uid="query_user", role=Role.ADMIN, display_name="Query User")]
 
     session.add_all(users)
     session.commit()
@@ -166,7 +168,7 @@ def app():
 @pytest.fixture
 def course_teacher_ad():
     """A user that's a teacher for testing"""
-    ad_teacher = User(uid="Gunnar", role=Role.TEACHER)
+    ad_teacher = User(uid="Gunnar", role=Role.TEACHER, display_name="Gunnar Brinckmann")
     return ad_teacher
 
 @pytest.fixture
@@ -216,7 +218,7 @@ def client(app):
 @pytest.fixture
 def valid_teacher_entry(session):
     """A valid teacher for testing that's already in the db"""
-    teacher = User(uid="Bart", role=Role.TEACHER)
+    teacher = User(uid="Bart", role=Role.TEACHER, display_name="Bart Bart")
     try:
         session.add(teacher)
         session.commit()
@@ -262,7 +264,7 @@ def valid_course_entry(session, valid_course):
 def valid_students_entries(session):
     """Valid students for testing that are already in the db"""
     students = [
-        User(uid=f"student_sel2_{i}", role=Role.STUDENT)
+        User(uid=f"student_sel2_{i}", role=Role.STUDENT, display_name=f"Sel2 Student {i}")
         for i in range(3)
     ]
     session.add_all(students)

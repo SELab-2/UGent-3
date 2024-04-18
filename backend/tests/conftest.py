@@ -34,10 +34,10 @@ def db_session():
 def users():
     """Return a list of users to populate the database"""
     return [
-        User(uid="brinkmann", role=Role.ADMIN),
-        User(uid="laermans", role=Role.ADMIN),
-        User(uid="student01", role=Role.STUDENT),
-        User(uid="student02", role=Role.STUDENT)
+        User(uid="brinkmann", role=Role.ADMIN, display_name="Gunnar Brinckmann"),
+        User(uid="laermans", role=Role.ADMIN, display_name="Eric Laermans"),
+        User(uid="student01", role=Role.STUDENT, display_name="Jan met de Pet"),
+        User(uid="student02", role=Role.STUDENT, display_name="Janine met de Pet")
     ]
 
 def courses():
@@ -128,13 +128,13 @@ def auth_tokens():
     """Add the authenticated users to the database"""
 
     return [
-        User(uid="login", role=Role.STUDENT),
-        User(uid="student", role=Role.STUDENT),
-        User(uid="student_other", role=Role.STUDENT),
-        User(uid="teacher", role=Role.TEACHER),
-        User(uid="teacher_other", role=Role.TEACHER),
-        User(uid="admin", role=Role.ADMIN),
-        User(uid="admin_other", role=Role.ADMIN)
+        User(uid="login", role=Role.STUDENT, display_name="Logged In"),
+        User(uid="student", role=Role.STUDENT, display_name="Student Person"),
+        User(uid="student_other", role=Role.STUDENT, display_name="Student Other Person"),
+        User(uid="teacher", role=Role.TEACHER, display_name="Teacher Person"),
+        User(uid="teacher_other", role=Role.TEACHER, display_name="Teacher Other Person"),
+        User(uid="admin", role=Role.ADMIN, display_name="Admin Man"),
+        User(uid="admin_other", role=Role.ADMIN, display_name="Admin Woman")
     ]
 
 ### SESSION ###
