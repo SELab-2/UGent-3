@@ -8,25 +8,24 @@ import { useTranslation } from "react-i18next";
  */
 export function ErrorBoundary() {
   const error = useRouteError();
-  const { t } = useTranslation();
-  const keyPrefix = "error.";
+  const { t } = useTranslation('translation', { keyPrefix: 'projectView' });
 
   if (isRouteErrorResponse(error)) {
     if (error.status == 404) {
       return (
-        <ErrorPage statusCode={"404"} statusTitle={t(keyPrefix + "pageNotFound")} message={t(keyPrefix + "pageNotFoundMessage")} />
+        <ErrorPage statusCode={"404"} statusTitle={t("pageNotFound")} message={t("pageNotFoundMessage")} />
       );
     } else if (error.status == 403) {
       return (
-        <ErrorPage statusCode={"403"} statusTitle={t(keyPrefix + "forbidden")} message={t(keyPrefix + "forbiddenMessage")} />
+        <ErrorPage statusCode={"403"} statusTitle={t("forbidden")} message={t("forbiddenMessage")} />
       );
     } else if (error.status >= 400 && error.status <= 499) {
       return (
-        <ErrorPage statusCode={error.statusText} statusTitle={t(keyPrefix + "clientError")} message={t(keyPrefix + "clientErrorMessage")} />
+        <ErrorPage statusCode={error.statusText} statusTitle={t("clientError")} message={t("clientErrorMessage")} />
       );
     } else if (error.status >= 500 && error.status <= 599) {
       return (
-        <ErrorPage statusCode={error.statusText} statusTitle={t(keyPrefix + "serverError")} message={t(keyPrefix + "serverErrorMessage")} />
+        <ErrorPage statusCode={error.statusText} statusTitle={t("serverError")} message={t("serverErrorMessage")} />
       );
     }
   }
