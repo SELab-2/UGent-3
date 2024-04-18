@@ -19,6 +19,43 @@ API_HOST = getenv("API_HOST")
 UPLOAD_FOLDER = getenv("UPLOAD_FOLDER")
 BASE_URL = urljoin(f"{API_HOST}/", "/projects")
 
+def get_last_submissions_per_user(project_id):
+    """
+    Get the last submissions per user for a given project
+    """
+    try:
+        project = Project.query.get(project_id)
+    except SQLAlchemyError:
+        return {"message": "Internal server error"}, 500
+
+    if project is None:
+        return {
+            "message": f"Project (project_id={project_id}) not found",
+            "url": BASE_URL}, 404
+
+    # Define a subquery to find the latest submission times for each user
+    latest_submissions = db.session.query(
+        Submission.uid,
+        func.max(Submission.submission_time).label('max_time')
+    ).filter(
+        Submission.project_id == project_id,
+        Submission.submission_status != 'LATE'
+    ).group_by(
+        Submission.uid
+    ).subquery()
+
+    # Use the subquery to fetch the actual submissions
+    submissions = db.session.query(Submission).join(
+        latest_submissions,
+        (Submission.uid == latest_submissions.c.uid) &
+        (Submission.submission_time == latest_submissions.c.max_time)
+    ).all()
+
+    if not submissions:
+        return {"message": "No submissions found", "url": BASE_URL}, 404
+
+    return {"message": "Resource fetched succesfully", "data": submissions}, 200
+
 class SubmissionDownload(Resource):
     """
     Resource to download all submissions for a project.
@@ -27,37 +64,11 @@ class SubmissionDownload(Resource):
         """
         Download all submissions for a project as a zip file.
         """
+        data, status_code = get_last_submissions_per_user(project_id)
 
-        try:
-            project = Project.query.get(project_id)
-        except SQLAlchemyError:
-            return {"message": "Internal server error"}, 500
-
-        if project is None:
-            return {
-                "message": f"Project (project_id={project_id}) not found",
-                "url": BASE_URL}, 404
-
-        # Define a subquery to find the latest submission times for each user
-        latest_submissions = db.session.query(
-            Submission.uid,
-            func.max(Submission.submission_time).label('max_time')
-        ).filter(
-            Submission.project_id == project_id,
-            Submission.submission_status != 'LATE'
-        ).group_by(
-            Submission.uid
-        ).subquery()
-
-        # Use the subquery to fetch the actual submissions
-        submissions = db.session.query(Submission).join(
-            latest_submissions,
-            (Submission.uid == latest_submissions.c.uid) &
-            (Submission.submission_time == latest_submissions.c.max_time)
-        ).all()
-
-        if not submissions:
-            return {"message": "No submissions found", "url": BASE_URL}, 404
+        if status_code != 200:
+            return data, status_code
+        submissions = data["data"]
 
         def zip_directory_stream():
             with io.BytesIO() as memory_file:

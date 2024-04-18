@@ -33,7 +33,7 @@ class SubmissionDownload(Resource):
             str(submission.project_id),
             "submissions",
             str(submission_id))
-        print(submission_path)
+
         if not path.exists(submission_path) or not path.isdir(submission_path):
             return {"message": "Submission directory not found", "url": BASE_URL}, 404
 
