@@ -1,9 +1,32 @@
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Grid, Paper, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Grid, Menu, MenuItem, Paper, TextField, Typography } from "@mui/material";
 import { Course, Project, apiHost, getIdFromLink, getNearestFutureDate, loggedInToken } from "./CourseUtils";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import debounce from 'debounce';
+
+export function ErrorPopUpMenu({error, open, handleClose, anchorEl}: {error: string, open: boolean, handleClose : () => void, anchorEl: HTMLElement | null}): JSX.Element {
+  return (
+    <Menu 
+      open={open} 
+      onClose={handleClose} 
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'left',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'left',
+      }}
+    >
+      <MenuItem>
+        <Typography variant="body1">{error}</Typography>
+      </MenuItem>      
+    </Menu>
+  );
+}
+
 /**
  * @param text - The text to be displayed
  * @returns Typography that overflow into ... when text is too long

@@ -18,6 +18,7 @@
   "courseDetailTeacher": {
     "title": "Course Details",
     "deleteCourse": "Delete Course",
+    "unauthorizedDelete": "You are unauthorized to delete this course",
     "noCoursesFound": "No courses found",
     "noProjects": "No projects",
     "noStudents": "No students in this course",

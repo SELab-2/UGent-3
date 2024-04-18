@@ -17,6 +17,7 @@
   "courseDetailTeacher": {
     "title": "Vak Details",
     "noCoursesFound": "Geen vakken gevonden",
+    "unauthorizedDelete": "U heeft niet de juiste rechten om dit vak te verwijderen",
     "noProjects": "Geen projecten",
     "noStudents": "Geen studenten voor dit vak",
     "deleteCourse": "Verwijder vak",

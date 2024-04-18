@@ -30,14 +30,6 @@ function handleDeleteAdmin(navigate: NavigateFunction, courseId: string, uid: st
   })
     .then(() => {
       navigate(0);
-    })
-    .catch(error => {
-      if(error.status === 403){
-        alert('You are unauthorized to perform this action.');
-      }
-      else{
-        throw new Response(error);
-      }
     });
 }
 
@@ -60,14 +52,6 @@ function handleDeleteStudent(navigate: NavigateFunction, courseId: string, uids:
   })
     .then(() => {
       navigate(0);
-    })
-    .catch(error => {
-      if(error.status === 403){
-        alert('You are unauthorized to perform this action.');
-      }
-      else{
-        throw new Response(error);
-      }
     });
 }
 
@@ -82,17 +66,12 @@ function handleDeleteCourse(navigate: NavigateFunction, courseId: string): void 
     headers: {
       "Authorization": loggedInToken()
     }
-  }).then(() => {
-    navigate(-1);
-  }).catch(error => {
-    if(error.status === 404){
+  }).then((response) => {
+    if(response.ok){
       navigate(-1);
     }
-    else if(error.status === 403){
-      alert('You are unauthorized to perform this action.');
-    }
-    else{
-      throw new Response(error);
+    else if(response.status === 404){
+      navigate(-1);
     }
   });
 }
@@ -113,7 +92,7 @@ export function CourseDetailTeacher(): JSX.Element {
     setAnchorElStudent(null);
   };
 
-  const courseDetail = useLoaderData() as {
+  const courseDetail = useLoaderData() as { //TODO CATCH ERROR
     course: Course ,
     projects:Project[] ,
     admins: UserUid[],
@@ -311,9 +290,6 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
 
   const handleCopyToClipboard = (join_code: string) => {
     navigator.clipboard.writeText(`${appHost}/join-course?code=${join_code}`)
-      .catch((error) => {
-        console.error('Error copying text to clipboard:', error);
-      });
   };
 
   const getCodes = useCallback(() => {
@@ -338,8 +314,7 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
         });
         setCodes(filteredData);
       })
-      .catch(error => console.error('Error:', error));
-  }, [courseId])
+  }, [courseId]);
 
   const handleNewCode = () => {
     
@@ -357,7 +332,6 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
       body: JSON.stringify(bodyContent)
     })
       .then(() => getCodes())
-      .catch(error => console.error('Error:', error));
   }
 
   const handleDeleteCode = (joinCode: string) => {
@@ -372,8 +346,7 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
           "join_code": joinCode
         })
       })
-      .then(() => getCodes())
-      .catch(error => console.error('Error:', error));
+      .then(() => getCodes());
   }
 
   useEffect(() => {

@@ -67,9 +67,6 @@ export function callToApiToCreateCourse(data: string, navigate: NavigateFunction
       });
       navigate(getIdFromLink(data.url)); // navigate to data.url
     })
-    .catch((error) => {
-      //should redirect to error page
-    });
 }
   
 /**
@@ -105,7 +102,7 @@ const fetchData = async (url: string, params?: URLSearchParams) => {
     }
   });
   if(res.status !== 200){
-    throw new Response("Not Found", { status: res.status });
+    throw new Response("Failed to fetch data", {status: res.status});
   }
   const jsonResult = await res.json();
 
