@@ -15,7 +15,8 @@ export const fetchMe = async () => {
       headers:header
     })
     if(response.status == 200){
-      return "LOGGED_IN"
+      const data  = await response.json()
+      return data.role
     }else {
       return "UNKNOWN"
     }
