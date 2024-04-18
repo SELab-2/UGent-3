@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 import LanguageIcon from "@mui/icons-material/Language";
 import { Link } from "react-router-dom";
 import { TitlePortal } from "./TitlePortal";
-import {LoginLink} from "./Login";
+import {LoginButton} from "./Login";
 
 /**
  * The header component for the application that will be rendered at the top of the page.
@@ -68,8 +68,8 @@ export function Header(): JSX.Element {
           <IconButton edge="start" onClick={() => setOpen(!open)} sx={{ color: "white", marginLeft: 0 }}>
             <MenuIcon style={{fontSize:"2rem"}} />
           </IconButton>
-          <TitlePortal />
-          <LoginLink></LoginLink>
+          <TitlePortal/>
+          <LoginButton></LoginButton>
           <div>
             <IconButton onClick={handleLanguageMenu} color="inherit">
               <LanguageIcon />
