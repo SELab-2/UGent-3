@@ -1,10 +1,12 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {DataGrid, GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
-import {Box} from "@mui/material";
+import {Box, IconButton} from "@mui/material";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { green, red } from '@mui/material/colors';
 import CancelIcon from '@mui/icons-material/Cancel';
+import DownloadIcon from '@mui/icons-material/Download';
+import download from "downloadjs";
 
 const apiUrl = import.meta.env.VITE_API_HOST
 const user = "teacher"
@@ -20,13 +22,27 @@ const user = "teacher"
   }
 
 /**
- *
+ * @returns unique id for datarows
  */
 function getRowId(row: Submission) {
   return row.submission_id;
 }
 
-const columns: GridColDef<Submission> = [
+const fetchSubmissionsFromUser = async (submission_id: string) => {
+  await fetch(`${apiUrl}/submissions/${submission_id}/download`, {
+    headers: {
+      "Authorization": user
+    },
+  })
+    .then(res => {
+      return res.blob();
+    })
+    .then(blob => {
+      download(blob, `submissions_${submission_id}.zip`);
+    });
+}
+
+const columns: GridColDef<Submission>[] = [
   { field: 'submission_id', headerName: 'Submission ID', flex: 0.4 },
   { field: 'uid', headerName: 'Student ID', width: 160, flex: 0.4 },
   {
@@ -38,24 +54,28 @@ const columns: GridColDef<Submission> = [
   {
     field: 'submission_status',
     headerName: 'Status',
-    renderCell: (params: Submission) => (
-        //<>
-        //  {console.log(params.row)}
-        //  <CheckCircleIcon sx={{ color: green[500] }}/>
-        //</>
-        <>
+    renderCell: (params: GridRenderCellParams<Submission>) => (
+      <>
         {
           params.row.submission_status === "SUCCESS" ? (
-              <CheckCircleIcon sx={{ color: green[500] }} />
+            <CheckCircleIcon sx={{ color: green[500] }} />
           ) : <CancelIcon sx={{ color: red[500] }}/>
         }
-        </>
-    ),
-  }
-];
+      </>
+    )
+  },
+  {
+    field: 'submission_path',
+    headerName: 'Download',
+    renderCell: (params: GridRenderCellParams<Submission>) => (
+      <IconButton onClick={() => fetchSubmissionsFromUser(params.row.submission_id)}>
+        <DownloadIcon />
+      </IconButton>
+    )
+  }];
 
 /**
- *
+ * @returns the datagrid for displaying submissiosn
  */
 export default function ProjectSubmissionsOverviewDatagrid() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -63,7 +83,7 @@ export default function ProjectSubmissionsOverviewDatagrid() {
 
   useEffect(() => {
     fetchLastSubmissionsByUser();
-  }, []);
+  });
 
   const fetchLastSubmissionsByUser = async () => {
     const response = await fetch(`${apiUrl}/projects/${projectId}/latest-per-user`, {
@@ -78,7 +98,6 @@ export default function ProjectSubmissionsOverviewDatagrid() {
   return (
     <Box
       my={4}
-      width="60%"
     >
       <DataGrid
         getRowId={getRowId}
