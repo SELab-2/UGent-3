@@ -2,15 +2,98 @@
 
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from os import getenv
+from typing import Generator
+
 from pytest import fixture
-from project.sessionmaker import engine, Session
-from project.db_in import db
+from flask import Flask
+from sqlalchemy.orm import Session
+
+from project import create_app_with_db
+from project.sessionmaker import engine, Session as session_maker
+from project.db_in import db, url
 from project.models.course import Course
 from project.models.user import User,Role
 from project.models.project import Project
 from project.models.course_relation import CourseStudent,CourseAdmin
 from project.models.submission import Submission, SubmissionStatus
 
+
+
+### CLIENT & SESSION ###
+@fixture
+def app() -> Generator[Flask, any, None]:
+    """Yield a Flask application instance with database"""
+    app = create_app_with_db(url)
+    yield app
+
+@fixture
+def client(app: Flask) -> Generator[any, any, None]:
+    """Yield a test client"""
+    with app.test_client() as client:
+        with app.app_context():
+            yield client
+
+@fixture
+def session() -> Generator[Session, any, None]:
+    """Yield a database session for other fixtures to use"""
+    session = session_maker()
+    try:
+        # Create all tables
+        db.metadata.create_all(engine)
+
+        # (OLD) Populate the database
+        session.add_all(users())
+        session.commit()
+        session.add_all(courses())
+        session.commit()
+        session.add_all(course_relations(session))
+        session.commit()
+        session.add_all(projects(session))
+        session.commit()
+        session.add_all(submissions(session))
+        session.commit()
+
+        yield session
+    finally:
+        # Rollback
+        session.rollback()
+
+        # Drop all tables
+        for table in reversed(db.metadata.sorted_tables):
+            session.execute(table.delete())
+        session.commit()
+        session.close()
+
+
+
+### AUTHENTICATION & AUTHORIZATION ###
+@fixture(autouse=True) # Always run this before a test
+def auth_tokens(session: Session) -> None:
+    """Add the authenticated users to the database"""
+
+    session.add_all([
+        User(uid="login", role=Role.STUDENT),
+        User(uid="student", role=Role.STUDENT),
+        User(uid="student_other", role=Role.STUDENT),
+        User(uid="teacher", role=Role.TEACHER),
+        User(uid="teacher_other", role=Role.TEACHER),
+        User(uid="admin", role=Role.ADMIN),
+        User(uid="admin_other", role=Role.ADMIN)
+    ])
+    session.commit()
+
+
+
+### OTHER ###
+@fixture
+def api_host() -> str:
+    """Get the API URL from the environment"""
+    return getenv("API_HOST") or ""
+
+
+
+### OLD ###
 @fixture
 def db_session():
     """Create a new database session for a test.
@@ -69,25 +152,19 @@ def projects(session):
         Project(
             title="B+ Trees",
             description="Implement B+ trees",
-            assignment_file="assignement.pdf",
-            deadline=datetime(2024,3,15,13,0,0),
+            deadlines=[("Deadline 1",datetime(2024,3,15,13,0,0))],
             course_id=course_id_ad3,
             visible_for_students=True,
             archived=False,
-            test_path="/tests",
-            script_name="script.sh",
             regex_expressions=["solution"]
         ),
         Project(
             title="Predicaten",
             description="Predicaten project",
-            assignment_file="assignment.pdf",
-            deadline=datetime(2023,3,15,13,0,0),
+            deadlines=[("Deadline 1", datetime(2023,3,15,13,0,0))],
             course_id=course_id_raf,
             visible_for_students=False,
             archived=True,
-            test_path="/tests",
-            script_name="script.sh",
             regex_expressions=[".*"]
         )
     ]
@@ -171,3 +248,4 @@ def session():
         for table in reversed(db.metadata.sorted_tables):
             session.execute(table.delete())
         session.commit()
+

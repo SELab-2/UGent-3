@@ -14,6 +14,7 @@ from flask import request
 from flask_restful import Resource
 
 from project.db_in import db
+from project.models.user import User
 from project.models.course_relation import CourseStudent
 from project.endpoints.courses.courses_utils import (
     execute_query_abort_if_db_error,
@@ -65,12 +66,18 @@ class CourseToAddStudents(Resource):
         """
         abort_url = f"{API_URL}/courses/{course_id}/students"
         data = request.get_json()
+        if any(key != "students" for key in data.keys()):
+            return json_message("Incorrect data field given"), 400
         student_uids = data.get("students")
         abort_if_none_uid_student_uids_or_non_existant_course_id(
             course_id, student_uids
         )
 
         for uid in student_uids:
+            query = User.query.filter_by(uid=uid)
+            user = execute_query_abort_if_db_error(query, abort_url)
+            if not user:
+                return json_message("User does not exist"), 400
             query = CourseStudent.query.filter_by(uid=uid, course_id=course_id)
             student_relation = execute_query_abort_if_db_error(query, abort_url)
             if student_relation:
@@ -96,6 +103,8 @@ class CourseToAddStudents(Resource):
         """
         abort_url = f"{API_URL}/courses/{str(course_id)}/students"
         data = request.get_json()
+        if len([key for key in data.keys() if key != "students"]) != 0:
+            return json_message("Incorrect data field given"), 400
         student_uids = data.get("students")
         abort_if_none_uid_student_uids_or_non_existant_course_id(
             course_id, student_uids
@@ -106,6 +115,8 @@ class CourseToAddStudents(Resource):
             student_relation = execute_query_abort_if_db_error(query, abort_url)
             if student_relation:
                 delete_abort_if_error(student_relation, abort_url)
+            else:
+                return json_message(f"'{uid}' is not a student of the course"), 400
         commit_abort_if_error(abort_url)
 
         response = json_message("Users were succesfully removed from the course")

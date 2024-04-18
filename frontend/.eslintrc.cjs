@@ -51,5 +51,6 @@ module.exports = {
     "jsdoc/require-yields-check": 1,
     "jsdoc/tag-lines": 1,
     "jsdoc/valid-types": 1,
+    "no-console": "error"
   },
 };

@@ -23,6 +23,9 @@
     "noImplicitThis": true,
     "strictNullChecks": true
   },
-  "include": ["src"],
+  "include": [
+    "src",
+    "node_modules/cypress/types/jquery/misc.d.ts"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

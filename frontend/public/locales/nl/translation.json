@@ -1,16 +1,76 @@
 {
+  "home": {
+    "title": "Homepagina"
+  },
   "header": {
     "myProjects": "Mijn Projecten",
     "myCourses": "Mijn Vakken",
-    "login": "Login",
-    "home": "Home"
+    "login": "Aanmelden",
+    "home": "Home",
+    "tag": "nl",
+    "homepage": "Homepage",
+    "projectUploadForm": "Project uploaden"
   },
   "home": {
+    "login": "Aanmelden",
+    "home": "Home",
+    "tag": "nl",
     "homepage": "Homepage"
   },
   "courseForm": {
     "courseName": "Vak Naam",
     "submit": "Opslaan",
     "emptyCourseNameError": "Vak naam mag niet leeg zijn"
+  },
+  "projectForm": {
+    "projectTitle": "Titel",
+    "projectDescription": "Beschrijving",
+    "projectCourse": "Vak",
+    "projectDeadline": "Project deadline",
+    "visibleForStudents": "Zichtbaar voor studenten",
+    "uploadFile": "Upload bestand",
+    "regex": "Voeg Regex toe",
+    "selectCourseText": "Selecteer een vak",
+    "testWarning": "Opgelet: Deze opgave bevat geen tests",
+    "helperText": "Selecteer een geldige deadline voor het project",
+    "uploadProject": "Upload project",
+    "regexStructure": "Regex structuur",
+    "uploadError": "Project is niet goed geformatteerd",
+    "noDeadlinesPlaceholder": "Nog geen opgegeven deadlines",
+    "noFilesPlaceholder": "Nog geen opgave bestanden geupload",
+    "noRegexPlaceholder": "Nog geen regex toegevoegd"
+  },
+  "projectView": {
+    "submitNetworkError": "Er is iets mislopen bij het opslaan van uw indiening. Probeer het later opnieuw.",
+    "selected": "Geselecteerd",
+    "submit": "Indienen",
+    "previousSubmissions": "Vorige indieningen",
+    "noFileSelected": "Er is geen bestand geselecteerd",
+    "submissionGrid": {
+      "late": "Te laat",
+      "fail": "Gefaald",
+      "success": "Succesvol",
+      "running": "Aan het uitvoeren",
+      "submitTime": "Indientijd",
+      "status": "Status"
+    }
+  },
+  "time": {
+    "yearsAgo": "jaren geleden",
+    "monthsAgo": "maanden geleden",
+    "daysAgo": "dagen geleden",
+    "hoursAgo": "uur geleden",
+    "minutesAgo": "minuten geleden",
+    "justNow": "Zonet"
+  },
+  "error": {
+    "pageNotFound": "Pagina Niet Gevonden",
+    "pageNotFoundMessage": "De opgevraagde pagina werd niet gevonden.",
+    "forbidden": "Verboden",
+    "forbiddenMessage": "Je hebt geen toegang tot deze bron.",
+    "clientError": "Client Fout",
+    "clientErrorMessage": "Er is een client fout opgetreden.",
+    "serverError": "Server Fout",
+    "serverErrorMessage": "Er is een server fout opgetreden."
   }
 }

@@ -3,7 +3,6 @@ This module contains the functions to interact with the database. It contains fu
 delete, insert and query entries from the database. The functions are used by the routes
 to interact with the database.
 """
-
 from typing import Dict, List, Union
 from urllib.parse import urljoin
 from flask import jsonify
@@ -11,8 +10,8 @@ from sqlalchemy import and_
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm.query import Query
 from sqlalchemy.exc import SQLAlchemyError
-from project.db_in import db
 from project.utils.misc import map_all_keys_to_url, models_to_dict, filter_model_fields
+from project.db_in import db
 
 def delete_by_id_from_model(
         model: DeclarativeMeta,
@@ -60,13 +59,13 @@ def create_model_instance(model: DeclarativeMeta,
     """
     if required_fields is None:
         required_fields = []
+
     # Check if all non-nullable fields are present in the data
     missing_fields = [field for field in required_fields if field not in data or data[field] == '']
 
     if missing_fields:
         return {"error": f"Missing required fields: {', '.join(missing_fields)}",
                 "url": response_url_base}, 400
-
     filtered_data = filter_model_fields(model, data)
     new_instance: DeclarativeMeta = model(**filtered_data)
     db.session.add(new_instance)
@@ -121,7 +120,8 @@ def query_selected_from_model(model: DeclarativeMeta,
                               response_url: str,
                               url_mapper: Dict[str, str] = None,
                               select_values: List[str] = None,
-                              filters: Dict[str, Union[str, int]]=None):
+                              filters: Dict[str, Union[str, int]]=None
+                              ):
     """
     Query entries from the database giving the model corresponding to a certain table and
     the filters to apply to the query.
@@ -141,9 +141,10 @@ def query_selected_from_model(model: DeclarativeMeta,
     try:
         query: Query = model.query
         if filters:
-            filtered_filters = filter_model_fields(model, filters)
+            if not all(hasattr(model, key) for key in filters.keys()):
+                return {"message": "Unknown parameter", "url": response_url}, 400
             conditions: List[bool] = []
-            for key, value in filtered_filters.items():
+            for key, value in filters.items():
                 conditions.append(getattr(model, key) == value)
             query = query.filter(and_(*conditions))
 

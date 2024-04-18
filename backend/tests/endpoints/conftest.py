@@ -1,37 +1,125 @@
-""" Configuration for pytest, Flask, and the test client."""
+"""Endpoint level fixtures"""
 
 import tempfile
-import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from typing import Any
 import pytest
 from pytest import fixture, FixtureRequest
 from flask.testing import FlaskClient
-from sqlalchemy import create_engine
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
 from project.models.user import User,Role
 from project.models.course import Course
+from project.models.course_relation import CourseStudent, CourseAdmin
 from project.models.course_share_code import CourseShareCode
-from project import create_app_with_db
-from project.db_in import url, db
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
 
 ### AUTHENTICATION & AUTHORIZATION ###
 @fixture
-def auth_test(request: FixtureRequest, client: FlaskClient, valid_course_entry):
-    """Add concrete test data"""
-    # endpoint, parameters, method, token, status
-    endpoint, parameters, method, *other = request.param
-
-    d = {
-        "course_id": valid_course_entry.course_id
+def data_map(course: Course) -> dict[str, Any]:
+    """Map an id to data"""
+    return {
+        "@course_id": course.course_id
     }
 
-    for index, parameter in enumerate(parameters):
-        endpoint = endpoint.replace(f"@{index}", str(d[parameter]))
+@fixture
+def auth_test(request: FixtureRequest, client: FlaskClient, data_map: dict[str, Any]) -> tuple:
+    """Add concrete test data to auth"""
+    # endpoint, method, token, allowed
+    endpoint, method, *other = request.param
+
+    for k, v in data_map.items():
+        endpoint = endpoint.replace(k, str(v))
 
     return endpoint, getattr(client, method), *other
+
+
+
+### DATA FIELD TYPE ###
+@fixture
+def data_field_type_test(
+        request: FixtureRequest, client: FlaskClient, data_map: dict[str, Any]
+    ) -> tuple[str, Any, str, dict[str, Any]]:
+    """Add concrete test data to the data_field tests"""
+    endpoint, method, token, data = request.param
+
+    for key, value in data_map.items():
+        endpoint = endpoint.replace(key, str(value))
+
+    for key, value in data.items():
+        if isinstance(value, list):
+            data[key] = [data_map.get(v,v) for v in value]
+        elif value in data_map.keys():
+            data[key] = data_map[value]
+
+    return endpoint, getattr(client, method), token, data
+
+
+
+### QUERY PARAMETER ###
+@fixture
+def query_parameter_test(request: FixtureRequest, client: FlaskClient, data_map: dict[str, Any]):
+    """Add concrete test data to the query_parameter tests"""
+    endpoint, method, token, wrong_parameter = request.param
+
+    for key, value in data_map.items():
+        endpoint = endpoint.replace(key, str(value))
+
+    return endpoint, getattr(client, method), token, wrong_parameter
+
+
+
+### USERS ###
+@fixture
+def student(session: Session) -> User:
+    """Return a student entry"""
+    return session.get(User, "student")
+
+@fixture
+def student_other(session: Session) -> User:
+    """Return a student entry"""
+    return session.get(User, "student_other")
+
+@fixture
+def teacher(session: Session) -> User:
+    """Return a teacher entry"""
+    return session.get(User, "teacher")
+
+@fixture
+def admin(session: Session) -> User:
+    """Return an admin entry"""
+    return session.get(User, "admin")
+
+@fixture
+def admin_other(session: Session) -> User:
+    """Return an admin entry"""
+    return session.get(User, "admin_other")
+
+
+
+### COURSES ###
+@fixture
+def courses(session: Session, teacher: User) -> list[Course]:
+    """Return course entries"""
+    courses = [Course(name=f"SEL{i}", teacher=teacher.uid) for i in range(1, 3)]
+    session.add_all(courses)
+    session.commit()
+    return courses
+
+@fixture
+def course(session: Session, student: User, teacher: User, admin: User) -> Course:
+    """Return a course entry"""
+    course = Course(name="SEL", ufora_id="C003784A_2023", teacher=teacher.uid)
+    session.add(course)
+    session.commit()
+    session.add(CourseStudent(course_id=course.course_id, uid=student.uid))
+    session.add(CourseAdmin(course_id=course.course_id, uid=admin.uid))
+    session.commit()
+    return course
+
+
 
 ### OTHER ###
 @pytest.fixture
@@ -124,7 +212,6 @@ def valid_user_entries(session):
 
     return users
 
-
 @pytest.fixture
 def file_empty():
     """Return an empty file"""
@@ -155,17 +242,6 @@ def files():
             yield [(temp01, name01), (temp02, name02)]
 
 @pytest.fixture
-def app():
-    """A fixture that creates and configures a new app instance for each test.
-    Returns:
-        Flask -- A Flask application instance
-    """
-    engine = create_engine(url)
-    app = create_app_with_db(url)
-    db.metadata.create_all(engine)
-    yield app
-
-@pytest.fixture
 def course_teacher_ad():
     """A user that's a teacher for testing"""
     ad_teacher = User(uid="Gunnar", role=Role.TEACHER, display_name="Gunnar Brinckmann")
@@ -180,6 +256,7 @@ def course_ad(course_teacher_ad: User):
 @pytest.fixture
 def valid_project_entry(session, valid_project):
     """A project for testing, with the course as the course it belongs to"""
+    valid_project["deadlines"] = [valid_project["deadlines"]]
     project = Project(**valid_project)
 
     session.add(project)
@@ -187,19 +264,17 @@ def valid_project_entry(session, valid_project):
     return project
 
 @pytest.fixture
-def valid_project(valid_course_entry):
+def valid_project(course):
     """A function that return the json form data of a project"""
+
     data = {
         "title": "Project",
         "description": "Test project",
-        "assignment_file": "testfile",
-        "deadline": "2024-02-25T12:00:00",
-        "course_id": valid_course_entry.course_id,
+        "deadlines": {"deadline": "2024-02-25T12:00:00", "description": "Deadline 1"},
+        "course_id": course.course_id,
         "visible_for_students": True,
         "archived": False,
-        "test_path": "tests",
-        "script_name": "script.sh",
-        "regex_expressions": ["*.pdf", "*.txt"]
+        "regex_expressions": "*.pdf"
     }
     return data
 
@@ -240,7 +315,7 @@ def valid_course(valid_teacher_entry):
 @pytest.fixture
 def course_no_name(valid_teacher_entry):
     """A course with no name"""
-    return {"name": "", "teacher": valid_teacher_entry.uid}
+    return {"name": "", "teacher": teacher.uid}
 
 @pytest.fixture
 def course_empty_name():
@@ -251,14 +326,6 @@ def course_empty_name():
 def invalid_course():
     """An invalid course for testing."""
     return {"invalid": "error"}
-
-@pytest.fixture
-def valid_course_entry(session, valid_course):
-    """A valid course for testing that's already in the db"""
-    course = Course(**valid_course)
-    session.add(course)
-    session.commit()
-    return course
 
 @pytest.fixture
 def valid_students_entries(session):
@@ -272,17 +339,9 @@ def valid_students_entries(session):
     return students
 
 @pytest.fixture
-def valid_course_entries(session, valid_teacher_entry):
-    """A valid course for testing that's already in the db"""
-    courses = [Course(name=f"Sel{i}", teacher=valid_teacher_entry.uid) for i in range(3)]
-    session.add_all(courses)
-    session.commit()
-    return courses
-
-@pytest.fixture
-def share_code_admin(session, valid_course_entry):
+def share_code_admin(session, course):
     """A course with share codes for testing."""
-    share_code = CourseShareCode(course_id=valid_course_entry.course_id, for_admins=True)
+    share_code = CourseShareCode(course_id=course.course_id, for_admins=True)
     session.add(share_code)
     session.commit()
     return share_code
