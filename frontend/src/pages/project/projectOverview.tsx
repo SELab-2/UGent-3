@@ -1,9 +1,9 @@
 import {ProjectDeadline} from "./projectDeadline/ProjectDeadline.tsx";
-import {Card, CardContent, Container, Grid, Link, Typography} from "@mui/material";
+import {Button, Card, CardContent, Container, Grid, Typography, Link} from "@mui/material";
 import {ProjectDeadlineCard} from "./projectDeadline/ProjectDeadlineCard.tsx";
 import { useTranslation } from "react-i18next";
 import {Title} from "../../components/Header/Title.tsx";
-import {useLoaderData} from "react-router-dom";
+import {useLoaderData, Link as RouterLink} from "react-router-dom";
 import dayjs from "dayjs";
 
 /**
@@ -17,6 +17,7 @@ export default function ProjectOverView() {
     me: string
   }
   const projects = loader.projects
+  const me = loader.me
   
   const projectReducer = (acc: {[key: string]: ProjectDeadline[]}, project: ProjectDeadline) => {
     (acc[project.course.course_id] = acc[project.course.course_id] || []).push(project);
@@ -52,6 +53,11 @@ export default function ProjectOverView() {
     <Container style={{ paddingTop: '50px' }}>
       <Title title={"Projects Overview"}/>
       <Grid container spacing={2}>
+        <Grid item xs={2}>
+          {me === 'TEACHER' && (
+            <Button component={RouterLink} to={`/${i18n.language}/projects/create`}>{t('new_project')}</Button>
+          )}
+        </Grid>
         <Grid item xs={5}>
           <Card>
             <CardContent>

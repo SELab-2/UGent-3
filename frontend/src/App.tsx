@@ -17,7 +17,8 @@ const router = createBrowserRouter(
         <Route path="project" >
           <Route path=":projectId" element={<ProjectView />}/>
         </Route>
-        <Route path="projects" element={<ProjectOverView/>} loader={fetchProjectPage}>
+        <Route path="projects">
+          <Route index element={<ProjectOverView/>} loader={fetchProjectPage}/>
           <Route path="create" element={<ProjectCreateHome />} />
         </Route>
       </Route>

@@ -79,7 +79,8 @@
   "projectsOverview": {
     "past_deadline": "Verlopen Projecten",
     "future_deadline": "Opkomende Deadlines",
-    "no_projects": "Er zijn hier geen projecten."
+    "no_projects": "Er zijn hier geen projecten.",
+    "new_project": "Nieuw Project"
   },
   "error": {
     "pageNotFound": "Pagina Niet Gevonden",
