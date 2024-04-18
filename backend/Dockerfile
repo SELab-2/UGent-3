@@ -5,5 +5,5 @@ ADD ./project /app/
 COPY requirements.txt /app/requirements.txt
 RUN pip3 install -r requirements.txt
 COPY . /app
-ENTRYPOINT ["python"]
-CMD ["__main__.py"]
+
+CMD ["/app/entry-point.sh","python" ,"__main__.py"]
