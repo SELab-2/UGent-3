@@ -76,7 +76,7 @@ def microsoft_authentication():
 
         # add user if not yet in database
         try:
-            new_user = User(uid=auth_user_id, role=role)
+            new_user = User(uid=auth_user_id, role=role, display_name=profile_res.json()["displayName"])
             db.session.add(new_user)
             db.session.commit()
             user = new_user
