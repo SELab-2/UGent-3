@@ -20,6 +20,8 @@ from .endpoints.submissions.submission_config import submissions_bp
 from .endpoints.courses.join_codes.join_codes_config import join_codes_bp
 from .endpoints.docs.docs_endpoint import swagger_ui_blueprint
 from .endpoints.authentication.auth import auth_bp
+from .endpoints.authentication.me import me_bp
+from .endpoints.authentication.logout import logout_bp
 from .init_auth import auth_init
 
 load_dotenv()
@@ -49,6 +51,8 @@ def create_app():
     app.register_blueprint(join_codes_bp)
     app.register_blueprint(swagger_ui_blueprint)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(me_bp)
+    app.register_blueprint(logout_bp)
 
     jwt = JWTManager(app)
     auth_init(jwt, app)
