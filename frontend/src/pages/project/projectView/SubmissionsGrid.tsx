@@ -42,7 +42,7 @@ export default function SubmissionsGrid({
       headerName: t("submitTime"),
       type: "string",
       flex: 1,
-      valueFormatter: (value) => timeDifference(value),
+      valueFormatter: (value) => timeDifference(value, true),
     },
     {
       field: "submission_status",

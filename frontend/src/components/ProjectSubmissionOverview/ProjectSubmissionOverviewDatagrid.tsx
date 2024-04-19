@@ -9,7 +9,6 @@ import DownloadIcon from '@mui/icons-material/Download';
 import download from "downloadjs";
 
 const apiUrl = import.meta.env.VITE_API_HOST
-const user = "teacher"
 
   interface Submission {
     grading: string;
@@ -30,9 +29,7 @@ function getRowId(row: Submission) {
 
 const fetchSubmissionsFromUser = async (submission_id: string) => {
   await fetch(`${apiUrl}/submissions/${submission_id}/download`, {
-    headers: {
-      "Authorization": user
-    },
+    credentials: 'include',
   })
     .then(res => {
       return res.blob();
@@ -87,9 +84,7 @@ export default function ProjectSubmissionsOverviewDatagrid() {
 
   const fetchLastSubmissionsByUser = async () => {
     const response = await fetch(`${apiUrl}/projects/${projectId}/latest-per-user`, {
-      headers: {
-        "Authorization": user
-      },
+      credentials: 'include',
     })
     const jsonData = await response.json();
     setSubmissions(jsonData.data);

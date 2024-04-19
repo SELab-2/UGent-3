@@ -16,6 +16,43 @@
     "welcomeDescription": "Welcome to Peristerónas, the online submission platform of UGent",
     "login": "Login"
   },
+  "courseDetailTeacher": {
+    "title": "Course Details",
+    "deleteCourse": "Delete Course",
+    "unauthorizedDelete": "You are unauthorized to delete this course",
+    "noCoursesFound": "No courses found",
+    "noProjects": "No projects",
+    "noStudents": "No students in this course",
+    "joinCodes": "Join Codes",
+    "forAdmins": "For Admins",
+    "forStudents": "For Students",
+    "noExpiryDate": "No expiry date",
+    "expiryDate": "Expiry Date",
+    "newJoinCode": "New Join Code",
+    "deleteSelected": "Delete Selected Students",
+    "projects": "Projects",
+    "newProject": "New Project",
+    "assistantList": "List of co-teachers/assistants",
+    "newTeacher": "New teacher",
+    "studentList": "List of students",
+    "newStudent": "New student(s)",
+    "deadline": "Deadline",
+    "teacher": "Teacher",
+    "view": "View",
+    "admins": "Admins",
+    "students": "Students"
+  },
+  "allCoursesTeacher": {
+    "title": "All Courses",
+    "courseForm": "Course Form",
+    "courseName": "Course Name",
+    "submit": "Submit",
+    "emptyCourseNameError": "Course name should not be empty",
+    "cancel": "Cancel",
+    "create": "Create",
+    "activeCourses": "Active Courses",
+    "archivedCourses":"Archived Courses"    
+  },
   "courseForm": {
     "courseName": "Course Name",
     "submit": "Submit",
@@ -42,7 +79,12 @@
     "daysAgo": "days ago",
     "hoursAgo": "hours ago",
     "minutesAgo": "minutes ago",
-    "justNow": "just now"
+    "justNow": "just now",
+    "yearsLater": "years later",
+    "monthsLater": "months later",
+    "daysLater": "days later",
+    "hoursLater": "hours later",
+    "minutesLater": "minutes later"
   },
   "error": {
     "pageNotFound": "Page Not Found",
