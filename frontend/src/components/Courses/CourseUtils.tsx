@@ -48,9 +48,9 @@ export function callToApiToCreateCourse(data: string, navigate: NavigateFunction
   
   fetch(`${apiHost}/courses`, {
     method: 'POST',
+    credentials: 'include',
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': loggedInToken()
+      'Content-Type': 'application/json'
     },
     body: data,
   })
@@ -59,8 +59,8 @@ export function callToApiToCreateCourse(data: string, navigate: NavigateFunction
       //But first also make sure that teacher is in the course admins list
       fetch(`${apiHost}/courses/${getIdFromLink(data.url)}/admins`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Authorization': loggedInToken(),
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({admin_uid: loggedInUid()})
@@ -96,10 +96,16 @@ export function getNearestFutureDate(dates: string[][]): Date | null {
  */
 
 const fetchData = async (url: string, params?: URLSearchParams) => {
-  const res = await fetch(`${apiHost}/${url}?${params}`, {
-    headers: {
-      "Authorization": loggedInToken()
-    }
+  let uri = "";
+  if (!params) {
+    uri = `${apiHost}/${url}`
+  }
+  else {
+    uri += `?${params}`
+  }
+
+  const res = await fetch(uri, {
+    credentials: 'include'
   });
   if(res.status !== 200){
     throw new Response("Failed to fetch data", {status: res.status});
@@ -110,8 +116,8 @@ const fetchData = async (url: string, params?: URLSearchParams) => {
 };
 
 export const dataLoaderCourses = async () => {
-  const params = new URLSearchParams({ 'teacher': loggedInUid() });
-  return fetchData(`courses`, params);
+  //const params = new URLSearchParams({ 'teacher': loggedInUid() });
+  return fetchData(`courses`);
 };
 
 const dataLoaderCourse = async (courseId: string) => {

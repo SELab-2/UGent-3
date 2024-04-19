@@ -20,9 +20,7 @@ export default function ProjectSubmissionOverview() {
 
   const fetchProject = async () => {
     const response = await fetch(`${apiUrl}/projects/${projectId}`, {
-      headers: {
-        "Authorization": user
-      },
+      credentials: 'include'
     })
     const jsonData = await response.json();
     setProjectTitle(jsonData["data"].title);
@@ -31,9 +29,7 @@ export default function ProjectSubmissionOverview() {
 
   const downloadProjectSubmissions = async () => {
     await fetch(`${apiUrl}/projects/${projectId}/submissions-download`, {
-      headers: {
-        "Authorization": user
-      },
+      credentials: 'include',
     })
       .then(res => {
         return res.blob();

@@ -30,9 +30,7 @@ function getRowId(row: Submission) {
 
 const fetchSubmissionsFromUser = async (submission_id: string) => {
   await fetch(`${apiUrl}/submissions/${submission_id}/download`, {
-    headers: {
-      "Authorization": user
-    },
+    credentials: 'include',
   })
     .then(res => {
       return res.blob();
@@ -87,9 +85,7 @@ export default function ProjectSubmissionsOverviewDatagrid() {
 
   const fetchLastSubmissionsByUser = async () => {
     const response = await fetch(`${apiUrl}/projects/${projectId}/latest-per-user`, {
-      headers: {
-        "Authorization": user
-      },
+      credentials: 'include',
     })
     const jsonData = await response.json();
     setSubmissions(jsonData.data);

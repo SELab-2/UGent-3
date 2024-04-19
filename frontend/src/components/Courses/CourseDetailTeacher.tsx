@@ -20,8 +20,8 @@ interface UserUid{
 function handleDeleteAdmin(navigate: NavigateFunction, courseId: string, uid: string): void {
   fetch(`${apiHost}/courses/${courseId}/admins`, {
     method: 'DELETE',
+    credentials: 'include',
     headers: {
-      "Authorization": loggedInToken(),
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
@@ -42,8 +42,8 @@ function handleDeleteAdmin(navigate: NavigateFunction, courseId: string, uid: st
 function handleDeleteStudent(navigate: NavigateFunction, courseId: string, uids: string[]): void {
   fetch(`${apiHost}/courses/${courseId}/students`, {
     method: 'DELETE',
+    credentials: 'include',
     headers: {
-      "Authorization": loggedInToken(),
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
@@ -63,9 +63,7 @@ function handleDeleteStudent(navigate: NavigateFunction, courseId: string, uids:
 function handleDeleteCourse(navigate: NavigateFunction, courseId: string): void {
   fetch(`${apiHost}/courses/${courseId}`, {
     method: 'DELETE',
-    headers: {
-      "Authorization": loggedInToken()
-    }
+    credentials: 'include',
   }).then((response) => {
     if(response.ok){
       navigate(-1);
@@ -295,9 +293,7 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
   const getCodes = useCallback(() => {
     fetch(`${apiHost}/courses/${courseId}/join_codes`, {
       method: 'GET',
-      headers: {
-        'Authorization': loggedInToken()
-      }
+      credentials: 'include',
     })
       .then(response => response.json())
       .then(data => {
@@ -325,9 +321,9 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
 
     fetch(`${apiHost}/courses/${courseId}/join_codes`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': loggedInToken()
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(bodyContent)
     })
@@ -338,8 +334,8 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
     fetch(`${apiHost}/courses/${courseId}/join_codes/${joinCode}`,
       {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
-          "Authorization": loggedInToken(),
           "Content-Type": "application/json"
         },
         body: JSON.stringify({

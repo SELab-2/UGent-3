@@ -137,9 +137,7 @@ export default function ProjectForm() {
 
   const fetchCourses = async () => {
     const response = await fetch(`${apiUrl}/courses?teacher=${user}`, {
-      headers: {
-        "Authorization": user
-      },
+      credentials: 'include'
     })
     const jsonData = await response.json();
     if (jsonData.data) {
@@ -206,9 +204,7 @@ export default function ProjectForm() {
 
     const response = await fetch(`${apiUrl}/projects`, {
       method: "post",
-      headers: {
-        "Authorization": user
-      },
+      credentials: 'include',
       body: formData
     })
 

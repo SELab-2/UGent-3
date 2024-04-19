@@ -100,7 +100,8 @@ export function SideScrollableCourses({courses}: {courses: Course[]}): JSX.Eleme
     const fetchProjects = async () => {
       const projectPromises = courses.map(course =>
         fetch(`${apiHost}/projects?course_id=${getIdFromLink(course.course_id)}`, 
-          { headers: { "Authorization": loggedInToken() } })
+          { credentials: 'include' }
+        )
           .then(response => response.json())
       );
 

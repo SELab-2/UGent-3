@@ -35,14 +35,14 @@ export default function ProjectView() {
 
   useEffect(() => {
     fetch(`${API_URL}/projects/${projectId}`, {
-      headers: { Authorization: "teacher" },
+      credentials: 'include',
     }).then((response) => {
       if (response.ok) {
         response.json().then((data) => {
           const projectData = data["data"];
           setProjectData(projectData);
           fetch(`${API_URL}/courses/${projectData.course_id}`, {
-            headers: { Authorization: "teacher" },
+            credentials: 'include',
           }).then((response) => {
             if (response.ok) {
               response.json().then((data) => {
@@ -55,7 +55,7 @@ export default function ProjectView() {
     });
 
     fetch(`${API_URL}/projects/${projectId}/assignment`, {
-      headers: { Authorization: "teacher" },
+      credentials: 'include',
     }).then((response) => {
       if (response.ok) {
         response.text().then((data) => setAssignmentRawText(data));
