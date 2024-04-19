@@ -1,5 +1,8 @@
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 import Layout from "./components/Header/Layout";
+import { AllCoursesTeacher } from "./components/Courses/AllCoursesTeacher";
+import { CourseDetailTeacher } from "./components/Courses/CourseDetailTeacher";
+import { dataLoaderCourseDetail, dataLoaderCourses } from "./components/Courses/CourseUtils";
 import LanguagePath from "./components/LanguagePath";
 import ProjectView from "./pages/project/projectView/ProjectView";
 import { ErrorBoundary } from "./pages/error/ErrorBoundary.tsx";
@@ -19,6 +22,10 @@ const router = createBrowserRouter(
         <Route path="project">
           <Route path=":projectId" element={<ProjectView />}>
           </Route>
+        </Route>
+        <Route path="courses">
+          <Route index element={<AllCoursesTeacher />} loader={dataLoaderCourses}/>
+          <Route path=":courseId" element={<CourseDetailTeacher />} loader={dataLoaderCourseDetail} />
         </Route>
         <Route path="projects">
           <Route index element={<ProjectOverView/>} loader={fetchProjectPage}/>

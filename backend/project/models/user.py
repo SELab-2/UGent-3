@@ -30,6 +30,6 @@ class User(db.Model):
         """
         return {
             'uid': self.uid,
-            'role': self.role.name,  # Convert the enum to a string
-            'display_name': self.display_name
+            'display_name': self.display_name,
+            'role': self.role.name  # Convert the enum to a string
         }

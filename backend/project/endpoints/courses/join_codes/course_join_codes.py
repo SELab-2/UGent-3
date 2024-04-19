@@ -34,7 +34,7 @@ class CourseJoinCodes(Resource):
         return query_selected_from_model(
             CourseShareCode,
             urljoin(f"{RESPONSE_URL}/", f"{str(course_id)}/", "join_codes"),
-            select_values=["join_code", "expiry_time"],
+            select_values=["join_code", "expiry_time", "for_admins"],
             filters={"course_id": course_id}
         )
 

@@ -23,7 +23,7 @@ class Me(Resource):
         """
         Will return all user data associated with the access token in the request
         """
-        uid = get_jwt_identity
+        uid = get_jwt_identity()
 
         return query_by_id_from_model(User,
                                       "uid",

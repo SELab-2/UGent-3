@@ -193,7 +193,7 @@ def query_by_id_from_model(model: DeclarativeMeta,
         if not result:
             return {"message": "Resource not found", "url": base_url}, 404
         return {
-            "data": result,
+            "data": result.to_dict() if hasattr(result, "to_dict") else result,
             "message": "Resource fetched correctly",
             "url": urljoin(f"{base_url}/", str(column_id))}, 200
     except SQLAlchemyError:

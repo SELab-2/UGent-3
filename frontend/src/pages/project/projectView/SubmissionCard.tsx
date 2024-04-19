@@ -48,7 +48,7 @@ export default function SubmissionCard({
   useEffect(() => {
 
     fetch(`${submissionUrl}?project_id=${projectId}`, {
-      headers: { Authorization: "teacher" }
+      credentials: 'include'
     }).then((response) => {
       if (response.ok) {
         response.json().then((data) => {

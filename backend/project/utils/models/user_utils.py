@@ -21,7 +21,7 @@ def get_user(user_id):
         db.session.rollback()
         abort(make_response(({"message": "An error occurred while fetching the user"}
                             , 500)))
-    if not user:
+    if user is None:
         abort(make_response(({"message":f"User with id: {user_id} not found"}, 404)))
     return user
 
