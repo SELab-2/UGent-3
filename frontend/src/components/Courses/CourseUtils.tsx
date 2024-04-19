@@ -14,7 +14,7 @@ export interface Project{
     deadlines: string[][]
 }
 
-export const apiHost = import.meta.env.VITE_API_HOST;
+export const apiHost = import.meta.env.VITE_APP_API_HOST;
 export const appHost = import.meta.env.VITE_APP_HOST;
 /**
  * @returns The uid of the acces token of the logged in user
@@ -45,21 +45,20 @@ export function loggedInUid(){
  * @param navigate - function that allows the app to redirect
  */
 export function callToApiToCreateCourse(data: string, navigate: NavigateFunction){
-  
   fetch(`${apiHost}/courses`, {
-    method: 'POST',
-    credentials: 'include',
+    credentials: 'include', // include, *same-origin, omit
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json"
     },
+    method: 'POST',
     body: data,
   })
     .then(response => response.json())
     .then(data => {
       //But first also make sure that teacher is in the course admins list
       fetch(`${apiHost}/courses/${getIdFromLink(data.url)}/admins`, {
-        method: 'POST',
         credentials: 'include',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -96,14 +95,10 @@ export function getNearestFutureDate(dates: string[][]): Date | null {
  */
 
 const fetchData = async (url: string, params?: URLSearchParams) => {
-  let uri = "";
-  if (!params) {
-    uri = `${apiHost}/${url}`
-  }
-  else {
+  let uri = `${apiHost}/${url}`;
+  if(params){
     uri += `?${params}`
   }
-
   const res = await fetch(uri, {
     credentials: 'include'
   });
@@ -146,6 +141,6 @@ export const dataLoaderCourseDetail = async ({ params } : { params:Params}) => {
   const projects = await dataLoaderProjects(courseId);
   const admins = await dataLoaderAdmins(courseId);
   const students = await dataLoaderStudents(courseId);
-
+  
   return { course, projects, admins, students };
 };

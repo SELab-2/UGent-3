@@ -34,9 +34,7 @@ def return_authenticated_user_id():
     otherwise it will prompt them to login again
     """
     verify_jwt_in_request()
-    print("\n2\n")
     uid = get_jwt_identity()
-    print(uid)
     get_user(uid)
     return uid
 
@@ -48,7 +46,6 @@ def login_required(f):
     """
     @wraps(f)
     def wrap(*args, **kwargs):
-        print("\n1\n")
         return_authenticated_user_id()
         return f(*args, **kwargs)
     return wrap

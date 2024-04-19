@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardActions, CardContent, CardHeader, Checkbox, FormControlLabel, Grid, IconButton, Input, Menu, MenuItem, Paper, Typography } from "@mui/material";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Course, Project, apiHost, loggedInToken, getIdFromLink, getNearestFutureDate, getUserName, appHost } from "./CourseUtils";
+import { Course, Project, apiHost, getIdFromLink, getNearestFutureDate, getUserName, appHost } from "./CourseUtils";
 import { Link, useNavigate, NavigateFunction, useLoaderData } from "react-router-dom";
 import { Title } from "../Header/Title";
 import ClearIcon from '@mui/icons-material/Clear';
@@ -82,7 +82,6 @@ export function CourseDetailTeacher(): JSX.Element {
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [anchorEl, setAnchorElStudent] = useState<null | HTMLElement>(null);
   const openCodes = Boolean(anchorEl);
-
   const handleClickCodes = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorElStudent(event.currentTarget);
   };
@@ -97,7 +96,6 @@ export function CourseDetailTeacher(): JSX.Element {
     students: UserUid[]
   };
   const { course, projects, admins, students } = courseDetail;
-
   const { t } = useTranslation('translation', { keyPrefix: 'courseDetailTeacher' });
   const { i18n } = useTranslation();
   const lang = i18n.language;

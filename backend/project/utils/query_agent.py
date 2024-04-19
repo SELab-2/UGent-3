@@ -140,7 +140,6 @@ def query_selected_from_model(model: DeclarativeMeta,
     """
     try:
         query: Query = model.query
-        print("MADE IT")
         if filters:
             if not all(hasattr(model, key) for key in filters.keys()):
                 return {"message": "Unknown parameter", "url": response_url}, 400
@@ -191,8 +190,6 @@ def query_by_id_from_model(model: DeclarativeMeta,
     """
     try:
         result: Query = model.query.filter(getattr(model, column_name) == column_id).first()
-        print("\n\n",result,"HERE\n\n\n")
-        
         if not result:
             return {"message": "Resource not found", "url": base_url}, 404
         return {
