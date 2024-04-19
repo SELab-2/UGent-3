@@ -5,7 +5,6 @@ import ProjectSubmissionsOverviewDatagrid from "./ProjectSubmissionOverviewDatag
 import download from 'downloadjs';
 import {useTranslation} from "react-i18next";
 const apiUrl = import.meta.env.VITE_API_HOST
-const user = "teacher"
 
 /**
  *  @returns Overview page for submissions

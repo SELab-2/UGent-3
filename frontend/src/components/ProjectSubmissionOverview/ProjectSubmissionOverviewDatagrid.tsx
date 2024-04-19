@@ -9,7 +9,6 @@ import DownloadIcon from '@mui/icons-material/Download';
 import download from "downloadjs";
 
 const apiUrl = import.meta.env.VITE_API_HOST
-const user = "teacher"
 
   interface Submission {
     grading: string;

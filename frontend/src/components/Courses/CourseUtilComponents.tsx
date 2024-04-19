@@ -1,5 +1,5 @@
 import { Box, Button, Card, CardActions, CardContent, CardHeader, Grid, Paper, TextField, Typography } from "@mui/material";
-import { Course, Project, apiHost, getIdFromLink, getNearestFutureDate, loggedInToken } from "./CourseUtils";
+import { Course, Project, apiHost, getIdFromLink, getNearestFutureDate } from "./CourseUtils";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
