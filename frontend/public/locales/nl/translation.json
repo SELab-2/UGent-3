@@ -9,10 +9,11 @@
     "projectUploadForm": "Project uploaden"
   },
   "home": {
-    "login": "Aanmelden",
     "home": "Home",
     "tag": "nl",
-    "title": "Homepage"
+    "homepage": "Homepagina",
+    "welcomeDescription": "Welkom bij Peristerónas, het online indieningsplatform van UGent",
+    "login": "Aanmelden"
   },
   "courseDetailTeacher": {
     "title": "Vak Details",
@@ -45,7 +46,7 @@
     "courseForm": "Vak Form",
     "courseName": "Vak Naam",
     "submit": "Opslaan",
-    "emptyCourseNameError": "Vak name mag niet leeg zijn",
+    "emptyCourseNameError": "Vak naam mag niet leeg zijn",
     "cancel": "Annuleer",
     "create": "Nieuw Vak",
     "activeCourses": "Actieve Vakken",
@@ -55,6 +56,21 @@
     "courseName": "Vak Naam",
     "submit": "Opslaan",
     "emptyCourseNameError": "Vak naam mag niet leeg zijn"
+  },
+  "student": {
+    "myProjects": "Mijn Projecten",
+    "myCourses": "Mijn Vakken",
+    "deadlines": "Verlopen Deadlines",
+    "course": "Vak",
+    "last_submission": "Laatste indiening",
+    "SUCCESS": "Geslaagd",
+    "FAIL": "Gefaald",
+    "deadlinesOnDay": "Deadlines op: ",
+    "noDeadline": "Geen deadlines",
+    "no_submission_yet" : "Nog geen indiening",
+    "loading": "Laden...",
+    "no_projects": "Er zijn hier geen projecten."
+
   },
   "projectForm": {
     "projectTitle": "Titel",
@@ -101,6 +117,12 @@
     "daysLater": "dagen later",
     "hoursLater": "uur later",
     "minutesLater": "minuten later"
+  },
+  "projectsOverview": {
+    "past_deadline": "Verlopen Projecten",
+    "future_deadline": "Opkomende Deadlines",
+    "no_projects": "Er zijn hier geen projecten.",
+    "new_project": "Nieuw Project"
   },
   "error": {
     "pageNotFound": "Pagina Niet Gevonden",
