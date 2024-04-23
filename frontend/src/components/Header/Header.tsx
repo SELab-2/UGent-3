@@ -17,15 +17,19 @@ import MenuIcon from "@mui/icons-material/Menu";
 import React,{useState } from "react";
 import LanguageIcon from "@mui/icons-material/Language";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 import { TitlePortal } from "./TitlePortal";
-import {LoginButton} from "./Login";
+import {me} from "../../types/me.ts";
 
+interface HeaderProps{
+  me:me
+}
 /**
  * The header component for the application that will be rendered at the top of the page.
  * @returns - The header component
  */
-export function Header(): JSX.Element {
+export function Header({me}:HeaderProps): JSX.Element {
+  const API_URL = import.meta.env.VITE_APP_API_HOST
   const { t, i18n } = useTranslation('translation', { keyPrefix: 'header' });
   const [languageMenuAnchor, setLanguageMenuAnchor] =
     useState<null | HTMLElement>(null);
@@ -54,21 +58,19 @@ export function Header(): JSX.Element {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-  
-  const baseItems = [{ link: "/", text: t("homepage") }];
-  const additionalItems = [
-    { link: "/projects", text: t("myProjects") },
-    { link: "/courses", text: t("myCourses") }
-  ];
-  if (isLoggedIn()) {
-    setListItems([...baseItems, ...additionalItems]);
-  }
-  else {
-    setListItems(baseItems);
-  }
+  React.useEffect(() => {
+    const baseItems = [{ link: "/", text: t("homepage") }];
+    const additionalItems = [
+      { link: "/projects", text: t("myProjects") },
+      { link: "/courses", text: t("myCourses") }
+    ];
+    if (me.role !== "UNKNOWN") {
+      setListItems([...baseItems, ...additionalItems]);
+    }
+    else {
+      setListItems(baseItems);
+    }
+  }, [me, t]);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -78,23 +80,26 @@ export function Header(): JSX.Element {
             <MenuIcon style={{fontSize:"2rem"}} />
           </IconButton>
           <TitlePortal/>
-          <IconButton edge="end" onClick={handleClick} sx={{ color: "inherit", marginRight: "0.3rem"}}>
-            <AccountCircleIcon />
-            <Typography variant="body1" onClick={handleClick} sx={{ paddingLeft: "0.3rem" }}>
-              {"Test Name"}
-            </Typography>
-          </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-          >
-            <Typography sx={{ padding: '6px 16px', color: 'black'}}>
-              {"Test Name"}
-            </Typography> 
-            <MenuItem onClick={handleClose}>Logout</MenuItem>
-          </Menu>
-          <LoginButton></LoginButton>
+          {me.role !== "UNKNOWN" && (
+            <>
+              <IconButton edge="end" onClick={handleClick} sx={{ color: "inherit", marginRight: "0.3rem"}}>
+                <AccountCircleIcon />
+                <Typography variant="body1" onClick={handleClick} sx={{ paddingLeft: "0.3rem" }}>
+                  {me.display_name}
+                </Typography>
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={() => setAnchorEl(null)}
+              >
+                <Typography sx={{ padding: '6px 16px', color: 'black'}}>
+                  {me.display_name}
+                </Typography> 
+                <MenuItem onClick={() => window.location.href = `${API_URL}/logout`}>{t("logout")}</MenuItem>
+              </Menu>
+            </>
+          )}
           <div>
             <IconButton onClick={handleLanguageMenu} color="inherit">
               <LanguageIcon />
@@ -120,12 +125,6 @@ export function Header(): JSX.Element {
       <DrawerMenu open={open} onClose={() => setOpen(false)} listItems={listItems}/>
     </Box>
   );
-}
-/**
- * @returns Whether a user is logged in or not.
- */
-function isLoggedIn() {
-  return true;
 }
 
 /**

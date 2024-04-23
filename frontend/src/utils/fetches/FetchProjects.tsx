@@ -1,4 +1,5 @@
-import {Project, ProjectDeadline, ShortSubmission} from "./projectDeadline/ProjectDeadline.tsx";
+import { fetchMe } from "./FetchMe.ts";
+import {Project, ProjectDeadline, ShortSubmission} from "../../pages/project/projectDeadline/ProjectDeadline.tsx";
 const API_URL = import.meta.env.VITE_APP_API_HOST
 
 export const fetchProjectPage = async () => {
@@ -7,22 +8,6 @@ export const fetchProjectPage = async () => {
   return {projects, me}
 }
 
-export const fetchMe = async () => {
-  try {
-    const response = await fetch(`${API_URL}/me`, {
-      credentials: 'include'
-    })
-    if(response.status == 200){
-      const data  = await response.json()
-      return data.role
-    }else {
-      return "UNKNOWN"
-    }
-  } catch (e){
-    return "UNKNOWN"
-  }
-
-}
 export const fetchProjects = async () => {
 
   try{

@@ -2,6 +2,7 @@ import HomePage from './HomePage.tsx';
 import Home from "./Home.tsx";
 import {useLoaderData} from "react-router-dom";
 import {ProjectDeadline} from "../project/projectDeadline/ProjectDeadline.tsx";
+import {me} from "../../types/me.ts"
 
 /**
  * Gives the requested home page based on the login status
@@ -10,9 +11,9 @@ import {ProjectDeadline} from "../project/projectDeadline/ProjectDeadline.tsx";
 export default function HomePages() {
   const loader = useLoaderData() as {
     projects: ProjectDeadline[],
-    me: string
+    me: me
   }
-  const me = loader.me
+  const me = loader.me.role
   if (me === 'UNKNOWN') {
     return <Home />;
   } else {
