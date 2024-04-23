@@ -7,7 +7,7 @@ import {me} from "../../types/me.ts"
  * @returns The Layout component
  */
 export default function Layout(): JSX.Element {
-  const me = useLoaderData() as me
+  const me:me = useLoaderData() as me
 
   return (
     <>
