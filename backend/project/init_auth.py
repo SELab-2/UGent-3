@@ -19,7 +19,7 @@ def auth_init(jwt, app):
             401)
 
     @jwt.invalid_token_loader
-    def invalid_token_callback(jwt_header, jwt_payload):
+    def invalid_token_callback(jwt_header):
         return (
             {"message":("The server cannot recognize this access token cookie, "
                         "please log in again if you think this is an error")},

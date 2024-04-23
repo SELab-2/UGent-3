@@ -2,7 +2,7 @@ import {Button} from "@mui/material";
 import { Link } from 'react-router-dom';
 
 const CLIENT_ID = import.meta.env.VITE_APP_CLIENT_ID;
-const REDIRECT_URI = encodeURI(import.meta.env.VITE_APP_API_HOST + "/auth");
+const REDIRECT_URI = encodeURIComponent(import.meta.env.VITE_APP_API_HOST + "/auth");
 const TENANT_ID = import.meta.env.VITE_APP_TENANT_ID;
 
 /**
