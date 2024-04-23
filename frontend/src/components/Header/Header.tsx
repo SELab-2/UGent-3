@@ -84,7 +84,7 @@ export function Header({me}:HeaderProps): JSX.Element {
             <>
               <IconButton edge="end" onClick={handleClick} sx={{ color: "inherit", marginRight: "0.3rem"}}>
                 <AccountCircleIcon />
-                <Typography variant="body1" onClick={handleClick} sx={{ paddingLeft: "0.3rem" }}>
+                <Typography variant="body1"  sx={{ paddingLeft: "0.3rem" }}>
                   {me.display_name}
                 </Typography>
               </IconButton>
