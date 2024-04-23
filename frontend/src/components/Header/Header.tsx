@@ -10,27 +10,27 @@ import {
   Drawer,
   Grid,
   ListItemButton,
-  ListItemText
+  ListItemText,
 } from "@mui/material";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import MenuIcon from "@mui/icons-material/Menu";
-import React,{useState } from "react";
+import React, { useState } from "react";
 import LanguageIcon from "@mui/icons-material/Language";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import {Link} from "react-router-dom";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { Link } from "react-router-dom";
 import { TitlePortal } from "./TitlePortal";
-import {Me} from "../../types/me.ts";
+import { Me } from "../../types/me.ts";
 
-interface HeaderProps{
-  me:Me
+interface HeaderProps {
+  me: Me;
 }
 /**
  * The header component for the application that will be rendered at the top of the page.
  * @returns - The header component
  */
-export function Header({me}:HeaderProps): JSX.Element {
-  const API_URL = import.meta.env.VITE_APP_API_HOST
-  const { t, i18n } = useTranslation('translation', { keyPrefix: 'header' });
+export function Header({ me }: HeaderProps): JSX.Element {
+  const API_URL = import.meta.env.VITE_APP_API_HOST;
+  const { t, i18n } = useTranslation("translation", { keyPrefix: "header" });
   const [languageMenuAnchor, setLanguageMenuAnchor] =
     useState<null | HTMLElement>(null);
 
@@ -49,10 +49,12 @@ export function Header({me}:HeaderProps): JSX.Element {
 
   const [open, setOpen] = useState(false);
   const [listItems, setListItems] = useState([
-    { link: "/", text: t("homepage") }
+    { link: "/", text: t("homepage") },
   ]);
 
-  const [anchorEl, setAnchorEl] = React.useState<null| HTMLButtonElement>(null);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLButtonElement>(
+    null,
+  );
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -62,12 +64,11 @@ export function Header({me}:HeaderProps): JSX.Element {
     const baseItems = [{ link: "/", text: t("homepage") }];
     const additionalItems = [
       { link: "/projects", text: t("myProjects") },
-      { link: "/courses", text: t("myCourses") }
+      { link: "/courses", text: t("myCourses") },
     ];
     if (me.role !== "UNKNOWN") {
       setListItems([...baseItems, ...additionalItems]);
-    }
-    else {
+    } else {
       setListItems(baseItems);
     }
   }, [me, t]);
@@ -76,15 +77,23 @@ export function Header({me}:HeaderProps): JSX.Element {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky">
         <Toolbar disableGutters>
-          <IconButton edge="start" onClick={() => setOpen(!open)} sx={{ color: "white", marginLeft: 0 }}>
-            <MenuIcon style={{fontSize:"2rem"}} />
+          <IconButton
+            edge="start"
+            onClick={() => setOpen(!open)}
+            sx={{ color: "white", marginLeft: 0 }}
+          >
+            <MenuIcon style={{ fontSize: "2rem" }} />
           </IconButton>
-          <TitlePortal/>
+          <TitlePortal />
           {me.role !== "UNKNOWN" && (
             <>
-              <IconButton edge="end" onClick={handleClick} sx={{ color: "inherit", marginRight: "0.3rem"}}>
+              <IconButton
+                edge="end"
+                onClick={handleClick}
+                sx={{ color: "inherit", marginRight: "0.3rem" }}
+              >
                 <AccountCircleIcon />
-                <Typography variant="body1"  sx={{ paddingLeft: "0.3rem" }}>
+                <Typography variant="body1" sx={{ paddingLeft: "0.3rem" }}>
                   {me.display_name}
                 </Typography>
               </IconButton>
@@ -93,10 +102,14 @@ export function Header({me}:HeaderProps): JSX.Element {
                 open={Boolean(anchorEl)}
                 onClose={() => setAnchorEl(null)}
               >
-                <Typography sx={{ padding: '6px 16px', color: 'black'}}>
+                <Typography sx={{ padding: "6px 16px", color: "black" }}>
                   {me.display_name}
-                </Typography> 
-                <MenuItem onClick={() => window.location.href = `${API_URL}/logout`}>{t("logout")}</MenuItem>
+                </Typography>
+                <MenuItem
+                  onClick={() => (window.location.href = `${API_URL}/logout`)}
+                >
+                  {t("logout")}
+                </MenuItem>
               </Menu>
             </>
           )}
@@ -122,7 +135,11 @@ export function Header({me}:HeaderProps): JSX.Element {
           </div>
         </Toolbar>
       </AppBar>
-      <DrawerMenu open={open} onClose={() => setOpen(false)} listItems={listItems}/>
+      <DrawerMenu
+        open={open}
+        onClose={() => setOpen(false)}
+        listItems={listItems}
+      />
     </Box>
   );
 }
@@ -134,26 +151,46 @@ export function Header({me}:HeaderProps): JSX.Element {
  * @param listItems - Array of objects representing the list items in the drawer menu.
  * @returns The Side Bar
  */
-function DrawerMenu({ open, onClose, listItems }: { open: boolean, onClose: () => void, listItems: { link: string, text: string }[] }) {
-
+function DrawerMenu({
+  open,
+  onClose,
+  listItems,
+}: {
+  open: boolean;
+  onClose: () => void;
+  listItems: { link: string; text: string }[];
+}) {
   return (
     <Drawer open={open} anchor="left" onClose={onClose}>
-      <Grid container direction="column" sx={{
-        width: 250,
-        height: "100%",
-        backgroundColor: "primary.main"
-      }}>
+      <Grid
+        container
+        direction="column"
+        sx={{
+          width: 250,
+          height: "100%",
+          backgroundColor: "primary.main",
+        }}
+      >
         <Grid item container direction="row" alignItems="flex-start">
-          <IconButton onClick={onClose} sx={{
-            color: "white"
-          }}>
-            <MenuIcon style={{fontSize:"2rem"}} />
+          <IconButton
+            onClick={onClose}
+            sx={{
+              color: "white",
+            }}
+          >
+            <MenuIcon style={{ fontSize: "2rem" }} />
           </IconButton>
         </Grid>
         <List>
           {listItems.map((listItem, index) => (
-            <ListItemButton key={index} component={Link} to={listItem.link} role="listitem" onClick={onClose}>
-              <ListItemText primary={listItem.text} sx={{color:"white"}} />
+            <ListItemButton
+              key={index}
+              component={Link}
+              to={listItem.link}
+              role="listitem"
+              onClick={onClose}
+            >
+              <ListItemText primary={listItem.text} sx={{ color: "white" }} />
             </ListItemButton>
           ))}
         </List>
