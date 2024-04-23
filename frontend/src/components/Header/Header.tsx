@@ -12,10 +12,11 @@ import {
   ListItemButton,
   ListItemText
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from "react";
+import MenuIcon from "@mui/icons-material/Menu";
+import React,{useState } from "react";
 import LanguageIcon from "@mui/icons-material/Language";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Link } from "react-router-dom";
 import { TitlePortal } from "./TitlePortal";
 import {LoginButton} from "./Login";
@@ -47,19 +48,27 @@ export function Header(): JSX.Element {
     { link: "/", text: t("homepage") }
   ]);
 
-  useEffect(() => {
-    const baseItems = [{ link: "/", text: t("homepage") }];
-    const additionalItems = [
-      { link: "/projects", text: t("myProjects") },
-      { link: "/courses", text: t("myCourses") }
-    ];
-    if (isLoggedIn()) {
-      setListItems([...baseItems, ...additionalItems]);
-    }
-    else {
-      setListItems(baseItems);
-    }
-  }, [t]);
+  const [anchorEl, setAnchorEl] = React.useState<null| HTMLButtonElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  
+  const baseItems = [{ link: "/", text: t("homepage") }];
+  const additionalItems = [
+    { link: "/projects", text: t("myProjects") },
+    { link: "/courses", text: t("myCourses") }
+  ];
+  if (isLoggedIn()) {
+    setListItems([...baseItems, ...additionalItems]);
+  }
+  else {
+    setListItems(baseItems);
+  }
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -69,6 +78,22 @@ export function Header(): JSX.Element {
             <MenuIcon style={{fontSize:"2rem"}} />
           </IconButton>
           <TitlePortal/>
+          <IconButton edge="end" onClick={handleClick} sx={{ color: "inherit", marginRight: "0.3rem"}}>
+            <AccountCircleIcon />
+            <Typography variant="body1" onClick={handleClick} sx={{ paddingLeft: "0.3rem" }}>
+              {"Test Name"}
+            </Typography>
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <Typography sx={{ padding: '6px 16px', color: 'black'}}>
+              {"Test Name"}
+            </Typography> 
+            <MenuItem onClick={handleClose}>Logout</MenuItem>
+          </Menu>
           <LoginButton></LoginButton>
           <div>
             <IconButton onClick={handleLanguageMenu} color="inherit">

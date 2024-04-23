@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { Button, Container, Typography, Box } from "@mui/material";
-import {Link } from "react-router-dom";
+import { Container, Typography, Box } from "@mui/material";
+import {LoginButton} from "../../components/Header/Login.tsx";
 
 /**
  * This component is the home page component that will be rendered when on the index route.
@@ -8,7 +8,6 @@ import {Link } from "react-router-dom";
  */
 export default function Home() {
   const { t } = useTranslation('translation', { keyPrefix: 'home' });
-  const login_redirect:string =import.meta.env.VITE_LOGIN_LINK
   return (
     <Container maxWidth="sm">
       <Box
@@ -42,9 +41,7 @@ export default function Home() {
         <Typography variant="h6" component="p" >
           {t('welcomeDescription', 'Welcome to Peristeronas.')}
         </Typography>
-        <Button variant="contained" color="primary" size="large" component={Link} to={login_redirect}>
-          {t('login', 'Login')}
-        </Button>
+        <LoginButton/>
       </Box>
     </Container>  );
 }
