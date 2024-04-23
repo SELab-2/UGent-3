@@ -9,7 +9,7 @@ import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
 import {ProjectDeadlineCard} from "../project/projectDeadline/ProjectDeadlineCard.tsx";
 import {ProjectDeadline} from "../project/projectDeadline/ProjectDeadline.tsx";
 import {useLoaderData} from "react-router-dom";
-import {me} from "../../types/me.ts";
+import {Me} from "../../types/me.ts";
 
 interface DeadlineInfoProps {
   selectedDay: Dayjs;
@@ -105,7 +105,7 @@ export default function HomePage() {
   const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs(Date.now()));
   const loader = useLoaderData() as {
     projects: ProjectDeadline[],
-    me: me
+    me: Me
   }
   const projects = loader.projects
 

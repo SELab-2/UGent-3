@@ -19,10 +19,10 @@ import LanguageIcon from "@mui/icons-material/Language";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import {Link} from "react-router-dom";
 import { TitlePortal } from "./TitlePortal";
-import {me} from "../../types/me.ts";
+import {Me} from "../../types/me.ts";
 
 interface HeaderProps{
-  me:me
+  me:Me
 }
 /**
  * The header component for the application that will be rendered at the top of the page.
