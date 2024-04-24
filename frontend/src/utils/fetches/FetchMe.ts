@@ -6,11 +6,12 @@ export const fetchMe = async () => {
     });
     if (response.status == 200) {
       const data = await response.json();
+      data.data.loggedIn = true
       return data.data;
     } else {
-      return { role: "UNKNOWN" };
+      return {loggedIn: false };
     }
   } catch (e) {
-    return { role: "UNKNOWN" };
+    return { loggedIn: false };
   }
 };

@@ -13,8 +13,7 @@ export default function HomePages() {
     projects: ProjectDeadline[];
     me: Me;
   };
-  const me = loader.me.role;
-  if (me === "UNKNOWN") {
+  if (!loader.me.loggedIn) {
     return <Home />;
   } else {
     return <HomePage />;

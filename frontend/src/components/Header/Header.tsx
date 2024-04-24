@@ -20,6 +20,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Link } from "react-router-dom";
 import { TitlePortal } from "./TitlePortal";
 import { Me } from "../../types/me.ts";
+import {LoginButton} from "./Login.tsx";
 
 interface HeaderProps {
   me: Me;
@@ -66,7 +67,7 @@ export function Header({ me }: HeaderProps): JSX.Element {
       { link: "/projects", text: t("myProjects") },
       { link: "/courses", text: t("myCourses") },
     ];
-    if (me.role !== "UNKNOWN") {
+    if (me.loggedIn) {
       setListItems([...baseItems, ...additionalItems]);
     } else {
       setListItems(baseItems);
@@ -85,7 +86,10 @@ export function Header({ me }: HeaderProps): JSX.Element {
             <MenuIcon style={{ fontSize: "2rem" }} />
           </IconButton>
           <TitlePortal />
-          {me.role !== "UNKNOWN" && (
+          {!me.loggedIn && (
+            <LoginButton/>
+          )}
+          {me.loggedIn && (
             <>
               <IconButton
                 edge="end"

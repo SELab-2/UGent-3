@@ -16,7 +16,6 @@ export function LoginButton(): JSX.Element {
 
   return (
     <Button variant="contained" component={Link} to={link}>
-      {" "}
       {t("login", "Login")}
     </Button>
   );
