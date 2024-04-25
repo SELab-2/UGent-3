@@ -1,6 +1,5 @@
 import { redirect } from "react-router-dom";
 import i18next from "i18next";
-import { getCSRFCookie } from "../utils/csrf";
 import { authenticatedFetch } from "../utils/authenticated-fetch";
 
 const API_URL = import.meta.env.VITE_APP_API_HOST;
