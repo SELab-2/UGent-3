@@ -1,4 +1,4 @@
-import { get_csrf_cookie } from "../../utils/csrf.ts";
+import { authenticatedFetch } from "../../utils/authenticated-fetch.ts";
 import {
   Project,
   ProjectDeadline,
@@ -14,12 +14,7 @@ export const fetchProjectPage = async () => {
 
 export const fetchMe = async () => {
   try {
-    const response = await fetch(`${API_URL}/me`, {
-      credentials: "include",
-      headers: {
-        "X-CSRF-TOKEN": get_csrf_cookie(),
-      },
-    });
+    const response = await authenticatedFetch(`${API_URL}/me`);
     if (response.status == 200) {
       const data = await response.json();
       return data.role;
@@ -32,12 +27,7 @@ export const fetchMe = async () => {
 };
 export const fetchProjects = async () => {
   try {
-    const response = await fetch(`${API_URL}/projects`, {
-      credentials: "include",
-      headers: {
-        "X-CSRF-TOKEN": get_csrf_cookie(),
-      },
-    });
+    const response = await authenticatedFetch(`${API_URL}/projects`);
     const jsonData = await response.json();
     let formattedData: ProjectDeadline[] = await Promise.all(
       jsonData.data.map(async (item: Project) => {
@@ -45,14 +35,8 @@ export const fetchProjects = async () => {
           const url_split = item.project_id.split("/");
           const project_id = url_split[url_split.length - 1];
           const response_submissions = await (
-            await fetch(
-              encodeURI(`${API_URL}/submissions?project_id=${project_id}`),
-              {
-                credentials: "include",
-                headers: {
-                  "X-CSRF-TOKEN": get_csrf_cookie(),
-                },
-              }
+            await authenticatedFetch(
+              encodeURI(`${API_URL}/submissions?project_id=${project_id}`)
             )
           ).json();
 
@@ -70,24 +54,13 @@ export const fetchProjects = async () => {
             )[0];
           // fetch the course id of the project
           const project_item = await (
-            await fetch(encodeURI(`${API_URL}/projects/${project_id}`), {
-              credentials: "include",
-              headers: {
-                "X-CSRF-TOKEN": get_csrf_cookie(),
-              },
-            })
+            await authenticatedFetch(encodeURI(`${API_URL}/projects/${project_id}`))
           ).json();
 
           //fetch the course
           const response_courses = await (
-            await fetch(
-              encodeURI(`${API_URL}/courses/${project_item.data.course_id}`),
-              {
-                credentials: "include",
-                headers: {
-                  "X-CSRF-TOKEN": get_csrf_cookie(),
-                },
-              }
+            await authenticatedFetch(
+              encodeURI(`${API_URL}/courses/${project_item.data.course_id}`)
             )
           ).json();
           const course = {

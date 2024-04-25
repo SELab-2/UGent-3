@@ -7,7 +7,7 @@ import { green, red } from '@mui/material/colors';
 import CancelIcon from '@mui/icons-material/Cancel';
 import DownloadIcon from '@mui/icons-material/Download';
 import download from "downloadjs";
-import { get_csrf_cookie } from "../../utils/csrf";
+import { authenticatedFetch } from "../../utils/authenticated-fetch";
 
 const apiUrl = import.meta.env.VITE_API_HOST
 
@@ -29,12 +29,7 @@ function getRowId(row: Submission) {
 }
 
 const fetchSubmissionsFromUser = async (submission_id: string) => {
-  await fetch(`${apiUrl}/submissions/${submission_id}/download`, {
-    credentials: 'include',
-    headers: {
-      "X-CSRF-TOKEN": get_csrf_cookie()
-    },
-  })
+  await authenticatedFetch(`${apiUrl}/submissions/${submission_id}/download`)
     .then(res => {
       return res.blob();
     })
@@ -87,12 +82,7 @@ export default function ProjectSubmissionsOverviewDatagrid() {
   });
 
   const fetchLastSubmissionsByUser = async () => {
-    const response = await fetch(`${apiUrl}/projects/${projectId}/latest-per-user`, {
-      credentials: 'include',
-      headers: {
-        "X-CSRF-TOKEN": get_csrf_cookie()
-      },
-    })
+    const response = await authenticatedFetch(`${apiUrl}/projects/${projectId}/latest-per-user`)
     const jsonData = await response.json();
     setSubmissions(jsonData.data);
   }

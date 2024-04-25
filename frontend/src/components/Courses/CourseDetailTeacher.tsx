@@ -6,7 +6,7 @@ import { Link, useNavigate, NavigateFunction, useLoaderData } from "react-router
 import { Title } from "../Header/Title";
 import ClearIcon from '@mui/icons-material/Clear';
 import { timeDifference } from "../../utils/date-utils";
-import { get_csrf_cookie } from "../../utils/csrf";
+import { authenticatedFetch } from "../../utils/authenticated-fetch";
 
 interface UserUid{
     uid: string
@@ -19,13 +19,8 @@ interface UserUid{
  * @param uid - The UID of the admin.
  */
 function handleDeleteAdmin(navigate: NavigateFunction, courseId: string, uid: string): void {
-  fetch(`${apiHost}/courses/${courseId}/admins`, {
+  authenticatedFetch(`${apiHost}/courses/${courseId}/admins`, {
     method: 'DELETE',
-    credentials: 'include',
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRF-TOKEN": get_csrf_cookie()
-    },
     body: JSON.stringify({
       "admin_uid": uid
     })
@@ -42,12 +37,10 @@ function handleDeleteAdmin(navigate: NavigateFunction, courseId: string, uid: st
  * @param uid - The UID of the admin.
  */
 function handleDeleteStudent(navigate: NavigateFunction, courseId: string, uids: string[]): void {
-  fetch(`${apiHost}/courses/${courseId}/students`, {
+  authenticatedFetch(`${apiHost}/courses/${courseId}/students`, {
     method: 'DELETE',
-    credentials: 'include',
     headers: {
       "Content-Type": "application/json",
-      "X-CSRF-TOKEN": get_csrf_cookie()
     },
     body: JSON.stringify({
       "students": uids
@@ -64,12 +57,8 @@ function handleDeleteStudent(navigate: NavigateFunction, courseId: string, uids:
  * @param courseId - The ID of the course.
  */
 function handleDeleteCourse(navigate: NavigateFunction, courseId: string): void {
-  fetch(`${apiHost}/courses/${courseId}`, {
+  authenticatedFetch(`${apiHost}/courses/${courseId}`, {
     method: 'DELETE',
-    credentials: 'include',
-    headers: {
-      "X-CSRF-TOKEN": get_csrf_cookie()
-    },
   }).then((response) => {
     if(response.ok){
       navigate(-1);
@@ -295,12 +284,8 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
   };
 
   const getCodes = useCallback(() => {
-    fetch(`${apiHost}/courses/${courseId}/join_codes`, {
+    authenticatedFetch(`${apiHost}/courses/${courseId}/join_codes`, {
       method: 'GET',
-      credentials: 'include',
-      headers: {
-        "X-CSRF-TOKEN": get_csrf_cookie()
-      },
     })
       .then(response => response.json())
       .then(data => {
@@ -326,12 +311,10 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
       bodyContent.expiry_time = expiry_time.toISOString();
     }
 
-    fetch(`${apiHost}/courses/${courseId}/join_codes`, {
+    authenticatedFetch(`${apiHost}/courses/${courseId}/join_codes`, {
       method: 'POST',
-      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        "X-CSRF-TOKEN": get_csrf_cookie()
       },
       body: JSON.stringify(bodyContent)
     })
@@ -339,13 +322,11 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
   }
 
   const handleDeleteCode = (joinCode: string) => {
-    fetch(`${apiHost}/courses/${courseId}/join_codes/${joinCode}`,
+    authenticatedFetch(`${apiHost}/courses/${courseId}/join_codes/${joinCode}`,
       {
         method: 'DELETE',
-        credentials: 'include',
         headers: {
           "Content-Type": "application/json",
-          "X-CSRF-TOKEN": get_csrf_cookie()
         },
         body: JSON.stringify({
           "join_code": joinCode

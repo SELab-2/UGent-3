@@ -21,7 +21,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import debounce from "debounce";
-import { get_csrf_cookie } from "../../utils/csrf";
+import { authenticatedFetch } from "../../utils/authenticated-fetch";
 
 /**
  * @param text - The text to be displayed
@@ -153,14 +153,8 @@ export function SideScrollableCourses({
     // Fetch projects for each course
     const fetchProjects = async () => {
       const projectPromises = courses.map((course) =>
-        fetch(
-          `${apiHost}/projects?course_id=${getIdFromLink(course.course_id)}`,
-          {
-            credentials: "include",
-            headers: {
-              "X-CSRF-TOKEN": get_csrf_cookie(),
-            },
-          }
+        authenticatedFetch(
+          `${apiHost}/projects?course_id=${getIdFromLink(course.course_id)}`
         ).then((response) => response.json())
       );
 

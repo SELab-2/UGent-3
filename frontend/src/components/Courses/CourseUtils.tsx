@@ -1,5 +1,5 @@
 import { NavigateFunction, Params } from "react-router-dom";
-import { get_csrf_cookie } from "../../utils/csrf";
+import { authenticatedFetch } from "../../utils/authenticated-fetch";
 
 export interface Course {
   course_id: string;
@@ -49,11 +49,9 @@ export function callToApiToCreateCourse(
   data: string,
   navigate: NavigateFunction
 ) {
-  fetch(`${apiHost}/courses`, {
-    credentials: "include", // include, *same-origin, omit
+  authenticatedFetch(`${apiHost}/courses`, {
     headers: {
       "Content-Type": "application/json",
-      "X-CSRF-TOKEN": get_csrf_cookie(),
     },
     method: "POST",
     body: data,
@@ -61,12 +59,10 @@ export function callToApiToCreateCourse(
     .then((response) => response.json())
     .then((data) => {
       //But first also make sure that teacher is in the course admins list
-      fetch(`${apiHost}/courses/${getIdFromLink(data.url)}/admins`, {
-        credentials: "include",
+      authenticatedFetch(`${apiHost}/courses/${getIdFromLink(data.url)}/admins`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRF-TOKEN": get_csrf_cookie(),
         },
         body: JSON.stringify({ admin_uid: loggedInUid() }),
       });
@@ -109,9 +105,7 @@ const fetchData = async (url: string, params?: URLSearchParams) => {
   if (params) {
     uri += `?${params}`;
   }
-  const res = await fetch(uri, {
-    credentials: "include",
-  });
+  const res = await authenticatedFetch(uri);
   if (res.status !== 200) {
     throw new Response("Failed to fetch data", { status: res.status });
   }
