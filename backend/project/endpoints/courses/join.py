@@ -5,7 +5,6 @@ This file contains the endpoint to join a course using a join code
 
 from os import getenv
 from datetime import datetime
-from zoneinfo import ZoneInfo
 
 from flask import request
 from flask_restful import Resource

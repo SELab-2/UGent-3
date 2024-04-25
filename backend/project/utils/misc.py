@@ -87,7 +87,7 @@ def is_valid_uuid(uuid_to_test, version=4):
     Returns:
         bool: True if the UUID is valid, False otherwise.
     """
-    
+
     try:
         uuid_obj = UUID(uuid_to_test, version=version)
     except ValueError:
