@@ -11,6 +11,7 @@ import SubmissionsOverview from "./pages/submission_overview/SubmissionsOverview
 import {fetchProjectPage} from "./pages/project/FetchProjects.tsx";
 import HomePages from "./pages/home/HomePages.tsx";
 import ProjectOverView from "./pages/project/projectOverview.tsx";
+import { synchronizeJoinCode } from "./loaders/join-code.ts";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,6 +26,7 @@ const router = createBrowserRouter(
         </Route>
         <Route path="courses">
           <Route index element={<AllCoursesTeacher />} loader={dataLoaderCourses}/>
+          <Route path="join" loader={synchronizeJoinCode} />
           <Route path=":courseId" element={<CourseDetailTeacher />} loader={dataLoaderCourseDetail} />
         </Route>
         <Route path="projects">
