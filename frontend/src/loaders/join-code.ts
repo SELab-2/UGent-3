@@ -4,7 +4,10 @@ import { getCSRFCookie } from "../utils/csrf";
 
 const API_URL = import.meta.env.VITE_APP_API_HOST;
 
-
+/**
+ * This function sends a request to the server to join a course with a given join code.
+ * @returns - Redirects to the course page if the join code is valid
+ */
 export async function synchronizeJoinCode() {
   const queryParams = new URLSearchParams(window.location.search);
   const joinCode = queryParams.get("code");
