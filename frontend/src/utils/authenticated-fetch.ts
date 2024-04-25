@@ -5,7 +5,7 @@ import { getCSRFCookie } from "./csrf";
  * @returns the result of the fetch with given options and default authentication options included
  */
 export function authenticatedFetch(
-  url: string,
+  url: string | URL | globalThis.Request,
   init?: RequestInit
 ): Promise<Response> {
   const update = { ...init,  credentials: "include"};

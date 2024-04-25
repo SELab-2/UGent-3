@@ -1,6 +1,7 @@
 import { redirect } from "react-router-dom";
 import i18next from "i18next";
 import { getCSRFCookie } from "../utils/csrf";
+import { authenticatedFetch } from "../utils/authenticated-fetch";
 
 const API_URL = import.meta.env.VITE_APP_API_HOST;
 
@@ -13,17 +14,7 @@ export async function synchronizeJoinCode() {
   const joinCode = queryParams.get("code");
 
   if (joinCode) {
-    const response = await fetch(new URL("/courses/join", API_URL), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-TOKEN": getCSRFCookie(),
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        join_code: joinCode,
-      }),
-    });
+    const response = await authenticatedFetch(new URL("/courses/join", API_URL));
 
     if (response.ok) {
       const responseData = await response.json();
