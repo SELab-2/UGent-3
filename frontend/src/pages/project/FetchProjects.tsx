@@ -54,7 +54,9 @@ export const fetchProjects = async () => {
             )[0];
           // fetch the course id of the project
           const project_item = await (
-            await authenticatedFetch(encodeURI(`${API_URL}/projects/${project_id}`))
+            await authenticatedFetch(
+              encodeURI(`${API_URL}/projects/${project_id}`)
+            )
           ).json();
 
           //fetch the course
@@ -119,7 +121,7 @@ export const fetchProjects = async () => {
     );
     formattedData = formattedData.flat();
     return formattedData;
-  } catch (e) {
+  } catch (_) {
     return [];
   }
 };
