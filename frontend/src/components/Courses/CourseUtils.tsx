@@ -1,4 +1,5 @@
 import { NavigateFunction, Params } from 'react-router-dom';
+import { get_csrf_cookie } from '../../utils/csrf';
 
 export interface Course{
     course_id: string,
@@ -48,7 +49,8 @@ export function callToApiToCreateCourse(data: string, navigate: NavigateFunction
   fetch(`${apiHost}/courses`, {
     credentials: 'include', // include, *same-origin, omit
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "X-CSRF-TOKEN": get_csrf_cookie()
     },
     method: 'POST',
     body: data,
@@ -60,7 +62,8 @@ export function callToApiToCreateCourse(data: string, navigate: NavigateFunction
         credentials: 'include',
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          "X-CSRF-TOKEN": get_csrf_cookie()
         },
         body: JSON.stringify({admin_uid: loggedInUid()})
       });

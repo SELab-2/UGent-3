@@ -30,6 +30,9 @@ function getRowId(row: Submission) {
 const fetchSubmissionsFromUser = async (submission_id: string) => {
   await fetch(`${apiUrl}/submissions/${submission_id}/download`, {
     credentials: 'include',
+    headers: {
+      "X-CSRF-TOKEN": get_csrf_cookie()
+    },
   })
     .then(res => {
       return res.blob();
@@ -85,6 +88,9 @@ export default function ProjectSubmissionsOverviewDatagrid() {
   const fetchLastSubmissionsByUser = async () => {
     const response = await fetch(`${apiUrl}/projects/${projectId}/latest-per-user`, {
       credentials: 'include',
+      headers: {
+        "X-CSRF-TOKEN": get_csrf_cookie()
+      },
     })
     const jsonData = await response.json();
     setSubmissions(jsonData.data);

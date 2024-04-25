@@ -6,6 +6,7 @@ import { Link, useNavigate, NavigateFunction, useLoaderData } from "react-router
 import { Title } from "../Header/Title";
 import ClearIcon from '@mui/icons-material/Clear';
 import { timeDifference } from "../../utils/date-utils";
+import { get_csrf_cookie } from "../../utils/csrf";
 
 interface UserUid{
     uid: string
@@ -22,7 +23,8 @@ function handleDeleteAdmin(navigate: NavigateFunction, courseId: string, uid: st
     method: 'DELETE',
     credentials: 'include',
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "X-CSRF-TOKEN": get_csrf_cookie()
     },
     body: JSON.stringify({
       "admin_uid": uid
@@ -44,7 +46,8 @@ function handleDeleteStudent(navigate: NavigateFunction, courseId: string, uids:
     method: 'DELETE',
     credentials: 'include',
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "X-CSRF-TOKEN": get_csrf_cookie()
     },
     body: JSON.stringify({
       "students": uids
@@ -64,6 +67,9 @@ function handleDeleteCourse(navigate: NavigateFunction, courseId: string): void 
   fetch(`${apiHost}/courses/${courseId}`, {
     method: 'DELETE',
     credentials: 'include',
+    headers: {
+      "X-CSRF-TOKEN": get_csrf_cookie()
+    },
   }).then((response) => {
     if(response.ok){
       navigate(-1);
@@ -292,6 +298,9 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
     fetch(`${apiHost}/courses/${courseId}/join_codes`, {
       method: 'GET',
       credentials: 'include',
+      headers: {
+        "X-CSRF-TOKEN": get_csrf_cookie()
+      },
     })
       .then(response => response.json())
       .then(data => {
@@ -321,7 +330,8 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
       method: 'POST',
       credentials: 'include',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        "X-CSRF-TOKEN": get_csrf_cookie()
       },
       body: JSON.stringify(bodyContent)
     })
@@ -334,7 +344,8 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
         method: 'DELETE',
         credentials: 'include',
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": get_csrf_cookie()
         },
         body: JSON.stringify({
           "join_code": joinCode

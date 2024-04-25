@@ -29,6 +29,7 @@ import {TabContext} from "@mui/lab";
 import FileStuctureForm from "./FileStructureForm.tsx";
 import AdvancedRegex from "./AdvancedRegex.tsx";
 import RunnerSelecter from "./RunnerSelecter.tsx";
+import { get_csrf_cookie } from "../../utils/csrf.ts";
 
 interface Course {
   course_id: string;
@@ -137,7 +138,10 @@ export default function ProjectForm() {
 
   const fetchCourses = async () => {
     const response = await fetch(`${apiUrl}/courses?teacher=${user}`, {
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+        "X-CSRF-TOKEN": get_csrf_cookie()
+      },
     })
     const jsonData = await response.json();
     if (jsonData.data) {
@@ -205,7 +209,10 @@ export default function ProjectForm() {
     const response = await fetch(`${apiUrl}/projects`, {
       method: "post",
       credentials: 'include',
-      body: formData
+      body: formData,
+      headers: {
+        "X-CSRF-TOKEN": get_csrf_cookie()
+      },
     })
 
     if (!response.ok) {

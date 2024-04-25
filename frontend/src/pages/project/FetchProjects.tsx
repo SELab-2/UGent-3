@@ -1,3 +1,4 @@
+import { get_csrf_cookie } from "../../utils/csrf.ts";
 import {Project, ProjectDeadline, ShortSubmission} from "./projectDeadline/ProjectDeadline.tsx";
 const API_URL = import.meta.env.VITE_APP_API_HOST
 
@@ -10,7 +11,10 @@ export const fetchProjectPage = async () => {
 export const fetchMe = async () => {
   try {
     const response = await fetch(`${API_URL}/me`, {
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+        "X-CSRF-TOKEN": get_csrf_cookie()
+      },
     })
     if(response.status == 200){
       const data  = await response.json()
@@ -27,7 +31,10 @@ export const fetchProjects = async () => {
 
   try{
     const response = await fetch(`${API_URL}/projects`, {
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+        "X-CSRF-TOKEN": get_csrf_cookie()
+      },
 
     })
     const jsonData = await response.json();
@@ -36,7 +43,10 @@ export const fetchProjects = async () => {
         const url_split = item.project_id.split('/')
         const project_id = url_split[url_split.length -1]
         const response_submissions =  await (await fetch(encodeURI(`${API_URL}/submissions?project_id=${project_id}`), {
-          credentials: 'include'
+          credentials: 'include',
+          headers: {
+            "X-CSRF-TOKEN": get_csrf_cookie()
+          }
 
         })).json()
 
@@ -49,12 +59,18 @@ export const fetchProjects = async () => {
         }
         )).sort((a:ShortSubmission, b:ShortSubmission) => b.submission_time.getTime() - a.submission_time.getTime())[0];
         // fetch the course id of the project
-        const project_item = await (await fetch(encodeURI(`${API_URL}/projects/${project_id}`), {  credentials: 'include'
+        const project_item = await (await fetch(encodeURI(`${API_URL}/projects/${project_id}`), {  credentials: 'include',
+        headers: {
+          "X-CSRF-TOKEN": get_csrf_cookie()
+        },
         })).json()
 
         //fetch the course
         const response_courses = await (await fetch(encodeURI(`${API_URL}/courses/${project_item.data.course_id}`), {
-          credentials: 'include'
+          credentials: 'include',
+          headers: {
+            "X-CSRF-TOKEN": get_csrf_cookie()
+          },
         })).json()
         const course = {
           course_id: response_courses.data.course_id,

@@ -14,6 +14,7 @@ import { useParams } from "react-router-dom";
 import SubmissionCard from "./SubmissionCard";
 import { Course } from "../../../types/course";
 import { Title } from "../../../components/Header/Title";
+import { get_csrf_cookie } from "../../../utils/csrf";
 
 const API_URL = import.meta.env.VITE_API_HOST;
 
@@ -36,6 +37,9 @@ export default function ProjectView() {
   useEffect(() => {
     fetch(`${API_URL}/projects/${projectId}`, {
       credentials: 'include',
+      headers: {
+        "X-CSRF-TOKEN": get_csrf_cookie()
+      },
     }).then((response) => {
       if (response.ok) {
         response.json().then((data) => {
@@ -43,6 +47,9 @@ export default function ProjectView() {
           setProjectData(projectData);
           fetch(`${API_URL}/courses/${projectData.course_id}`, {
             credentials: 'include',
+            headers: {
+              "X-CSRF-TOKEN": get_csrf_cookie()
+            },
           }).then((response) => {
             if (response.ok) {
               response.json().then((data) => {
@@ -56,6 +63,9 @@ export default function ProjectView() {
 
     fetch(`${API_URL}/projects/${projectId}/assignment`, {
       credentials: 'include',
+      headers: {
+        "X-CSRF-TOKEN": get_csrf_cookie()
+      },
     }).then((response) => {
       if (response.ok) {
         response.text().then((data) => setAssignmentRawText(data));
