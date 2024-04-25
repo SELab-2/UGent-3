@@ -1,17 +1,18 @@
-import { NavigateFunction, Params } from 'react-router-dom';
+import { NavigateFunction, Params } from "react-router-dom";
+import { authenticatedFetch } from "../../utils/authenticated-fetch";
 
-export interface Course{
-    course_id: string,
-    name: string,
-    teacher:string,
-    ufora_id:string,
-    url:string
+export interface Course {
+  course_id: string;
+  name: string;
+  teacher: string;
+  ufora_id: string;
+  url: string;
 }
 
-export interface Project{
-    title: string,
-    project_id: string,
-    deadlines: string[][]
+export interface Project {
+  title: string;
+  project_id: string;
+  deadlines: string[][];
 }
 
 export const apiHost = import.meta.env.VITE_APP_API_HOST;
@@ -19,7 +20,7 @@ export const appHost = import.meta.env.VITE_APP_HOST;
 /**
  * @returns The uid of the acces token of the logged in user
  */
-export function loggedInToken(){
+export function loggedInToken() {
   return "teacher1";
 }
 
@@ -35,7 +36,7 @@ export function getUserName(uid: string): string {
 /**
  * @returns The Uid of the logged in user
  */
-export function loggedInUid(){
+export function loggedInUid() {
   return "Gunnar";
 }
 
@@ -44,36 +45,37 @@ export function loggedInUid(){
  * @param data - course data to send to the api
  * @param navigate - function that allows the app to redirect
  */
-export function callToApiToCreateCourse(data: string, navigate: NavigateFunction){
-  fetch(`${apiHost}/courses`, {
-    credentials: 'include', // include, *same-origin, omit
+export function callToApiToCreateCourse(
+  data: string,
+  navigate: NavigateFunction
+) {
+  authenticatedFetch(`${apiHost}/courses`, {
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    method: 'POST',
+    method: "POST",
     body: data,
   })
-    .then(response => response.json())
-    .then(data => {
+    .then((response) => response.json())
+    .then((data) => {
       //But first also make sure that teacher is in the course admins list
-      fetch(`${apiHost}/courses/${getIdFromLink(data.url)}/admins`, {
-        credentials: 'include',
-        method: 'POST',
+      authenticatedFetch(`${apiHost}/courses/${getIdFromLink(data.url)}/admins`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({admin_uid: loggedInUid()})
+        body: JSON.stringify({ admin_uid: loggedInUid() }),
       });
       navigate(getIdFromLink(data.url)); // navigate to data.url
-    })
+    });
 }
-  
+
 /**
  * @param link - the link to the api endpoint
  * @returns the Id at the end of the link
  */
 export function getIdFromLink(link: string): string {
-  const parts = link.split('/');
+  const parts = link.split("/");
   return parts[parts.length - 1];
 }
 
@@ -84,9 +86,13 @@ export function getIdFromLink(link: string): string {
  */
 export function getNearestFutureDate(dates: string[][]): Date | null {
   const now = new Date();
-  const futureDates = dates.map(date => new Date(date[1])).filter(date => date > now);
+  const futureDates = dates
+    .map((date) => new Date(date[1]))
+    .filter((date) => date > now);
   if (futureDates.length === 0) return null;
-  return futureDates.reduce((nearest, current) => current < nearest ? current : nearest);
+  return futureDates.reduce((nearest, current) =>
+    current < nearest ? current : nearest
+  );
 }
 
 /**
@@ -96,14 +102,12 @@ export function getNearestFutureDate(dates: string[][]): Date | null {
 
 const fetchData = async (url: string, params?: URLSearchParams) => {
   let uri = `${apiHost}/${url}`;
-  if(params){
-    uri += `?${params}`
+  if (params) {
+    uri += `?${params}`;
   }
-  const res = await fetch(uri, {
-    credentials: 'include'
-  });
-  if(res.status !== 200){
-    throw new Response("Failed to fetch data", {status: res.status});
+  const res = await authenticatedFetch(uri);
+  if (res.status !== 200) {
+    throw new Response("Failed to fetch data", { status: res.status });
   }
   const jsonResult = await res.json();
 
@@ -132,7 +136,11 @@ const dataLoaderStudents = async (courseId: string) => {
   return fetchData(`courses/${courseId}/students`);
 };
 
-export const dataLoaderCourseDetail = async ({ params } : { params:Params}) => {
+export const dataLoaderCourseDetail = async ({
+  params,
+}: {
+  params: Params;
+}) => {
   const { courseId } = params;
   if (!courseId) {
     throw new Error("Course ID is undefined.");
@@ -141,6 +149,6 @@ export const dataLoaderCourseDetail = async ({ params } : { params:Params}) => {
   const projects = await dataLoaderProjects(courseId);
   const admins = await dataLoaderAdmins(courseId);
   const students = await dataLoaderStudents(courseId);
-  
+
   return { course, projects, admins, students };
 };

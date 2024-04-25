@@ -29,6 +29,7 @@ import {TabContext} from "@mui/lab";
 import FileStuctureForm from "./FileStructureForm.tsx";
 import AdvancedRegex from "./AdvancedRegex.tsx";
 import RunnerSelecter from "./RunnerSelecter.tsx";
+import { authenticatedFetch } from "../../utils/authenticated-fetch.ts";
 
 interface Course {
   course_id: string;
@@ -136,9 +137,7 @@ export default function ProjectForm() {
   }
 
   const fetchCourses = async () => {
-    const response = await fetch(`${apiUrl}/courses?teacher=${user}`, {
-      credentials: 'include'
-    })
+    const response = await authenticatedFetch(`${apiUrl}/courses?teacher=${user}`)
     const jsonData = await response.json();
     if (jsonData.data) {
       setCourses(jsonData.data);
@@ -202,10 +201,9 @@ export default function ProjectForm() {
       formData.append("runner", runner);
     }
 
-    const response = await fetch(`${apiUrl}/projects`, {
+    const response = await authenticatedFetch(`${apiUrl}/projects`, {
       method: "post",
-      credentials: 'include',
-      body: formData
+      body: formData,
     })
 
     if (!response.ok) {

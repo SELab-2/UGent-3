@@ -45,6 +45,12 @@ def microsoft_authentication():
         res = requests.post(f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token",
                             data=data,
                             timeout=5)
+        if res.status_code != 200:
+            abort(make_response((
+                {"message":
+                    "An error occured while trying to authenticate your access token"},
+                    500)))
+        # hier wel nog if om error zelf op te vangen
         token = res.json()["access_token"]
         profile_res = requests.get("https://graph.microsoft.com/v1.0/me",
                                     headers={"Authorization":f"Bearer {token}"},
