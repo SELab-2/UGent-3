@@ -43,7 +43,7 @@ interface RegexData {
   regex: string;
 }
 
-const API_URL = import.meta.env.VITE_API_HOST
+const API_URL = import.meta.env.VITE_APP_API_HOST
 
 /**
  * @returns Form for uploading project
