@@ -1,9 +1,10 @@
-import { authenticatedFetch } from "../../utils/authenticated-fetch.ts";
+import { fetchMe } from "./FetchMe.ts";
+import { authenticatedFetch } from "../authenticated-fetch.ts";
 import {
   Project,
   ProjectDeadline,
   ShortSubmission,
-} from "./projectDeadline/ProjectDeadline.tsx";
+} from "../../pages/project/projectDeadline/ProjectDeadline.tsx";
 const API_URL = import.meta.env.VITE_APP_API_HOST;
 
 export const fetchProjectPage = async () => {
@@ -12,19 +13,6 @@ export const fetchProjectPage = async () => {
   return { projects, me };
 };
 
-export const fetchMe = async () => {
-  try {
-    const response = await authenticatedFetch(`${API_URL}/me`);
-    if (response.status == 200) {
-      const data = await response.json();
-      return data.role;
-    } else {
-      return "UNKNOWN";
-    }
-  } catch (e) {
-    return "UNKNOWN";
-  }
-};
 export const fetchProjects = async () => {
   try {
     const response = await authenticatedFetch(`${API_URL}/projects`);
@@ -50,7 +38,7 @@ export const fetchProjects = async () => {
             }))
             .sort(
               (a: ShortSubmission, b: ShortSubmission) =>
-                b.submission_time.getTime() - a.submission_time.getTime()
+                b.submission_time.getTime() - a.submission_time.getTime(),
             )[0];
           // fetch the course id of the project
           const project_item = await (
@@ -82,7 +70,7 @@ export const fetchProjects = async () => {
                 deadline_description: d[0],
                 course_id: Number(project_item.data.course_id),
                 visible_for_students: Boolean(
-                  project_item.data.visible_for_students
+                  project_item.data.visible_for_students,
                 ),
                 archived: Boolean(project_item.data.archived),
                 test_path: project_item.data.test_path,
@@ -104,7 +92,7 @@ export const fetchProjects = async () => {
               deadline_description: undefined,
               course_id: Number(project_item.data.course_id),
               visible_for_students: Boolean(
-                project_item.data.visible_for_students
+                project_item.data.visible_for_students,
               ),
               archived: Boolean(project_item.data.archived),
               test_path: project_item.data.test_path,
@@ -117,7 +105,7 @@ export const fetchProjects = async () => {
         } catch (e) {
           return [];
         }
-      })
+      }),
     );
     formattedData = formattedData.flat();
     return formattedData;
