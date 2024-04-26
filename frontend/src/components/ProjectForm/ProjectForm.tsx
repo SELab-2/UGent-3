@@ -43,7 +43,7 @@ interface RegexData {
   regex: string;
 }
 
-const apiUrl = import.meta.env.VITE_API_HOST
+const API_URL = import.meta.env.VITE_API_HOST
 
 /**
  * @returns Form for uploading project
@@ -201,7 +201,7 @@ export default function ProjectForm() {
       formData.append("runner", runner);
     }
 
-    const response = await authenticatedFetch(`${apiUrl}/projects`, {
+    const response = await authenticatedFetch(`${API_URL}/projects`, {
       method: "post",
       body: formData,
     })
