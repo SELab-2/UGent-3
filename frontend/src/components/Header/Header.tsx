@@ -10,7 +10,7 @@ import {
   Drawer,
   Grid,
   ListItemButton,
-  ListItemText,
+  ListItemText, Divider,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -85,6 +85,17 @@ export function Header({ me }: HeaderProps): JSX.Element {
           >
             <MenuIcon style={{ fontSize: "2rem" }} />
           </IconButton>
+          <Link to={`/${i18n.language}/home`}
+            style={{ color: 'inherit', textDecoration: 'none' }}>
+            <Typography
+              variant="h6"
+              color="inherit"
+              sx={{ marginRight: '1rem' }}>
+              Peristerónas
+            </Typography>
+          </Link>
+          <Divider orientation="vertical" flexItem 
+            sx={{ marginRight: '1rem', borderColor: 'rgba(255, 255, 255, 0.15)' }}/>
           <TitlePortal />
           {!me.loggedIn && (
             <LoginButton/>
