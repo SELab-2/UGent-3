@@ -17,8 +17,8 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get install -y python3 python3-pip
 
 # Install Node.js
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get install -y nodejs
+RUN apt-get install -y npm
 
 # Install Java
 RUN apt-get install -y openjdk-11-jdk
