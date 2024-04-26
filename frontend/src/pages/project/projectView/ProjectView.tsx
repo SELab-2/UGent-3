@@ -14,6 +14,7 @@ import { useParams } from "react-router-dom";
 import SubmissionCard from "./SubmissionCard";
 import { Course } from "../../../types/course";
 import { Title } from "../../../components/Header/Title";
+import { authenticatedFetch } from "../../../utils/authenticated-fetch";
 
 const API_URL = import.meta.env.VITE_API_HOST;
 
@@ -34,16 +35,12 @@ export default function ProjectView() {
   const [assignmentRawText, setAssignmentRawText] = useState<string>("");
 
   useEffect(() => {
-    fetch(`${API_URL}/projects/${projectId}`, {
-      credentials: 'include',
-    }).then((response) => {
+    authenticatedFetch(`${API_URL}/projects/${projectId}`).then((response) => {
       if (response.ok) {
         response.json().then((data) => {
           const projectData = data["data"];
           setProjectData(projectData);
-          fetch(`${API_URL}/courses/${projectData.course_id}`, {
-            credentials: 'include',
-          }).then((response) => {
+          authenticatedFetch(`${API_URL}/courses/${projectData.course_id}`).then((response) => {
             if (response.ok) {
               response.json().then((data) => {
                 setCourseData(data["data"]);
@@ -54,9 +51,7 @@ export default function ProjectView() {
       }
     });
 
-    fetch(`${API_URL}/projects/${projectId}/assignment`, {
-      credentials: 'include',
-    }).then((response) => {
+    authenticatedFetch(`${API_URL}/projects/${projectId}/assignment`).then((response) => {
       if (response.ok) {
         response.text().then((data) => setAssignmentRawText(data));
       }

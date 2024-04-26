@@ -10,22 +10,28 @@ import {
   Drawer,
   Grid,
   ListItemButton,
-  ListItemText
+  ListItemText,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 import LanguageIcon from "@mui/icons-material/Language";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Link } from "react-router-dom";
 import { TitlePortal } from "./TitlePortal";
-import {LoginButton} from "./Login";
+import { Me } from "../../types/me.ts";
+import {LoginButton} from "./Login.tsx";
 
+interface HeaderProps {
+  me: Me;
+}
 /**
  * The header component for the application that will be rendered at the top of the page.
  * @returns - The header component
  */
-export function Header(): JSX.Element {
-  const { t, i18n } = useTranslation('translation', { keyPrefix: 'header' });
+export function Header({ me }: HeaderProps): JSX.Element {
+  const API_URL = import.meta.env.VITE_APP_API_HOST;
+  const { t, i18n } = useTranslation("translation", { keyPrefix: "header" });
   const [languageMenuAnchor, setLanguageMenuAnchor] =
     useState<null | HTMLElement>(null);
 
@@ -44,32 +50,72 @@ export function Header(): JSX.Element {
 
   const [open, setOpen] = useState(false);
   const [listItems, setListItems] = useState([
-    { link: "/", text: t("homepage") }
+    { link: "/", text: t("homepage") },
   ]);
 
-  useEffect(() => {
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLButtonElement>(
+    null,
+  );
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  React.useEffect(() => {
     const baseItems = [{ link: "/", text: t("homepage") }];
     const additionalItems = [
       { link: "/projects", text: t("myProjects") },
-      { link: "/courses", text: t("myCourses") }
+      { link: "/courses", text: t("myCourses") },
     ];
-    if (isLoggedIn()) {
+    if (me.loggedIn) {
       setListItems([...baseItems, ...additionalItems]);
-    }
-    else {
+    } else {
       setListItems(baseItems);
     }
-  }, [t]);
+  }, [me, t]);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky">
         <Toolbar disableGutters>
-          <IconButton edge="start" onClick={() => setOpen(!open)} sx={{ color: "white", marginLeft: 0 }}>
-            <MenuIcon style={{fontSize:"2rem"}} />
+          <IconButton
+            edge="start"
+            onClick={() => setOpen(!open)}
+            sx={{ color: "white", marginLeft: 0 }}
+          >
+            <MenuIcon style={{ fontSize: "2rem" }} />
           </IconButton>
-          <TitlePortal/>
-          <LoginButton></LoginButton>
+          <TitlePortal />
+          {!me.loggedIn && (
+            <LoginButton/>
+          )}
+          {me.loggedIn && (
+            <>
+              <IconButton
+                edge="end"
+                onClick={handleClick}
+                sx={{ color: "inherit", marginRight: "0.3rem" }}
+              >
+                <AccountCircleIcon />
+                <Typography variant="body1" sx={{ paddingLeft: "0.3rem" }}>
+                  {me.display_name}
+                </Typography>
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={() => setAnchorEl(null)}
+              >
+                <Typography sx={{ padding: "6px 16px", color: "black" }}>
+                  {me.display_name}
+                </Typography>
+                <MenuItem>
+                  <Link to={`${API_URL}/logout`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                    {t("logout")}</Link>
+                </MenuItem>
+              </Menu>
+            </>
+          )}
           <div>
             <IconButton onClick={handleLanguageMenu} color="inherit">
               <LanguageIcon />
@@ -92,15 +138,13 @@ export function Header(): JSX.Element {
           </div>
         </Toolbar>
       </AppBar>
-      <DrawerMenu open={open} onClose={() => setOpen(false)} listItems={listItems}/>
+      <DrawerMenu
+        open={open}
+        onClose={() => setOpen(false)}
+        listItems={listItems}
+      />
     </Box>
   );
-}
-/**
- * @returns Whether a user is logged in or not.
- */
-function isLoggedIn() {
-  return true;
 }
 
 /**
@@ -110,26 +154,46 @@ function isLoggedIn() {
  * @param listItems - Array of objects representing the list items in the drawer menu.
  * @returns The Side Bar
  */
-function DrawerMenu({ open, onClose, listItems }: { open: boolean, onClose: () => void, listItems: { link: string, text: string }[] }) {
-
+function DrawerMenu({
+  open,
+  onClose,
+  listItems,
+}: {
+  open: boolean;
+  onClose: () => void;
+  listItems: { link: string; text: string }[];
+}) {
   return (
     <Drawer open={open} anchor="left" onClose={onClose}>
-      <Grid container direction="column" sx={{
-        width: 250,
-        height: "100%",
-        backgroundColor: "primary.main"
-      }}>
+      <Grid
+        container
+        direction="column"
+        sx={{
+          width: 250,
+          height: "100%",
+          backgroundColor: "primary.main",
+        }}
+      >
         <Grid item container direction="row" alignItems="flex-start">
-          <IconButton onClick={onClose} sx={{
-            color: "white"
-          }}>
-            <MenuIcon style={{fontSize:"2rem"}} />
+          <IconButton
+            onClick={onClose}
+            sx={{
+              color: "white",
+            }}
+          >
+            <MenuIcon style={{ fontSize: "2rem" }} />
           </IconButton>
         </Grid>
         <List>
           {listItems.map((listItem, index) => (
-            <ListItemButton key={index} component={Link} to={listItem.link} role="listitem" onClick={onClose}>
-              <ListItemText primary={listItem.text} sx={{color:"white"}} />
+            <ListItemButton
+              key={index}
+              component={Link}
+              to={listItem.link}
+              role="listitem"
+              onClick={onClose}
+            >
+              <ListItemText primary={listItem.text} sx={{ color: "white" }} />
             </ListItemButton>
           ))}
         </List>
