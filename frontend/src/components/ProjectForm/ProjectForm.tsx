@@ -15,14 +15,14 @@ import {
   TableBody, Paper,
   Tooltip, IconButton, Tabs, Tab,
 } from "@mui/material";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import JSZip from 'jszip';
 import {useTranslation} from "react-i18next";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeadlineCalender from "../Calender/DeadlineCalender.tsx";
 import { Deadline } from "../../types/deadline";
 import {InfoOutlined} from "@mui/icons-material";
-import {Link} from "react-router-dom";
+import {Link, useLoaderData, useLocation} from "react-router-dom";
 import FolderDragDrop from "../FolderUpload/FolderUpload.tsx";
 import TabPanel from "@mui/lab/TabPanel";
 import {TabContext} from "@mui/lab";
@@ -44,7 +44,6 @@ interface RegexData {
 }
 
 const apiUrl = import.meta.env.VITE_API_HOST
-const user = "Gunnar"
 
 /**
  * @returns Form for uploading project
@@ -71,10 +70,6 @@ export default function ProjectForm() {
   const [assignmentFile, setAssignmentFile] = useState<File>();
   const [filename, setFilename] = useState("");
 
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [courseId, setCourseId] = useState<string>('');
-  const [courseName, setCourseName] = useState<string>('');
-
   const [containsDockerfile, setContainsDockerfile] = useState(false);
   const [containsRuntest, setContainsRuntest] = useState(false);
 
@@ -83,9 +78,21 @@ export default function ProjectForm() {
   const [validRunner, setValidRunner] = useState(true);
   const [validSubmission, setValidSubmission] = useState(true);
 
-  useEffect(() => {
-    fetchCourses();
-  }, [regexError]);
+  const courses = useLoaderData() as Course[]
+  const location = useLocation();
+  const urlParams = new URLSearchParams(location.search);
+  const initialCourseId = urlParams.get('course_id') || '';
+  let initialCourseName = ''
+  for( let c of courses){
+    const parts = c.course_id.split('/');
+    const courseId = parts[parts.length - 1];
+    if(courseId === initialCourseId){
+      initialCourseName = c.name
+    }
+  }
+
+  const [courseId, setCourseId] = useState<string>(initialCourseId);
+  const [courseName, setCourseName] = useState<string>(initialCourseName);
 
   const handleRunnerSwitch = (newRunner: string) => {
     if (newRunner === t('clearSelected')) {
@@ -133,14 +140,6 @@ export default function ProjectForm() {
     } else {
       setValidRunner(containsRuntest);
       setValidSubmission(containsRuntest);
-    }
-  }
-
-  const fetchCourses = async () => {
-    const response = await authenticatedFetch(`${apiUrl}/courses?teacher=${user}`)
-    const jsonData = await response.json();
-    if (jsonData.data) {
-      setCourses(jsonData.data);
     }
   }
 
