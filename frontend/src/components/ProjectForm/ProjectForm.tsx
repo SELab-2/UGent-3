@@ -79,14 +79,15 @@ export default function ProjectForm() {
   const [validSubmission, setValidSubmission] = useState(true);
 
   const courses = useLoaderData() as Course[]
+
   const location = useLocation();
   const urlParams = new URLSearchParams(location.search);
   const initialCourseId = urlParams.get('course_id') || '';
   let initialCourseName = ''
-  for( let c of courses){
+  for( const c of courses){
     const parts = c.course_id.split('/');
     const courseId = parts[parts.length - 1];
-    if(courseId === initialCourseId){
+    if (courseId === initialCourseId){
       initialCourseName = c.name
     }
   }
