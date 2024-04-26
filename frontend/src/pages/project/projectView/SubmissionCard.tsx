@@ -16,6 +16,7 @@ import axios from "axios";
 import { useTranslation } from "react-i18next";
 import SubmissionsGrid from "./SubmissionsGrid";
 import { Submission } from "../../../types/submission";
+import { authenticatedFetch } from "../../../utils/authenticated-fetch";
 
 interface SubmissionCardProps {
   regexRequirements?: string[];
@@ -47,9 +48,7 @@ export default function SubmissionCard({
 
   useEffect(() => {
 
-    fetch(`${submissionUrl}?project_id=${projectId}`, {
-      credentials: 'include'
-    }).then((response) => {
+    authenticatedFetch(`${submissionUrl}?project_id=${projectId}`).then((response) => {
       if (response.ok) {
         response.json().then((data) => {
           setPreviousSubmissions(data["data"]);
