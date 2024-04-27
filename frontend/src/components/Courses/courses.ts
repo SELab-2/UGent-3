@@ -1,7 +1,10 @@
-import { authenticatedFetch } from "../authenticated-fetch.ts";
+import { authenticatedFetch } from "../../utils/authenticated-fetch.ts";
 const API_URL = import.meta.env.VITE_APP_API_HOST;
 
-export const fetchCourses = async (user_uid: string) => {
+/**
+ * @returns Courses[]
+ */
+export async function  fetchProjectFormCourses(user_uid: string){
   try {
     const response = await authenticatedFetch(
       `${API_URL}/courses?teacher=${user_uid}`,
@@ -15,4 +18,4 @@ export const fetchCourses = async (user_uid: string) => {
   } catch (_) {
     return [];
   }
-};
+}

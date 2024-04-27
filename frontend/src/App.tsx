@@ -21,7 +21,7 @@ import HomePages from "./pages/home/HomePages.tsx";
 import ProjectOverView from "./pages/project/projectOverview.tsx";
 import { synchronizeJoinCode } from "./loaders/join-code.ts";
 import { fetchMe } from "./utils/fetches/FetchMe.ts";
-import {fetchProjectForm} from "./utils/fetches/fetch-project-form.ts";
+import {fetchProjectForm} from "./components/ProjectForm/project-form.ts";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
