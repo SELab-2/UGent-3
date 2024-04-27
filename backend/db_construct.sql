@@ -65,7 +65,7 @@ CREATE TABLE submissions (
 	project_id INT NOT NULL,
 	grading FLOAT CHECK (grading >= 0 AND grading <= 20),
 	submission_time TIMESTAMP WITH TIME ZONE NOT NULL,
-	submission_path VARCHAR(50) NOT NULL,
+	submission_path VARCHAR(255) NOT NULL,
 	submission_status submission_status NOT NULL,
 	PRIMARY KEY(submission_id),
 	CONSTRAINT fk_project FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE,

@@ -23,7 +23,7 @@ from .endpoints.authentication.auth import auth_bp
 from .endpoints.authentication.me import me_bp
 from .endpoints.authentication.logout import logout_bp
 from .init_auth import auth_init
-from .utils.seeder.seeder import test_generator
+from .utils.seeder.seeder import run_seeder
 
 load_dotenv()
 JWT_SECRET_KEY = getenv("JWT_SECRET_KEY")
@@ -78,5 +78,5 @@ def create_app_with_db(db_uri: str):
         connection = db.session.connection()
         register_composites(connection)
     CORS(app, supports_credentials=True)
-    test_generator()
+    run_seeder("851c87d0-a62f-4af3-ab92-316a84f370ac")
     return app
