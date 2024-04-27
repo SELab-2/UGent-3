@@ -118,9 +118,8 @@ export function Header({ me }: HeaderProps): JSX.Element {
                 <Typography sx={{ padding: "6px 16px", color: "black" }}>
                   {me.display_name}
                 </Typography>
-                <MenuItem>
-                  <Link to={`${API_URL}/logout`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                    {t("logout")}</Link>
+                <MenuItem component="a" href={`${API_URL}/logout`}>
+                  {t("logout")}
                 </MenuItem>
               </Menu>
             </>
