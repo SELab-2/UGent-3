@@ -98,8 +98,8 @@ class TestUserEndpoint:
 
     def test_get_all_users(self, client, valid_user_entries):
         """Test getting all users."""
-        res = client.get("/auth?code=teacher1")
-        response = client.get("/users")
+        csrf = get_csrf_from_login(client, "teacher1")
+        response = client.get("/users", headers={"X-CSRF-TOKEN":csrf})
         assert response.status_code == 200
         # Check that the response is a list (even if it's empty)
         assert isinstance(response.json["data"], list)
@@ -108,7 +108,8 @@ class TestUserEndpoint:
 
     def test_get_all_users_no_authentication(self, client):
         """Test getting all users without authentication."""
-        response = client.get("/users")
+        csrf = get_csrf_from_login(client, "teacher1")
+        response = client.get("/users", headers={"X-CSRF-TOKEN":csrf})
         assert response.status_code == 401
 
     def test_get_all_users_wrong_authentication(self, client):
