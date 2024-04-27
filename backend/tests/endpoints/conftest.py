@@ -34,7 +34,7 @@ def auth_test(request: FixtureRequest, client: FlaskClient, data_map: dict[str, 
     for k, v in data_map.items():
         endpoint = endpoint.replace(k, str(v))
     csrf = get_csrf_from_login(client, token)
-    return endpoint, getattr(client, method), token, *other
+    return endpoint, getattr(client, method), csrf, *other
 
 
 
