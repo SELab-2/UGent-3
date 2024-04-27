@@ -9,6 +9,7 @@ from pytest import fixture, FixtureRequest
 from flask.testing import FlaskClient
 from sqlalchemy.orm import Session
 
+from tests.utils.auth_login import get_csrf_from_login
 from project.models.user import User,Role
 from project.models.course import Course
 from project.models.course_relation import CourseStudent, CourseAdmin
@@ -47,14 +48,13 @@ def data_field_type_test(
 
     for key, value in data_map.items():
         endpoint = endpoint.replace(key, str(value))
-
     for key, value in data.items():
         if isinstance(value, list):
             data[key] = [data_map.get(v,v) for v in value]
         elif value in data_map.keys():
             data[key] = data_map[value]
-
-    return endpoint, getattr(client, method), token, data
+    csrf = get_csrf_from_login(client, token)
+    return endpoint, getattr(client, method), csrf, data
 
 
 
@@ -66,8 +66,8 @@ def query_parameter_test(request: FixtureRequest, client: FlaskClient, data_map:
 
     for key, value in data_map.items():
         endpoint = endpoint.replace(key, str(value))
-
-    return endpoint, getattr(client, method), token, wrong_parameter
+    csrf = get_csrf_from_login(client, token)
+    return endpoint, getattr(client, method), csrf, wrong_parameter
 
 
 

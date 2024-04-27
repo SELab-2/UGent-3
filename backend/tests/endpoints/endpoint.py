@@ -98,25 +98,25 @@ class TestEndpoint:
     def authorization(self, auth_test: tuple[str, Any, str, bool]):
         """Test if the authorization for the given endpoint works"""
 
-        endpoint, method, token, allowed = auth_test
+        endpoint, method, csrf, allowed = auth_test
 
-        response = method(endpoint, headers = {"Authorization": token})
+        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
         assert allowed == (response.status_code != 403)
 
     def data_field_type(self, test: tuple[str, Any, str, dict[str, Any]]):
         """Test if the datatypes are properly checked for data fields"""
 
-        endpoint, method, token, data = test
+        endpoint, method, csrf, data = test
 
-        response = method(endpoint, headers = {"Authorization": token}, json = data)
+        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf}, json = data)
         assert response.status_code == 400
 
     def query_parameter(self, test: tuple[str, Any, str, bool]):
         """Test the query parameter"""
 
-        endpoint, method, token, wrong_parameter = test
+        endpoint, method, csrf, wrong_parameter = test
 
-        response = method(endpoint, headers = {"Authorization": token})
+        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
         assert wrong_parameter == (response.status_code == 400)
 
         if not wrong_parameter:
