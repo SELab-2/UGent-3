@@ -11,6 +11,7 @@ from dataclasses import asdict
 import pytest
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+from backend.tests.utils.auth_login import get_csrf_from_login
 from project.models.user import User,Role
 from project.db_in import db
 from tests import db_url
@@ -45,32 +46,35 @@ class TestUserEndpoint:
     def test_delete_user(self, client, valid_user_entry):
         """Test deleting a user."""
         # Delete the user
+        csrf = get_csrf_from_login(client, "student1")
         response = client.delete(f"/users/{valid_user_entry.uid}",
-                                  headers={"Authorization":"student1"})
+                                  headers={"X-CSRF-TOKEN":csrf})
         assert response.status_code == 200
 
+        csrf = get_csrf_from_login(client, "teacher1")
         # If student 1 sends this request, he would get added again
         get_response = client.get(f"/users/{valid_user_entry.uid}",
-                                  headers={"Authorization":"teacher1"})
+                                  headers={"X-CSRF-TOKEN":csrf})
 
         assert get_response.status_code == 404
 
     def test_delete_user_not_yourself(self, client, valid_user_entry):
         """Test deleting a user that is not the user the authentication belongs to."""
         # Delete the user
+        csrf = get_csrf_from_login(client, "teacher1")
         response = client.delete(f"/users/{valid_user_entry.uid}",
-                                 headers={"Authorization":"teacher1"})
+                                 headers={"X-CSRF-TOKEN":csrf})
         assert response.status_code == 403
 
-        # If student 1 sends this request, he would get added again
         get_response = client.get(f"/users/{valid_user_entry.uid}",
-                                  headers={"Authorization":"teacher1"})
+                                  headers={"X-CSRF-TOKEN":csrf})
 
         assert get_response.status_code == 200
 
     def test_delete_not_present(self, client):
         """Test deleting a user that does not exist."""
-        response = client.delete("/users/-20", headers={"Authorization":"student1"})
+        csrf = get_csrf_from_login(client, "teacher1")
+        response = client.delete("/users/-20", headers={"X-CSRF-TOKEN":csrf})
         assert response.status_code == 403 # User does not exist, so you are not the user
 
     def test_post_no_authentication(self, client, user_invalid_field):
@@ -80,14 +84,16 @@ class TestUserEndpoint:
 
     def test_post_authenticated(self, client, valid_user):
         """Test posting with wrong authentication."""
+        csrf = get_csrf_from_login(client, "teacher1")
         response = client.post("/users", data=valid_user,
-                               headers={"Authorization":"teacher1"})
+                               headers={"X-CSRF-TOKEN":csrf})
         assert response.status_code == 403 # POST to /users is not allowed
 
     def test_wrong_form_post(self, client, user_invalid_field):
         """Test posting with a wrong form."""
+        csrf = get_csrf_from_login(client, "teacher1")
         response = client.post("/users", data=user_invalid_field,
-                               headers={"Authorization":"teacher1"})
+                               headers={"X-CSRF-TOKEN":csrf})
         assert response.status_code == 403
 
     def test_get_all_users(self, client, valid_user_entries):
@@ -107,13 +113,13 @@ class TestUserEndpoint:
 
     def test_get_all_users_wrong_authentication(self, client):
         """Test getting all users with wrong authentication."""
-        res = client.get("/auth?code=wrong")
+        client.get("/auth?code=wrong")
         response = client.get("/users")
         assert response.status_code == 401
 
     def test_get_one_user(self, client, valid_user_entry):
         """Test getting a single user."""
-        res = client.get("/auth?code=teacher1")
+        client.get("/auth?code=teacher1")
         response = client.get(f"users/{valid_user_entry.uid}")
         assert response.status_code == 200
         assert "data" in response.json
@@ -140,9 +146,10 @@ class TestUserEndpoint:
         else:
             new_role = Role.TEACHER
         new_role = new_role.name
+        csrf = get_csrf_from_login(client, "student01")
         response = client.patch(f"/users/{valid_user_entry.uid}", json={
             'role': new_role
-        }, headers={"Authorization":"student01"})
+        }, headers={'X-CSRF-TOKEN':csrf})
         assert response.status_code == 403 # Patching a user is not allowed as a not-admin
 
     def test_patch_user(self, client, admin, valid_user_entry):
@@ -155,16 +162,18 @@ class TestUserEndpoint:
         else:
             new_role = Role.TEACHER
         new_role = new_role.name
+        csrf = get_csrf_from_login(client, "admin")
         response = client.patch(f"/users/{valid_user_entry.uid}", json={
             'role': new_role
-        }, headers={"Authorization":"admin"})
+        }, headers={'X-CSRF-TOKEN':csrf})
         assert response.status_code == 200
 
     def test_patch_non_existent(self, client, admin):
         """Test updating a non-existent user."""
+        csrf = get_csrf_from_login(client, "admin")
         response = client.patch("/users/-20", json={
             'role': Role.TEACHER.name
-        }, headers={"Authorization":"admin"})
+        }, headers={'X-CSRF-TOKEN':csrf})
         assert response.status_code == 404
 
     def test_patch_non_json(self, client, admin, valid_user_entry):
@@ -174,17 +183,14 @@ class TestUserEndpoint:
             valid_user_form["role"] = Role.STUDENT.name
         else:
             valid_user_form["role"] = Role.TEACHER.name
-        response = client.get("/auth?code=admin")
-        csrf = next(cookie for cookie 
-                    in response.headers.getlist('Set-Cookie') 
-                    if 'csrf_access_token' in cookie).split(";")[0].split("=")[1]
+        csrf = get_csrf_from_login(client, "admin")
         response = client.patch(f"/users/{valid_user_form['uid']}", data=valid_user_form,
                                 headers={'X-CSRF-TOKEN':csrf})
         assert response.status_code == 415
 
     def test_get_users_with_query(self, client, valid_user_entries):
         """Test getting users with a query."""
-        res = client.get("/auth?code=teacher1")
+        get_csrf_from_login(client, "admin")
         # Send a GET request with query parameters, this is a nonsense entry but good for testing
         response = client.get("/users?role=ADMIN")
         assert response.status_code == 200
