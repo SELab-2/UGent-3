@@ -1,7 +1,8 @@
-# Import necessary modules
-import argparse
-#from seeder import into_the_db
 
+import argparse
+from seeder import into_the_db
+from sys import path
+path.append(".")
 
 # Create a function to parse command line arguments
 def parse_args():
@@ -15,7 +16,7 @@ def main():
     args = parse_args()
     print(args.my_uid)
     # Call into_the_db function with the provided UID
-    #into_the_db(args.my_uid)
+    into_the_db(args.my_uid)
 
 if __name__ == '__main__':
     main()
