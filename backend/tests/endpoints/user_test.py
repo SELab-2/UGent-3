@@ -175,8 +175,9 @@ class TestUserEndpoint:
         else:
             valid_user_form["role"] = Role.TEACHER.name
         response = client.get("/auth?code=admin")
-        csrf = response.headers.getlist('Set-Cookie')
-        print(csrf)
+        csrf = next(cookie for cookie 
+                    in response.headers.getlist('Set-Cookie') 
+                    if 'csrf_access_token' in cookie).split(";")[0].split("=")[1]
         response = client.patch(f"/users/{valid_user_form['uid']}", data=valid_user_form,
                                 headers={'X-CSRF-TOKEN':csrf})
         assert response.status_code == 415

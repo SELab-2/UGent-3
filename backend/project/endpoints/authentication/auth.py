@@ -55,7 +55,7 @@ def microsoft_authentication():
                                     timeout=5)
     except TimeoutError:
         return {"message":"Request to Microsoft timed out"}, 500
-    if not profile_res or profile_res.status_code != 200:
+    if profile_res is None or profile_res.status_code != 200:
         abort(make_response(({"message":
                               "An error occured while trying to authenticate your access token"},
                                500)))
@@ -78,7 +78,8 @@ def test_authentication():
     if code is None:
         return {"message":"No code"}, 400
     profile_res = requests.get(AUTHENTICATION_URL, headers={"Authorization":f"{code}"}, timeout=5)
-    if not profile_res:
+    print(profile_res)
+    if profile_res is None:
         abort(make_response(({"message":
                               "An error occured while trying to authenticate your access token"},
                                500)))
