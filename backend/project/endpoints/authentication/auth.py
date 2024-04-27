@@ -83,7 +83,9 @@ def test_authentication():
                               "An error occured while trying to authenticate your access token"},
                                500)))
     if profile_res.status_code != 200:
-        abort(profile_res)
+        abort(make_response(({"message":
+                              "Something was wrong with your code"},
+                               401)))
     user = get_or_make_user(profile_res)
     resp = redirect(HOMEPAGE_URL, code=303)
     additional_claims = {"is_teacher":user.role == Role.TEACHER,

@@ -174,19 +174,17 @@ class TestUserEndpoint:
             valid_user_form["role"] = Role.STUDENT.name
         else:
             valid_user_form["role"] = Role.TEACHER.name
-        res = client.get("/auth?code=admin")
-        csrf = next(
-                (cookie for cookie in client.cookie_jar if cookie.name == "csrf_access_token"),
-                None
-                )
+        response = client.get("/auth?code=admin")
+        csrf = response.headers.getlist('Set-Cookie')
+        print(csrf)
         response = client.patch(f"/users/{valid_user_form['uid']}", data=valid_user_form,
                                 headers={'X-CSRF-TOKEN':csrf})
         assert response.status_code == 415
 
     def test_get_users_with_query(self, client, valid_user_entries):
         """Test getting users with a query."""
-        # Send a GET request with query parameters, this is a nonsense entry but good for testing
         res = client.get("/auth?code=teacher1")
+        # Send a GET request with query parameters, this is a nonsense entry but good for testing
         response = client.get("/users?role=ADMIN")
         assert response.status_code == 200
 
