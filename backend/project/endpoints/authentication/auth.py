@@ -76,7 +76,7 @@ def test_authentication():
     """
     code = request.args.get("code")
     if code is None:
-        return {"message":"Not yet"}, 500
+        return {"message":"No code"}, 400
     profile_res = requests.get(AUTHENTICATION_URL, headers={"Authorization":f"{code}"}, timeout=5)
     if not profile_res:
         abort(make_response(({"message":

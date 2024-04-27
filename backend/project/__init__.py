@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
-from flask_restful import Api
 from sqlalchemy_utils import register_composites
 from .executor import executor
 from .db_in import db
