@@ -9,7 +9,7 @@ from os import getenv
 from urllib.parse import urljoin
 from dotenv import load_dotenv
 
-from flask import request, jsonify
+from flask import request
 from flask_restful import Resource
 
 from sqlalchemy import union, select
@@ -17,7 +17,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from project.models.course import Course
 from project.models.course_relation import CourseAdmin, CourseStudent
-from project.utils.query_agent import query_selected_from_model, insert_into_model
+from project.utils.query_agent import insert_into_model
 from project.utils.authentication import login_required_return_uid, authorize_teacher
 from project.endpoints.courses.courses_utils import check_data
 from project.db_in import db
@@ -39,8 +39,12 @@ class CourseForUser(Resource):
 
         try:
             # Define the individual select statements
-            student_courses = select(Course).join(CourseStudent, Course.course_id == CourseStudent.course_id).filter(CourseStudent.uid == uid)
-            admin_courses = select(Course).join(CourseAdmin, Course.course_id == CourseAdmin.course_id).filter(CourseAdmin.uid == uid)
+            student_courses = select(Course).join(
+                CourseStudent, Course.course_id == CourseStudent.course_id).filter(
+                    CourseStudent.uid == uid)
+            admin_courses = select(Course).join(
+                CourseAdmin, Course.course_id == CourseAdmin.course_id).filter(
+                    CourseAdmin.uid == uid)
             teacher_courses = select(Course).filter(Course.teacher == uid)
 
             # Combine the select statements using union to remove duplicates
@@ -49,7 +53,7 @@ class CourseForUser(Resource):
             # Execute the union query and fetch all results as Course instances
             courses = db.session.execute(all_courses_query).mappings().all()
             courses_data = [dict(course) for course in courses]
-            
+
             for course in courses_data:
                 course["course_id"] = urljoin(f"{RESPONSE_URL}/", str(course['course_id']))
 
