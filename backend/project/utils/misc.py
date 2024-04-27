@@ -5,6 +5,7 @@ These functions apply to a variety of use cases and are not specific to any one 
 
 from typing import Dict, List
 from urllib.parse import urljoin
+from uuid import UUID
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
 
@@ -73,3 +74,22 @@ def filter_model_fields(model: DeclarativeMeta, data: Dict[str, str]):
         A dictionary with the fields of the model.
     """
     return {key: value for key, value in data.items() if hasattr(model, key)}
+
+
+def is_valid_uuid(uuid_to_test, version=4):
+    """
+    Check if uuid_to_test is a valid UUID.
+
+    Args:
+        uuid_to_test: str - The UUID to test.
+        version: int - The version of the UUID.
+    
+    Returns:
+        bool: True if the UUID is valid, False otherwise.
+    """
+
+    try:
+        uuid_obj = UUID(uuid_to_test, version=version)
+    except ValueError:
+        return False
+    return str(uuid_obj) == uuid_to_test
