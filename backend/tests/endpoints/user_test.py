@@ -126,6 +126,7 @@ class TestUserEndpoint:
     def test_get_one_user_wrong_authentication(self, client, valid_user_entry):
         """Test getting a single user with wrong authentication."""
         res = client.get("/auth?code=wrong")
+        assert res.status_code == 401
         response = client.get(f"users/{valid_user_entry.uid}")
         assert response.status_code == 401
 

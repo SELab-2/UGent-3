@@ -78,6 +78,12 @@ def test_authentication():
     if code is None:
         return {"message":"Not yet"}, 500
     profile_res = requests.get(AUTHENTICATION_URL, headers={"Authorization":f"{code}"}, timeout=5)
+    if not profile_res:
+        abort(make_response(({"message":
+                              "An error occured while trying to authenticate your access token"},
+                               500)))
+    if profile_res.status_code != 200:
+        abort(make_response(profile_res))
     user = get_or_make_user(profile_res)
     resp = redirect(HOMEPAGE_URL, code=303)
     additional_claims = {"is_teacher":user.role == Role.TEACHER,
