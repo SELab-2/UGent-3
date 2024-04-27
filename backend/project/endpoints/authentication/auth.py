@@ -16,7 +16,7 @@ auth_api = Api(auth_bp)
 load_dotenv()
 API_URL = getenv("API_HOST")
 AUTH_METHOD = getenv("AUTH_METHOD")
-AUTHENTICATION_URL = getenv("AUTHENTICATION_URL")
+TEST_AUTHENTICATION_URL = getenv("TEST_AUTHENTICATION_URL")
 CLIENT_ID = getenv("CLIENT_ID")
 CLIENT_SECRET = getenv("CLIENT_SECRET")
 HOMEPAGE_URL = getenv("HOMEPAGE_URL")
@@ -77,8 +77,9 @@ def test_authentication():
     code = request.args.get("code")
     if code is None:
         return {"message":"No code"}, 400
-    profile_res = requests.get(AUTHENTICATION_URL, headers={"Authorization":f"{code}"}, timeout=5)
-    print(profile_res)
+    profile_res = requests.get(TEST_AUTHENTICATION_URL,
+                               headers={"Authorization":f"{code}"},
+                               timeout=5)
     if profile_res is None:
         abort(make_response(({"message":
                               "An error occured while trying to authenticate your access token"},
