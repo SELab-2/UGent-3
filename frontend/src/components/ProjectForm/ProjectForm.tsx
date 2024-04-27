@@ -15,7 +15,7 @@ import {
   TableBody, Paper,
   Tooltip, IconButton, Tabs, Tab,
 } from "@mui/material";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import JSZip from 'jszip';
 import {useTranslation} from "react-i18next";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -80,20 +80,25 @@ export default function ProjectForm() {
 
   const courses = useLoaderData() as Course[]
 
+  const [courseId, setCourseId] = useState<string>('');
+  const [courseName, setCourseName] = useState<string>('');
   const location = useLocation();
-  const urlParams = new URLSearchParams(location.search);
-  const initialCourseId = urlParams.get('course_id') || '';
-  let initialCourseName = ''
-  for( const c of courses){
-    const parts = c.course_id.split('/');
-    const courseId = parts[parts.length - 1];
-    if (courseId === initialCourseId){
-      initialCourseName = c.name
-    }
-  }
 
-  const [courseId, setCourseId] = useState<string>(initialCourseId);
-  const [courseName, setCourseName] = useState<string>(initialCourseName);
+  useEffect(() =>{
+    const urlParams = new URLSearchParams(location.search);
+    const initialCourseId = urlParams.get('course_id') || '';
+    let initialCourseName = ''
+    for( const c of courses){
+      const parts = c.course_id.split('/');
+      const courseId = parts[parts.length - 1];
+      if (courseId === initialCourseId){
+        initialCourseName = c.name
+      }
+    }
+    setCourseId(initialCourseId)
+    setCourseName(initialCourseName)
+  }
+  ,[courses,location])
 
   const handleRunnerSwitch = (newRunner: string) => {
     if (newRunner === t('clearSelected')) {
