@@ -1,8 +1,43 @@
 """Utility functions for the user model"""
 
 from typing import Tuple
+from requests import Response
+
+from flask import abort, make_response
+from sqlalchemy.exc import SQLAlchemyError
+from project import db
 from sqlalchemy.orm import Session
-from project.models.user import User
+from project.models.user import User, Role
+
+def get_or_make_user(profile_res: Response) -> User:
+    auth_user_id = profile_res.json()["id"]
+    try:
+        user = db.session.get(User, auth_user_id)
+    except SQLAlchemyError:
+        db.session.rollback()
+        abort(make_response(({"message":
+                            "An unexpected database error occured while fetching the user"},
+                            500)))
+
+    if not user:
+        role = Role.STUDENT
+        if profile_res.json()["jobTitle"] is not None:
+            role = Role.TEACHER
+
+        # add user if not yet in database
+        try:
+            new_user = User(uid=auth_user_id,
+                            role=role,
+                            display_name=profile_res.json()["displayName"])
+            db.session.add(new_user)
+            db.session.commit()
+            user = new_user
+        except SQLAlchemyError:
+            db.session.rollback()
+            abort(make_response(({"message":
+                                    """An unexpected database error occured
+                                while creating the user during authentication"""}, 500)))
+    return user
 
 def is_valid_user(session: Session, uid: any) -> Tuple[bool, str]:
     """Check if a uid is valid

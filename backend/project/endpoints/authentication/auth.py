@@ -6,11 +6,9 @@ import requests
 from flask import Blueprint, request, redirect, abort, make_response
 from flask_jwt_extended import create_access_token, set_access_cookies
 from flask_restful import Resource, Api
-from sqlalchemy.exc import SQLAlchemyError
 
-from project import db
-
-from project.models.user import User, Role
+from project.models.user import Role
+from project.utils.user import get_or_make_user
 
 auth_bp = Blueprint("auth", __name__)
 auth_api = Api(auth_bp)
@@ -61,33 +59,7 @@ def microsoft_authentication():
         abort(make_response(({"message":
                               "An error occured while trying to authenticate your access token"},
                                500)))
-    auth_user_id = profile_res.json()["id"]
-    try:
-        user = db.session.get(User, auth_user_id)
-    except SQLAlchemyError:
-        db.session.rollback()
-        abort(make_response(({"message":
-                            "An unexpected database error occured while fetching the user"},
-                            500)))
-
-    if not user:
-        role = Role.STUDENT
-        if profile_res.json()["jobTitle"] is not None:
-            role = Role.TEACHER
-
-        # add user if not yet in database
-        try:
-            new_user = User(uid=auth_user_id,
-                            role=role,
-                            display_name=profile_res.json()["displayName"])
-            db.session.add(new_user)
-            db.session.commit()
-            user = new_user
-        except SQLAlchemyError:
-            db.session.rollback()
-            abort(make_response(({"message":
-                                    """An unexpected database error occured
-                                while creating the user during authentication"""}, 500)))
+    user = get_or_make_user(profile_res)
     resp = redirect(HOMEPAGE_URL, code=303)
     additional_claims = {"is_teacher":user.role == Role.TEACHER,
                          "is_admin":user.role == Role.ADMIN}
@@ -106,8 +78,13 @@ def test_authentication():
     if code is None:
         return {"message":"Not yet"}, 500
     profile_res = requests.get(AUTHENTICATION_URL, headers={"Authorization":f"{code}"}, timeout=5)
+    user = get_or_make_user(profile_res)
     resp = redirect(HOMEPAGE_URL, code=303)
-    set_access_cookies(resp, create_access_token(identity=profile_res.json()["id"]))
+    additional_claims = {"is_teacher":user.role == Role.TEACHER,
+                         "is_admin":user.role == Role.ADMIN}
+    set_access_cookies(resp,
+                       create_access_token(identity=profile_res.json()["id"],
+                                           additional_claims=additional_claims))
     return resp
 
 

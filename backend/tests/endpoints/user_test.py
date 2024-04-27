@@ -92,7 +92,8 @@ class TestUserEndpoint:
 
     def test_get_all_users(self, client, valid_user_entries):
         """Test getting all users."""
-        response = client.get("/users", headers={"Authorization":"teacher1"})
+        res = client.get("/auth?code=teacher1")
+        response = client.get("/users")
         assert response.status_code == 200
         # Check that the response is a list (even if it's empty)
         assert isinstance(response.json["data"], list)
@@ -106,12 +107,14 @@ class TestUserEndpoint:
 
     def test_get_all_users_wrong_authentication(self, client):
         """Test getting all users with wrong authentication."""
-        response = client.get("/users", headers={"Authorization":"wrong"})
+        res = client.get("/auth?code=wrong")
+        response = client.get("/users")
         assert response.status_code == 401
 
     def test_get_one_user(self, client, valid_user_entry):
         """Test getting a single user."""
-        response = client.get(f"users/{valid_user_entry.uid}", headers={"Authorization":"teacher1"})
+        res = client.get("/auth?code=teacher1")
+        response = client.get(f"users/{valid_user_entry.uid}")
         assert response.status_code == 200
         assert "data" in response.json
 
@@ -122,7 +125,8 @@ class TestUserEndpoint:
 
     def test_get_one_user_wrong_authentication(self, client, valid_user_entry):
         """Test getting a single user with wrong authentication."""
-        response = client.get(f"users/{valid_user_entry.uid}", headers={"Authorization":"wrong"})
+        res = client.get("/auth?code=wrong")
+        response = client.get(f"users/{valid_user_entry.uid}")
         assert response.status_code == 401
 
     def test_patch_user_not_authorized(self, client, admin, valid_user_entry):
@@ -177,8 +181,8 @@ class TestUserEndpoint:
     def test_get_users_with_query(self, client, valid_user_entries):
         """Test getting users with a query."""
         # Send a GET request with query parameters, this is a nonsense entry but good for testing
-        response = client.get("/users?role=ADMIN",
-                              headers={"Authorization":"teacher1"})
+        res = client.get("/auth?code=teacher1")
+        response = client.get("/users?role=ADMIN")
         assert response.status_code == 200
 
         # Check that the response contains only the user that matches the query
