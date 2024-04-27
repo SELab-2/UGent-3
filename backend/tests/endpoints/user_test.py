@@ -14,7 +14,7 @@ from sqlalchemy import create_engine
 from project.models.user import User,Role
 from project.db_in import db
 from tests import db_url
-from utils.auth_login import get_csrf_from_login
+from tests.utils.auth_login import get_csrf_from_login
 
 engine = create_engine(db_url)
 Session = sessionmaker(bind=engine)
