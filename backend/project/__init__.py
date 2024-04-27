@@ -35,6 +35,7 @@ def create_app():
     """
 
     app = Flask(__name__)
+    app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config["JWT_COOKIE_SECURE"] = True
     app.config["JWT_COOKIE_CSRF_PROTECT"] = True
     app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
