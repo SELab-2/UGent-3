@@ -76,7 +76,7 @@ def test_post_project(client, valid_project):
 
 def test_remove_project(client, valid_project_entry):
     """Test removing a project to the datab and fetching it, testing if it's not present anymore"""
-    csrf = get_csrf_from_login(client, "teacher1")
+    csrf = get_csrf_from_login(client, "teacher")
     project_id = valid_project_entry.project_id
     response = client.delete(f"/projects/{project_id}", headers = {"X-CSRF-TOKEN":csrf})
     assert response.status_code == 200
@@ -87,7 +87,7 @@ def test_remove_project(client, valid_project_entry):
 
 def test_patch_project(client, valid_project_entry):
     """Test functionality of the PATCH method for projects"""
-    csrf = get_csrf_from_login(client, "teacher1")
+    csrf = get_csrf_from_login(client, "teacher")
     project_id = valid_project_entry.project_id
 
     new_title = valid_project_entry.title + "hallo"

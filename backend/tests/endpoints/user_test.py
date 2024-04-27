@@ -108,8 +108,7 @@ class TestUserEndpoint:
 
     def test_get_all_users_no_authentication(self, client):
         """Test getting all users without authentication."""
-        csrf = get_csrf_from_login(client, "teacher1")
-        response = client.get("/users", headers={"X-CSRF-TOKEN":csrf})
+        response = client.get("/users")
         assert response.status_code == 401
 
     def test_get_all_users_wrong_authentication(self, client):
