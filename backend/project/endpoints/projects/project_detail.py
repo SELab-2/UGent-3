@@ -22,7 +22,7 @@ from project.endpoints.projects.endpoint_parser import parse_project_params
 
 API_URL = os.getenv('API_HOST')
 RESPONSE_URL = urljoin(API_URL, "projects")
-UPLOAD_FOLDER = os.getenv('UPLOAD_URL')
+UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER')
 
 
 class ProjectDetail(Resource):
