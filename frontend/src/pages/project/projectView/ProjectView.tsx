@@ -21,6 +21,7 @@ const API_URL = import.meta.env.VITE_API_HOST;
 interface Project {
   title: string;
   description: string;
+  regex_expressions: string[];
 }
 
 /**
@@ -100,6 +101,7 @@ export default function ProjectView() {
       <Grid item sm={12}>
         <Container>
           <SubmissionCard
+            regexRequirements={projectData ? projectData.regex_expressions : []}
             submissionUrl={`${API_URL}/submissions`}
             projectId={projectId}
           />
