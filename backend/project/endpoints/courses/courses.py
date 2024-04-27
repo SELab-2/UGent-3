@@ -38,14 +38,29 @@ class CourseForUser(Resource):
         """
 
         try:
-            # Define the individual select statements
-            student_courses = select(Course).join(
-                CourseStudent, Course.course_id == CourseStudent.course_id).filter(
+
+            filter_params = request.args.to_dict()
+
+            # Start with a base query
+            base_query = select(Course)
+
+            # Apply filters dynamically if they are provided
+            for param, value in filter_params.items():
+                if value:
+                    attribute = getattr(Course, param, None)
+                    if attribute:
+                        base_query = base_query.filter(attribute == value)
+
+            # Define the role-specific queries
+            student_courses = base_query.join(
+                CourseStudent,
+                Course.course_id == CourseStudent.course_id).filter(
                     CourseStudent.uid == uid)
-            admin_courses = select(Course).join(
-                CourseAdmin, Course.course_id == CourseAdmin.course_id).filter(
+            admin_courses = base_query.join(
+                CourseAdmin,
+                Course.course_id == CourseAdmin.course_id).filter(
                     CourseAdmin.uid == uid)
-            teacher_courses = select(Course).filter(Course.teacher == uid)
+            teacher_courses = base_query.filter(Course.teacher == uid)
 
             # Combine the select statements using union to remove duplicates
             all_courses_query = union(student_courses, admin_courses, teacher_courses)
@@ -63,8 +78,7 @@ class CourseForUser(Resource):
                 "message": "Courses fetched successfully"
             }
 
-        except SQLAlchemyError as e:
-            print(e)
+        except SQLAlchemyError:
             db.session.rollback()
             return {
                 "message": "An error occurred while fetching the courses",
