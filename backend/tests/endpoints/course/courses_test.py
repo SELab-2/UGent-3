@@ -21,10 +21,13 @@ class TestCourseEndpoint(TestEndpoint):
     ### AUTHENTICATION ###
     # Where is login required
     authentication_tests = \
-        authentication_tests("/courses", ["get", "post"]) + \
-        authentication_tests("/courses/@course_id", ["get", "patch", "delete"]) + \
-        authentication_tests("/courses/@course_id/students", ["get", "post", "delete"]) + \
-        authentication_tests("/courses/@course_id/admins", ["get", "post", "delete"])
+        authentication_tests("/courses", ["get", "post"], ["login"], ["0123456789", ""]) + \
+        authentication_tests("/courses/@course_id", ["get", "patch", "delete"], 
+                             ["login"], ["0123456789", ""]) + \
+        authentication_tests("/courses/@course_id/students", ["get", "post", "delete"], 
+                             ["login"], ["0123456789", ""]) + \
+        authentication_tests("/courses/@course_id/admins", ["get", "post", "delete"], 
+                             ["login"], ["0123456789", ""])
 
     @mark.parametrize("auth_test", authentication_tests, indirect=True)
     def test_authentication(self, auth_test: tuple[str, Any]):
