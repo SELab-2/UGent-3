@@ -18,7 +18,7 @@ auth_api = Api(auth_bp)
 load_dotenv()
 API_URL = getenv("API_HOST")
 AUTH_METHOD = getenv("AUTH_METHOD")
-AUTHENTICATION_URL = getenv("AUTHENTICATION_URL")
+TEST_AUTHENTICATION_URL = getenv("TEST_AUTHENTICATION_URL")
 CLIENT_ID = getenv("CLIENT_ID")
 CLIENT_SECRET = getenv("CLIENT_SECRET")
 HOMEPAGE_URL = getenv("HOMEPAGE_URL")
@@ -105,7 +105,7 @@ def test_authentication():
     code = request.args.get("code")
     if code is None:
         return {"message":"Not yet"}, 500
-    profile_res = requests.get(AUTHENTICATION_URL, headers={"Authorization":f"{code}"}, timeout=5)
+    profile_res = requests.get(TEST_AUTHENTICATION_URL, headers={"Authorization":f"{code}"}, timeout=5)
     resp = redirect(HOMEPAGE_URL, code=303)
     set_access_cookies(resp, create_access_token(identity=profile_res.json()["id"]))
     return resp
