@@ -4,12 +4,20 @@ from typing import Tuple
 from requests import Response
 
 from flask import abort, make_response
+
 from sqlalchemy.exc import SQLAlchemyError
-from project import db
 from sqlalchemy.orm import Session
+
+from project import db
 from project.models.user import User, Role
 
 def get_or_make_user(profile_res: Response) -> User:
+    """
+    Function to create a new User in the database or return
+    the user associated with the profile_res received from authentication
+    
+    Returns either a database error or the User data.
+    """
     auth_user_id = profile_res.json()["id"]
     try:
         user = db.session.get(User, auth_user_id)
