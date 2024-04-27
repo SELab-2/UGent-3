@@ -1,6 +1,6 @@
 
 import argparse
-from seeder import into_the_db
+from .seeder import into_the_db
 from sys import path
 path.append(".")
 

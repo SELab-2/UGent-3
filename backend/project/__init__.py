@@ -23,7 +23,6 @@ from .endpoints.authentication.auth import auth_bp
 from .endpoints.authentication.me import me_bp
 from .endpoints.authentication.logout import logout_bp
 from .init_auth import auth_init
-from .utils.seeder.seeder import run_seeder
 
 load_dotenv()
 JWT_SECRET_KEY = getenv("JWT_SECRET_KEY")

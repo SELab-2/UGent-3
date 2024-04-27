@@ -9,7 +9,7 @@ from .elements import course_titles
 from faker import Faker
 from faker.providers import DynamicProvider
 from datetime import datetime, timedelta
-from project.sessionmaker import engine, Session as session_maker
+from project.sessionmaker import Session as session_maker
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -66,12 +66,11 @@ def generate_projects(course_id, num_projects):
 
         for _ in range(num_deadlines):
             future_datetime = datetime.now() + timedelta(days=random.randint(1, 30))
-            deadline = (fake.sentence(), future_datetime)
+            deadline = (fake.catch_phrase(), future_datetime)
             deadlines.append(deadline)
-
         project = Project(course_id=course_id,
                           title=fake.catch_phrase(),
-                          description=fake.text(),
+                          description=fake.catch_phrase(),
                           deadlines=deadlines,
                           visible_for_students=random.choice([True, False]),
                           archived=random.choice([True, False]),
@@ -140,6 +139,7 @@ def into_the_db(my_uid):
             for project in projects:
                 session.add(project)
                 session.commit()
+                print(project)
                 project_id = project.project_id
 
                 # Write assignment.md file
