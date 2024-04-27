@@ -3,7 +3,8 @@
 from typing import Any
 from pytest import param
 
-def authentication_tests(endpoint: str, methods: list[str], allowed_tokens: list[str], disallowed_tokens: list[str]) -> list[Any]:
+def authentication_tests(endpoint: str, methods: list[str],
+                         allowed_tokens: list[str], disallowed_tokens: list[str]) -> list[Any]:
     """Transform the format to single authentication tests"""
     tests = []
 
@@ -11,8 +12,8 @@ def authentication_tests(endpoint: str, methods: list[str], allowed_tokens: list
         allowed: bool = token in allowed_tokens
         for method in methods:
             tests.append(param(
-                (endpoint, method, token, allowed),
-                id = f"{endpoint} {method.upper()} ({token} {'allowed' if allowed else 'disallowed'})"
+            (endpoint, method, token, allowed),
+            id = f"{endpoint} {method.upper()} ({token} {'allowed' if allowed else 'disallowed'})"
             ))
 
     return tests

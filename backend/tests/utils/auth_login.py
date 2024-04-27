@@ -7,5 +7,7 @@ def get_csrf_from_login(client, code):
     response = client.get(f"/auth?code={code}")
     csrf = next((cookie for cookie
                 in response.headers.getlist('Set-Cookie')
-                if 'csrf_access_token' in cookie), "").split(";")[0].split("=")[1]
+                if 'csrf_access_token' in cookie), "")
+    if csrf != "":
+        csrf = csrf.split(";")[0].split("=")[1]
     return csrf
