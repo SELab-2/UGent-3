@@ -29,12 +29,12 @@ def data_map(course: Course) -> dict[str, Any]:
 def auth_test(request: FixtureRequest, client: FlaskClient, data_map: dict[str, Any]) -> tuple:
     """Add concrete test data to auth"""
     # endpoint, method, token, allowed
-    endpoint, method, *other = request.param
+    endpoint, method, token, *other = request.param
 
     for k, v in data_map.items():
         endpoint = endpoint.replace(k, str(v))
-
-    return endpoint, getattr(client, method), *other
+    csrf = get_csrf_from_login(client, token)
+    return endpoint, getattr(client, method), token, *other
 
 
 
