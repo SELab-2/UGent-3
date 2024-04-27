@@ -174,9 +174,10 @@ class TestUserEndpoint:
             valid_user_form["role"] = Role.STUDENT.name
         else:
             valid_user_form["role"] = Role.TEACHER.name
-
+        client.get("auth?code=admin")
+        csrf = client.cookies['csrf_access_token']
         response = client.patch(f"/users/{valid_user_form['uid']}", data=valid_user_form,
-                                headers={"Authorization":"admin"})
+                                headers={'X-CSRF-TOKEN':csrf})
         assert response.status_code == 415
 
     def test_get_users_with_query(self, client, valid_user_entries):
