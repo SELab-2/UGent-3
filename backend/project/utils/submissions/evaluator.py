@@ -15,7 +15,7 @@ from project.db_in import db
 from project.models.submission import Submission
 
 
-EVALUATORS_FOLDER = path.join(path.join(__file__), "evaluators")
+EVALUATORS_FOLDER = path.join(path.dirname(__file__), "evaluators")
 
 DOCKER_IMAGE_MAPPER = {
     "PYTHON": path.join(EVALUATORS_FOLDER, "python"),
