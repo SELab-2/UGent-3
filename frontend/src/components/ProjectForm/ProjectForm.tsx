@@ -22,13 +22,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DeadlineCalender from "../Calender/DeadlineCalender.tsx";
 import { Deadline } from "../../types/deadline";
 import {InfoOutlined} from "@mui/icons-material";
-import {Link} from "react-router-dom";
+import {Link, useLoaderData, useLocation} from "react-router-dom";
 import FolderDragDrop from "../FolderUpload/FolderUpload.tsx";
 import TabPanel from "@mui/lab/TabPanel";
 import {TabContext} from "@mui/lab";
 import FileStuctureForm from "./FileStructureForm.tsx";
 import AdvancedRegex from "./AdvancedRegex.tsx";
 import RunnerSelecter from "./RunnerSelecter.tsx";
+import { authenticatedFetch } from "../../utils/authenticated-fetch.ts";
 
 interface Course {
   course_id: string;
@@ -42,8 +43,7 @@ interface RegexData {
   regex: string;
 }
 
-const apiUrl = import.meta.env.VITE_API_HOST
-const user = "Gunnar"
+const API_URL = import.meta.env.VITE_APP_API_HOST
 
 /**
  * @returns Form for uploading project
@@ -70,10 +70,6 @@ export default function ProjectForm() {
   const [assignmentFile, setAssignmentFile] = useState<File>();
   const [filename, setFilename] = useState("");
 
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [courseId, setCourseId] = useState<string>('');
-  const [courseName, setCourseName] = useState<string>('');
-
   const [containsDockerfile, setContainsDockerfile] = useState(false);
   const [containsRuntest, setContainsRuntest] = useState(false);
 
@@ -82,9 +78,27 @@ export default function ProjectForm() {
   const [validRunner, setValidRunner] = useState(true);
   const [validSubmission, setValidSubmission] = useState(true);
 
-  useEffect(() => {
-    fetchCourses();
-  }, [regexError]);
+  const courses = useLoaderData() as Course[]
+
+  const [courseId, setCourseId] = useState<string>('');
+  const [courseName, setCourseName] = useState<string>('');
+  const location = useLocation();
+
+  useEffect(() =>{
+    const urlParams = new URLSearchParams(location.search);
+    const initialCourseId = urlParams.get('course_id') || '';
+    let initialCourseName = ''
+    for( const c of courses){
+      const parts = c.course_id.split('/');
+      const courseId = parts[parts.length - 1];
+      if (courseId === initialCourseId){
+        initialCourseName = c.name
+      }
+    }
+    setCourseId(initialCourseId)
+    setCourseName(initialCourseName)
+  }
+  ,[courses,location])
 
   const handleRunnerSwitch = (newRunner: string) => {
     if (newRunner === t('clearSelected')) {
@@ -132,16 +146,6 @@ export default function ProjectForm() {
     } else {
       setValidRunner(containsRuntest);
       setValidSubmission(containsRuntest);
-    }
-  }
-
-  const fetchCourses = async () => {
-    const response = await fetch(`${apiUrl}/courses?teacher=${user}`, {
-      credentials: 'include'
-    })
-    const jsonData = await response.json();
-    if (jsonData.data) {
-      setCourses(jsonData.data);
     }
   }
 
@@ -202,10 +206,9 @@ export default function ProjectForm() {
       formData.append("runner", runner);
     }
 
-    const response = await fetch(`${apiUrl}/projects`, {
+    const response = await authenticatedFetch(`${API_URL}/projects`, {
       method: "post",
-      credentials: 'include',
-      body: formData
+      body: formData,
     })
 
     if (!response.ok) {

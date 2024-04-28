@@ -42,7 +42,7 @@ services:
       POSTGRES_PASSWORD: test_password
       POSTGRES_DB: test_database
       API_HOST: http://api_is_here
-      AUTHENTICATION_URL: http://auth-server:5001 # Use the service name defined in Docker Compose
+      TEST_AUTHENTICATION_URL: http://auth-server:5001 # Use the service name defined in Docker Compose
       AUTH_METHOD: test
       JWT_SECRET_KEY: Test123
       UPLOAD_URL: /data/assignments

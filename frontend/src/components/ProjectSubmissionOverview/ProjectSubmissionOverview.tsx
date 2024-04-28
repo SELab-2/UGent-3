@@ -4,6 +4,7 @@ import {useParams} from "react-router-dom";
 import ProjectSubmissionsOverviewDatagrid from "./ProjectSubmissionOverviewDatagrid.tsx";
 import download from 'downloadjs';
 import {useTranslation} from "react-i18next";
+import { authenticatedFetch } from "../../utils/authenticated-fetch.ts";
 const apiUrl = import.meta.env.VITE_API_HOST
 
 /**
@@ -18,18 +19,14 @@ export default function ProjectSubmissionOverview() {
   });
 
   const fetchProject = async () => {
-    const response = await fetch(`${apiUrl}/projects/${projectId}`, {
-      credentials: 'include'
-    })
+    const response = await authenticatedFetch(`${apiUrl}/projects/${projectId}`)
     const jsonData = await response.json();
     setProjectTitle(jsonData["data"].title);
 
   }
 
   const downloadProjectSubmissions = async () => {
-    await fetch(`${apiUrl}/projects/${projectId}/submissions-download`, {
-      credentials: 'include',
-    })
+    await authenticatedFetch(`${apiUrl}/projects/${projectId}/submissions-download`)
       .then(res => {
         return res.blob();
       })

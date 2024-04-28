@@ -11,74 +11,90 @@ index_endpoint = Api(index_bp)
 token_dict = {
     "teacher1":{
         "id":"Gunnar",
-        "jobTitle":"teacher"
+        "jobTitle":"teacher",
+        "displayName":"Gunnar Brinckmann"
     },
     "teacher2":{
         "id":"Bart",
-        "jobTitle":"teacher"
+        "jobTitle":"teacher",
+        "displayName":"Bart Bart"
     },
     "student1":{
         "id":"w_student",
-        "jobTitle":None
+        "jobTitle":None,
+        "displayName":"William Student"
     },
     "student01":{
         "id":"student01",
-        "jobTitle":None
+        "jobTitle":None,
+        "displayName":"Student Nul Een"
     },
     "course_admin1":{
         "id":"Rien",
-        "jobTitle":None
+        "jobTitle":None,
+        "displayName":"Rien Admien"
     },
     "del_user":{
         "id":"del",
-        "jobTitle":None
+        "jobTitle":None,
+        "displayName":"Peter Deleter"
     },
     "ad3_teacher":{
         "id":"brinkmann",
-        "jobTitle0":"teacher"
+        "jobTitle0":"teacher",
+        "displayName":"Gunnar Brinckmann"
     },
     "student02":{
         "id":"student02",
-        "jobTitle":None
+        "jobTitle":None,
+        "displayName":"Student Nul Twee"
     },
     "admin1":{
         "id":"admin_person",
-        "jobTitle":"admin"
+        "jobTitle":"admin",
+        "displayName":"Admin Man"
     },
     # Lowest authorized user to test login requirement
     "login": {
         "id": "login",
-        "jobTitle": None
+        "jobTitle": None,
+        "displayName":"Lotte Login"
     },
     # Student authorization access, associated with valid_...
     "student": {
         "id": "student",
-        "jobTitle": None
+        "jobTitle": None,
+        "displayName":"Student"
     },
     # Student authorization access, other
     "student_other": {
         "id": "student_other",
-        "jobTitle": None
+        "jobTitle": None,
+        "displayName":"Student Other"
     },
     # Teacher authorization access, associated with valid_...
     "teacher": {
         "id": "teacher",
-        "jobTitle": "teacher"
+        "jobTitle": "teacher",
+        "displayName":"Gieter Teacher"
     },
     # Teacher authorization access, other
     "teacher_other": {
         "id": "teacher_other",
-        "jobTitle": "teacher"
+        "jobTitle": "teacher",
+        "displayName":"Teacher Other"
     },
     # Admin authorization access, associated with valid_...
     "admin": {
         "id": "admin",
-        "jobTitle": "admin"
+        "jobTitle": "admin",
+        "displayName":"Admin Man"
     },
     # Admin authorization access, other
     "admin_other": {
         "id": "admin_other",
-        "jobTitle": "admin"
+        "jobTitle": "admin",
+        "displayName":"Admin Woman"
     }
 }
 

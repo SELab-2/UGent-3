@@ -3,6 +3,7 @@
 from os import getenv
 from flask.testing import FlaskClient
 from sqlalchemy.orm import Session
+from tests.utils.auth_login import get_csrf_from_login
 from project.models.project import Project
 from project.models.submission import Submission
 
@@ -14,26 +15,30 @@ class TestSubmissionsEndpoint:
     ### GET SUBMISSIONS ###
     def test_get_submissions_wrong_user(self, client: FlaskClient):
         """Test getting submissions for a non-existing user"""
-        response = client.get("/submissions?uid=-20", headers={"Authorization":"teacher"})
+        csrf = get_csrf_from_login(client, "teacher")
+        response = client.get("/submissions?uid=-20", headers = {"X-CSRF-TOKEN":csrf})
         assert response.status_code == 400
 
     def test_get_submissions_wrong_project(self, client: FlaskClient):
         """Test getting submissions for a non-existing project"""
+        csrf = get_csrf_from_login(client, "teacher")
         response = client.get("/submissions?project_id=123456789",
-                              headers={"Authorization":"teacher"})
+                              headers = {"X-CSRF-TOKEN":csrf})
         assert response.status_code == 400
         assert "message" in response.json
 
     def test_get_submissions_wrong_project_type(self, client: FlaskClient):
         """Test getting submissions for a non-existing project of the wrong type"""
-        response = client.get("/submissions?project_id=zero", headers={"Authorization":"teacher"})
+        csrf = get_csrf_from_login(client, "teacher")
+        response = client.get("/submissions?project_id=zero", headers = {"X-CSRF-TOKEN":csrf})
         assert response.status_code == 400
         assert "message" in response.json
 
     def test_get_submissions_project(self, client: FlaskClient, valid_submission_entry):
         """Test getting the submissions given a specific project"""
+        csrf = get_csrf_from_login(client, "teacher")
         response = client.get(f"/submissions?project_id={valid_submission_entry.project_id}",
-                              headers={"Authorization":"teacher"})
+                              headers = {"X-CSRF-TOKEN":csrf})
         data = response.json
         assert response.status_code == 200
         assert "message" in data
@@ -42,7 +47,8 @@ class TestSubmissionsEndpoint:
     ### GET SUBMISSION ###
     def test_get_submission_wrong_id(self, client: FlaskClient, session: Session):
         """Test getting a submission for a non-existing submission id"""
-        response = client.get("/submissions/0", headers={"Authorization":"ad3_teacher"})
+        csrf = get_csrf_from_login(client, "ad3_teacher")
+        response = client.get("/submissions/0", headers = {"X-CSRF-TOKEN":csrf})
         data = response.json
         assert response.status_code == 404
         assert data["message"] == "Submission with id: 0 not found"
@@ -53,8 +59,9 @@ class TestSubmissionsEndpoint:
         submission = session.query(Submission).filter_by(
             uid="student01", project_id=project.project_id
         ).first()
+        csrf = get_csrf_from_login(client, "ad3_teacher")
         response = client.get(f"/submissions/{submission.submission_id}",
-                              headers={"Authorization":"ad3_teacher"})
+                              headers = {"X-CSRF-TOKEN":csrf})
         data = response.json
         assert response.status_code == 200
         assert data["message"] == "Successfully fetched the submission"
@@ -70,8 +77,9 @@ class TestSubmissionsEndpoint:
     ### PATCH SUBMISSION ###
     def test_patch_submission_wrong_id(self, client: FlaskClient, session: Session):
         """Test patching a submission for a non-existing submission id"""
+        csrf = get_csrf_from_login(client, "ad3_teacher")
         response = client.patch("/submissions/0", data={"grading": 20},
-                                headers={"Authorization":"ad3_teacher"})
+                                headers = {"X-CSRF-TOKEN":csrf})
         data = response.json
         assert response.status_code == 404
         assert data["message"] == "Submission with id: 0 not found"
@@ -82,9 +90,10 @@ class TestSubmissionsEndpoint:
         submission = session.query(Submission).filter_by(
             uid="student02", project_id=project.project_id
         ).first()
+        csrf = get_csrf_from_login(client, "ad3_teacher")
         response = client.patch(f"/submissions/{submission.submission_id}",
                                 data={"grading": 100},
-                                headers={"Authorization":"ad3_teacher"})
+                                headers = {"X-CSRF-TOKEN":csrf})
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "Invalid grading (grading=0-20)"
@@ -95,9 +104,10 @@ class TestSubmissionsEndpoint:
         submission = session.query(Submission).filter_by(
             uid="student02", project_id=project.project_id
         ).first()
+        csrf = get_csrf_from_login(client, "ad3_teacher")
         response = client.patch(f"/submissions/{submission.submission_id}",
                                 data={"grading": "zero"},
-                                headers={"Authorization":"ad3_teacher"})
+                                headers = {"X-CSRF-TOKEN":csrf})
         data = response.json
         assert response.status_code == 400
         assert data["message"] == "Invalid grading (not a valid float)"
@@ -108,9 +118,10 @@ class TestSubmissionsEndpoint:
         submission = session.query(Submission).filter_by(
             uid="student02", project_id=project.project_id
         ).first()
+        csrf = get_csrf_from_login(client, "ad3_teacher")
         response = client.patch(f"/submissions/{submission.submission_id}",
                                 data={"grading": 20},
-                                headers={"Authorization":"ad3_teacher"})
+                                headers = {"X-CSRF-TOKEN":csrf})
         data = response.json
         assert response.status_code == 200
         assert data["message"] == f"Submission (submission_id={submission.submission_id}) patched"
