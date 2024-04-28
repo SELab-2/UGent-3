@@ -101,7 +101,7 @@ export function CourseDetailTeacher(): JSX.Element {
     setAnchorElStudent(null);
   };
 
-  const courseDetail = useLoaderData() as { //TODO CATCH ERROR
+  const courseDetail = useLoaderData() as {
     course: Course ,
     projects:ProjectDetail[] ,
     admins: UserUid[],
