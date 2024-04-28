@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Course, Project, apiHost, getIdFromLink, getNearestFutureDate, getUserName, appHost, ProjectDetail } from "./CourseUtils";
+import { Course, apiHost, getIdFromLink, getNearestFutureDate, getUserName, appHost, ProjectDetail } from "./CourseUtils";
 import { Link, useNavigate, NavigateFunction, useLoaderData } from "react-router-dom";
 import { Title } from "../Header/Title";
 import ClearIcon from '@mui/icons-material/Clear';
