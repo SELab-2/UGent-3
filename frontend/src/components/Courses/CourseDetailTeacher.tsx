@@ -1,4 +1,21 @@
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Checkbox, FormControlLabel, Grid, IconButton, Input, Menu, MenuItem, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  Input,
+  InputLabel,
+  Menu,
+  MenuItem,
+  Paper,
+  Typography
+} from "@mui/material";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Course, Project, apiHost, getIdFromLink, getNearestFutureDate, getUserName, appHost } from "./CourseUtils";
@@ -377,6 +394,7 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
           ))}
         </Paper>
         <MenuItem style={{marginTop:"1rem"}}>
+          <InputLabel htmlFor="expiry-date" style={{marginRight: '1rem'}}>{t('expiryDate')}: </InputLabel>
           <Input
             id="expiry-date"
             type="datetime-local"
