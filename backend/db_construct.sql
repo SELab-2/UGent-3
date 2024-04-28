@@ -47,7 +47,7 @@ CREATE TYPE deadline AS(
 
 CREATE TABLE projects (
 	project_id INT GENERATED ALWAYS AS IDENTITY,
-	title VARCHAR(50) NOT NULL,
+	title VARCHAR(100) NOT NULL,
 	description TEXT NOT NULL,
 	deadlines deadline[],
 	course_id INT NOT NULL,

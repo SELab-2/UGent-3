@@ -77,5 +77,4 @@ def create_app_with_db(db_uri: str):
         connection = db.session.connection()
         register_composites(connection)
     CORS(app, supports_credentials=True)
-    run_seeder("851c87d0-a62f-4af3-ab92-316a84f370ac")
     return app
