@@ -13,6 +13,7 @@ import {
 import {
   Course,
   Project,
+  ProjectDetail,
   apiHost,
   getIdFromLink,
   getNearestFutureDate,
@@ -100,7 +101,7 @@ export function SideScrollableCourses({
   const [teacherNameFilter, setTeacherNameFilter] = useState(
     initialTeacherNameFilter
   );
-  const [projects, setProjects] = useState<{ [courseId: string]: Project[] }>(
+  const [projects, setProjects] = useState<{ [courseId: string]: ProjectDetail[] }>(
     {}
   );
 
@@ -159,10 +160,33 @@ export function SideScrollableCourses({
       );
 
       const projectResults = await Promise.all(projectPromises);
-      const projectsMap: { [courseId: string]: Project[] } = {};
+      const projectsMap: { [courseId: string]: ProjectDetail[] } = {};
 
       projectResults.forEach((result, index) => {
-        projectsMap[getIdFromLink(courses[index].course_id)] = result.data;
+        const detailProjectPromises = result.data.map(async (item: Project) => {
+          const projectRes = await authenticatedFetch(item.project_id);
+          if (projectRes.status !== 200) {
+            throw new Response("Failed to fetch project data", {
+              status: projectRes.status,
+            });
+          }
+          const projectJson = await projectRes.json();
+          const projectData = projectJson.data;
+          const project: ProjectDetail = {
+            ...item,
+            deadlines: projectData.deadlines.map(
+              ([description, dateString]: [string, string]) => [
+                description,
+                new Date(dateString),
+              ]
+            ),
+          };
+          return project;
+        });
+        Promise.all(detailProjectPromises).then((projects) => {
+          projectsMap[getIdFromLink(courses[index].course_id)] = projects;
+          setProjects({ ...projectsMap });
+        });
       });
 
       setProjects(projectsMap);
@@ -216,7 +240,7 @@ function EmptyOrNotFilteredCourses({
   projects,
 }: {
   filteredCourses: Course[];
-  projects: { [courseId: string]: Project[] };
+  projects: { [courseId: string]: ProjectDetail[] };
 }): JSX.Element {
   const { t } = useTranslation("translation", {
     keyPrefix: "courseDetailTeacher",
@@ -286,7 +310,7 @@ function EmptyOrNotProjects({
   projects,
   noProjectsText,
 }: {
-  projects: Project[];
+  projects: ProjectDetail[];
   noProjectsText: string;
 }): JSX.Element {
   if (projects === undefined || projects.length === 0) {
@@ -305,10 +329,11 @@ function EmptyOrNotProjects({
         {projects.slice(0, 3).map((project) => {
           let timeLeft = "";
           if (project.deadlines != undefined) {
-            const deadlineDate = getNearestFutureDate(project.deadlines);
-            if (deadlineDate == null) {
+            const deadline = getNearestFutureDate(project.deadlines);
+            if (deadline == null) {
               return <></>;
             }
+            const deadlineDate = deadline[1];
             const diffTime = Math.abs(deadlineDate.getTime() - now.getTime());
             const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
             const diffDays = Math.ceil(diffHours * 24);

@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Course, Project, apiHost, getIdFromLink, getNearestFutureDate, getUserName, appHost } from "./CourseUtils";
+import { Course, Project, apiHost, getIdFromLink, getNearestFutureDate, getUserName, appHost, ProjectDetail } from "./CourseUtils";
 import { Link, useNavigate, NavigateFunction, useLoaderData } from "react-router-dom";
 import { Title } from "../Header/Title";
 import ClearIcon from '@mui/icons-material/Clear';
@@ -103,10 +103,11 @@ export function CourseDetailTeacher(): JSX.Element {
 
   const courseDetail = useLoaderData() as { //TODO CATCH ERROR
     course: Course ,
-    projects:Project[] ,
+    projects:ProjectDetail[] ,
     admins: UserUid[],
     students: UserUid[]
   };
+
   const { course, projects, admins, students } = courseDetail;
   const { t } = useTranslation('translation', { keyPrefix: 'courseDetailTeacher' });
   const { i18n } = useTranslation();
@@ -179,7 +180,7 @@ export function CourseDetailTeacher(): JSX.Element {
  * @param projects - The array of projects.
  * @returns Either a place holder for no projects or a grid of cards describing the projects.
  */
-function EmptyOrNotProjects({projects}: {projects: Project[]}): JSX.Element {
+function EmptyOrNotProjects({projects}: {projects: ProjectDetail[]}): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'courseDetailTeacher' });
   if(projects === undefined || projects.length === 0){
     return (
@@ -199,7 +200,7 @@ function EmptyOrNotProjects({projects}: {projects: Project[]}): JSX.Element {
                 {getNearestFutureDate(project.deadlines) &&
                 (
                   <Typography variant="body1">
-                    {`${t('deadline')}: ${getNearestFutureDate(project.deadlines)?.toLocaleDateString()}`}
+                    {`${t('deadline')}: ${getNearestFutureDate(project.deadlines)?.[1].toLocaleDateString()}`}
                   </Typography>
                 )}
               </CardContent>
