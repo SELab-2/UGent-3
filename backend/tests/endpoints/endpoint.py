@@ -8,7 +8,7 @@ def authentication_tests(endpoint: str, methods: list[str]) -> list[Any]:
     tests = []
 
     for method in methods:
-        for token in ["0123456789", "login"]:
+        for token in [None, "0123456789", "login"]:
             allowed = token == "login"
             tests.append(param(
                 (endpoint, method, token, allowed),
@@ -89,7 +89,10 @@ class TestEndpoint:
 
         endpoint, method, csrf, allowed = auth_test
 
-        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
+        if csrf:
+            response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
+        else:
+            response = method(endpoint)
         assert allowed == (response.status_code != 401)
 
     def authorization(self, auth_test: tuple[str, Any, str, bool]):

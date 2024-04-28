@@ -34,8 +34,9 @@ def auth_test(
 
     for k, v in data_map.items():
         endpoint = endpoint.replace(k, str(v))
+    csrf = get_csrf_from_login(client, token) if token else None
 
-    return endpoint, getattr(client, method), get_csrf_from_login(client, token), allowed
+    return endpoint, getattr(client, method), csrf, allowed
 
 
 
