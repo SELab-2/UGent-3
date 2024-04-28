@@ -3,17 +3,17 @@
 from typing import Any
 from pytest import param
 
-def authentication_tests(endpoint: str, methods: list[str],
-                         allowed_tokens: list[str], disallowed_tokens: list[str]) -> list[Any]:
+def authentication_tests(endpoint: str, methods: list[str]) -> list[Any]:
     """Transform the format to single authentication tests"""
     tests = []
 
-    for token in (allowed_tokens + disallowed_tokens):
-        allowed: bool = token in allowed_tokens
-        for method in methods:
+    for method in methods:
+        for token in [None, "0123456789", "login"]:
+            allowed = token == "login"
             tests.append(param(
-            (endpoint, method, token, allowed),
-            id = f"{endpoint} {method.upper()} ({token} {'allowed' if allowed else 'disallowed'})"
+                (endpoint, method, token, allowed),
+                id = f"{endpoint} {method.upper()} " \
+                    f"({token} {'allowed' if allowed else 'disallowed'})"
             ))
 
     return tests
@@ -84,12 +84,15 @@ def query_parameter_tests(
 class TestEndpoint:
     """Base class for endpoint tests"""
 
-    def authentication(self, auth_test: tuple[str, Any]):
+    def authentication(self, auth_test: tuple[str, Any, str, bool]):
         """Test if the authentication for the given endpoint works"""
 
         endpoint, method, csrf, allowed = auth_test
 
-        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
+        if csrf:
+            response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
+        else:
+            response = method(endpoint)
         assert allowed == (response.status_code != 401)
 
     def authorization(self, auth_test: tuple[str, Any, str, bool]):
