@@ -1,7 +1,6 @@
 # Python evaluator
 ## General usage
 This evaluator is responsible for running and executing tests on a student's Python code.
-dit is zwaar translated
 
 ## Structure
 When submitting the project a teacher can add a requirments manifest `filename of manifest`, this way only the packages in the requirments file are installable on the evaluator.

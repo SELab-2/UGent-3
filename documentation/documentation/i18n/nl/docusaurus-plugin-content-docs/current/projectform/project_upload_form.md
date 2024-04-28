@@ -7,15 +7,16 @@ De eerste 3 velden zijn vrij eenvoudig, je hoeft alleen maar de titel in te vull
 
 ![Projectformulier](/img/project_form_2.png)
 
-Vervolgens is er een kalender waar je de deadlines van het project moet kiezen, elke deadline kan een deadline en een tijdstempel hebben. Zoals te zien is in de afbeelding hierboven, zie je een tabel van elke deadline die je hebt toegevoegd, als je een deadline wilt verwijderen, klik dan gewoon op de datum in de kalender en klik op het verwijdersymbool.
+Vervolgens is er een kalender waar je de deadlines van het project moet kiezen, elke deadline kan een beschrijving en een tijdstempel hebben. Zoals te zien is in de afbeelding hierboven, zie je een tabel van elke deadline die je hebt toegevoegd. Als je een deadline wilt verwijderen, klik dan gewoon op de datum in de kalender en klik op het verwijdersymbool.
 
 ![Projectformulier](/img/project_upload_form_3.png)
 
 Daarna is er een selectievakje dat de waarde bevat die zichtbaar is voor studenten, dit bepaalt of een project direct zichtbaar moet zijn bij het uploaden of niet.
+Als de box aangeduid is, zal deze waarde op true staat en zal het project direct zichtbaar worden na de upload.
 
 ![Projectformulier](/img/project_upload_form_4.png)
 
-Om opdrachtbestanden te uploaden, kun je de gegeven bestandsuploader gebruiken, het moet een .zip-bestand zijn. Je kunt je bestanden slepen en neerzetten of op de knop klikken en wanneer de bestanden zijn geüpload, krijg je een tabel die een overzicht geeft van welke bestanden in het zipbestand zitten.
+Om opdrachtbestanden te uploaden, kun je de gegeven bestandsuploader gebruiken, de bestanden moeten geüpload worden als een .zip-bestand. Je kunt je bestanden slepen en neerzetten of op de knop klikken en wanneer de bestanden geüpload zijn, krijg je een tabel die een overzicht geeft van welke bestanden in het zipbestand zitten.
 
 ![Projectformulier](/img/project_upload_form_5.png)
 
@@ -23,7 +24,7 @@ Je kunt bestandsbeperkingen specificeren voor de inzendingen van studenten met h
 
 ![Projectformulier](/img/project_upload_form_6.png)
 
-Als je bekend bent met regexes, kun je ook naar de geavanceerde modus gaan om bestandsbeperkingen te specificeren. Als je niet weet hoe je regex moet gebruiken maar toch interesse hebt om deze functionaliteit te gebruiken, kun je de volgende [cheatsheet](https://cheatography.com/davechild/cheat-sheets/regular-expressions/) raadplegen.
+Als je bekend bent met regex, kun je ook naar de geavanceerde modus gaan om bestandsbeperkingen te specificeren. Als je niet weet hoe je regex moet gebruiken maar toch interesse hebt om deze functionaliteit te gebruiken, kun je de volgende [cheatsheet](https://cheatography.com/davechild/cheat-sheets/regular-expressions/) raadplegen.
 
 Tot slot is er het vervolgkeuzemenu voor de runner. Maar die worden uitgelegd in deze [sectie](/docs/category/evaluators).
 
