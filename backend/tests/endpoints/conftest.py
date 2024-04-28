@@ -15,14 +15,16 @@ from project.models.course import Course
 from project.models.course_relation import CourseStudent, CourseAdmin
 from project.models.course_share_code import CourseShareCode
 from project.models.submission import Submission, SubmissionStatus
-from project.models.project import Project
+from project.models.project import Project, Runner
 
 ### AUTHENTICATION & AUTHORIZATION ###
 @fixture
-def data_map(course: Course) -> dict[str, Any]:
+def data_map(course: Course, project: Project, submission: Submission) -> dict[str, Any]:
     """Map an id to data"""
     return {
-        "@course_id": course.course_id
+        "@course_id": course.course_id,
+        "@project_id": project.project_id,
+        "@submission_id": submission.submission_id
     }
 
 @fixture
@@ -120,6 +122,42 @@ def course(session: Session, student: User, teacher: User, admin: User) -> Cours
     session.add(CourseAdmin(course_id=course.course_id, uid=admin.uid))
     session.commit()
     return course
+
+
+### PROJECTS ###
+@fixture
+def project(session: Session, course: Course):
+    """Return a project entry"""
+    project = Project(
+        title="Test project",
+        description="Test project",
+        deadlines=[{"deadline":"2024-05-23T21:59:59", "description":"Final deadline"}],
+        course_id=course.course_id,
+        visible_for_students=True,
+        archived=False,
+        runner=Runner.GENERAL,
+        regex_expressions=["*.pdf"]
+    )
+    session.add(project)
+    session.commit()
+    return project
+
+
+
+### SUBMISSIONS ###
+@fixture
+def submission(session: Session, student: User, project: Project):
+    """Return a submission entry"""
+    submission = Submission(
+        uid=student.uid,
+        project_id=project.project_id,
+        submission_time=datetime(2024,5,23,22,00,00,tzinfo=ZoneInfo("GMT")),
+        submission_path="/1",
+        submission_status= SubmissionStatus.SUCCESS
+    )
+    session.add(submission)
+    session.commit()
+    return submission
 
 
 
