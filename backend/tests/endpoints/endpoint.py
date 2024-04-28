@@ -8,10 +8,13 @@ def authentication_tests(endpoint: str, methods: list[str]) -> list[Any]:
     tests = []
 
     for method in methods:
-        tests.append(param(
-            (endpoint, method),
-            id = f"{endpoint} {method.upper()}"
-        ))
+        for token in [None, "0123456789", "login"]:
+            allowed = token == "login"
+            tests.append(param(
+                (endpoint, method, token, allowed),
+                id = f"{endpoint} {method.upper()} " \
+                    f"({token} {'allowed' if allowed else 'disallowed'})"
+            ))
 
     return tests
 
@@ -81,42 +84,39 @@ def query_parameter_tests(
 class TestEndpoint:
     """Base class for endpoint tests"""
 
-    def authentication(self, auth_test: tuple[str, Any]):
-        """Test if the authentication for the given enpoint works"""
+    def authentication(self, auth_test: tuple[str, Any, str, bool]):
+        """Test if the authentication for the given endpoint works"""
 
-        endpoint, method = auth_test
+        endpoint, method, csrf, allowed = auth_test
 
-        response = method(endpoint)
-        assert response.status_code == 401
-
-        response = method(endpoint, headers = {"Authorization": "0123456789"})
-        assert response.status_code == 401
-
-        response = method(endpoint, headers = {"Authorization": "login"})
-        assert response.status_code != 401
+        if csrf:
+            response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
+        else:
+            response = method(endpoint)
+        assert allowed == (response.status_code != 401)
 
     def authorization(self, auth_test: tuple[str, Any, str, bool]):
         """Test if the authorization for the given endpoint works"""
 
-        endpoint, method, token, allowed = auth_test
+        endpoint, method, csrf, allowed = auth_test
 
-        response = method(endpoint, headers = {"Authorization": token})
+        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
         assert allowed == (response.status_code != 403)
 
     def data_field_type(self, test: tuple[str, Any, str, dict[str, Any]]):
         """Test if the datatypes are properly checked for data fields"""
 
-        endpoint, method, token, data = test
+        endpoint, method, csrf, data = test
 
-        response = method(endpoint, headers = {"Authorization": token}, json = data)
+        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf}, json = data)
         assert response.status_code == 400
 
     def query_parameter(self, test: tuple[str, Any, str, bool]):
         """Test the query parameter"""
 
-        endpoint, method, token, wrong_parameter = test
+        endpoint, method, csrf, wrong_parameter = test
 
-        response = method(endpoint, headers = {"Authorization": token})
+        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
         assert wrong_parameter == (response.status_code == 400)
 
         if not wrong_parameter:
