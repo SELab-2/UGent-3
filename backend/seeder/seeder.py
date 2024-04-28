@@ -215,20 +215,22 @@ def populate_course_projects(session, course_id, students, teacher_uid):
         os.makedirs(os.path.dirname(assignment_file_path), exist_ok=True)
         with open(assignment_file_path, "w", encoding="utf-8") as assignment_file:
             assignment_file.write(assignment_content)
+        populate_project_submissions(session, students, project_id)
 
-        # Make submissions, 0 1 or 2 for each project per student
-        for student in students:
-            submissions = generate_submissions(project_id, student)
-            for submission in submissions:
-                session.add(submission)
-                session.commit()
-                submission_directory = os.path.join(UPLOAD_URL, "projects", str(
-                    project_id), "submissions", str(submission.submission_id), "submission")
-                os.makedirs(submission_directory, exist_ok=True)
-                submission_file_path = os.path.join(
-                    submission_directory, "submission.md")
-                with open(submission_file_path, "w", encoding="utf-8") as submission_file:
-                    submission_file.write(fake.text())
+def populate_project_submissions(session, students, project_id):
+    """Make submissions, 0 1 or 2 for each project per student"""
+    for student in students:
+        submissions = generate_submissions(project_id, student)
+        for submission in submissions:
+            session.add(submission)
+            session.commit()
+            submission_directory = os.path.join(UPLOAD_URL, "projects", str(
+                project_id), "submissions", str(submission.submission_id), "submission")
+            os.makedirs(submission_directory, exist_ok=True)
+            submission_file_path = os.path.join(
+                submission_directory, "submission.md")
+            with open(submission_file_path, "w", encoding="utf-8") as submission_file:
+                submission_file.write(fake.text())
 
-                submission.submission_path = submission_directory
-                session.commit()  # update submission path
+            submission.submission_path = submission_directory
+            session.commit()  # update submission path

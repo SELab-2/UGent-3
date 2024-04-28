@@ -1,3 +1,4 @@
+"""Some valid course names for the course_titles provider"""
 course_titles = [
     " Computer Science",
     "Principles of Economics",
