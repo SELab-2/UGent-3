@@ -125,7 +125,7 @@ def generate_submissions(project_id, student_uid):
 
 
 def into_the_db(my_uid):
-    """Populates the db with 5 courses where my uid is teacher and 5 where he is student"""
+    """Populates the db with 5 courses where my_uid is teacher and 5 where he is student"""
     try:
         session = session_maker()  # setup the db session
         connection = session.connection()
@@ -134,21 +134,16 @@ def into_the_db(my_uid):
         students = []
         # make a random amount of 100-200 students which we can use later to populate courses
         num_students = random.randint(100, 200)
-        for _ in range(num_students):
-            student = student_generator()
-            students.append(student)  # make the students
-            session.add(student)
-            session.commit()
+        students = [student_generator() for _ in range(num_students)]
+        session.add_all(students)
+        session.commit()
 
-        teachers = []  # same as students but for teachers
         num_teachers = random.randint(5, 10)
-        for _ in range(num_teachers):
-            teacher = teacher_generator()
-            teachers.append(teacher)
-            session.add(teacher)
-            session.commit()  # only after commit uid becomes available
+        teachers = [teacher_generator() for _ in range(num_teachers)]
+        session.add_all(teachers)
+        session.commit()  # only after commit uid becomes available
 
-        for _ in range(5):  # 5 courses where we are teacher
+        for _ in range(5):  # 5 courses where my_uid is teacher
             course_id = insert_course_into_db_get_id(session, my_uid)
             # Add students to the course
             subscribed_students = populate_course_students(
@@ -156,18 +151,17 @@ def into_the_db(my_uid):
             populate_course_projects(
                 session, course_id, subscribed_students, my_uid)
 
-        for _ in range(5):  # 5 courses where we are student
+        for _ in range(5):  # 5 courses where my_uid is a student
             teacher_uid = teachers[random.randint(0, len(teachers)-1)].uid
             course_id = insert_course_into_db_get_id(session, teacher_uid)
             subscribed_students = populate_course_students(
                 session, course_id, students)
-            subscribed_students.append(my_uid)  # we are also a student
+            subscribed_students.append(my_uid)  # my_uid is also a student
             populate_course_projects(
                 session, course_id, subscribed_students, teacher_uid)
 
     finally:
-        # Rollback
-        session.rollback()
+        session.rollback() #rollback in case any of the commits failed
         session.close()
 
 
@@ -181,7 +175,6 @@ def insert_course_into_db_get_id(session, teacher_uid):
 
 def populate_course_students(session, course_id, students):
     """Populates the course with students and returns their uids as a list"""
-    # Add students to the course
     num_students_in_course = random.randint(5, 30)
     subscribed_students = []
     selected_students = set()
@@ -203,11 +196,10 @@ def populate_course_projects(session, course_id, students, teacher_uid):
     session.commit()
 
     projects = generate_projects(course_id, 2)
+    session.add_all(projects)
+    session.commit()
     for project in projects:
-        session.add(project)
-        session.commit()
         project_id = project.project_id
-
         # Write assignment.md file
         assignment_content = fake.text()
         assignment_file_path = os.path.join(
@@ -221,9 +213,9 @@ def populate_project_submissions(session, students, project_id):
     """Make submissions, 0 1 or 2 for each project per student"""
     for student in students:
         submissions = generate_submissions(project_id, student)
+        session.add_all(submissions)
+        session.commit()
         for submission in submissions:
-            session.add(submission)
-            session.commit()
             submission_directory = os.path.join(UPLOAD_URL, "projects", str(
                 project_id), "submissions", str(submission.submission_id), "submission")
             os.makedirs(submission_directory, exist_ok=True)
