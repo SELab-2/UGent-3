@@ -12,11 +12,6 @@ API_HOST = getenv("API_HOST")
 class TestSubmissionsEndpoint:
     """Class to test the submissions API endpoint"""
 
-    def test_test(self, client: FlaskClient, valid_submission_entry):
-        """Test"""
-        csrf = get_csrf_from_login(client, "teacher")
-        response = client.get(f"/submissions/{valid_submission_entry.submission_id}/download")
-
     ### GET SUBMISSIONS ###
     def test_get_submissions_wrong_user(self, client: FlaskClient):
         """Test getting submissions for a non-existing user"""
