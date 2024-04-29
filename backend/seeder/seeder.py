@@ -17,7 +17,7 @@ from .elements import course_titles
 
 load_dotenv()
 
-UPLOAD_URL = os.getenv("UPLOAD_URL")
+UPLOAD_URL = os.getenv("UPLOAD_FOLDER")
 
 fake = Faker()
 
