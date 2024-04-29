@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from sqlalchemy import Integer, Column, ForeignKey
 from project import db
 
+
 @dataclass
 class Group(db.Model):
     """
@@ -10,6 +11,7 @@ class Group(db.Model):
     """
     __tablename__ = "groups"
 
-    group_id: int = Column(Integer, primary_key=True)
-    project_id: int = Column(Integer, ForeignKey("projects.project_id"), nullable=False, ondelete="CASCADE", primary_key=True)
+    group_id: int = Column(Integer, autoincrement=True, primary_key=True)
+    project_id: int = Column(Integer, ForeignKey(
+        "projects.project_id"), autoincrement=False, primary_key=True)
     group_size: int = Column(Integer, nullable=False)

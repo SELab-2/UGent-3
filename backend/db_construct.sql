@@ -37,7 +37,6 @@ CREATE TABLE course_admins (
 CREATE TABLE course_students (
 	course_id INT NOT NULL REFERENCES courses(course_id) ON DELETE CASCADE,
 	uid VARCHAR(255) NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
-	group_tag VARCHAR(50) NOT NULL REFERENCES groups(group_tag) ON DELETE CASCADE,
 	PRIMARY KEY(course_id, uid)
 );
 
@@ -64,7 +63,7 @@ CREATE TABLE groups (
 	group_id INT GENERATED ALWAYS AS IDENTITY,
 	project_id INT NOT NULL REFERENCES projects(project_id) ON DELETE CASCADE,
 	group_size INT NOT NULL,
-	PRIMARY KEY(group_id, project_id)
+	PRIMARY KEY(project_id, group_id)
 );
 
 CREATE TABLE group_students (
