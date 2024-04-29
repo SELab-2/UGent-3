@@ -4,6 +4,7 @@ import string
 from datetime import datetime, timedelta
 import os
 from sqlalchemy_utils import register_composites
+from sqlalchemy.exc import SQLAlchemyError
 from faker import Faker
 from faker.providers import DynamicProvider
 from dotenv import load_dotenv
@@ -158,7 +159,7 @@ def into_the_db(my_uid):
             subscribed_students.append(my_uid)  # my_uid is also a student
             populate_course_projects(
                 session, course_id, subscribed_students, teacher_uid)
-    except Exception as e:
+    except SQLAlchemyError as e:
         if session:  # possibly error resulted in session being null
             session.rollback()
             session.close()
