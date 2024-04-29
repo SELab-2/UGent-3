@@ -162,7 +162,6 @@ def into_the_db(my_uid):
     except SQLAlchemyError as e:
         if session:  # possibly error resulted in session being null
             session.rollback()
-            session.close()
         raise e
     finally:
         session.close()
