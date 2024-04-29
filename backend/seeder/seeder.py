@@ -108,15 +108,14 @@ def generate_submissions(project_id, student_uid):
     """Generates a list of submissions with random status"""
     submissions = []
     statusses = [SubmissionStatus.SUCCESS, SubmissionStatus.FAIL,
-                SubmissionStatus.LATE, SubmissionStatus.RUNNING]
+                 SubmissionStatus.LATE, SubmissionStatus.RUNNING]
     num_submissions = random.randint(0, 2)
     for _ in range(num_submissions):
         submission = Submission(project_id=project_id,
                                 uid=student_uid,
                                 submission_time=datetime.now(),
                                 submission_path="",
-                                submission_status=
-                                random.choice(statusses))
+                                submission_status=random.choice(statusses))
         graded = random.choice([True, False])
         if graded and submission.submission_status == "SUCCESS":
             submission.grading = random.randint(0, 20)
@@ -159,9 +158,12 @@ def into_the_db(my_uid):
             subscribed_students.append(my_uid)  # my_uid is also a student
             populate_course_projects(
                 session, course_id, subscribed_students, teacher_uid)
-
+    except Exception as e:
+        if session:  # possibly error resulted in session being null
+            session.rollback()
+            session.close()
+        raise e
     finally:
-        session.rollback() #rollback in case any of the commits failed
         session.close()
 
 
@@ -176,17 +178,14 @@ def insert_course_into_db_get_id(session, teacher_uid):
 def populate_course_students(session, course_id, students):
     """Populates the course with students and returns their uids as a list"""
     num_students_in_course = random.randint(5, 30)
-    subscribed_students = []
-    selected_students = set()
-    while len(subscribed_students) < num_students_in_course:
-        student = random.choice(students)
-        if student.uid not in selected_students:
-            student_relation = course_student_generator(course_id, student.uid)
-            session.add(student_relation)
-            session.commit()
-            subscribed_students.append(student.uid)
-            selected_students.add(student.uid)
-    return subscribed_students
+    subscribed_students = random.sample(students, num_students_in_course)
+    student_relations = [course_student_generator(course_id, student.uid)
+                            for student in subscribed_students]
+
+    session.add_all(student_relations)
+    session.commit()
+
+    return [student.uid for student in subscribed_students]
 
 
 def populate_course_projects(session, course_id, students, teacher_uid):
@@ -208,6 +207,7 @@ def populate_course_projects(session, course_id, students, teacher_uid):
         with open(assignment_file_path, "w", encoding="utf-8") as assignment_file:
             assignment_file.write(assignment_content)
         populate_project_submissions(session, students, project_id)
+
 
 def populate_project_submissions(session, students, project_id):
     """Make submissions, 0 1 or 2 for each project per student"""
