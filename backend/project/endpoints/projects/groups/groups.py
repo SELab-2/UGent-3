@@ -28,18 +28,19 @@ class Groups(Resource):
         )
 
     @authorize_teacher
-    def post(self, project_id):
+    def post(self, project_id, teacher_id=None):
         """
         This function will create a new group for a project
         if the body of the post contains a group_size and project_id exists
         """
-        
+
         req = request.json
         req["project_id"] = project_id
+        print(req)
         return insert_into_model(
             Group,
             req,
             RESPONSE_URL,
             "group_id",
-            required_fields=["project_id", "group_size"]
+            required_fields=["project_id", "size"]
         )

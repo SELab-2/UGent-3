@@ -6,6 +6,7 @@ import { SideScrollableCourses } from "./CourseUtilComponents";
 import { Course, callToApiToCreateCourse } from "./CourseUtils";
 import { Title } from "../Header/Title";
 import { useLoaderData } from "react-router-dom";
+import { GroupMenuHolder } from "../../pages/project/projectView/Groups";
 
 /**
  * @returns A jsx component representing all courses for a teacher
@@ -48,6 +49,7 @@ export function AllCoursesTeacher(): JSX.Element {
   return (
     <>
       <Title title={t('title')}></Title>
+      <GroupMenuHolder/>
       <Grid container direction={'column'} style={{marginTop: '1rem', width:'100vw', height: '80vh'}}>
         <SideScrollableCourses courses={courses}></SideScrollableCourses>
         <Dialog open={open} onClose={handleClose}>
