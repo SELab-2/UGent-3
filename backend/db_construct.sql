@@ -20,12 +20,26 @@ CREATE TABLE courses (
 );
 
 CREATE TABLE course_join_codes (
-    join_code UUID DEFAULT gen_random_uuid() NOT NULL,
-    course_id INT NOT NULL,
+	join_code UUID DEFAULT gen_random_uuid() NOT NULL,
+	course_id INT NOT NULL,
 	expiry_time DATE,
 	for_admins BOOLEAN NOT NULL,
 	CONSTRAINT fk_course_join_link FOREIGN KEY(course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
 	PRIMARY KEY(join_code)
+);
+
+CREATE TABLE groups (
+	course_id INT NOT NULL REFERENCES courses(course_id) ON DELETE CASCADE,
+	group_tag VARCHAR(50) NOT NULL,
+	PRIMARY KEY(course_id, group_tag)
+);
+
+CREATE TABLE group_students (
+	course_id INT NOT NULL REFERENCES courses(course_id) ON DELETE CASCADE,
+	group_tag VARCHAR(50) NOT NULL,
+	uid VARCHAR(255) NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
+	PRIMARY KEY(course_id, group_tag, uid),
+	CONSTRAINT fk_group FOREIGN KEY(course_id, group_tag) REFERENCES groups(course_id, group_tag) ON DELETE CASCADE
 );
 
 CREATE TABLE course_admins (
@@ -37,6 +51,7 @@ CREATE TABLE course_admins (
 CREATE TABLE course_students (
 	course_id INT NOT NULL REFERENCES courses(course_id) ON DELETE CASCADE,
 	uid VARCHAR(255) NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
+	group_tag VARCHAR(50) NOT NULL REFERENCES groups(group_tag) ON DELETE CASCADE,
 	PRIMARY KEY(course_id, uid)
 );
 
@@ -85,3 +100,17 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER remove_expired_codes_trigger
 AFTER INSERT OR UPDATE ON course_join_codes
 FOR EACH ROW EXECUTE FUNCTION remove_expired_codes();
+
+CREATE OR REPLACE FUNCTION create_default_group()
+RETURNS TRIGGER AS $$
+BEGIN
+	INSERT INTO groups (course_id, group_tag)
+	VALUES (NEW.course_id, 'default');
+	
+	RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER create_default_group_trigger
+AFTER INSERT ON courses
+FOR EACH ROW EXECUTE FUNCTION create_default_group();
