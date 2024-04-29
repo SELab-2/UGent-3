@@ -64,13 +64,15 @@ CREATE TABLE groups (
 	group_id INT GENERATED ALWAYS AS IDENTITY,
 	project_id INT NOT NULL REFERENCES projects(project_id) ON DELETE CASCADE,
 	group_size INT NOT NULL,
-	PRIMARY KEY(group_id)
+	PRIMARY KEY(group_id, project_id)
 );
 
 CREATE TABLE group_students (
-	uid VARCHAR(255) NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
-	group_id INT NOT NULL REFERENCES groups(group_id) ON DELETE CASCADE,
-	PRIMARY KEY(uid, group_id)
+    uid VARCHAR(255) NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
+    group_id INT NOT NULL,
+    project_id INT NOT NULL,
+    PRIMARY KEY(uid, group_id),
+    CONSTRAINT fk_group_reference FOREIGN KEY (group_id, project_id) REFERENCES groups(group_id, project_id) ON DELETE CASCADE
 );
 
 CREATE TABLE submissions (
