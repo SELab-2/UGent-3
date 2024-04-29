@@ -19,8 +19,8 @@ API_URL = getenv("API_HOST")
 RESPONSE_URL = urljoin(f"{API_URL}/", "groups")
 class GroupStudent(Resource):
 
-    @login_required
-    def post(self, project_id, group_id):
+    @login_required_return_uid
+    def post(self, project_id, group_id, uid=None):
         """
         This function will allow students to join project groups if not full
         """
@@ -31,6 +31,13 @@ class GroupStudent(Resource):
                 "url": RESPONSE_URL
             }, 404
         
+        joined_groups = db.session.query(GroupStudent).filter_by(uid=uid, project_id=project_id).all()
+        if len(joined_groups) > 0:
+            return {
+                "message": "Student is already in a group",
+                "url": RESPONSE_URL
+            }, 400
+
         joined_students = db.session.query(GroupStudent).filter_by(group_id=group_id, project_id=project_id).all()
         if len(joined_students) >= group.group_size:
             return {
@@ -40,12 +47,14 @@ class GroupStudent(Resource):
         
         req = request.json
         req["project_id"] = project_id
+        req["group_id"] = group_id
+        req["uid"] = uid
         return insert_into_model(
-            Group,
+            GroupStudent,
             req,
             RESPONSE_URL,
             "group_id",
-            required_fields=["project_id", "group_size"]
+            required_fields=["project_id", "group_id", "uid"]
         )
 
     @login_required_return_uid
@@ -63,6 +72,12 @@ class GroupStudent(Resource):
                     "message": "Group does not exist",
                     "url": RESPONSE_URL
                 }, 404
+            
+            if uid is None:
+                return {
+                    "message": "Failed to verify uid of user",
+                    "url": RESPONSE_URL
+                }, 400
             
             student_group = db.session.query(GroupStudent).filter_by(group_id=group_id, project_id=project_id, uid=uid).first()
             if student_group is None:
