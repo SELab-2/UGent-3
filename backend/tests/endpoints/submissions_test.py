@@ -31,7 +31,7 @@ class TestSubmissionsEndpoint(TestEndpoint):
         authentication_tests("/submissions/@submission_id/download", ["get"])
 
     @mark.parametrize("auth_test", authentication_tests, indirect=True)
-    def test_authentication(self, auth_test: tuple[str, Any, str, bool]):
+    def test_authentication(self, auth_test: tuple[str, Any, str, bool, dict[str, Any]]):
         """Test the authentication"""
         super().authentication(auth_test)
 
@@ -46,7 +46,7 @@ class TestSubmissionsEndpoint(TestEndpoint):
         authorization_tests("/submissions", "post",
             ["student"],
             ["student_other", "teacher", "teacher_other", "admin", "admin_other"]) + \
-        authorization_tests("/submission/@submission_id", "get",
+        authorization_tests("/submissions/@submission_id", "get",
             ["student", "teacher", "admin"],
             ["student_other", "teacher_other", "admin_other"]) + \
         authorization_tests("submissions/@submission_id", "patch",
@@ -57,7 +57,7 @@ class TestSubmissionsEndpoint(TestEndpoint):
             ["student_other", "teacher_other", "admin_other"])
 
     @mark.parametrize("auth_test", authorization_tests, indirect=True)
-    def test_authorization(self, auth_test: tuple[str, Any, str, bool]):
+    def test_authorization(self, auth_test: tuple[str, Any, str, bool, dict[str, Any]]):
         """Test the authorization"""
         super().authorization(auth_test)
 
