@@ -9,11 +9,10 @@ from flask_restful import Resource
 from sqlalchemy import exc
 from project.db_in import db
 from project.models.submission import Submission
-from project.utils.query_agent import delete_by_id_from_model
 from project.utils.authentication import (
     authorize_submission_request,
-    authorize_grader,
-    authorize_submission_author)
+    authorize_grader
+)
 
 API_HOST = getenv("API_HOST")
 UPLOAD_FOLDER = getenv("UPLOAD_FOLDER")
