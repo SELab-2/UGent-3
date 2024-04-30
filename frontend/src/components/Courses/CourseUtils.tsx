@@ -12,7 +12,17 @@ export interface Course {
 export interface Project {
   title: string;
   project_id: string;
-  deadlines: string[][];
+}
+
+export interface ProjectDetail {
+  title: string;
+  project_id: string;
+  deadlines: Deadline[];
+}
+
+interface Deadline {
+  description: string;
+  date: Date;
 }
 
 export const apiHost = import.meta.env.VITE_APP_API_HOST;
@@ -80,17 +90,15 @@ export function getIdFromLink(link: string): string {
 }
 
 /**
- * Function to find the nearest future date from a list of dates
- * @param dates - Array of dates
- * @returns The nearest future date
+ * Function to find the nearest future deadline from a list of deadlines
+ * @param deadlines - List of deadlines
+ * @returns The nearest future deadline
  */
-export function getNearestFutureDate(dates: string[][]): Date | null {
+export function getNearestFutureDate(deadlines: Deadline[]): Deadline | null {
   const now = new Date();
-  const futureDates = dates
-    .map((date) => new Date(date[1]))
-    .filter((date) => date > now);
-  if (futureDates.length === 0) return null;
-  return futureDates.reduce((nearest, current) =>
+  const futureDeadlines = deadlines.filter((deadline) => deadline.date > now);
+  if (futureDeadlines.length === 0) return null;
+  return futureDeadlines.reduce((nearest, current) =>
     current < nearest ? current : nearest
   );
 }
@@ -125,7 +133,31 @@ const dataLoaderCourse = async (courseId: string) => {
 
 const dataLoaderProjects = async (courseId: string) => {
   const params = new URLSearchParams({ course_id: courseId });
-  return fetchData(`projects`, params);
+  const uri = `${apiHost}/projects?${params}`;
+
+  const res = await authenticatedFetch(uri);
+  if (res.status !== 200) {
+    throw new Response("Failed to fetch data", { status: res.status });
+  }
+  const jsonResult = await res.json();
+  const projects: ProjectDetail[] = jsonResult.data.map(async (item: Project) => {
+    const projectRes = await authenticatedFetch(item.project_id);
+    if (projectRes.status !== 200) {
+      throw new Response("Failed to fetch project data", { status: projectRes.status });
+    }
+    const projectJson = await projectRes.json();
+    const projectData = projectJson.data;
+    const project: ProjectDetail = {
+      ...item,
+      deadlines: projectData.deadlines.map((deadline: Deadline) => ({
+        description: deadline.description,
+        date: new Date(deadline.date),
+      })),
+    };
+    return project;
+  });
+
+  return Promise.all(projects);
 };
 
 const dataLoaderAdmins = async (courseId: string) => {
@@ -145,10 +177,10 @@ export const dataLoaderCourseDetail = async ({
   if (!courseId) {
     throw new Error("Course ID is undefined.");
   }
+
   const course = await dataLoaderCourse(courseId);
   const projects = await dataLoaderProjects(courseId);
   const admins = await dataLoaderAdmins(courseId);
   const students = await dataLoaderStudents(courseId);
-
   return { course, projects, admins, students };
 };
