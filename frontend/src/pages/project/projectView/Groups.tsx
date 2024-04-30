@@ -38,7 +38,7 @@ export function GroupMenuHolder(){
  * @returns Component to display group menu
  */
 export function GroupMenu({projectId,open,handleClose, anchorEl}: {projectId:string, open: boolean, handleClose : () => void, anchorEl: HTMLElement | null}) {
-  const { t } = useTranslation('translation', { keyPrefix: 'courseDetailTeacher' });
+  const { t } = useTranslation('translation', { keyPrefix: 'groupMenu' });
   
   const [groups, setGroups] = useState<Group[]>([]);
   const [size, setSize] = useState<number>(0);
@@ -103,7 +103,7 @@ export function GroupMenu({projectId,open,handleClose, anchorEl}: {projectId:str
         }}
       >
         <MenuItem disabled>
-          <Typography variant="h6">{t('joinCodes')}</Typography>
+          <Typography variant="h6">{t('groups')}</Typography>
         </MenuItem>
         <Paper elevation={0} style={{margin:"1rem", width:"30vw" ,maxHeight: "20vh", height: "20vh", overflowY:"auto" }}>
           {groups.map((group:Group) => (

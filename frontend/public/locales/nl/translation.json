@@ -134,5 +134,10 @@
     "clientErrorMessage": "Er is een client fout opgetreden.",
     "serverError": "Server Fout",
     "serverErrorMessage": "Er is een server fout opgetreden."
+  },
+  "groupMenu" : {
+    "groups": "Groep menu",
+    "groupSize": "Groep grootte",
+    "newGroup": "Nieuwe groep"
   }
 }
