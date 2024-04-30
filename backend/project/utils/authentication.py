@@ -88,7 +88,6 @@ def authorize_teacher(f):
         auth_user_id = return_authenticated_user_id()
         if get_jwt()["is_teacher"]:
             kwargs["teacher_id"] = auth_user_id
-            print(kwargs)
             return f(*args, **kwargs)
         abort(make_response(({"message":
                               """You are not authorized to perfom this action,
