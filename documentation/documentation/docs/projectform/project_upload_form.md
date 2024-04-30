@@ -2,7 +2,7 @@
 A teacher can upload a new project of their course by going to the url ```projects/create``` where they will need to fill out data corresponding to the project they want to upload.
 ![Projectform](/img/project_form_1.png)
 
-The first 3 fields are rather straightforward, you just need to fill in the title you want for the project, the description and select the course you want the project to be for. The course selection is in a dropdown menu where you can see all the courses that you are the teacher of.
+For the first 3 fields of the form, you just need to fill in the title you want for the project, the description and select the course you want the project to be for. The course selection is in a dropdown menu where you can see all the courses that you are the teacher of.
 
 ![Projectform](/img/project_form_2.png)
 

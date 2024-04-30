@@ -3,7 +3,7 @@ Een leraar kan een nieuw project van zijn cursus uploaden door naar de url `proj
 
 ![Projectformulier](/img/project_form_1.png)
 
-De eerste 3 velden zijn vrij eenvoudig, je hoeft alleen maar de titel in te vullen die je voor het project wilt, de beschrijving en de cursus te selecteren waarvoor je het project wilt. De cursusselectie bevindt zich in een vervolgkeuzemenu waarin je alle cursussen ziet waarvan je leraar bent.
+Voor de eerste 3 velden van de formulier, hoef je alleen maar de titel in te vullen die je voor het project wilt, de beschrijving en de cursus te selecteren waarvoor je het project wilt. De cursusselectie bevindt zich in een vervolgkeuzemenu waarin je alle cursussen ziet waarvan je leraar bent.
 
 ![Projectformulier](/img/project_form_2.png)
 
