@@ -121,21 +121,3 @@ class SubmissionEndpoint(Resource):
             data["message"] = \
                 f"An error occurred while patching submission (submission_id={submission_id})"
             return data, 500
-
-    @authorize_submission_author
-    def delete(self, submission_id: int) -> dict[str, any]:
-        """Delete a submission given a submission ID
-
-        Args:
-            submission_id (int): Submission ID
-
-        Returns:
-            dict[str, any]: A message
-        """
-
-        return delete_by_id_from_model(
-            Submission,
-            "submission_id",
-            submission_id,
-            BASE_URL
-        )
