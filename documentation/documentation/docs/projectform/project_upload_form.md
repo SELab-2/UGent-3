@@ -1,5 +1,5 @@
 # Project upload guide
-A teacher can upload a new project of their course by going to the url ```projects/create``` where they will need to fill out data corresponding to the project they wants to upload.
+A teacher can upload a new project of their course by going to the url ```projects/create``` where they will need to fill out data corresponding to the project they want to upload.
 ![Projectform](/img/project_form_1.png)
 
 The first 3 fields are rather straightforward, you just need to fill in the title you want for the project, the description and select the course you want the project to be for. The course selection is in a dropdown menu where you can see all the courses that you are the teacher of.
@@ -7,7 +7,7 @@ The first 3 fields are rather straightforward, you just need to fill in the titl
 ![Projectform](/img/project_form_2.png)
 
 Next there's a calender where you need to choose deadlines of the project, every deadline can have a description and a timestamp.
-As seen in the image above you'll see a table of every deadline you added, if you want to remove a deadline simply click on the calender date itself and click the remove icon. -> As seen in the image above you'll see a table of every deadline you added. If you want to remove a deadline, simply click on the calender date itself and click the remove icon.
+As seen in the image above you'll see a table of every deadline you added. If you want to remove a deadline, simply click on the calender date itself and click the remove icon.
 
 ![Projectform](/img/project_upload_form_3.png)
 
