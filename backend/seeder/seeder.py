@@ -85,7 +85,7 @@ def generate_projects(course_id, num_projects):
     projects = []
     for _ in range(num_projects):
         deadlines = []
-        # Generate a random number of deadlines (1 to 3)
+        # Generate a random number of deadlines (0-2)
         num_deadlines = random.randint(0, 2)
 
         for _ in range(num_deadlines):
@@ -194,7 +194,7 @@ def populate_course_projects(session, course_id, students, teacher_uid):
     session.add(teacher_relation)
     session.commit()
 
-    num_projects = random.randint(1, 4)
+    num_projects = random.randint(1, 3)
     projects = generate_projects(course_id, num_projects)
     session.add_all(projects)
     session.commit()
