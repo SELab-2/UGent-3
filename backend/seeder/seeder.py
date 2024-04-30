@@ -9,12 +9,12 @@ from faker import Faker
 from faker.providers import DynamicProvider
 from dotenv import load_dotenv
 from project.models.user import User
-from project.models.course import Course
-from project.models.project import Project
-from project.models.course_relation import CourseStudent, CourseAdmin
-from project.models.submission import Submission, SubmissionStatus
-from project.sessionmaker import Session as session_maker
-from .elements import course_titles
+from backend.project.models.course import Course
+from backend.project.models.project import Project
+from backend.project.models.course_relation import CourseStudent, CourseAdmin
+from backend.project.models.submission import Submission, SubmissionStatus
+from backend.project.sessionmaker import Session as session_maker
+from backend.seeder.elements import course_titles
 
 load_dotenv()
 
@@ -89,8 +89,12 @@ def generate_projects(course_id, num_projects):
         num_deadlines = random.randint(0, 2)
 
         for _ in range(num_deadlines):
-            future_datetime = datetime.now() + timedelta(days=random.randint(1, 30))
-            deadline = (fake.catch_phrase(), future_datetime)
+            if random.random() < 1/3:
+                past_datetime = datetime.now() - timedelta(days=random.randint(1, 30))
+                deadline = (fake.catch_phrase(), past_datetime)
+            else:
+                future_datetime = datetime.now() + timedelta(days=random.randint(1, 30))
+                deadline = (fake.catch_phrase(), future_datetime)
             deadlines.append(deadline)
         project = Project(
             title=fake.catch_phrase(),

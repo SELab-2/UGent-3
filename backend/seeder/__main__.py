@@ -1,10 +1,6 @@
 """Main file of the seeder package, will parse given uid and pass it to the seeder function"""
 import argparse
-from sys import path
-
-from .seeder import into_the_db
-
-path.append(".")
+from seeder.seeder import into_the_db
 
 # Create a function to parse command line arguments
 def parse_args():
