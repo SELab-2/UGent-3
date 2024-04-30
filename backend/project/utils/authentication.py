@@ -241,11 +241,10 @@ def authorize_student_submission(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
+        kwargs["uid"] = auth_user_id
         project_id = request.form["project_id"]
         course_id = get_course_of_project(project_id)
-        if (is_student_of_course(auth_user_id, course_id)
-            and project_visible(project_id)
-                and auth_user_id == request.form.get("uid")):
+        if (is_student_of_course(auth_user_id, course_id) and project_visible(project_id)):
             return f(*args, **kwargs)
         abort(make_response(
             ({"message": "You're not authorized to perform this action"}, 403)))
