@@ -200,7 +200,7 @@ function EmptyOrNotProjects({projects}: {projects: ProjectDetail[]}): JSX.Elemen
                 {getNearestFutureDate(project.deadlines) &&
                 (
                   <Typography variant="body1">
-                    {`${t('deadline')}: ${getNearestFutureDate(project.deadlines)?.[1].toLocaleDateString()}`}
+                    {`${t('deadline')}: ${getNearestFutureDate(project.deadlines)?.date.toLocaleDateString()}`}
                   </Typography>
                 )}
               </CardContent>

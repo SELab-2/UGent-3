@@ -175,10 +175,10 @@ export function SideScrollableCourses({
           const project: ProjectDetail = {
             ...item,
             deadlines: projectData.deadlines.map(
-              ([description, dateString]: [string, string]) => [
+              ([description, dateString]: [string, string]) => ({
                 description,
-                new Date(dateString),
-              ]
+                date: new Date(dateString),
+              })
             ),
           };
           return project;
@@ -330,15 +330,14 @@ function EmptyOrNotProjects({
           let timeLeft = "";
           if (project.deadlines != undefined) {
             const deadline = getNearestFutureDate(project.deadlines);
-            if (deadline == null) {
-              return <></>;
-            }
-            const deadlineDate = deadline[1];
-            const diffTime = Math.abs(deadlineDate.getTime() - now.getTime());
-            const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-            const diffDays = Math.ceil(diffHours * 24);
+            if(deadline !== null){
+              const deadlineDate = deadline.date;
+              const diffTime = Math.abs(deadlineDate.getTime() - now.getTime());
+              const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+              const diffDays = Math.ceil(diffHours * 24);
 
-            timeLeft = diffDays > 1 ? `${diffDays} days` : `${diffHours} hours`;
+              timeLeft = diffDays > 1 ? `${diffDays} days` : `${diffHours} hours`;
+            }
           }
           return (
             <Grid item key={project.project_id}>
