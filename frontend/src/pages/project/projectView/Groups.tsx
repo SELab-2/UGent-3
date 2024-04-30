@@ -2,7 +2,7 @@ import { Box, Menu, MenuItem, Typography, Paper, Grid, IconButton, InputLabel, I
 import { ClearIcon } from "@mui/x-date-pickers";
 import { useState, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { apiHost } from "../../../components/Courses/CourseUtils";
+import { apiHost, getIdFromLink } from "../../../components/Courses/CourseUtils";
 import { authenticatedFetch } from "../../../utils/authenticated-fetch";
 
 interface Group {
@@ -58,7 +58,7 @@ export function GroupMenu({projectId,open,handleClose, anchorEl}: {projectId:str
   }, [projectId]);
   
   const handleNewGroup = () => {
-    const bodyContent: { size: number } = { "size": size };
+    const bodyContent: { group_size: number } = { "group_size": size };
   
     authenticatedFetch(`${apiHost}/projects/${projectId}/groups`, {
       method: 'POST',
@@ -71,9 +71,14 @@ export function GroupMenu({projectId,open,handleClose, anchorEl}: {projectId:str
   }
   
   const handleDeleteGroup = (groupId: string) => {
-    authenticatedFetch(`${apiHost}/projects/${projectId}/groups/${groupId}`,
+    const bodyContent: { group_id: string } = { "group_id": getIdFromLink(groupId) };
+    authenticatedFetch(`${apiHost}/projects/${projectId}/groups`,
       {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bodyContent)
       })
       .then(() => getGroups());
   }

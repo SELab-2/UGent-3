@@ -17,6 +17,8 @@ from project import db
 load_dotenv()
 API_URL = getenv("API_HOST")
 RESPONSE_URL = urljoin(f"{API_URL}/", "groups")
+
+
 class GroupStudent(Resource):
 
     @login_required_return_uid
@@ -24,27 +26,30 @@ class GroupStudent(Resource):
         """
         This function will allow students to join project groups if not full
         """
-        group = db.session.query(Group).filter_by(project_id=project_id, group_id=group_id).first()
+        group = db.session.query(Group).filter_by(
+            project_id=project_id, group_id=group_id).first()
         if group is None:
             return {
                 "message": "Group does not exist",
                 "url": RESPONSE_URL
             }, 404
-        
-        joined_groups = db.session.query(GroupStudent).filter_by(uid=uid, project_id=project_id).all()
+
+        joined_groups = db.session.query(GroupStudent).filter_by(
+            uid=uid, project_id=project_id).all()
         if len(joined_groups) > 0:
             return {
                 "message": "Student is already in a group",
                 "url": RESPONSE_URL
             }, 400
 
-        joined_students = db.session.query(GroupStudent).filter_by(group_id=group_id, project_id=project_id).all()
+        joined_students = db.session.query(GroupStudent).filter_by(
+            group_id=group_id, project_id=project_id).all()
         if len(joined_students) >= group.group_size:
             return {
                 "message": "Group is full",
                 "url": RESPONSE_URL
             }, 400
-        
+
         req = request.json
         req["project_id"] = project_id
         req["group_id"] = group_id
@@ -65,21 +70,23 @@ class GroupStudent(Resource):
         data = {
             "url": urljoin(f"{API_URL}/", "projects")
         }
-        try : 
-            group = db.session.query(Group).filter_by(project_id=project_id, group_id=group_id).first()
+        try:
+            group = db.session.query(Group).filter_by(
+                project_id=project_id, group_id=group_id).first()
             if group is None:
                 return {
                     "message": "Group does not exist",
                     "url": RESPONSE_URL
                 }, 404
-            
+
             if uid is None:
                 return {
                     "message": "Failed to verify uid of user",
                     "url": RESPONSE_URL
                 }, 400
-            
-            student_group = db.session.query(GroupStudent).filter_by(group_id=group_id, project_id=project_id, uid=uid).first()
+
+            student_group = db.session.query(GroupStudent).filter_by(
+                group_id=group_id, project_id=project_id, uid=uid).first()
             if student_group is None:
                 return {
                     "message": "Student is not in the group",
@@ -90,7 +97,7 @@ class GroupStudent(Resource):
             db.session.commit()
             data["message"] = "Student has succesfully left the group"
             return data, 200
-        
+
         except SQLAlchemyError:
             data["message"] = "An error occurred while fetching the projects"
             return data, 500
