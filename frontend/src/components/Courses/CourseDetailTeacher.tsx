@@ -397,8 +397,8 @@ function JoinCodeMenu({courseId,open,handleClose, anchorEl}: {courseId:string, o
           <InputLabel htmlFor="expiry-date" style={{marginRight: '1rem'}}>{t('expiryDate')}: </InputLabel>
           <Input
             id="expiry-date"
-            type="datetime-local"
-            value={expiry_time ? expiry_time.toISOString().substring(0, 16) : ''}
+            type="date"
+            value={expiry_time ? expiry_time.toISOString().substring(0, 10) : ''}
             onChange={handleInputChange}
             style={{marginRight:"2rem"}}
           />
