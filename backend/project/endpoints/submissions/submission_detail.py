@@ -87,6 +87,10 @@ class SubmissionEndpoint(Resource):
                     return data, 404
 
                 # Update the grading field
+                if set(request.form.keys()) - {"grading"}:
+                    data["message"] = "Invalid data field given, only 'grading' is allowed"
+                    return data, 400
+
                 grading = request.form.get("grading")
                 if grading is not None:
                     try:

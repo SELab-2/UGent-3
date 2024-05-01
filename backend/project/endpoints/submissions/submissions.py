@@ -113,6 +113,10 @@ class SubmissionsEndpoint(Resource):
             "url": BASE_URL
         }
         try:
+            if set(request.form.keys()) - {"project_id", "files"}:
+                data["message"] = "Invalid data fields, only 'project_id' and 'files' are allowed"
+                return data, 400
+
             with db.session() as session:
                 submission = Submission()
 
