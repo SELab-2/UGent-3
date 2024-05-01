@@ -14,7 +14,6 @@ from project.executor import executor
 from project.db_in import db
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
-
 from project.models.course import Course
 from project.models.course_relation import CourseAdmin
 from project.utils.files import all_files_uploaded
