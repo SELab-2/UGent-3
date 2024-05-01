@@ -188,14 +188,14 @@ class SubmissionsEndpoint(Resource):
                 data["message"] = "Successfully fetched the submissions"
                 data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
                 data["data"] = {
-                    "submission_id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
+                    "submission_id": urljoin(f"{API_HOST}/",  f"/submissions/{submission.submission_id}"),
                     "uid": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
                     "project_id": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
                     "grading": submission.grading,
                     "submission_time": submission.submission_time,
                     "submission_status": submission.submission_status
                 }
-                return data, 202
+                return data, 200
 
         except exc.SQLAlchemyError:
             session.rollback()
