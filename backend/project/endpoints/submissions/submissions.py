@@ -21,7 +21,7 @@ from project.utils.project import is_valid_project
 from project.utils.authentication import authorize_student_submission, login_required_return_uid
 from project.utils.submissions.evaluator import run_evaluator
 from project.utils.models.project_utils import get_course_of_project
-
+from project.utils.models.submission_utils import submission_response
 
 API_HOST = getenv("API_HOST")
 UPLOAD_FOLDER = getenv("UPLOAD_FOLDER")
@@ -187,14 +187,7 @@ class SubmissionsEndpoint(Resource):
 
                 data["message"] = "Successfully fetched the submissions"
                 data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
-                data["data"] = {
-                    "submission_id": urljoin(f"{API_HOST}/",  f"/submissions/{submission.submission_id}"),
-                    "uid": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
-                    "project_id": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
-                    "grading": submission.grading,
-                    "submission_time": submission.submission_time,
-                    "submission_status": submission.submission_status
-                }
+                data["data"] = submission_response(submission, API_HOST)
                 return data, 200
 
         except exc.SQLAlchemyError:
