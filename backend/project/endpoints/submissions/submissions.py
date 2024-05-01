@@ -14,7 +14,7 @@ from project.executor import executor
 from project.db_in import db
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
-from project.models.user import User
+
 from project.models.course import Course
 from project.models.course_relation import CourseAdmin
 from project.utils.files import all_files_uploaded
@@ -45,17 +45,21 @@ class SubmissionsEndpoint(Resource):
         }
         filters = dict(request.args)
         try:
+            invalid_parameters = set(filters.keys()) - {"uid", "project_id"}
+            if invalid_parameters:
+                data["message"] = f"Invalid query parameter(s) {invalid_parameters}"
+                return data, 400
+
             # Check the uid query parameter
             user_id = filters.get("uid")
-            if user_id and not User.query.filter_by(uid=user_id).all():
+            if user_id and not isinstance(user_id, str):
                 data["message"] = f"Invalid user (uid={user_id})"
                 return data, 400
 
             # Check the project_id query parameter
             project_id = filters.get("project_id")
             if project_id:
-                if not project_id.isdigit() or \
-                    not Project.query.filter_by(project_id=project_id).all():
+                if not project_id.isdigit():
                     data["message"] = f"Invalid project (project_id={project_id})"
                     return data, 400
                 filters["project_id"] = int(project_id)
