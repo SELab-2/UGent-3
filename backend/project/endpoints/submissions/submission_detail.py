@@ -106,12 +106,12 @@ class SubmissionEndpoint(Resource):
                 data["message"] = f"Submission (submission_id={submission_id}) patched"
                 data["url"] = urljoin(f"{BASE_URL}/", str(submission.submission_id))
                 data["data"] = {
-                    "id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
-                    "user": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
-                    "project": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
+                    "submission_id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
+                    "uid": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
+                    "project_id": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
                     "grading": submission.grading,
-                    "time": submission.submission_time,
-                    "status": submission.submission_status
+                    "submission_time": submission.submission_time,
+                    "submission_status": submission.submission_status
                 }
                 return data, 200
 
