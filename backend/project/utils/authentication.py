@@ -291,11 +291,8 @@ def authorize_submission_request(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         auth_user_id = return_authenticated_user_id()
-        print(auth_user_id)
         submission_id = kwargs["submission_id"]
-        print(submission_id)
         submission = get_submission(submission_id)
-        print(submission)
         if submission.uid == auth_user_id:
             return f(*args, **kwargs)
         course_id = get_course_of_project(submission.project_id)
