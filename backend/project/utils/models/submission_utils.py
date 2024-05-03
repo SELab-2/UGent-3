@@ -31,3 +31,14 @@ def get_course_of_submission(submission_id):
     """Get the course linked to a given submission"""
     submission = get_submission(submission_id)
     return get_course_of_project(submission.project_id)
+
+def submission_response(submission, api_host):
+    """Return the response data for a submission"""
+    return {
+        "submission_id": f"{api_host}/submissions/{submission.submission_id}",
+        "uid": f"{api_host}/users/{submission.uid}",
+        "project_id": f"{api_host}/projects/{submission.project_id}",
+        "grading": submission.grading,
+        "submission_time": submission.submission_time,
+        "submission_status": submission.submission_status
+    }

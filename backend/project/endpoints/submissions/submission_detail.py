@@ -9,6 +9,7 @@ from flask_restful import Resource
 from sqlalchemy import exc
 from project.db_in import db
 from project.models.submission import Submission
+from project.utils.models.submission_utils import submission_response
 from project.utils.authentication import (
     authorize_submission_request,
     authorize_grader
@@ -87,6 +88,10 @@ class SubmissionEndpoint(Resource):
                     return data, 404
 
                 # Update the grading field
+                if set(request.form.keys()) - {"grading"}:
+                    data["message"] = "Invalid data field given, only 'grading' is allowed"
+                    return data, 400
+
                 grading = request.form.get("grading")
                 if grading is not None:
                     try:
@@ -105,14 +110,7 @@ class SubmissionEndpoint(Resource):
 
                 data["message"] = f"Submission (submission_id={submission_id}) patched"
                 data["url"] = urljoin(f"{BASE_URL}/", str(submission.submission_id))
-                data["data"] = {
-                    "id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
-                    "user": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
-                    "project": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
-                    "grading": submission.grading,
-                    "time": submission.submission_time,
-                    "status": submission.submission_status
-                }
+                data["data"] = submission_response(submission, API_HOST)
                 return data, 200
 
         except exc.SQLAlchemyError:
