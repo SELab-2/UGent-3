@@ -1,14 +1,13 @@
 [tool.poetry]
-name = "projector"
+name = "your_project_name"
 version = "0.1.0"
 description = "Description of your project"
 authors = ["Your Name <your.email@example.com>"]
+packages = [
+    { include = "project/models" },
+    { include = "seeder" },
+]
 
-[tool.setuptools.packages.find]
-where = ["project"]
-include = ["endpoints","models"]
-namespaces = false
-
-[project]
-name = "project"
-version = "1.0.0"
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
