@@ -11,13 +11,13 @@ from faker.providers import DynamicProvider
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy_utils import register_composites
 
+from elements import course_titles
 from project.models.course import Course
 from project.models.course_relation import CourseAdmin, CourseStudent
 from project.models.project import Project
 from project.models.submission import Submission, SubmissionStatus
 from project.models.user import User
 from project.sessionmaker import Session as session_maker
-from elements import course_titles
 
 load_dotenv()
 
