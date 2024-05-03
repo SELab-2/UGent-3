@@ -13,4 +13,3 @@ requests>=2.31.0
 waitress
 flask_swagger_ui
 flask_executor
-faker
