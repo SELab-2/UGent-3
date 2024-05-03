@@ -18,7 +18,6 @@ from project.models.user import User
 from project.models.course import Course
 from project.models.course_relation import CourseAdmin
 from project.utils.files import all_files_uploaded
-from project.utils.user import is_valid_user
 from project.utils.project import is_valid_project
 from project.utils.authentication import authorize_student_submission, login_required_return_uid
 from project.utils.submissions.evaluator import run_evaluator
@@ -99,7 +98,7 @@ class SubmissionsEndpoint(Resource):
             return data, 500
 
     @authorize_student_submission
-    def post(self) -> dict[str, any]:
+    def post(self, uid=None) -> dict[str, any]:
         """Post a new submission to a project
 
         Returns:
@@ -114,11 +113,7 @@ class SubmissionsEndpoint(Resource):
                 submission = Submission()
 
                 # User
-                valid, message = is_valid_user(session, request.form.get("uid"))
-                if not valid:
-                    data["message"] = message
-                    return data, 400
-                submission.uid = request.form.get("uid")
+                submission.uid = uid
 
                 # Project
                 project_id = request.form.get("project_id")
