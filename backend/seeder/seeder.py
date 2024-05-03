@@ -1,20 +1,23 @@
 """Seeder file does the actual seeding of the db"""
+import argparse
+import os
 import random
 import string
 from datetime import datetime, timedelta
-import os
-from sqlalchemy_utils import register_composites
-from sqlalchemy.exc import SQLAlchemyError
+
+from dotenv import load_dotenv
 from faker import Faker
 from faker.providers import DynamicProvider
-from dotenv import load_dotenv
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy_utils import register_composites
+
+from project.models.course import Course
+from project.models.course_relation import CourseAdmin, CourseStudent
+from project.models.project import Project
+from project.models.submission import Submission, SubmissionStatus
 from project.models.user import User
-from backend.project.models.course import Course
-from backend.project.models.project import Project
-from backend.project.models.course_relation import CourseStudent, CourseAdmin
-from backend.project.models.submission import Submission, SubmissionStatus
-from backend.project.sessionmaker import Session as session_maker
-from backend.seeder.elements import course_titles
+from project.sessionmaker import Session as session_maker
+from elements import course_titles
 
 load_dotenv()
 
@@ -231,3 +234,19 @@ def populate_project_submissions(session, students, project_id):
 
             submission.submission_path = submission_directory
             session.commit()  # update submission path
+
+# Create a function to parse command line arguments
+def parse_args():
+    """Parse the given uid from the command line"""
+    parser = argparse.ArgumentParser(description='Populate the database')
+    parser.add_argument('my_uid', type=str, help='Your UID')
+    return parser.parse_args()
+
+# Main function to run when script is executed
+def main():
+    """Parse arguments, pass them to into_the_db function"""
+    args = parse_args()
+    into_the_db(args.my_uid)
+
+if __name__ == '__main__':
+    main()

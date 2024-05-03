@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "projector"
+version = "0.1.0"
+description = "Description of your project"
+authors = ["Your Name <your.email@example.com>"]
+
+[tool.setuptools.packages.find]
+where = ["project"]
+include = ["endpoints","models"]
+namespaces = false
+
+[project]
+name = "project"
+version = "1.0.0"
