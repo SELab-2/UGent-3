@@ -11,7 +11,6 @@ from faker.providers import DynamicProvider
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy_utils import register_composites
 
-from elements import course_titles
 from project.models.course import Course
 from project.models.course_relation import CourseAdmin, CourseStudent
 from project.models.project import Project
@@ -25,9 +24,19 @@ UPLOAD_URL = os.getenv("UPLOAD_FOLDER")
 
 fake = Faker()
 
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.realpath(__file__))
+
+# Construct the path to titles.txt relative to the script directory
+titles_path = os.path.join(script_dir, 'titles.txt')
+
+with open(titles_path, 'r', encoding='utf-8') as file:
+    # Read the lines of the file and strip newline characters
+    titles = [line.strip() for line in file]
+
 course_title_provider = DynamicProvider(  # Custom course titles.
     provider_name="course_titles",
-    elements=course_titles,
+    elements=titles,
 )
 fake.add_provider(course_title_provider)
 
