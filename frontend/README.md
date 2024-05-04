@@ -26,6 +26,20 @@ You can choose your own preferred webserver like for example `nginx`, `serve` or
    npm run dev
    ```
 
+## Setting up the environment variables
+
+The project requires a couple of environment variables to run, if you want to develop on this codebase.
+Setting values for these variables can be done with a method to your own liking.
+
+| Variable          | Description                                                    |
+|-------------------|----------------------------------------------------------------|
+| VITE_API_HOST           | Url of where the database is located                           |
+| POSTGRES_USER     | Name of the user, needed to login to the postgres database     |
+| POSTGRES_PASSWORD | Password of the user, needed to login to the postgres database |
+| POSTGRES_HOST     | IP adress of the postgres database                             |
+| POSTGRES_DB       | Name of the postgres database                                  |
+| API_HOST          | Location of the API root                                       |
+
 ## Maintaining the codebase
 ### Writing tests
 When writing new code it is important to maintain the right functionality so 
