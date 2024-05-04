@@ -91,7 +91,9 @@
     "uploadError": "Project is niet goed geformatteerd",
     "noDeadlinesPlaceholder": "Nog geen opgegeven deadlines",
     "noFilesPlaceholder": "Nog geen opgave bestanden geupload",
-    "noRegexPlaceholder": "Nog geen regex toegevoegd"
+    "noRegexPlaceholder": "Nog geen regex toegevoegd",
+    "unauthorized": "U heeft niet de juiste rechten om een project aan te maken voor dit vak",
+    "submissionError": "Er is een fout opgetreden bij het indienen van uw project, probeer het later opnieuw."
   },
   "projectView": {
     "submitNetworkError": "Er is iets mislopen bij het opslaan van uw indiening. Probeer het later opnieuw.",
