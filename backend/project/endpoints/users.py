@@ -21,7 +21,7 @@ API_URL = getenv("API_HOST")
 class Users(Resource):
     """Api endpoint for the /users route"""
 
-    @login_required
+    # @login_required
     def get(self):
         """
         This function will respond to get requests made to /users.
@@ -33,6 +33,10 @@ class Users(Resource):
             if role is not None:
                 role = Role[role.upper()]
                 query = query.filter(userModel.role == role)
+
+            uid = request.args.getlist("uid")
+            if uid is not None:
+                query = query.filter(userModel.uid.in_(uid))
 
             users = query.all()
             users = [user.to_dict() for user in users]

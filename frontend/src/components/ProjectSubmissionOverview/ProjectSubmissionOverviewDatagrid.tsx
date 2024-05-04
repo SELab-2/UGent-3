@@ -11,15 +11,21 @@ import { authenticatedFetch } from "../../utils/authenticated-fetch";
 
 const apiUrl = import.meta.env.VITE_API_HOST
 
-  interface Submission {
-    grading: string;
-    project_id: string;
-    submission_id: string;
-    submission_path: string;
-    submission_status: string;
-    submission_time: string;
-    uid: string;
-  }
+interface Submission {
+  grading: string;
+  project_id: string;
+  submission_id: string;
+  submission_path: string;
+  submission_status: string;
+  submission_time: string;
+  uid: string;
+}
+
+interface User {
+  display_name: string;
+  role: string;
+  uid: string
+}
 
 /**
  * @returns unique id for datarows
@@ -40,7 +46,7 @@ const fetchSubmissionsFromUser = async (submission_id: string) => {
 
 const columns: GridColDef<Submission>[] = [
   { field: 'submission_id', headerName: 'Submission ID', flex: 0.4 },
-  { field: 'uid', headerName: 'Student ID', width: 160, flex: 0.4 },
+  { field: 'display_name', headerName: 'Student', width: 160, flex: 0.4 },
   {
     field: 'grading',
     headerName: 'Grading',
@@ -77,15 +83,41 @@ export default function ProjectSubmissionsOverviewDatagrid() {
   const { projectId } = useParams<{ projectId: string }>();
   const [submissions, setSubmissions]  = useState<Submission[]>([])
 
-  useEffect(() => {
-    fetchLastSubmissionsByUser();
-  });
+  const fetchDisplaynameByUid = async (uids: [string]) => {
+
+    const uidParams = new URLSearchParams()
+    for (const uid of uids) {
+      uidParams.append('uid', uid);
+    }
+    const uidUrl = `${apiUrl}/users?`+uidParams;
+    const response = await authenticatedFetch(uidUrl);
+    const jsonData = await response.json();
+
+    return jsonData.data
+  };
 
   const fetchLastSubmissionsByUser = async () => {
     const response = await authenticatedFetch(`${apiUrl}/projects/${projectId}/latest-per-user`)
     const jsonData = await response.json();
-    setSubmissions(jsonData.data);
+    const uids = jsonData.data.map((submission: Submission) => submission.uid);
+    const users = await fetchDisplaynameByUid(uids);
+
+    const submissionsWithUsers = jsonData.data.map((submission: Submission) => {
+      // Find the corresponding user for this submission's UID
+      const user = users.find((user: User) => user.uid === submission.uid);
+      // Add user information to the submission
+      return {
+        ...submission,
+        display_name: user.display_name
+      };
+    });
+
+    setSubmissions(submissionsWithUsers);
   }
+
+  useEffect(() => {
+    fetchLastSubmissionsByUser();
+  });
 
   return (
     <Box
