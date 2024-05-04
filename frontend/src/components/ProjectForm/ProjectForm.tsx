@@ -22,7 +22,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DeadlineCalender from "../Calender/DeadlineCalender.tsx";
 import { Deadline } from "../../types/deadline";
 import {InfoOutlined} from "@mui/icons-material";
-import {Link, redirect, useLoaderData, useLocation, useNavigate} from "react-router-dom";
+import {Link, useLoaderData, useLocation, useNavigate} from "react-router-dom";
 import FolderDragDrop from "../FolderUpload/FolderUpload.tsx";
 import TabPanel from "@mui/lab/TabPanel";
 import {TabContext} from "@mui/lab";
