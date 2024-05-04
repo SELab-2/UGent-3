@@ -9,7 +9,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import download from "downloadjs";
 import { authenticatedFetch } from "../../utils/authenticated-fetch";
 
-const apiUrl = import.meta.env.VITE_API_HOST
+const apiUrl = import.meta.env.VITE_APP_API_HOST;
 
   interface Submission {
     grading: string;

@@ -17,7 +17,7 @@ import { Title } from "../../../components/Header/Title";
 import { authenticatedFetch } from "../../../utils/authenticated-fetch";
 import i18next from "i18next";
 
-const API_URL = import.meta.env.VITE_API_HOST;
+const API_URL = import.meta.env.VITE_APP_API_HOST;
 
 interface Project {
   title: string;
