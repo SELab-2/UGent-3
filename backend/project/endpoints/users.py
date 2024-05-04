@@ -35,7 +35,7 @@ class Users(Resource):
                 query = query.filter(userModel.role == role)
 
             uid = request.args.getlist("uid")
-            if uid is not None:
+            if len(uid) > 0:
                 query = query.filter(userModel.uid.in_(uid))
 
             users = query.all()
