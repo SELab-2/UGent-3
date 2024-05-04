@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "your_project_name"
-version = "0.1.0"
-description = "Description of your project"
-authors = ["Your Name <your.email@example.com>"]
+name = "Peristerónas"
+version = "1.0"
+description = "Project submission platform"
+authors = ["Aron","Gerwoud","Siebe","Matisse","Warre","Cedric"]
 packages = [
     { include = "project/models" },
     { include = "seeder" },
