@@ -150,7 +150,10 @@ export default function ProjectForm() {
         setErrorMessage(t("faultySubmission"));
       }
       setValidSubmission(constainsDocker);
-    } else {
+    } else if(runner === ''){
+      setValidRunner(true);
+    }
+    else {
       setValidRunner(containsRuntest);
       if(!containsRuntest) {
         setErrorMessage(t("faultySubmission"));
