@@ -12,10 +12,15 @@ from dotenv import load_dotenv
 from flask import request
 from flask_restful import Resource
 
+from sqlalchemy import union, select
+from sqlalchemy.exc import SQLAlchemyError
+
 from project.models.course import Course
-from project.utils.query_agent import query_selected_from_model, insert_into_model
-from project.utils.authentication import login_required, authorize_teacher
+from project.models.course_relation import CourseAdmin, CourseStudent
+from project.utils.query_agent import insert_into_model
+from project.utils.authentication import login_required_return_uid, authorize_teacher
 from project.endpoints.courses.courses_utils import check_data
+from project.db_in import db
 
 load_dotenv()
 API_URL = getenv("API_HOST")
@@ -24,20 +29,61 @@ RESPONSE_URL = urljoin(f"{API_URL}/", "courses")
 class CourseForUser(Resource):
     """Api endpoint for the /courses link"""
 
-    @login_required
-    def get(self):
+    @login_required_return_uid
+    def get(self, uid=None):
         """ "
         Get function for /courses this will be the main endpoint
         to get all courses and filter by given query parameter like /courses?parameter=...
         parameters can be either one of the following: teacher,ufora_id,name.
         """
 
-        return query_selected_from_model(
-            Course,
-            RESPONSE_URL,
-            url_mapper={"course_id": RESPONSE_URL},
-            filters=request.args
-        )
+        try:
+
+            filter_params = request.args.to_dict()
+
+            # Start with a base query
+            base_query = select(Course)
+
+            # Apply filters dynamically if they are provided
+            for param, value in filter_params.items():
+                if value:
+                    attribute = getattr(Course, param, None)
+                    if attribute:
+                        base_query = base_query.filter(attribute == value)
+
+            # Define the role-specific queries
+            student_courses = base_query.join(
+                CourseStudent,
+                Course.course_id == CourseStudent.course_id).filter(
+                    CourseStudent.uid == uid)
+            admin_courses = base_query.join(
+                CourseAdmin,
+                Course.course_id == CourseAdmin.course_id).filter(
+                    CourseAdmin.uid == uid)
+            teacher_courses = base_query.filter(Course.teacher == uid)
+
+            # Combine the select statements using union to remove duplicates
+            all_courses_query = union(student_courses, admin_courses, teacher_courses)
+
+            # Execute the union query and fetch all results as Course instances
+            courses = db.session.execute(all_courses_query).mappings().all()
+            courses_data = [dict(course) for course in courses]
+
+            for course in courses_data:
+                course["course_id"] = urljoin(f"{RESPONSE_URL}/", str(course['course_id']))
+
+            return {
+                "data": courses_data,
+                "url": RESPONSE_URL,
+                "message": "Courses fetched successfully"
+            }
+
+        except SQLAlchemyError:
+            db.session.rollback()
+            return {
+                "message": "An error occurred while fetching the courses",
+                "url": RESPONSE_URL
+                }, 500
 
     @authorize_teacher
     def post(self, teacher_id=None):
