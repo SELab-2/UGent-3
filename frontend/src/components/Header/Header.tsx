@@ -85,6 +85,15 @@ export function Header({ me }: HeaderProps): JSX.Element {
           >
             <MenuIcon style={{ fontSize: "2rem" }} />
           </IconButton>
+          <Link to={`/home`}
+            style={{ color: 'inherit', textDecoration: 'none' }}>
+            <Typography
+              variant="h6"
+              color="inherit"
+              sx={{ marginRight: '2rem' }}>
+              Peristerónas
+            </Typography>
+          </Link>
           <TitlePortal />
           {!me.loggedIn && (
             <LoginButton/>
