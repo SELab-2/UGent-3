@@ -115,7 +115,7 @@ class TestCourseEndpoint(TestEndpoint):
     ### QUERY PARAMETER ###
     # Test a query parameter, should return [] for wrong values
     query_parameter_tests = \
-        query_parameter_tests("/courses", "get", "student", [f.name for f in fields(Course)])
+        query_parameter_tests("/courses", "get", "teacher", [f.name for f in fields(Course)])
 
     @mark.parametrize("query_parameter_test", query_parameter_tests, indirect=True)
     def test_query_parameters(self, query_parameter_test: tuple[str, Any, str, bool]):
@@ -127,7 +127,7 @@ class TestCourseEndpoint(TestEndpoint):
     ### COURSES ###
     def test_get_courses(self, client: FlaskClient, courses: list[Course]):
         """Test getting all courses"""
-        csrf = get_csrf_from_login(client, "student")
+        csrf = get_csrf_from_login(client, "teacher")
         response = client.get("/courses", headers = {"X-CSRF-TOKEN":csrf})
         assert response.status_code == 200
         data = [course["name"] for course in response.json["data"]]
@@ -222,7 +222,6 @@ class TestCourseEndpoint(TestEndpoint):
             }
         )
         assert response.status_code == 201
-        csrf = get_csrf_from_login(client, "student")
         response = client.get("/courses?name=test", headers = {"X-CSRF-TOKEN":csrf})
         assert response.status_code == 200
         data = response.json["data"][0]
