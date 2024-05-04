@@ -14,16 +14,14 @@ from project.executor import executor
 from project.db_in import db
 from project.models.submission import Submission, SubmissionStatus
 from project.models.project import Project
-from project.models.user import User
 from project.models.course import Course
 from project.models.course_relation import CourseAdmin
 from project.utils.files import all_files_uploaded
-from project.utils.user import is_valid_user
 from project.utils.project import is_valid_project
 from project.utils.authentication import authorize_student_submission, login_required_return_uid
 from project.utils.submissions.evaluator import run_evaluator
 from project.utils.models.project_utils import get_course_of_project
-
+from project.utils.models.submission_utils import submission_response
 
 API_HOST = getenv("API_HOST")
 UPLOAD_FOLDER = getenv("UPLOAD_FOLDER")
@@ -46,17 +44,21 @@ class SubmissionsEndpoint(Resource):
         }
         filters = dict(request.args)
         try:
+            invalid_parameters = set(filters.keys()) - {"uid", "project_id"}
+            if invalid_parameters:
+                data["message"] = f"Invalid query parameter(s) {invalid_parameters}"
+                return data, 400
+
             # Check the uid query parameter
             user_id = filters.get("uid")
-            if user_id and not User.query.filter_by(uid=user_id).all():
+            if user_id and not isinstance(user_id, str):
                 data["message"] = f"Invalid user (uid={user_id})"
                 return data, 400
 
             # Check the project_id query parameter
             project_id = filters.get("project_id")
             if project_id:
-                if not project_id.isdigit() or \
-                    not Project.query.filter_by(project_id=project_id).all():
+                if not project_id.isdigit():
                     data["message"] = f"Invalid project (project_id={project_id})"
                     return data, 400
                 filters["project_id"] = int(project_id)
@@ -99,7 +101,7 @@ class SubmissionsEndpoint(Resource):
             return data, 500
 
     @authorize_student_submission
-    def post(self) -> dict[str, any]:
+    def post(self, uid=None) -> dict[str, any]:
         """Post a new submission to a project
 
         Returns:
@@ -110,15 +112,15 @@ class SubmissionsEndpoint(Resource):
             "url": BASE_URL
         }
         try:
+            if set(request.form.keys()) - {"project_id", "files"}:
+                data["message"] = "Invalid data fields, only 'project_id' and 'files' are allowed"
+                return data, 400
+
             with db.session() as session:
                 submission = Submission()
 
                 # User
-                valid, message = is_valid_user(session, request.form.get("uid"))
-                if not valid:
-                    data["message"] = message
-                    return data, 400
-                submission.uid = request.form.get("uid")
+                submission.uid = uid
 
                 # Project
                 project_id = request.form.get("project_id")
@@ -185,15 +187,8 @@ class SubmissionsEndpoint(Resource):
 
                 data["message"] = "Successfully fetched the submissions"
                 data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
-                data["data"] = {
-                    "submission_id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
-                    "uid": urljoin(f"{API_HOST}/", f"/users/{submission.uid}"),
-                    "project_id": urljoin(f"{API_HOST}/", f"/projects/{submission.project_id}"),
-                    "grading": submission.grading,
-                    "submission_time": submission.submission_time,
-                    "submission_status": submission.submission_status
-                }
-                return data, 202
+                data["data"] = submission_response(submission, API_HOST)
+                return data, 200
 
         except exc.SQLAlchemyError:
             session.rollback()

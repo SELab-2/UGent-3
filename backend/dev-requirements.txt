@@ -2,3 +2,4 @@ pytest
 pylint
 pylint-flask
 pyyaml
+faker

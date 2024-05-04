@@ -14,12 +14,15 @@ import { useParams } from "react-router-dom";
 import SubmissionCard from "./SubmissionCard";
 import { Course } from "../../../types/course";
 import { Title } from "../../../components/Header/Title";
+import { authenticatedFetch } from "../../../utils/authenticated-fetch";
+import i18next from "i18next";
 
 const API_URL = import.meta.env.VITE_API_HOST;
 
 interface Project {
   title: string;
   description: string;
+  regex_expressions: string[];
 }
 
 /**
@@ -34,16 +37,14 @@ export default function ProjectView() {
   const [assignmentRawText, setAssignmentRawText] = useState<string>("");
 
   useEffect(() => {
-    fetch(`${API_URL}/projects/${projectId}`, {
-      credentials: 'include',
-    }).then((response) => {
+    authenticatedFetch(`${API_URL}/projects/${projectId}`).then((response) => {
       if (response.ok) {
         response.json().then((data) => {
           const projectData = data["data"];
           setProjectData(projectData);
-          fetch(`${API_URL}/courses/${projectData.course_id}`, {
-            credentials: 'include',
-          }).then((response) => {
+          authenticatedFetch(
+            `${API_URL}/courses/${projectData.course_id}`
+          ).then((response) => {
             if (response.ok) {
               response.json().then((data) => {
                 setCourseData(data["data"]);
@@ -54,9 +55,9 @@ export default function ProjectView() {
       }
     });
 
-    fetch(`${API_URL}/projects/${projectId}/assignment`, {
-      credentials: 'include',
-    }).then((response) => {
+    authenticatedFetch(
+      `${API_URL}/projects/${projectId}/assignment?lang=${i18next.language}`
+    ).then((response) => {
       if (response.ok) {
         response.text().then((data) => setAssignmentRawText(data));
       }
@@ -77,7 +78,7 @@ export default function ProjectView() {
         <Container>
           {projectData && (
             <Card>
-              <Title title={projectData.title}/>
+              <Title title={projectData.title} />
               <CardHeader
                 color="secondary"
                 title={projectData.title}
@@ -105,6 +106,7 @@ export default function ProjectView() {
       <Grid item sm={12}>
         <Container>
           <SubmissionCard
+            regexRequirements={projectData ? projectData.regex_expressions : []}
             submissionUrl={`${API_URL}/submissions`}
             projectId={projectId}
           />

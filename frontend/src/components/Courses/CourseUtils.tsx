@@ -1,17 +1,29 @@
-import { NavigateFunction, Params } from 'react-router-dom';
+import { NavigateFunction, Params } from "react-router-dom";
+import { authenticatedFetch } from "../../utils/authenticated-fetch";
+import { Me } from "../../types/me";
 
-export interface Course{
-    course_id: string,
-    name: string,
-    teacher:string,
-    ufora_id:string,
-    url:string
+export interface Course {
+  course_id: string;
+  name: string;
+  teacher: string;
+  ufora_id: string;
+  url: string;
 }
 
-export interface Project{
-    title: string,
-    project_id: string,
-    deadlines: string[][]
+export interface Project {
+  title: string;
+  project_id: string;
+}
+
+export interface ProjectDetail {
+  title: string;
+  project_id: string;
+  deadlines: Deadline[];
+}
+
+interface Deadline {
+  description: string;
+  date: Date;
 }
 
 export const apiHost = import.meta.env.VITE_APP_API_HOST;
@@ -19,7 +31,7 @@ export const appHost = import.meta.env.VITE_APP_HOST;
 /**
  * @returns The uid of the acces token of the logged in user
  */
-export function loggedInToken(){
+export function loggedInToken() {
   return "teacher1";
 }
 
@@ -28,14 +40,20 @@ export function loggedInToken(){
  * @param uid - The uid of the user.
  * @returns The username.
  */
-export function getUserName(uid: string): string {
-  return getIdFromLink(uid);
+export async function getUser(uid: string): Promise<Me> {
+  return authenticatedFetch(`${apiHost}/users/${getIdFromLink(uid)}`).then((response) => {
+    if (response.ok) {
+      return response.json().then((data) => {
+        return data.data;
+      });
+    }
+  })
 }
 
 /**
  * @returns The Uid of the logged in user
  */
-export function loggedInUid(){
+export function loggedInUid() {
   return "Gunnar";
 }
 
@@ -44,49 +62,52 @@ export function loggedInUid(){
  * @param data - course data to send to the api
  * @param navigate - function that allows the app to redirect
  */
-export function callToApiToCreateCourse(data: string, navigate: NavigateFunction){
-  fetch(`${apiHost}/courses`, {
-    credentials: 'include', // include, *same-origin, omit
+export function callToApiToCreateCourse(
+  data: string,
+  navigate: NavigateFunction
+) {
+  authenticatedFetch(`${apiHost}/courses`, {
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    method: 'POST',
+    method: "POST",
     body: data,
   })
-    .then(response => response.json())
-    .then(data => {
+    .then((response) => response.json())
+    .then((data) => {
       //But first also make sure that teacher is in the course admins list
-      fetch(`${apiHost}/courses/${getIdFromLink(data.url)}/admins`, {
-        credentials: 'include',
-        method: 'POST',
+      authenticatedFetch(`${apiHost}/courses/${getIdFromLink(data.url)}/admins`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({admin_uid: loggedInUid()})
+        body: JSON.stringify({ admin_uid: loggedInUid() }),
       });
       navigate(getIdFromLink(data.url)); // navigate to data.url
-    })
+    });
 }
-  
+
 /**
  * @param link - the link to the api endpoint
  * @returns the Id at the end of the link
  */
 export function getIdFromLink(link: string): string {
-  const parts = link.split('/');
+  const parts = link.split("/");
   return parts[parts.length - 1];
 }
 
 /**
- * Function to find the nearest future date from a list of dates
- * @param dates - Array of dates
- * @returns The nearest future date
+ * Function to find the nearest future deadline from a list of deadlines
+ * @param deadlines - List of deadlines
+ * @returns The nearest future deadline
  */
-export function getNearestFutureDate(dates: string[][]): Date | null {
+export function getNearestFutureDate(deadlines: Deadline[]): Deadline | null {
   const now = new Date();
-  const futureDates = dates.map(date => new Date(date[1])).filter(date => date > now);
-  if (futureDates.length === 0) return null;
-  return futureDates.reduce((nearest, current) => current < nearest ? current : nearest);
+  const futureDeadlines = deadlines.filter((deadline) => deadline.date > now);
+  if (futureDeadlines.length === 0) return null;
+  return futureDeadlines.reduce((nearest, current) =>
+    current < nearest ? current : nearest
+  );
 }
 
 /**
@@ -96,14 +117,12 @@ export function getNearestFutureDate(dates: string[][]): Date | null {
 
 const fetchData = async (url: string, params?: URLSearchParams) => {
   let uri = `${apiHost}/${url}`;
-  if(params){
-    uri += `?${params}`
+  if (params) {
+    uri += `?${params}`;
   }
-  const res = await fetch(uri, {
-    credentials: 'include'
-  });
-  if(res.status !== 200){
-    throw new Response("Failed to fetch data", {status: res.status});
+  const res = await authenticatedFetch(uri);
+  if (res.status !== 200) {
+    throw new Response("Failed to fetch data", { status: res.status });
   }
   const jsonResult = await res.json();
 
@@ -121,7 +140,31 @@ const dataLoaderCourse = async (courseId: string) => {
 
 const dataLoaderProjects = async (courseId: string) => {
   const params = new URLSearchParams({ course_id: courseId });
-  return fetchData(`projects`, params);
+  const uri = `${apiHost}/projects?${params}`;
+
+  const res = await authenticatedFetch(uri);
+  if (res.status !== 200) {
+    throw new Response("Failed to fetch data", { status: res.status });
+  }
+  const jsonResult = await res.json();
+  const projects: ProjectDetail[] = jsonResult.data.map(async (item: Project) => {
+    const projectRes = await authenticatedFetch(item.project_id);
+    if (projectRes.status !== 200) {
+      throw new Response("Failed to fetch project data", { status: projectRes.status });
+    }
+    const projectJson = await projectRes.json();
+    const projectData = projectJson.data;
+    const project: ProjectDetail = {
+      ...item,
+      deadlines: projectData.deadlines.map((deadline: Deadline) => ({
+        description: deadline.description,
+        date: new Date(deadline.date),
+      })),
+    };
+    return project;
+  });
+
+  return Promise.all(projects);
 };
 
 const dataLoaderAdmins = async (courseId: string) => {
@@ -132,15 +175,19 @@ const dataLoaderStudents = async (courseId: string) => {
   return fetchData(`courses/${courseId}/students`);
 };
 
-export const dataLoaderCourseDetail = async ({ params } : { params:Params}) => {
+export const dataLoaderCourseDetail = async ({
+  params,
+}: {
+  params: Params;
+}) => {
   const { courseId } = params;
   if (!courseId) {
     throw new Error("Course ID is undefined.");
   }
+
   const course = await dataLoaderCourse(courseId);
   const projects = await dataLoaderProjects(courseId);
   const admins = await dataLoaderAdmins(courseId);
   const students = await dataLoaderStudents(courseId);
-  
   return { course, projects, admins, students };
 };

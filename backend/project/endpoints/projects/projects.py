@@ -18,6 +18,7 @@ from project.models.course_relation import CourseStudent, CourseAdmin
 from project.utils.query_agent import create_model_instance
 from project.utils.authentication import login_required_return_uid, authorize_teacher
 from project.endpoints.projects.endpoint_parser import parse_project_params
+from project.utils.models.course_utils import is_teacher_of_course
 from project.utils.models.project_utils import get_course_of_project
 
 API_URL = os.getenv('API_HOST')
@@ -80,8 +81,11 @@ class ProjectsEndpoint(Resource):
         Post functionality for project
         using flask_restfull parse lib
         """
-
         project_json = parse_project_params()
+
+        if not is_teacher_of_course(teacher_id, project_json["course_id"]):
+            return {"message":"You are not the teacher of this course"}, 403
+
         filename = None
         if "assignment_file" in request.files:
             file = request.files["assignment_file"]

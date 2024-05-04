@@ -5,7 +5,7 @@ of a project
 import os
 from urllib.parse import urljoin
 
-from flask import send_from_directory
+from flask import send_from_directory, request
 
 from flask_restful import Resource
 
@@ -28,8 +28,22 @@ class ProjectAssignmentFiles(Resource):
         Get the assignment files of a project
         """
 
+        language = request.args.get('lang')
         directory_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, str(project_id)))
-        assignment_file = os.path.join(directory_path, ASSIGNMENT_FILE_NAME)
+        file_name = ASSIGNMENT_FILE_NAME
+        if language:
+            potential_file = f"assignment_{language}.md"
+            if os.path.isfile(os.path.join(directory_path, potential_file)):
+                file_name = potential_file
+            else:
+                # Find any .md file that starts with "assignment"
+                for filename in os.listdir(directory_path):
+                    if filename.startswith("assignment") and filename.endswith(".md"):
+                        file_name = filename
+                        break
+
+
+        assignment_file = os.path.join(directory_path, file_name)
 
         if not os.path.isfile(assignment_file):
             # no file is found so return 404
