@@ -123,7 +123,9 @@
     "noFilesPlaceholder": "No assignment files given yet",
     "noRegexPlaceholder": "No regex added yet",
     "clearSelected": "Clear Selection",
-    "faultySubmission": "Some fields were left open or there is no valid runner/file combination"
+    "faultySubmission": "Some fields were left open or there is no valid runner/file combination",
+    "unauthorized": "You are unauthorized to upload a project for this course",
+    "submissionError": "Submission failed, please try again"
   },
   "student" : {
     "myProjects": "My Projects",
