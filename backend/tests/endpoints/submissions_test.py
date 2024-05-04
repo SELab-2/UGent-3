@@ -17,14 +17,16 @@ class TestSubmissionsEndpoint:
         """Test getting submissions for a non-existing user"""
         csrf = get_csrf_from_login(client, "teacher")
         response = client.get("/submissions?uid=-20", headers = {"X-CSRF-TOKEN":csrf})
-        assert response.status_code == 400
+        assert response.status_code == 200
+        assert response.json["data"] == []
 
     def test_get_submissions_wrong_project(self, client: FlaskClient):
         """Test getting submissions for a non-existing project"""
         csrf = get_csrf_from_login(client, "teacher")
         response = client.get("/submissions?project_id=123456789",
                               headers = {"X-CSRF-TOKEN":csrf})
-        assert response.status_code == 400
+        assert response.status_code == 200
+        assert response.json["data"] == []
         assert "message" in response.json
 
     def test_get_submissions_wrong_project_type(self, client: FlaskClient):
@@ -42,6 +44,15 @@ class TestSubmissionsEndpoint:
         data = response.json
         assert response.status_code == 200
         assert "message" in data
+
+    def test_get_submission_wrong_parameter(self, client: FlaskClient):
+        """Test a submission filtering on a non existing parameter"""
+        response = client.get(
+            "/submissions?parameter=0",
+            headers = {"X-CSRF-TOKEN":get_csrf_from_login(client, "teacher")}
+        )
+        assert response.status_code == 400
+
 
 
     ### GET SUBMISSION ###
@@ -127,10 +138,10 @@ class TestSubmissionsEndpoint:
         assert data["message"] == f"Submission (submission_id={submission.submission_id}) patched"
         assert data["url"] == f"{API_HOST}/submissions/{submission.submission_id}"
         assert data["data"] == {
-            "id": f"{API_HOST}/submissions/{submission.submission_id}",
-            "user": f"{API_HOST}/users/student02",
-            "project": f"{API_HOST}/projects/{project.project_id}",
+            "submission_id": f"{API_HOST}/submissions/{submission.submission_id}",
+            "uid": f"{API_HOST}/users/student02",
+            "project_id": f"{API_HOST}/projects/{project.project_id}",
             "grading": 20,
-            "time": 'Thu, 14 Mar 2024 23:59:59 GMT',
-            "status": 'FAIL'
+            "submission_time": 'Thu, 14 Mar 2024 23:59:59 GMT',
+            "submission_status": 'FAIL'
         }
