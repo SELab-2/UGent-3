@@ -69,7 +69,7 @@ def query_parameter_tests(
     new_endpoint = endpoint + "?parameter=0"
     tests.append(param(
         (new_endpoint, method, token, True),
-        id = f"{new_endpoint} {method.upper()} {token} (parameter 0 400)"
+        id = f"{new_endpoint} {method.upper()} {token} (parameter 0 500)"
     ))
 
     for parameter in parameters:
