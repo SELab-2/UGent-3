@@ -138,10 +138,10 @@
     "RUNNING": "Is running",
     "LATE": "Late",
     "deadlinesOnDay": "Deadlines on: ",
-    "noDeadline": "No deadlines",
+    "noDeadline": "No deadlines on this day",
     "no_submission_yet" : "No submission yet",
     "loading": "Loading...",
-    "no_projects": "There are no projects here."
+    "no_projects": "There are no projects here, sign up for a course to see projects"
   },
   "projectsOverview": {
     "past_deadline": "Past Projects",
