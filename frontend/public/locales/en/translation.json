@@ -1,7 +1,4 @@
 {
-  "home": {
-    "title": "Homepage"
-  },
   "header": {
     "myProjects": "My Projects",
     "myCourses": "My Courses",
@@ -15,7 +12,46 @@
   "home": {
     "home": "Home",
     "tag": "en",
-    "homepage": "Homepage"
+    "homepage": "Homepage",
+    "welcomeDescription": "Welcome to Peristerónas, the online submission platform of UGent",
+    "login": "Login"
+  },
+  "courseDetailTeacher": {
+    "title": "Course Details",
+    "deleteCourse": "Delete Course",
+    "unauthorizedDelete": "You are unauthorized to delete this course",
+    "noCoursesFound": "No courses found",
+    "noProjects": "No projects",
+    "noStudents": "No students in this course",
+    "joinCodes": "Join Codes",
+    "forAdmins": "For Admins",
+    "forStudents": "For Students",
+    "noExpiryDate": "No expiry date",
+    "expiryDate": "Expiry Date",
+    "newJoinCode": "New Join Code",
+    "deleteSelected": "Delete Selected Students",
+    "projects": "Projects",
+    "newProject": "New Project",
+    "assistantList": "List of co-teachers/assistants",
+    "newTeacher": "New teacher",
+    "studentList": "List of students",
+    "newStudent": "New student(s)",
+    "deadline": "Deadline",
+    "teacher": "Teacher",
+    "view": "View",
+    "admins": "Admins",
+    "students": "Students"
+  },
+  "allCoursesTeacher": {
+    "title": "All Courses",
+    "courseForm": "Course Form",
+    "courseName": "Course Name",
+    "submit": "Submit",
+    "emptyCourseNameError": "Course name should not be empty",
+    "cancel": "Cancel",
+    "create": "Create",
+    "activeCourses": "Active Courses",
+    "archivedCourses":"Archived Courses"    
   },
   "courseForm": {
     "courseName": "Course Name",
@@ -43,7 +79,22 @@
     "daysAgo": "days ago",
     "hoursAgo": "hours ago",
     "minutesAgo": "minutes ago",
-    "justNow": "just now"
+    "justNow": "just now",
+    "yearsLater": "years later",
+    "monthsLater": "months later",
+    "daysLater": "days later",
+    "hoursLater": "hours later",
+    "minutesLater": "minutes later"
+  },
+  "error": {
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundMessage": "The requested page was not found.",
+    "forbidden": "Forbidden",
+    "forbiddenMessage": "You don't have access to this resource.",
+    "clientError": "Client Error",
+    "clientErrorMessage": "A client error has occured.",
+    "serverError": "Server Error",
+    "serverErrorMessage": "A server error has occured."
   },
   "projectForm": {
     "projectTitle": "Title",
@@ -72,5 +123,25 @@
     "noRegexPlaceholder": "No regex added yet",
     "clearSelected": "Clear Selection",
     "faultySubmission": "Some fields were left open or there is no valid runner/file combination"
+  },
+  "student" : {
+    "myProjects": "My Projects",
+    "myCourses": "My Courses",
+    "deadlines": "Past deadlines",
+    "last_submission" : "Last submission",
+    "course": "Course",
+    "SUCCESS": "Success",
+    "FAIL": "Fail",
+    "deadlinesOnDay": "Deadlines on: ",
+    "noDeadline": "No deadlines",
+    "no_submission_yet" : "No submission yet",
+    "loading": "Loading...",
+    "no_projects": "There are no projects here."
+  },
+  "projectsOverview": {
+    "past_deadline": "Past Projects",
+    "future_deadline": "Upcoming Deadlines",
+    "no_projects": "There are no projects here.",
+    "new_project": "New Project"
   }
 }

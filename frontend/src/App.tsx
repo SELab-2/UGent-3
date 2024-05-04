@@ -1,20 +1,34 @@
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 import Layout from "./components/Header/Layout";
-import Home from "./pages/home/Home";
+import { AllCoursesTeacher } from "./components/Courses/AllCoursesTeacher";
+import { CourseDetailTeacher } from "./components/Courses/CourseDetailTeacher";
+import { dataLoaderCourseDetail, dataLoaderCourses } from "./components/Courses/CourseUtils";
 import LanguagePath from "./components/LanguagePath";
 import ProjectView from "./pages/project/projectView/ProjectView";
+import { ErrorBoundary } from "./pages/error/ErrorBoundary.tsx";
 import ProjectCreateHome from "./pages/create_project/ProjectCreateHome.tsx";
+import SubmissionsOverview from "./pages/submission_overview/SubmissionsOverview.tsx";
+import {fetchProjectPage} from "./pages/project/FetchProjects.tsx";
+import HomePages from "./pages/home/HomePages.tsx";
+import ProjectOverView from "./pages/project/projectOverview.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<Layout />}>
-      <Route index element={<Home />} />
+    <Route path="/" element={<Layout />} errorElement={<ErrorBoundary />}>
+      <Route index element={<HomePages />} loader={fetchProjectPage}/>
       <Route path=":lang" element={<LanguagePath/>}>
-        <Route path="home" element={<Home />} />
-        <Route path="project" >
-          <Route path=":projectId" element={<ProjectView />}/>
+        <Route path="home" element={<HomePages />} loader={fetchProjectPage} />
+        <Route path="project/:projectId/overview" element={<SubmissionsOverview/>}/>
+        <Route path="project">
+          <Route path=":projectId" element={<ProjectView />}>
+          </Route>
+        </Route>
+        <Route path="courses">
+          <Route index element={<AllCoursesTeacher />} loader={dataLoaderCourses}/>
+          <Route path=":courseId" element={<CourseDetailTeacher />} loader={dataLoaderCourseDetail} />
         </Route>
         <Route path="projects">
+          <Route index element={<ProjectOverView/>} loader={fetchProjectPage}/>
           <Route path="create" element={<ProjectCreateHome />} />
         </Route>
       </Route>
@@ -27,8 +41,5 @@ const router = createBrowserRouter(
  * @returns - The main application component
  */
 export default function App(): React.JSX.Element {
-  return (
-    <RouterProvider router={router}>
-    </RouterProvider>
-  );
+  return <RouterProvider router={router} />;
 }
