@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "Peristerónas"
+name = "Peristeronas"
 version = "1.0"
 description = "Project submission platform"
 authors = ["Aron","Gerwoud","Siebe","Matisse","Warre","Cedric"]
