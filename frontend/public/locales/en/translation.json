@@ -133,6 +133,8 @@
     "course": "Course",
     "SUCCESS": "Success",
     "FAIL": "Fail",
+    "RUNNING": "Is running",
+    "LATE": "Late",
     "deadlinesOnDay": "Deadlines on: ",
     "noDeadline": "No deadlines",
     "no_submission_yet" : "No submission yet",
