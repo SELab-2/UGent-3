@@ -14,6 +14,7 @@ import {
   Menu,
   MenuItem,
   Paper,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
@@ -24,7 +25,6 @@ import {
   getIdFromLink,
   getNearestFutureDate,
   getUser,
-  appHost,
   ProjectDetail,
 } from "./CourseUtils";
 import {
@@ -39,6 +39,7 @@ import { timeDifference } from "../../utils/date-utils";
 import { authenticatedFetch } from "../../utils/authenticated-fetch";
 import i18next from "i18next";
 import { Me } from "../../types/me";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 interface UserUid {
   uid: string;
@@ -179,9 +180,17 @@ export function CourseDetailTeacher(): JSX.Element {
   return (
     <>
       <Title title={course.name}></Title>
-      <Grid container direction={"row"} spacing={2} margin="1rem">
-        <Grid item xs={5}>
-          <Paper style={{ height: "90%", maxHeight: "90vh" }}>
+      <Grid
+        container
+        direction={"row"}
+        spacing={2}
+        margin="1rem"
+        style={{ height: "80vh" }}
+      >
+        <Grid item xs={5} height="100%">
+          <Paper
+            style={{ height: "100%", maxHeight: "100%", overflow: "auto" }}
+          >
             <div style={{ padding: "1rem" }}>
               <Typography variant="h5">{t("projects")}:</Typography>
               <EmptyOrNotProjects projects={projects} />
@@ -191,19 +200,12 @@ export function CourseDetailTeacher(): JSX.Element {
             <Button>{t("newProject")}</Button>
           </Link>
         </Grid>
-        <Grid item xs={6}>
-          <Grid
-            container
-            direction={"column"}
-            spacing={2}
-            style={{
-              height: "100%",
-            }}
-          >
+        <Grid item xs={5} height="100%">
+          <Grid container direction={"column"} spacing={2} height={"100%"}>
             <Grid
               item
               style={{
-                height: "45.9%",
+                height: "50%",
               }}
             >
               <Paper
@@ -239,7 +241,7 @@ export function CourseDetailTeacher(): JSX.Element {
             <Grid
               item
               style={{
-                height: "45.9%",
+                height: "50%",
               }}
             >
               <Paper
@@ -255,22 +257,6 @@ export function CourseDetailTeacher(): JSX.Element {
                   handleCheckboxChange={handleCheckboxChange}
                 />
               </Paper>
-
-              <IconButton
-                style={{ position: "absolute", bottom: 0, left: 0 }}
-                onClick={() =>
-                  handleDeleteStudent(
-                    navigate,
-                    course.course_id,
-                    selectedStudents
-                  )
-                }
-              >
-                <ClearIcon />
-                <Typography variant="body1">{t("deleteSelected")}</Typography>
-              </IconButton>
-            </Grid>
-            <Grid item>
               <Grid container>
                 <Grid item>
                   <Button onClick={handleClickCodes}>{t("joinCodes")}</Button>
@@ -291,6 +277,20 @@ export function CourseDetailTeacher(): JSX.Element {
                   </Button>
                 </Grid>
               </Grid>
+
+              <IconButton
+                style={{ position: "absolute", bottom: 0, left: 0 }}
+                onClick={() =>
+                  handleDeleteStudent(
+                    navigate,
+                    course.course_id,
+                    selectedStudents
+                  )
+                }
+              >
+                <ClearIcon />
+                <Typography variant="body1">{t("deleteSelected")}</Typography>
+              </IconButton>
             </Grid>
           </Grid>
         </Grid>
@@ -486,7 +486,10 @@ function JoinCodeMenu({
   };
 
   const handleCopyToClipboard = (join_code: string) => {
-    navigator.clipboard.writeText(`${appHost}/join-course?code=${join_code}`);
+    const host = window.location.host;
+    navigator.clipboard.writeText(
+      `${host}/${i18next.language}/courses/join?code=${join_code}`
+    );
   };
 
   const getCodes = useCallback(() => {
@@ -560,6 +563,9 @@ function JoinCodeMenu({
           vertical: "bottom",
           horizontal: "center",
         }}
+        style={{
+          width: "25vw",
+        }}
       >
         <MenuItem disabled>
           <Typography variant="h6">{t("joinCodes")}</Typography>
@@ -568,25 +574,33 @@ function JoinCodeMenu({
           elevation={0}
           style={{
             margin: "1rem",
+            width: "100%",
+            maxHeight: "20vh",
+            height: "20vh",
+            overflowY: "auto",
           }}
         >
           {codes.map((code: JoinCode) => (
-            <MenuItem
-              onClick={() => handleCopyToClipboard(code.join_code)}
-              key={code.join_code}
-            >
+            <MenuItem style={{ width: "100%" }} key={code.join_code}>
               <Grid container direction={"row"}>
-                <Grid marginRight={"1rem"} item>
-                  <Typography variant="body1">
-                    {code.expiry_time
-                      ? timeDifference(code.expiry_time)
-                      : t("noExpiryDate")}
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Typography variant="body1">
-                    {code.for_admins ? t("forAdmins") : t("forStudents")}
-                  </Typography>
+                <Grid item flexGrow={1}>
+                  <Box display="flex" gap="1rem">
+                    <Typography variant="body1">
+                      {code.expiry_time
+                        ? timeDifference(code.expiry_time)
+                        : t("noExpiryDate")}
+                    </Typography>
+                    <Typography variant="body1">
+                      {code.for_admins ? t("forAdmins") : t("forStudents")}
+                    </Typography>
+                    <Tooltip title={t("copyToClipboard")}>
+                      <IconButton
+                        onClick={() => handleCopyToClipboard(code.join_code)}
+                      >
+                        <ContentCopyIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
                 </Grid>
                 <Grid item>
                   <IconButton onClick={() => handleDeleteCode(code.join_code)}>
