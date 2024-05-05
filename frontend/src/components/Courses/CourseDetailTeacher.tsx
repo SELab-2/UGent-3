@@ -180,9 +180,17 @@ export function CourseDetailTeacher(): JSX.Element {
   return (
     <>
       <Title title={course.name}></Title>
-      <Grid container direction={"row"} spacing={2} margin="1rem">
-        <Grid item xs={5}>
-          <Paper style={{ height: "90%", maxHeight: "90vh" }}>
+      <Grid
+        container
+        direction={"row"}
+        spacing={2}
+        margin="1rem"
+        style={{ height: "80vh" }}
+      >
+        <Grid item xs={5} height="100%">
+          <Paper
+            style={{ height: "100%", maxHeight: "100%", overflow: "auto" }}
+          >
             <div style={{ padding: "1rem" }}>
               <Typography variant="h5">{t("projects")}:</Typography>
               <EmptyOrNotProjects projects={projects} />
@@ -192,19 +200,12 @@ export function CourseDetailTeacher(): JSX.Element {
             <Button>{t("newProject")}</Button>
           </Link>
         </Grid>
-        <Grid item xs={6}>
-          <Grid
-            container
-            direction={"column"}
-            spacing={2}
-            style={{
-              height: "100%",
-            }}
-          >
+        <Grid item xs={5} height="100%">
+          <Grid container direction={"column"} spacing={2} height={"100%"}>
             <Grid
               item
               style={{
-                height: "45.9%",
+                height: "50%",
               }}
             >
               <Paper
@@ -240,7 +241,7 @@ export function CourseDetailTeacher(): JSX.Element {
             <Grid
               item
               style={{
-                height: "45.9%",
+                height: "50%",
               }}
             >
               <Paper
@@ -256,22 +257,6 @@ export function CourseDetailTeacher(): JSX.Element {
                   handleCheckboxChange={handleCheckboxChange}
                 />
               </Paper>
-
-              <IconButton
-                style={{ position: "absolute", bottom: 0, left: 0 }}
-                onClick={() =>
-                  handleDeleteStudent(
-                    navigate,
-                    course.course_id,
-                    selectedStudents
-                  )
-                }
-              >
-                <ClearIcon />
-                <Typography variant="body1">{t("deleteSelected")}</Typography>
-              </IconButton>
-            </Grid>
-            <Grid item>
               <Grid container>
                 <Grid item>
                   <Button onClick={handleClickCodes}>{t("joinCodes")}</Button>
@@ -292,6 +277,20 @@ export function CourseDetailTeacher(): JSX.Element {
                   </Button>
                 </Grid>
               </Grid>
+
+              <IconButton
+                style={{ position: "absolute", bottom: 0, left: 0 }}
+                onClick={() =>
+                  handleDeleteStudent(
+                    navigate,
+                    course.course_id,
+                    selectedStudents
+                  )
+                }
+              >
+                <ClearIcon />
+                <Typography variant="body1">{t("deleteSelected")}</Typography>
+              </IconButton>
             </Grid>
           </Grid>
         </Grid>
@@ -488,7 +487,9 @@ function JoinCodeMenu({
 
   const handleCopyToClipboard = (join_code: string) => {
     const host = window.location.host;
-    navigator.clipboard.writeText(`${host}/${i18next.language}/courses/join?code=${join_code}`);
+    navigator.clipboard.writeText(
+      `${host}/${i18next.language}/courses/join?code=${join_code}`
+    );
   };
 
   const getCodes = useCallback(() => {
