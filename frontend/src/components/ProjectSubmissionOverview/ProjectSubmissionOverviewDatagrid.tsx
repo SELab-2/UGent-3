@@ -9,7 +9,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import download from "downloadjs";
 import { authenticatedFetch } from "../../utils/authenticated-fetch";
 
-const apiUrl = import.meta.env.VITE_API_HOST
+const apiUrl = import.meta.env.VITE_APP_API_HOST
 
 interface Submission {
   grading: string;
@@ -97,8 +97,11 @@ export default function ProjectSubmissionsOverviewDatagrid() {
   };
 
   const fetchLastSubmissionsByUser = async () => {
+    console.log("hier");
+    console.log(`${apiUrl}/projects/${projectId}/latest-per-user`);
     const response = await authenticatedFetch(`${apiUrl}/projects/${projectId}/latest-per-user`)
     const jsonData = await response.json();
+    console.log(jsonData);
     const uids = jsonData.data.map((submission: Submission) => submission.uid);
     const users = await fetchDisplaynameByUid(uids);
 
