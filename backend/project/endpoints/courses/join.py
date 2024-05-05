@@ -68,7 +68,10 @@ class CourseJoin(Resource):
             relation = course_relation.query.filter_by(course_id=course_id, uid=uid).first()
             if relation:
                 response["message"] = "User already in course"
-                return response, 400
+                response["data"] = {
+                    "course_id": course_id
+                }
+                return response, 409
         except SQLAlchemyError:
             response["message"] = "Internal server error"
             return response, 500

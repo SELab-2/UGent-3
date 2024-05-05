@@ -24,7 +24,7 @@ import {
   apiHost,
   getIdFromLink,
   getNearestFutureDate,
-  getUserName,
+  getUser,
   ProjectDetail,
 } from "./CourseUtils";
 import {
@@ -37,8 +37,9 @@ import { Title } from "../Header/Title";
 import ClearIcon from "@mui/icons-material/Clear";
 import { timeDifference } from "../../utils/date-utils";
 import { authenticatedFetch } from "../../utils/authenticated-fetch";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import i18next from "i18next";
+import { Me } from "../../types/me";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 interface UserUid {
   uid: string;
@@ -132,12 +133,36 @@ export function CourseDetailTeacher(): JSX.Element {
   };
 
   const { course, projects, admins, students } = courseDetail;
+  const [adminObjects, setAdminObjects] = useState<Me[]>([]);
+  const [studentObjects, setStudentObjects] = useState<Me[]>([]);
   const { t } = useTranslation("translation", {
     keyPrefix: "courseDetailTeacher",
   });
   const { i18n } = useTranslation();
   const lang = i18n.language;
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setAdminObjects([]);
+    admins.forEach((admin) => {
+      getUser(admin.uid).then((user: Me) => {
+        setAdminObjects((prev) => {
+          return [...prev, user];
+        });
+      });
+    });
+  }, [admins]);
+
+  useEffect(() => {
+    setStudentObjects([]);
+    students.forEach((student) => {
+      getUser(student.uid).then((user: Me) => {
+        setStudentObjects((prev) => {
+          return [...prev, user];
+        });
+      });
+    });
+  }, [students]);
 
   const handleCheckboxChange = (
     event: ChangeEvent<HTMLInputElement>,
@@ -155,31 +180,43 @@ export function CourseDetailTeacher(): JSX.Element {
   return (
     <>
       <Title title={course.name}></Title>
-      <Grid container direction={"row"} margin={"1rem"}>
-        <Grid item style={{ width: "50%" }}>
-          <Paper
-            elevation={0}
-            style={{ height: "70vh", maxHeight: "70vh", overflowY: "auto" }}
-          >
-            <Typography variant="h5">{t("projects")}:</Typography>
-            <EmptyOrNotProjects projects={projects} />
+      <Grid container direction={"row"} spacing={2} margin="1rem">
+        <Grid item xs={5}>
+          <Paper style={{ height: "90%", maxHeight: "90vh" }}>
+            <div style={{ padding: "1rem" }}>
+              <Typography variant="h5">{t("projects")}:</Typography>
+              <EmptyOrNotProjects projects={projects} />
+            </div>
           </Paper>
           <Link to={`/${lang}/projects/create?course_id=${course.course_id}`}>
             <Button>{t("newProject")}</Button>
           </Link>
         </Grid>
-        <Grid item style={{ marginLeft: "1rem" }}>
-          <Grid container direction={"column"}>
-            <Grid item position={"relative"} height={"35vh"} width={"35vw"}>
+        <Grid item xs={6}>
+          <Grid
+            container
+            direction={"column"}
+            spacing={2}
+            style={{
+              height: "100%",
+            }}
+          >
+            <Grid
+              item
+              style={{
+                height: "45.9%",
+              }}
+            >
               <Paper
-                elevation={0}
-                style={{ maxHeight: "35vh", overflowY: "auto" }}
+                style={{
+                  overflow: "auto",
+                  height: "100%",
+                }}
               >
                 <Typography variant="h5">{t("admins")}:</Typography>
                 <Grid container direction={"column"}>
-                  {admins.map((admin) => (
+                  {adminObjects.map((admin) => (
                     <Grid
-                      item
                       container
                       alignItems="center"
                       spacing={1}
@@ -187,7 +224,7 @@ export function CourseDetailTeacher(): JSX.Element {
                     >
                       <Grid item>
                         <Typography variant="body1">
-                          {getUserName(admin.uid)}
+                          {admin.display_name}
                         </Typography>
                       </Grid>
                       <EitherDeleteIconOrNothing
@@ -200,18 +237,26 @@ export function CourseDetailTeacher(): JSX.Element {
                 </Grid>
               </Paper>
             </Grid>
-            <Grid item position={"relative"} height={"35vh"} width={"35vw"}>
-              <Typography variant="h5">{t("students")}:</Typography>
+            <Grid
+              item
+              style={{
+                height: "45.9%",
+              }}
+            >
               <Paper
-                elevation={0}
-                style={{ maxHeight: "25vh", overflowY: "auto" }}
+                style={{
+                  maxHeight: "100%",
+                  overflow: "auto",
+                }}
               >
+                <Typography variant="h5">{t("students")}:</Typography>
                 <EmptyOrNotStudents
-                  students={students}
+                  students={studentObjects}
                   selectedStudents={selectedStudents}
                   handleCheckboxChange={handleCheckboxChange}
                 />
               </Paper>
+
               <IconButton
                 style={{ position: "absolute", bottom: 0, left: 0 }}
                 onClick={() =>
@@ -227,20 +272,26 @@ export function CourseDetailTeacher(): JSX.Element {
               </IconButton>
             </Grid>
             <Grid item>
-              <Button onClick={handleClickCodes}>{t("joinCodes")}</Button>
-              <JoinCodeMenu
-                courseId={course.course_id}
-                open={openCodes}
-                handleClose={handleCloseCodes}
-                anchorEl={anchorEl}
-              />
-            </Grid>
-            <Grid item>
-              <Button
-                onClick={() => handleDeleteCourse(navigate, course.course_id)}
-              >
-                {t("deleteCourse")}
-              </Button>
+              <Grid container>
+                <Grid item>
+                  <Button onClick={handleClickCodes}>{t("joinCodes")}</Button>
+                  <JoinCodeMenu
+                    courseId={course.course_id}
+                    open={openCodes}
+                    handleClose={handleCloseCodes}
+                    anchorEl={anchorEl}
+                  />
+                </Grid>
+                <Grid item>
+                  <Button
+                    onClick={() =>
+                      handleDeleteCourse(navigate, course.course_id)
+                    }
+                  >
+                    {t("deleteCourse")}
+                  </Button>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
@@ -262,21 +313,25 @@ function EmptyOrNotProjects({
     keyPrefix: "courseDetailTeacher",
   });
   if (projects === undefined || projects.length === 0) {
-    return (
-      <Typography
-        variant="h6"
-        style={{ marginLeft: "5rem", marginTop: "2rem" }}
-      >
-        {t("noProjects")}
-      </Typography>
-    );
+    return <Typography variant="h6">{t("noProjects")}</Typography>;
   } else {
     return (
-      <Grid container direction={"row"}>
+      <Grid
+        container
+        direction={"row"}
+        spacing={3}
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          marginTop: "1rem",
+        }}
+      >
         {projects?.map((project) => (
-          <Grid item key={project.project_id} margin={"2rem"}>
+          <Grid item sm={6} key={project.project_id}>
             <Card style={{ background: "lightblue" }} key={project.project_id}>
-              <Link to={`/projects/${getIdFromLink(project.project_id)}`}>
+              <Link
+                to={`/${i18next.language}/projects/${getIdFromLink(project.project_id)}`}
+              >
                 <CardHeader title={project.title} />
               </Link>
               <CardContent>
@@ -287,7 +342,9 @@ function EmptyOrNotProjects({
                 )}
               </CardContent>
               <CardActions>
-                <Link to={`/projects/${project.project_id}`}>
+                <Link
+                  to={`/${i18next.language}/projects/${getIdFromLink(project.project_id)}`}
+                >
                   <Button>{t("view")}</Button>
                 </Link>
               </CardActions>
@@ -346,7 +403,7 @@ function EmptyOrNotStudents({
   selectedStudents,
   handleCheckboxChange,
 }: {
-  students: UserUid[];
+  students: Me[];
   selectedStudents: string[];
   handleCheckboxChange: (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -382,9 +439,7 @@ function EmptyOrNotStudents({
               />
             </Grid>
             <Grid item>
-              <Typography variant="body1">
-                {getUserName(student.uid)}
-              </Typography>
+              <Typography variant="body1">{student.display_name}</Typography>
             </Grid>
           </Grid>
         ))}

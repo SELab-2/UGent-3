@@ -6,6 +6,7 @@ import {
   Grid,
   Container,
   Badge,
+  CardHeader,
 } from "@mui/material";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { DayCalendarSkeleton, LocalizationProvider } from "@mui/x-date-pickers";
@@ -148,8 +149,8 @@ export default function HomePage() {
       <Grid container spacing={2} wrap="nowrap">
         <Grid item xs={6}>
           <Card>
+            <CardHeader title={t("myProjects")} />
             <CardContent>
-              <Typography variant="body1">{t("myProjects")}</Typography>
               {futureProjects.length + noDeadlineProject.length > 0 ? (
                 <>
                   <ProjectDeadlineCard deadlines={futureProjects} />
@@ -164,8 +165,8 @@ export default function HomePage() {
 
         <Grid item xs={6}>
           <Card>
+            <CardHeader title={t("deadlines")} />
             <CardContent>
-              <Typography variant="body1">{t("deadlines")}</Typography>
               {pastDeadlines.length > 0 ? (
                 <ProjectDeadlineCard deadlines={pastDeadlines} />
               ) : (

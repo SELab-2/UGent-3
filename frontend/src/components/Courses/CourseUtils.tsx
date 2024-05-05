@@ -1,5 +1,6 @@
 import { NavigateFunction, Params } from "react-router-dom";
 import { authenticatedFetch } from "../../utils/authenticated-fetch";
+import { Me } from "../../types/me";
 
 export interface Course {
   course_id: string;
@@ -38,8 +39,14 @@ export function loggedInToken() {
  * @param uid - The uid of the user.
  * @returns The username.
  */
-export function getUserName(uid: string): string {
-  return getIdFromLink(uid);
+export async function getUser(uid: string): Promise<Me> {
+  return authenticatedFetch(`${apiHost}/users/${getIdFromLink(uid)}`).then((response) => {
+    if (response.ok) {
+      return response.json().then((data) => {
+        return data.data;
+      });
+    }
+  })
 }
 
 /**
