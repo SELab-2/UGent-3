@@ -1,0 +1,24 @@
+{
+  "id": "evaluators/python_evaluator",
+  "title": "Python evaluator",
+  "description": "General usage",
+  "source": "@site/docs/evaluators/python_evaluator.md",
+  "sourceDirName": "evaluators",
+  "slug": "/evaluators/python_evaluator",
+  "permalink": "/docs/evaluators/python_evaluator",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/docs/evaluators/python_evaluator.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "General evaluator",
+    "permalink": "/docs/evaluators/general_evaluator"
+  },
+  "next": {
+    "title": "Project upload form",
+    "permalink": "/docs/category/project-upload-form"
+  }
+}

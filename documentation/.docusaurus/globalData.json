@@ -1,0 +1,63 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "path": "/docs",
+      "versions": [
+        {
+          "name": "current",
+          "label": "Next",
+          "isLast": true,
+          "path": "/docs",
+          "mainDocId": "intro",
+          "docs": [
+            {
+              "id": "evaluators/custom_evaluator",
+              "path": "/docs/evaluators/custom_evaluator",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "evaluators/general_evaluator",
+              "path": "/docs/evaluators/general_evaluator",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "evaluators/python_evaluator",
+              "path": "/docs/evaluators/python_evaluator",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "intro",
+              "path": "/docs/intro",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "projectform/project_upload_form",
+              "path": "/docs/projectform/project_upload_form",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "/category/evaluators",
+              "path": "/docs/category/evaluators",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "/category/project-upload-form",
+              "path": "/docs/category/project-upload-form",
+              "sidebar": "tutorialSidebar"
+            }
+          ],
+          "draftIds": [],
+          "sidebars": {
+            "tutorialSidebar": {
+              "link": {
+                "path": "/docs/intro",
+                "label": "intro"
+              }
+            }
+          }
+        }
+      ],
+      "breadcrumbs": true
+    }
+  }
+}

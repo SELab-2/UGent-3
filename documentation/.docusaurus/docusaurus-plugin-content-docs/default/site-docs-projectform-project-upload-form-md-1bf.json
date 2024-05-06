@@ -1,0 +1,20 @@
+{
+  "id": "projectform/project_upload_form",
+  "title": "Project upload guide",
+  "description": "A teacher can upload a new project of their course by going to the url `projects/create` where they will need to fill out data corresponding to the project they want to upload.",
+  "source": "@site/docs/projectform/project_upload_form.md",
+  "sourceDirName": "projectform",
+  "slug": "/projectform/project_upload_form",
+  "permalink": "/docs/projectform/project_upload_form",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/docs/projectform/project_upload_form.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Project upload form",
+    "permalink": "/docs/category/project-upload-form"
+  }
+}

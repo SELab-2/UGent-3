@@ -1,0 +1,217 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "loadedVersions": [
+        {
+          "versionName": "current",
+          "label": "Next",
+          "banner": null,
+          "badge": false,
+          "noIndex": false,
+          "className": "docs-version-current",
+          "path": "/docs",
+          "tagsPath": "/docs/tags",
+          "editUrl": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/docs",
+          "editUrlLocalized": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/i18n/en/docusaurus-plugin-content-docs/current",
+          "isLast": true,
+          "routePriority": -1,
+          "sidebarFilePath": "/home/gerry/PycharmProjects/UGent-3/documentation/sidebars.ts",
+          "contentPath": "/home/gerry/PycharmProjects/UGent-3/documentation/docs",
+          "contentPathLocalized": "/home/gerry/PycharmProjects/UGent-3/documentation/i18n/en/docusaurus-plugin-content-docs/current",
+          "docs": [
+            {
+              "id": "evaluators/custom_evaluator",
+              "title": "Custom evaluator",
+              "description": "",
+              "source": "@site/docs/evaluators/custom_evaluator.md",
+              "sourceDirName": "evaluators",
+              "slug": "/evaluators/custom_evaluator",
+              "permalink": "/docs/evaluators/custom_evaluator",
+              "draft": false,
+              "unlisted": false,
+              "editUrl": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/docs/evaluators/custom_evaluator.md",
+              "tags": [],
+              "version": "current",
+              "frontMatter": {},
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Evaluators",
+                "permalink": "/docs/category/evaluators"
+              },
+              "next": {
+                "title": "General evaluator",
+                "permalink": "/docs/evaluators/general_evaluator"
+              }
+            },
+            {
+              "id": "evaluators/general_evaluator",
+              "title": "General evaluator",
+              "description": "",
+              "source": "@site/docs/evaluators/general_evaluator.md",
+              "sourceDirName": "evaluators",
+              "slug": "/evaluators/general_evaluator",
+              "permalink": "/docs/evaluators/general_evaluator",
+              "draft": false,
+              "unlisted": false,
+              "editUrl": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/docs/evaluators/general_evaluator.md",
+              "tags": [],
+              "version": "current",
+              "frontMatter": {},
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Custom evaluator",
+                "permalink": "/docs/evaluators/custom_evaluator"
+              },
+              "next": {
+                "title": "Python evaluator",
+                "permalink": "/docs/evaluators/python_evaluator"
+              }
+            },
+            {
+              "id": "evaluators/python_evaluator",
+              "title": "Python evaluator",
+              "description": "General usage",
+              "source": "@site/docs/evaluators/python_evaluator.md",
+              "sourceDirName": "evaluators",
+              "slug": "/evaluators/python_evaluator",
+              "permalink": "/docs/evaluators/python_evaluator",
+              "draft": false,
+              "unlisted": false,
+              "editUrl": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/docs/evaluators/python_evaluator.md",
+              "tags": [],
+              "version": "current",
+              "frontMatter": {},
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "General evaluator",
+                "permalink": "/docs/evaluators/general_evaluator"
+              },
+              "next": {
+                "title": "Project upload form",
+                "permalink": "/docs/category/project-upload-form"
+              }
+            },
+            {
+              "id": "intro",
+              "title": "Project user guide",
+              "description": "If you need help using project Péristeronas you can read the user guide below.",
+              "source": "@site/docs/intro.md",
+              "sourceDirName": ".",
+              "slug": "/intro",
+              "permalink": "/docs/intro",
+              "draft": false,
+              "unlisted": false,
+              "editUrl": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/docs/intro.md",
+              "tags": [],
+              "version": "current",
+              "sidebarPosition": 1,
+              "frontMatter": {
+                "sidebar_position": 1
+              },
+              "sidebar": "tutorialSidebar",
+              "next": {
+                "title": "Evaluators",
+                "permalink": "/docs/category/evaluators"
+              }
+            },
+            {
+              "id": "projectform/project_upload_form",
+              "title": "Project upload guide",
+              "description": "A teacher can upload a new project of their course by going to the url `projects/create` where they will need to fill out data corresponding to the project they want to upload.",
+              "source": "@site/docs/projectform/project_upload_form.md",
+              "sourceDirName": "projectform",
+              "slug": "/projectform/project_upload_form",
+              "permalink": "/docs/projectform/project_upload_form",
+              "draft": false,
+              "unlisted": false,
+              "editUrl": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/docs/projectform/project_upload_form.md",
+              "tags": [],
+              "version": "current",
+              "frontMatter": {},
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Project upload form",
+                "permalink": "/docs/category/project-upload-form"
+              }
+            }
+          ],
+          "drafts": [],
+          "sidebars": {
+            "tutorialSidebar": [
+              {
+                "type": "doc",
+                "id": "intro"
+              },
+              {
+                "type": "category",
+                "label": "Evaluators",
+                "collapsible": true,
+                "collapsed": true,
+                "items": [
+                  {
+                    "type": "doc",
+                    "id": "evaluators/custom_evaluator"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "evaluators/general_evaluator"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "evaluators/python_evaluator"
+                  }
+                ],
+                "link": {
+                  "type": "generated-index",
+                  "description": "Choose an evaluator of which you need to learn the usage.",
+                  "slug": "/category/evaluators",
+                  "permalink": "/docs/category/evaluators"
+                }
+              },
+              {
+                "type": "category",
+                "label": "Project upload form",
+                "collapsible": true,
+                "collapsed": true,
+                "items": [
+                  {
+                    "type": "doc",
+                    "id": "projectform/project_upload_form"
+                  }
+                ],
+                "link": {
+                  "type": "generated-index",
+                  "description": "User guide on how to upload a new project",
+                  "slug": "/category/project-upload-form",
+                  "permalink": "/docs/category/project-upload-form"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "docusaurus-plugin-content-blog": {
+    "default": {
+      "blogSidebarTitle": "Recent posts",
+      "blogPosts": [],
+      "blogListPaginated": [],
+      "blogTags": {},
+      "blogTagsListPath": "/blog/tags"
+    }
+  },
+  "docusaurus-plugin-content-pages": {
+    "default": [
+      {
+        "type": "jsx",
+        "permalink": "/",
+        "source": "@site/src/pages/index.tsx"
+      }
+    ]
+  },
+  "docusaurus-plugin-debug": {},
+  "docusaurus-theme-classic": {},
+  "docusaurus-bootstrap-plugin": {},
+  "docusaurus-mdx-fallback-plugin": {}
+}

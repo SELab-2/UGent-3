@@ -1,0 +1,16 @@
+{
+  "title": "Evaluators",
+  "description": "Choose an evaluator of which you need to learn the usage.",
+  "slug": "/category/evaluators",
+  "permalink": "/docs/category/evaluators",
+  "navigation": {
+    "previous": {
+      "title": "Project user guide",
+      "permalink": "/docs/intro"
+    },
+    "next": {
+      "title": "Custom evaluator",
+      "permalink": "/docs/evaluators/custom_evaluator"
+    }
+  }
+}

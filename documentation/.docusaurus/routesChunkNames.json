@@ -1,0 +1,93 @@
+{
+  "/__docusaurus/debug-333": {
+    "__comp": "__comp---theme-debug-config-23-a-2ff",
+    "__context": {
+      "plugin": "plugin---docusaurus-debug-234-105"
+    }
+  },
+  "/__docusaurus/debug/config-e60": {
+    "__comp": "__comp---theme-debug-config-23-a-2ff",
+    "__context": {
+      "plugin": "plugin---docusaurus-debug-234-105"
+    }
+  },
+  "/__docusaurus/debug/content-383": {
+    "__comp": "__comp---theme-debug-contentba-8-ce7",
+    "__context": {
+      "plugin": "plugin---docusaurus-debug-234-105"
+    },
+    "allContent": "allContent---docusaurus-debug-content-246-9aa"
+  },
+  "/__docusaurus/debug/globalData-8c9": {
+    "__comp": "__comp---theme-debug-global-dataede-0fa",
+    "__context": {
+      "plugin": "plugin---docusaurus-debug-234-105"
+    }
+  },
+  "/__docusaurus/debug/metadata-eba": {
+    "__comp": "__comp---theme-debug-site-metadata-68-e-3d4",
+    "__context": {
+      "plugin": "plugin---docusaurus-debug-234-105"
+    }
+  },
+  "/__docusaurus/debug/registry-94d": {
+    "__comp": "__comp---theme-debug-registry-679-501",
+    "__context": {
+      "plugin": "plugin---docusaurus-debug-234-105"
+    }
+  },
+  "/__docusaurus/debug/routes-a0c": {
+    "__comp": "__comp---theme-debug-routes-946-699",
+    "__context": {
+      "plugin": "plugin---docusaurus-debug-234-105"
+    }
+  },
+  "/docs-701": {
+    "__comp": "__comp---theme-docs-root-5-e-9-0b6",
+    "__context": {
+      "plugin": "plugin---docs-5-d-7-532"
+    }
+  },
+  "/docs-ac1": {
+    "__comp": "__comp---theme-doc-version-roota-7-b-5de",
+    "version": "version---docs-935-398"
+  },
+  "/docs-f97": {
+    "__comp": "__comp---theme-doc-roota-94-67a"
+  },
+  "/docs/category/evaluators-f11": {
+    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
+    "categoryGeneratedIndex": "categoryGeneratedIndex---docs-category-evaluators-16-a-c26"
+  },
+  "/docs/category/project-upload-form-8a1": {
+    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
+    "categoryGeneratedIndex": "categoryGeneratedIndex---docs-category-project-upload-formfab-696"
+  },
+  "/docs/evaluators/custom_evaluator-6e4": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-evaluators-custom-evaluator-790-e95"
+  },
+  "/docs/evaluators/general_evaluator-87d": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-evaluators-general-evaluator-6-a-3-015"
+  },
+  "/docs/evaluators/python_evaluator-425": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-evaluators-python-evaluator-610-d1c"
+  },
+  "/docs/intro-61d": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-intro-0-e-3-be1"
+  },
+  "/docs/projectform/project_upload_form-ace": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-projectform-project-upload-form-1-bf-687"
+  },
+  "/-449": {
+    "__comp": "__comp---site-src-pages-index-tsx-1-df-d3e",
+    "__context": {
+      "plugin": "plugin---fe-9-00c"
+    },
+    "config": "config---5-e-9-4f3"
+  }
+}

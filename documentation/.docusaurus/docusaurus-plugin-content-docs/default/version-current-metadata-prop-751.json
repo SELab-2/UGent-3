@@ -1,0 +1,99 @@
+{
+  "pluginId": "default",
+  "version": "current",
+  "label": "Next",
+  "banner": null,
+  "badge": false,
+  "noIndex": false,
+  "className": "docs-version-current",
+  "isLast": true,
+  "docsSidebars": {
+    "tutorialSidebar": [
+      {
+        "type": "link",
+        "label": "Project user guide",
+        "href": "/docs/intro",
+        "docId": "intro",
+        "unlisted": false
+      },
+      {
+        "type": "category",
+        "label": "Evaluators",
+        "collapsible": true,
+        "collapsed": true,
+        "items": [
+          {
+            "type": "link",
+            "label": "Custom evaluator",
+            "href": "/docs/evaluators/custom_evaluator",
+            "docId": "evaluators/custom_evaluator",
+            "unlisted": false
+          },
+          {
+            "type": "link",
+            "label": "General evaluator",
+            "href": "/docs/evaluators/general_evaluator",
+            "docId": "evaluators/general_evaluator",
+            "unlisted": false
+          },
+          {
+            "type": "link",
+            "label": "Python evaluator",
+            "href": "/docs/evaluators/python_evaluator",
+            "docId": "evaluators/python_evaluator",
+            "unlisted": false
+          }
+        ],
+        "href": "/docs/category/evaluators"
+      },
+      {
+        "type": "category",
+        "label": "Project upload form",
+        "collapsible": true,
+        "collapsed": true,
+        "items": [
+          {
+            "type": "link",
+            "label": "Project upload guide",
+            "href": "/docs/projectform/project_upload_form",
+            "docId": "projectform/project_upload_form",
+            "unlisted": false
+          }
+        ],
+        "href": "/docs/category/project-upload-form"
+      }
+    ]
+  },
+  "docs": {
+    "evaluators/custom_evaluator": {
+      "id": "evaluators/custom_evaluator",
+      "title": "Custom evaluator",
+      "description": "",
+      "sidebar": "tutorialSidebar"
+    },
+    "evaluators/general_evaluator": {
+      "id": "evaluators/general_evaluator",
+      "title": "General evaluator",
+      "description": "",
+      "sidebar": "tutorialSidebar"
+    },
+    "evaluators/python_evaluator": {
+      "id": "evaluators/python_evaluator",
+      "title": "Python evaluator",
+      "description": "General usage",
+      "sidebar": "tutorialSidebar"
+    },
+    "intro": {
+      "id": "intro",
+      "title": "Project user guide",
+      "description": "If you need help using project Péristeronas you can read the user guide below.",
+      "sidebar": "tutorialSidebar"
+    },
+    "projectform/project_upload_form": {
+      "id": "projectform/project_upload_form",
+      "title": "Project upload guide",
+      "description": "A teacher can upload a new project of their course by going to the url `projects/create` where they will need to fill out data corresponding to the project they want to upload.",
+      "sidebar": "tutorialSidebar"
+    }
+  }
+}
