@@ -1,13 +1,13 @@
 # Python evaluator
-## General usage
-This evaluator is responsible for running and executing tests on a student's Python code.
+## Algemeen gebruik
+Deze evaluator is verantwoordelijk voor het uitvoeren en testen van de Python-code van een student.
 
-## Structure
-When submitting the project a teacher can add a requirements manifest `req-manifest.txt`, this way only the packages in the requirements file are usable on the evaluator.
+## Structuur
+Bij het indienen van het project kan een leraar vereisten toevoegen via het bestand `req-manifest.txt`. Op deze manier zijn alleen de pakketten in het vereistenbestand bruikbaar op de evaluator.
 
-When no manifest is present, students are able to install their own depedencies with a `requirements.txt` and a `dev-requirements.txt`.
-Or the teacher can add a `requirements.txt` if they want to pre install dependencies that a are present for testing the project.
+Wanneer er geen manifest aanwezig is, kunnen studenten hun eigen paketten installeren met een `requirements.txt` en een `dev-requirements.txt`.
+Of de leraar kan een `requirements.txt` toevoegen als ze paketten vooraf willen installeren die aanwezig moeten zijn voor het testen van het project.
 
-## Running tests
-When a `run_tests.sh` is present in the project assignment files, it will be run when the student is submitting their code.
-When running tests, it's important to note that the root of the student's submission will be `/submission`.
+## Tests uitvoeren
+Als er een `run_tests.sh` aanwezig is in de projectopdrachtbestanden, wordt dit uitgevoerd wanneer de student zijn code indient.
+Bij het uitvoeren van tests is het belangrijk op te merken dat de map van de inzending van de student `/submission` zal zijn.
