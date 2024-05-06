@@ -55,7 +55,7 @@ export default function ProjectForm() {
 
   // all the stuff needed for submitting a project
   const [title, setTitle] = useState('');
-  const [_, setTransition] = useTransition();
+  const [, setTransition] = useTransition();
   const [titleError, setTitleError] = useState(false);
 
   const [description, setDescription] = useState('');
