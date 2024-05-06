@@ -15,7 +15,7 @@ import {
   TableBody, Paper,
   Tooltip, IconButton, Tabs, Tab,
 } from "@mui/material";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useTransition} from "react";
 import JSZip from 'jszip';
 import {useTranslation} from "react-i18next";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -55,6 +55,7 @@ export default function ProjectForm() {
 
   // all the stuff needed for submitting a project
   const [title, setTitle] = useState('');
+  const [, setTransition] = useTransition();
   const [titleError, setTitleError] = useState(false);
 
   const [description, setDescription] = useState('');
@@ -283,7 +284,11 @@ export default function ProjectForm() {
               label={t("projectTitle")}
               placeholder={t("projectTitle")}
               error={titleError}
-              onChange={event => setTitle(event.target.value)}
+              onChange={event => {
+                setTransition(() => {
+                  setTitle(event.target.value);
+                })
+              }}
             />
           </Grid>
           <Grid item>
@@ -296,7 +301,11 @@ export default function ProjectForm() {
               multiline
               rows={4}
               error={descriptionError}
-              onChange={event => setDescription(event.target.value)}
+              onChange={event => {
+                setTransition(() => {
+                  setDescription(event.target.value);
+                })
+              }}
             />
           </Grid>
           <Grid item>
