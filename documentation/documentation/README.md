@@ -1,7 +1,7 @@
 # UGent-3 project peristerónas user guide
 
 ## Introduction
-Project peristerónas has a lot of features, therefor a detailed user guide is available to consult.
+Project peristerónas has a lot of features, therefore a detailed user guide is available to consult.
 
 ## Usage
 ### Development
@@ -15,12 +15,12 @@ This creates a lightweight version of the site, if you want to test a certain la
   ```
 
   ### Deployment
-  When you're ready to deploy run the following command to run the proper version of the site:
+  When you're ready to deploy, run the following command to run the proper version of the site:
   ```sh
   npm run build
   ```
 
-  A static version will be build that you can acces in the directory `build/`, you can then run the static site by using the command:
+  A static version will be built that you can access in the directory `build/`, you can then run the static site by using the command:
 
   ```sh
   npm run serve
