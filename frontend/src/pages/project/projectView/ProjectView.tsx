@@ -16,7 +16,6 @@ import { Course } from "../../../types/course";
 import { Title } from "../../../components/Header/Title";
 import { authenticatedFetch } from "../../../utils/authenticated-fetch";
 import i18next from "i18next";
-import { GroupMenuHolder } from "./Groups";
 
 const API_URL = import.meta.env.VITE_APP_API_HOST;
 
@@ -75,7 +74,6 @@ export default function ProjectView() {
       rowGap="2rem"
       margin="2rem 0"
     >
-      <GroupMenuHolder projectId={projectId}/>
       <Grid item sm={12}>
         <Container>
           {projectData && (
