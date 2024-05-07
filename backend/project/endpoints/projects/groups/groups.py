@@ -1,3 +1,4 @@
+"""Endpoint for creating/deleting groups in a project"""
 from os import getenv
 from urllib.parse import urljoin
 from dotenv import load_dotenv

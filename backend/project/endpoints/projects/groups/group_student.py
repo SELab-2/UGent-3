@@ -10,7 +10,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from project.utils.query_agent import insert_into_model
 from project.models.group import Group
-from project.utils.authentication import login_required, login_required_return_uid
+from project.utils.authentication import login_required_return_uid
 
 from project import db
 
@@ -20,7 +20,7 @@ RESPONSE_URL = urljoin(f"{API_URL}/", "groups")
 
 
 class GroupStudent(Resource):
-
+    """Api endpoint to allow students to join and leave project groups"""
     @login_required_return_uid
     def post(self, project_id, group_id, uid=None):
         """
