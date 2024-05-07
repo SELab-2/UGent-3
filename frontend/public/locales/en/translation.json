@@ -148,10 +148,5 @@
     "future_deadline": "Upcoming Deadlines",
     "no_projects": "There are no projects here.",
     "new_project": "New Project"
-  },
-  "groupMenu" : {
-    "groups": "Group menu",
-    "groupSize": "Group size",
-    "newGroup": "New group"
   }
 }
