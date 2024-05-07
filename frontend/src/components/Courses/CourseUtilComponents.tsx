@@ -21,6 +21,7 @@ import {
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 import debounce from "debounce";
 import { authenticatedFetch } from "../../utils/authenticated-fetch";
 
@@ -347,7 +348,7 @@ function EmptyOrNotProjects({
           return (
             <Grid item key={project.project_id}>
               <Link
-                to={`/projects/${getIdFromLink(project.project_id)}`}
+                to={`/${i18next.language}/projects/${getIdFromLink(project.project_id)}`}
                 style={{ textDecoration: "none", color: "inherit" }}
               >
                 <EpsilonTypography
