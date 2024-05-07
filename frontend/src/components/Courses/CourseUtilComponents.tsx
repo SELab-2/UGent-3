@@ -317,6 +317,8 @@ function EmptyOrNotProjects({
   projects: ProjectDetail[];
   noProjectsText: string;
 }): JSX.Element {
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
   if (projects === undefined || projects.length === 0) {
     return (
       <Typography
@@ -346,8 +348,8 @@ function EmptyOrNotProjects({
           }
           return (
             <Grid item key={project.project_id}>
-              <Link
-                to={`/projects/${getIdFromLink(project.project_id)}`}
+              <Link 
+                to={`/${lang}/projects/${getIdFromLink(project.project_id)}`}
                 style={{ textDecoration: "none", color: "inherit" }}
               >
                 <EpsilonTypography
