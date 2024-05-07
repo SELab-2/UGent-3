@@ -123,7 +123,9 @@
     "noFilesPlaceholder": "No assignment files given yet",
     "noRegexPlaceholder": "No regex added yet",
     "clearSelected": "Clear Selection",
-    "faultySubmission": "Some fields were left open or there is no valid runner/file combination"
+    "faultySubmission": "Some fields were left open or there is no valid runner/file combination",
+    "unauthorized": "You are unauthorized to upload a project for this course",
+    "submissionError": "Submission failed, please try again"
   },
   "student" : {
     "myProjects": "My Projects",
@@ -133,11 +135,13 @@
     "course": "Course",
     "SUCCESS": "Success",
     "FAIL": "Fail",
+    "RUNNING": "Is running",
+    "LATE": "Late",
     "deadlinesOnDay": "Deadlines on: ",
-    "noDeadline": "No deadlines",
+    "noDeadline": "No deadlines on this day",
     "no_submission_yet" : "No submission yet",
     "loading": "Loading...",
-    "no_projects": "There are no projects here."
+    "no_projects": "There are no projects here, sign up for a course to see projects"
   },
   "projectsOverview": {
     "past_deadline": "Past Projects",

@@ -5,7 +5,7 @@ import ProjectSubmissionsOverviewDatagrid from "./ProjectSubmissionOverviewDatag
 import download from 'downloadjs';
 import {useTranslation} from "react-i18next";
 import { authenticatedFetch } from "../../utils/authenticated-fetch.ts";
-const apiUrl = import.meta.env.VITE_API_HOST
+const apiUrl = import.meta.env.VITE_APP_API_HOST;
 
 /**
  *  @returns Overview page for submissions
