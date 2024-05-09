@@ -22,6 +22,7 @@ import ProjectOverView from "./pages/project/projectOverview.tsx";
 import { synchronizeJoinCode } from "./loaders/join-code.ts";
 import { fetchMe } from "./utils/fetches/FetchMe.ts";
 import {fetchProjectForm} from "./components/ProjectForm/project-form.ts";
+import loadSubmissionOverview from "./loaders/submission-overview-loader.ts";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -46,6 +47,7 @@ const router = createBrowserRouter(
             loader={fetchProjectPage}
           />
           <Route
+            loader={loadSubmissionOverview}
             path=":projectId/overview"
             element={<SubmissionsOverview />}
           />
