@@ -7,6 +7,8 @@ import {
   Grid,
   IconButton,
   LinearProgress,
+  Tab,
+  Tabs,
   Typography,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
@@ -25,7 +27,7 @@ interface SubmissionCardProps {
 }
 
 /**
- * 
+ *
  * @param params - regexRequirements, submissionUrl, projectId
  * @returns - SubmissionCard component which allows the user to submit files
  * and view previous submissions
@@ -35,26 +37,29 @@ export default function SubmissionCard({
   submissionUrl,
   projectId,
 }: SubmissionCardProps) {
-  const { t } = useTranslation('translation', { keyPrefix: 'projectView' });
+  const { t } = useTranslation("translation", { keyPrefix: "projectView" });
   const [activeTab, setActiveTab] = useState("submit");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const [previousSubmissions, setPreviousSubmissions] = useState<Submission[]>([]);
+  const [previousSubmissions, setPreviousSubmissions] = useState<Submission[]>(
+    []
+  );
   const handleFileDrop = (file: File) => {
     setSelectedFile(file);
   };
 
   useEffect(() => {
-
-    authenticatedFetch(`${submissionUrl}?project_id=${projectId}`).then((response) => {
-      if (response.ok) {
-        response.json().then((data) => {
-          setPreviousSubmissions(data["data"]);
-        });
+    authenticatedFetch(`${submissionUrl}?project_id=${projectId}`).then(
+      (response) => {
+        if (response.ok) {
+          response.json().then((data) => {
+            setPreviousSubmissions(data["data"]);
+          });
+        }
       }
-    })
+    );
   }, [projectId, submissionUrl]);
 
   const handleSubmit = async () => {
@@ -99,12 +104,15 @@ export default function SubmissionCard({
     <Card>
       <CardHeader
         title={
-          <>
-            <Button onClick={() => setActiveTab("submit")}>{t("submit")}</Button>
-            <Button onClick={() => setActiveTab("submissions")}>
-              {t("previousSubmissions")}
-            </Button>
-          </>
+          <Tabs
+            value={activeTab}
+            onChange={(_, newValue) => {
+              setActiveTab(newValue);
+            }}
+          >
+            <Tab value="submit" label={t("submit")} />
+            <Tab value="submissions" label={t("previousSubmissions")} />
+          </Tabs>
         }
       />
       <CardContent>
@@ -141,7 +149,10 @@ export default function SubmissionCard({
             </Grid>
           </Grid>
         ) : (
-          <SubmissionsGrid submissionUrl={submissionUrl} rows={previousSubmissions}/>
+          <SubmissionsGrid
+            submissionUrl={submissionUrl}
+            rows={previousSubmissions}
+          />
         )}
       </CardContent>
     </Card>
