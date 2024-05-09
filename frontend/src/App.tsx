@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import Layout from "./components/Header/Layout";
 import { AllCoursesTeacher } from "./components/Courses/AllCoursesTeacher";
-import { CourseDetailTeacher } from "./components/Courses/CourseDetailTeacher";
+import { CourseDetail } from "./components/Courses/CourseDetail.tsx";
 import {
   dataLoaderCourseDetail,
   dataLoaderCourses,
@@ -41,7 +41,7 @@ const router = createBrowserRouter(
         <Route path="courses">
           <Route index element={<AllCoursesTeacher />} loader={dataLoaderCourses}/>
           <Route path="join" loader={synchronizeJoinCode} />
-          <Route path=":courseId" element={<CourseDetailTeacher />} loader={dataLoaderCourseDetail} />
+          <Route path=":courseId" element={<CourseDetail />} loader={dataLoaderCourseDetail} />
         </Route>
         <Route path="projects">
           <Route

@@ -17,7 +17,7 @@
     "welcomeDescription": "Welcome to Peristerónas, the online submission platform of UGent",
     "login": "Login"
   },
-  "courseDetailTeacher": {
+  "courseDetail": {
     "title": "Course Details",
     "deleteCourse": "Delete Course",
     "unauthorizedDelete": "You are unauthorized to delete this course",

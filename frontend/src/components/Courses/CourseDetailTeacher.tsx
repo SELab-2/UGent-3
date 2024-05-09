@@ -136,7 +136,7 @@ export function CourseDetailTeacher(): JSX.Element {
   const [adminObjects, setAdminObjects] = useState<Me[]>([]);
   const [studentObjects, setStudentObjects] = useState<Me[]>([]);
   const { t } = useTranslation("translation", {
-    keyPrefix: "courseDetailTeacher",
+    keyPrefix: "courseDetail",
   });
   const { i18n } = useTranslation();
   const lang = i18n.language;
@@ -303,13 +303,13 @@ export function CourseDetailTeacher(): JSX.Element {
  * @param projects - The array of projects.
  * @returns Either a place holder for no projects or a grid of cards describing the projects.
  */
-function EmptyOrNotProjects({
+export function EmptyOrNotProjects({
   projects,
 }: {
   projects: ProjectDetail[];
 }): JSX.Element {
   const { t } = useTranslation("translation", {
-    keyPrefix: "courseDetailTeacher",
+    keyPrefix: "courseDetail",
   });
   if (projects === undefined || projects.length === 0) {
     return <Typography variant="h6">{t("noProjects")}</Typography>;
@@ -474,7 +474,7 @@ function JoinCodeMenu({
   anchorEl: HTMLElement | null;
 }) {
   const { t } = useTranslation("translation", {
-    keyPrefix: "courseDetailTeacher",
+    keyPrefix: "courseDetail",
   });
 
   const [codes, setCodes] = useState<JoinCode[]>([]);
