@@ -1,3 +1,4 @@
+import { Params } from "react-router-dom";
 import { Me } from "../types/me";
 import { Submission } from "../types/submission";
 import { authenticatedFetch } from "../utils/authenticated-fetch";
@@ -24,7 +25,7 @@ const fetchDisplaynameByUid = async (uids: [string]) => {
 export default async function loadSubmissionOverview({
   params,
 }: {
-  params: { projectId: string };
+  params: Params<string>;
 }) {
   const projectId = params.projectId;
   const projectResponse = await authenticatedFetch(
