@@ -34,10 +34,6 @@ const router = createBrowserRouter(
       <Route index element={<HomePages />} loader={fetchProjectPage} />
       <Route path=":lang" element={<LanguagePath />}>
         <Route path="home" element={<HomePages />} loader={fetchProjectPage} />
-        <Route
-          path="project/:projectId/overview"
-          element={<SubmissionsOverview />}
-        />
         <Route path="courses">
           <Route index element={<AllCoursesTeacher />} loader={dataLoaderCourses}/>
           <Route path="join" loader={synchronizeJoinCode} />
@@ -48,6 +44,10 @@ const router = createBrowserRouter(
             index
             element={<ProjectOverView />}
             loader={fetchProjectPage}
+          />
+          <Route
+            path=":projectId/overview"
+            element={<SubmissionsOverview />}
           />
           <Route path=":projectId" element={<ProjectView />}></Route>
           <Route path="create" element={<ProjectCreateHome />} loader={fetchProjectForm}/>

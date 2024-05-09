@@ -99,7 +99,6 @@ export default function ProjectSubmissionsOverviewDatagrid() {
   const fetchLastSubmissionsByUser = async () => {
     const response = await authenticatedFetch(`${apiUrl}/projects/${projectId}/latest-per-user`)
     const jsonData = await response.json();
-    console.log(jsonData);
     const uids = jsonData.data.map((submission: Submission) => submission.uid);
     const users = await fetchDisplaynameByUid(uids);
 
