@@ -101,9 +101,9 @@ export function SideScrollableCourses({
   const [teacherNameFilter, setTeacherNameFilter] = useState(
     initialTeacherNameFilter
   );
-  const [projects, setProjects] = useState<{ [courseId: string]: ProjectDetail[] }>(
-    {}
-  );
+  const [projects, setProjects] = useState<{
+    [courseId: string]: ProjectDetail[];
+  }>({});
 
   const debouncedHandleSearchChange = useMemo(
     () =>
@@ -172,14 +172,18 @@ export function SideScrollableCourses({
           }
           const projectJson = await projectRes.json();
           const projectData = projectJson.data;
-          const project: ProjectDetail = {
-            ...item,
-            deadlines: projectData.deadlines.map(
+          let projectDeadlines = [];
+          if (projectData.deadlines) {
+            projectDeadlines = projectData.deadlines.map(
               ([description, dateString]: [string, string]) => ({
                 description,
                 date: new Date(dateString),
               })
-            ),
+            );
+          }
+          const project: ProjectDetail = {
+            ...item,
+            deadlines: projectDeadlines,
           };
           return project;
         });
@@ -313,6 +317,8 @@ function EmptyOrNotProjects({
   projects: ProjectDetail[];
   noProjectsText: string;
 }): JSX.Element {
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
   if (projects === undefined || projects.length === 0) {
     return (
       <Typography
@@ -328,21 +334,22 @@ function EmptyOrNotProjects({
       <>
         {projects.slice(0, 3).map((project) => {
           let timeLeft = "";
-          if (project.deadlines != undefined) {
+          if (project.deadlines.length > 0) {
             const deadline = getNearestFutureDate(project.deadlines);
-            if(deadline !== null){
+            if (deadline !== null) {
               const deadlineDate = deadline.date;
               const diffTime = Math.abs(deadlineDate.getTime() - now.getTime());
               const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
               const diffDays = Math.ceil(diffHours * 24);
 
-              timeLeft = diffDays > 1 ? `${diffDays} days` : `${diffHours} hours`;
+              timeLeft =
+                diffDays > 1 ? `${diffDays} days` : `${diffHours} hours`;
             }
           }
           return (
             <Grid item key={project.project_id}>
-              <Link
-                to={`/projects/${getIdFromLink(project.project_id)}`}
+              <Link 
+                to={`/${lang}/projects/${getIdFromLink(project.project_id)}`}
                 style={{ textDecoration: "none", color: "inherit" }}
               >
                 <EpsilonTypography

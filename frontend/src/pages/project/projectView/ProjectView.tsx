@@ -17,7 +17,7 @@ import { Title } from "../../../components/Header/Title";
 import { authenticatedFetch } from "../../../utils/authenticated-fetch";
 import i18next from "i18next";
 
-const API_URL = import.meta.env.VITE_API_HOST;
+const API_URL = import.meta.env.VITE_APP_API_HOST;
 
 interface Project {
   title: string;
@@ -88,7 +88,7 @@ export default function ProjectView() {
                       <Typography>{projectData.description}</Typography>
                       <Typography flex="1" />
                       {courseData && (
-                        <Link href={`/courses/${courseData.course_id}`}>
+                        <Link href={`/${i18next.language}/courses/${courseData.course_id}`}>
                           <Typography>{courseData.name}</Typography>
                         </Link>
                       )}
