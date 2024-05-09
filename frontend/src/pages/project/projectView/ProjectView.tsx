@@ -88,7 +88,7 @@ export default function ProjectView() {
                       <Typography>{projectData.description}</Typography>
                       <Typography flex="1" />
                       {courseData && (
-                        <Link href={`/courses/${courseData.course_id}`}>
+                        <Link href={`/${i18next.language}/courses/${courseData.course_id}`}>
                           <Typography>{courseData.name}</Typography>
                         </Link>
                       )}
