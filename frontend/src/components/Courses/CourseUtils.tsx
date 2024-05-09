@@ -27,7 +27,6 @@ interface Deadline {
 }
 
 export const apiHost = import.meta.env.VITE_APP_API_HOST;
-export const appHost = import.meta.env.VITE_APP_HOST;
 /**
  * @returns The uid of the acces token of the logged in user
  */
@@ -76,13 +75,16 @@ export function callToApiToCreateCourse(
     .then((response) => response.json())
     .then((data) => {
       //But first also make sure that teacher is in the course admins list
-      authenticatedFetch(`${apiHost}/courses/${getIdFromLink(data.url)}/admins`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ admin_uid: loggedInUid() }),
-      });
+      authenticatedFetch(
+        `${apiHost}/courses/${getIdFromLink(data.url)}/admins`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ admin_uid: loggedInUid() }),
+        }
+      );
       navigate(getIdFromLink(data.url)); // navigate to data.url
     });
 }
@@ -147,22 +149,30 @@ const dataLoaderProjects = async (courseId: string) => {
     throw new Response("Failed to fetch data", { status: res.status });
   }
   const jsonResult = await res.json();
-  const projects: ProjectDetail[] = jsonResult.data.map(async (item: Project) => {
-    const projectRes = await authenticatedFetch(item.project_id);
-    if (projectRes.status !== 200) {
-      throw new Response("Failed to fetch project data", { status: projectRes.status });
+  const projects: ProjectDetail[] = jsonResult.data.map(
+    async (item: Project) => {
+      const projectRes = await authenticatedFetch(item.project_id);
+      if (projectRes.status !== 200) {
+        throw new Response("Failed to fetch project data", {
+          status: projectRes.status,
+        });
+      }
+      const projectJson = await projectRes.json();
+      const projectData = projectJson.data;
+      let projectDeadlines = [];
+      if (projectData.deadlines) {
+        projectDeadlines = projectData.deadlines.map((deadline: Deadline) => ({
+          description: deadline.description,
+          date: new Date(deadline.date),
+        }));
+      }
+      const project: ProjectDetail = {
+        ...item,
+        deadlines: projectDeadlines,
+      };
+      return project;
     }
-    const projectJson = await projectRes.json();
-    const projectData = projectJson.data;
-    const project: ProjectDetail = {
-      ...item,
-      deadlines: projectData.deadlines.map((deadline: Deadline) => ({
-        description: deadline.description,
-        date: new Date(deadline.date),
-      })),
-    };
-    return project;
-  });
+  );
 
   return Promise.all(projects);
 };
@@ -184,7 +194,6 @@ export const dataLoaderCourseDetail = async ({
   if (!courseId) {
     throw new Error("Course ID is undefined.");
   }
-
   const course = await dataLoaderCourse(courseId);
   const projects = await dataLoaderProjects(courseId);
   const admins = await dataLoaderAdmins(courseId);
