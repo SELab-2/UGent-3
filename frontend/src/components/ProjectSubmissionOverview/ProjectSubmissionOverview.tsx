@@ -1,42 +1,39 @@
-import {Box, Button, Typography} from "@mui/material";
-import {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import { Box, Button, Typography } from "@mui/material";
+import { useLoaderData, useParams } from "react-router-dom";
 import ProjectSubmissionsOverviewDatagrid from "./ProjectSubmissionOverviewDatagrid.tsx";
-import download from 'downloadjs';
-import {useTranslation} from "react-i18next";
+import download from "downloadjs";
+import { useTranslation } from "react-i18next";
 import { authenticatedFetch } from "../../utils/authenticated-fetch.ts";
-const apiUrl = import.meta.env.VITE_APP_API_HOST;
+import { Project } from "../Courses/CourseUtils.tsx";
+import { Submission } from "../../types/submission.ts";
+
+const APIURL = import.meta.env.VITE_APP_API_HOST;
 
 /**
  *  @returns Overview page for submissions
  */
 export default function ProjectSubmissionOverview() {
-
-  const { t } = useTranslation('submissionOverview', { keyPrefix: 'submissionOverview' });
-
-  useEffect(() => {
-    fetchProject();
+  const { t } = useTranslation("submissionOverview", {
+    keyPrefix: "submissionOverview",
   });
 
-  const fetchProject = async () => {
-    const response = await authenticatedFetch(`${apiUrl}/projects/${projectId}`)
-    const jsonData = await response.json();
-    setProjectTitle(jsonData["data"].title);
-
-  }
+  const { projectId } = useParams<{ projectId: string }>();
+  const { projectData, submissionsWithUsers } = useLoaderData() as {
+    projectData: Project;
+    submissionsWithUsers: Submission[];
+  };
 
   const downloadProjectSubmissions = async () => {
-    await authenticatedFetch(`${apiUrl}/projects/${projectId}/submissions-download`)
-      .then(res => {
+    await authenticatedFetch(
+      `${APIURL}/projects/${projectId}/submissions-download`
+    )
+      .then((res) => {
         return res.blob();
       })
-      .then(blob => {
-        download(blob, 'submissions.zip');
+      .then((blob) => {
+        download(blob, "submissions.zip");
       });
-  }
-
-  const [projectTitle, setProjectTitle] = useState<string>("")
-  const { projectId } = useParams<{ projectId: string }>();
+  };
 
   return (
     <Box
@@ -47,10 +44,16 @@ export default function ProjectSubmissionOverview() {
       paddingTop="50px"
     >
       <Box width="40%">
-        <Typography minWidth="440px" variant="h6" align="left">{projectTitle}</Typography>
-        <ProjectSubmissionsOverviewDatagrid />
+        <Typography minWidth="440px" variant="h6" align="left">
+          {projectData["title"]}
+        </Typography>
+        <ProjectSubmissionsOverviewDatagrid
+          submissions={submissionsWithUsers}
+        />
       </Box>
-      <Button onClick={downloadProjectSubmissions} variant="contained">{t("downloadButton")}</Button>
+      <Button onClick={downloadProjectSubmissions} variant="contained">
+        {t("downloadButton")}
+      </Button>
     </Box>
-  )
+  );
 }

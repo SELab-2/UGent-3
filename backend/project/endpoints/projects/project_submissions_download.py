@@ -51,9 +51,6 @@ def get_last_submissions_per_user(project_id):
         (Submission.submission_time == latest_submissions.c.max_time)
     ).all()
 
-    if not submissions:
-        return {"message": "No submissions found", "url": BASE_URL}, 404
-
     return {"message": "Resource fetched succesfully", "data": submissions}, 200
 
 class SubmissionDownload(Resource):
