@@ -26,10 +26,19 @@ services:
     depends_on:
       - frontend
       - backend
+      - docs
     volumes:
        - ${DATA_DIR}/nginx/nginx.conf:/etc/nginx/nginx.conf:rw
        - /etc/letsencrypt/:/etc/letsencrypt/:rw 
        - ./certbot/www:/var/www/certbot/:ro
+  docs:
+    <<: *common-keys-selab
+    container_name: docs
+    build:
+      context: ./documentation
+      dockerfile: Dockerfile
+    ports:
+      - 4000:4000
   frontend:
     <<: *common-keys-selab
     container_name: frontend
