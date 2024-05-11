@@ -21,6 +21,8 @@ import HomePages from "./pages/home/HomePages.tsx";
 import ProjectOverView from "./pages/project/projectOverview.tsx";
 import { synchronizeJoinCode } from "./loaders/join-code.ts";
 import { fetchMe } from "./utils/fetches/FetchMe.ts";
+import {fetchProjectForm} from "./components/ProjectForm/project-form.ts";
+import loadSubmissionOverview from "./loaders/submission-overview-loader.ts";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -33,13 +35,6 @@ const router = createBrowserRouter(
       <Route index element={<HomePages />} loader={fetchProjectPage} />
       <Route path=":lang" element={<LanguagePath />}>
         <Route path="home" element={<HomePages />} loader={fetchProjectPage} />
-        <Route
-          path="project/:projectId/overview"
-          element={<SubmissionsOverview />}
-        />
-        <Route path="project">
-          <Route path=":projectId" element={<ProjectView />}></Route>
-        </Route>
         <Route path="courses">
           <Route index element={<AllCoursesTeacher />} loader={dataLoaderCourses}/>
           <Route path="join" loader={synchronizeJoinCode} />
@@ -51,7 +46,13 @@ const router = createBrowserRouter(
             element={<ProjectOverView />}
             loader={fetchProjectPage}
           />
-          <Route path="create" element={<ProjectCreateHome />} />
+          <Route
+            loader={loadSubmissionOverview}
+            path=":projectId/overview"
+            element={<SubmissionsOverview />}
+          />
+          <Route path=":projectId" element={<ProjectView />}></Route>
+          <Route path="create" element={<ProjectCreateHome />} loader={fetchProjectForm}/>
         </Route>
       </Route>
     </Route>,

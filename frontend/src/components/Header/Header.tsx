@@ -85,6 +85,15 @@ export function Header({ me }: HeaderProps): JSX.Element {
           >
             <MenuIcon style={{ fontSize: "2rem" }} />
           </IconButton>
+          <Link to={`/home`}
+            style={{ color: 'inherit', textDecoration: 'none' }}>
+            <Typography
+              variant="h6"
+              color="inherit"
+              sx={{ marginRight: '2rem' }}>
+              Peristerónas
+            </Typography>
+          </Link>
           <TitlePortal />
           {!me.loggedIn && (
             <LoginButton/>
@@ -109,9 +118,8 @@ export function Header({ me }: HeaderProps): JSX.Element {
                 <Typography sx={{ padding: "6px 16px", color: "black" }}>
                   {me.display_name}
                 </Typography>
-                <MenuItem>
-                  <Link to={`${API_URL}/logout`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                    {t("logout")}</Link>
+                <MenuItem component="a" href={`${API_URL}/logout`}>
+                  {t("logout")}
                 </MenuItem>
               </Menu>
             </>

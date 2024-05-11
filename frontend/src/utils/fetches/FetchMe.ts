@@ -1,7 +1,8 @@
 import {authenticatedFetch} from "../authenticated-fetch.ts";
 
+const API_URL = import.meta.env.VITE_APP_API_HOST;
+
 export const fetchMe = async () => {
-  const API_URL = import.meta.env.VITE_APP_API_HOST;
   try {
     const response = await authenticatedFetch(`${API_URL}/me`, {
       credentials: "include",

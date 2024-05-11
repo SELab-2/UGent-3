@@ -39,7 +39,7 @@ export default function ProjectOverView() {
     return (
       <Grid container spacing={2} key={index}>
         <Grid item xs={12}>
-          <Link href={`/${i18n.language}/course/${courseProjects[0].course.course_id}`} style={{color: 'inherit'}}
+          <Link href={`/${i18n.language}/courses/${courseProjects[0].course.course_id}`} style={{color: 'inherit'}}
             underline={'none'}>
             <Typography variant="h6">{courseProjects[0].course.name} {courseProjects[0].course.ufora_id}</Typography>
           </Link>

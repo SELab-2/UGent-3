@@ -34,6 +34,10 @@ class Users(Resource):
                 role = Role[role.upper()]
                 query = query.filter(userModel.role == role)
 
+            uid = request.args.getlist("uid")
+            if len(uid) > 0:
+                query = query.filter(userModel.uid.in_(uid))
+
             users = query.all()
             users = [user.to_dict() for user in users]
 
