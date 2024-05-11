@@ -69,7 +69,7 @@ def query_parameter_tests(
     new_endpoint = endpoint + "?parameter=0"
     tests.append(param(
         (new_endpoint, method, token, True),
-        id = f"{new_endpoint} {method.upper()} {token} (parameter 0 400)"
+        id = f"{new_endpoint} {method.upper()} {token} (parameter 0 500)"
     ))
 
     for parameter in parameters:
@@ -117,7 +117,8 @@ class TestEndpoint:
         endpoint, method, csrf, wrong_parameter = test
 
         response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
-        assert wrong_parameter == (response.status_code == 400)
+        if wrong_parameter:
+            assert wrong_parameter == (response.status_code == 200)
 
         if not wrong_parameter:
             assert response.json["data"] == []

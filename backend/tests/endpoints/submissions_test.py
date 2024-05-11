@@ -148,6 +148,15 @@ class TestSubmissionsEndpoint(TestEndpoint):
         )
         assert response.status_code == 201
 
+    def test_get_submission_wrong_parameter(self, client: FlaskClient):
+        """Test a submission filtering on a non existing parameter"""
+        response = client.get(
+            "/submissions?parameter=0",
+            headers = {"X-CSRF-TOKEN":get_csrf_from_login(client, "teacher")}
+        )
+        assert response.status_code == 400
+
+
 
 
     ### SUBMISSION ###
