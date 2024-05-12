@@ -55,6 +55,7 @@ class Project(db.Model): # pylint: disable=too-many-instance-attributes
     course_id: int = Column(Integer, ForeignKey("courses.course_id"), nullable=False)
     visible_for_students: bool = Column(Boolean, nullable=False)
     archived: bool = Column(Boolean, nullable=False)
+    groups_locked: bool = Column(Boolean, nullable=False)
     runner: Runner = Column(
         EnumField(Runner, name="runner"),
         nullable=False)

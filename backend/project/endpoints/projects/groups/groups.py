@@ -10,7 +10,7 @@ from project.models.project import Project
 from project.models.course import Course
 from project.models.group import Group
 from project.utils.query_agent import query_selected_from_model, insert_into_model
-from project.utils.authentication import login_required, authorize_teacher
+from project.utils.authentication import login_required, authorize_teacher_of_project
 from project import db
 
 load_dotenv()
@@ -20,6 +20,33 @@ RESPONSE_URL = urljoin(f"{API_URL}/", "groups")
 
 class Groups(Resource):
     """Api endpoint for the /project/project_id/groups link"""
+
+    @authorize_teacher_of_project
+    def patch(self, project_id, teacher_id=None):
+        """
+        This function will lock all groups of the project
+        """
+
+        try:
+            project = db.session.query(Project).filter_by(
+                project_id=project_id).first()
+            if project is None:
+                return {
+                    "message": "Project does not exist",
+                    "url": RESPONSE_URL
+                }, 404
+            project.groups_locked = True
+            db.session.commit()
+
+            return {
+                "message": "Groups are locked",
+                "url": RESPONSE_URL
+            }, 200
+        except SQLAlchemyError:
+            return {
+                "message": "Database error",
+                "url": RESPONSE_URL
+            }, 500
 
     @login_required
     def get(self, project_id):
@@ -34,7 +61,7 @@ class Groups(Resource):
             filters={"project_id": project_id}
         )
 
-    @authorize_teacher
+    @authorize_teacher_of_project
     def post(self, project_id, teacher_id=None):
         """
         This function will create a new group for a project
@@ -51,7 +78,7 @@ class Groups(Resource):
             required_fields=["project_id", "group_size"]
         )
 
-    @authorize_teacher
+    @authorize_teacher_of_project
     def delete(self, project_id, teacher_id=None):
         """
         This function will delete a group
@@ -59,7 +86,6 @@ class Groups(Resource):
         """
 
         req = request.json
-        print(req)
         group_id = req.get("group_id")
 
         if group_id is None:

@@ -10,7 +10,8 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from project.utils.query_agent import insert_into_model
 from project.models.group import Group
-from project.utils.authentication import login_required_return_uid
+from project.models.project import Project
+from project.utils.authentication import authorize_student_submission
 
 from project import db
 
@@ -21,48 +22,64 @@ RESPONSE_URL = urljoin(f"{API_URL}/", "groups")
 
 class GroupStudent(Resource):
     """Api endpoint to allow students to join and leave project groups"""
-    @login_required_return_uid
+    @authorize_student_submission
     def post(self, project_id, group_id, uid=None):
         """
         This function will allow students to join project groups if not full
         """
-        group = db.session.query(Group).filter_by(
-            project_id=project_id, group_id=group_id).first()
-        if group is None:
-            return {
-                "message": "Group does not exist",
-                "url": RESPONSE_URL
-            }, 404
+        try:
+            project = db.session.query(Project).filter_by(
+                project_id=project_id).first()
+            if project.groups_locked:
+                return {
+                    "message": "Groups are locked for this project",
+                    "url": RESPONSE_URL
+                }, 400
 
-        joined_groups = db.session.query(GroupStudent).filter_by(
-            uid=uid, project_id=project_id).all()
-        if len(joined_groups) > 0:
-            return {
-                "message": "Student is already in a group",
-                "url": RESPONSE_URL
-            }, 400
+            group = db.session.query(Group).filter_by(
+                project_id=project_id, group_id=group_id).first()
+            if group is None:
+                return {
+                    "message": "Group does not exist",
+                    "url": RESPONSE_URL
+                }, 404
 
-        joined_students = db.session.query(GroupStudent).filter_by(
-            group_id=group_id, project_id=project_id).all()
-        if len(joined_students) >= group.group_size:
-            return {
-                "message": "Group is full",
-                "url": RESPONSE_URL
-            }, 400
+            joined_groups = db.session.query(GroupStudent).filter_by(
+                uid=uid, project_id=project_id).all()
+            if len(joined_groups) > 0:
+                return {
+                    "message": "Student is already in a group",
+                    "url": RESPONSE_URL
+                }, 400
 
-        req = request.json
-        req["project_id"] = project_id
-        req["group_id"] = group_id
-        req["uid"] = uid
-        return insert_into_model(
-            GroupStudent,
-            req,
-            RESPONSE_URL,
-            "group_id",
-            required_fields=["project_id", "group_id", "uid"]
-        )
+            joined_students = db.session.query(GroupStudent).filter_by(
+                group_id=group_id, project_id=project_id).all()
+            if len(joined_students) >= group.group_size:
+                return {
+                    "message": "Group is full",
+                    "url": RESPONSE_URL
+                }, 400
 
-    @login_required_return_uid
+            req = request.json
+            req["project_id"] = project_id
+            req["group_id"] = group_id
+            req["uid"] = uid
+            return insert_into_model(
+                GroupStudent,
+                req,
+                RESPONSE_URL,
+                "group_id",
+                required_fields=["project_id", "group_id", "uid"]
+            )
+        except SQLAlchemyError:
+            data = {
+            "url": urljoin(f"{API_URL}/", "projects")
+            }
+            data["message"] = "An error occurred while fetching the projects"
+            return data, 500
+
+
+    @authorize_student_submission
     def delete(self, project_id, group_id, uid=None):
         """
         This function will allow students to leave project groups
@@ -71,6 +88,14 @@ class GroupStudent(Resource):
             "url": urljoin(f"{API_URL}/", "projects")
         }
         try:
+            project = db.session.query(Project).filter_by(
+                project_id=project_id).first()
+            if project.groups_locked:
+                return {
+                    "message": "Groups are locked for this project",
+                    "url": RESPONSE_URL
+                }, 400
+
             group = db.session.query(Group).filter_by(
                 project_id=project_id, group_id=group_id).first()
             if group is None:

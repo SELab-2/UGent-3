@@ -53,6 +53,7 @@ CREATE TABLE projects (
 	course_id INT NOT NULL,
 	visible_for_students BOOLEAN NOT NULL,
 	archived BOOLEAN NOT NULL,
+	groups_locked BOOLEAN DEFAULT FALSE NOT NULL,
 	regex_expressions VARCHAR(50)[],
 	runner runner,
 	PRIMARY KEY(project_id),
@@ -70,7 +71,7 @@ CREATE TABLE group_students (
     uid VARCHAR(255) NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
     group_id INT NOT NULL,
     project_id INT NOT NULL,
-    PRIMARY KEY(uid, group_id),
+    PRIMARY KEY(uid, group_id, project_id),
     CONSTRAINT fk_group_reference FOREIGN KEY (group_id, project_id) REFERENCES groups(group_id, project_id) ON DELETE CASCADE
 );
 
