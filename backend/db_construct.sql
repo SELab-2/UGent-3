@@ -53,7 +53,7 @@ CREATE TABLE projects (
 	course_id INT NOT NULL,
 	visible_for_students BOOLEAN NOT NULL,
 	archived BOOLEAN NOT NULL,
-	groups_locked BOOLEAN DEFAULT FALSE NOT NULL,
+	groups_locked BOOLEAN DEFAULT FALSE,
 	regex_expressions VARCHAR(50)[],
 	runner runner,
 	PRIMARY KEY(project_id),
