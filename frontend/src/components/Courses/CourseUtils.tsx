@@ -122,8 +122,58 @@ const fetchData = async (url: string, params?: URLSearchParams) => {
 
 export const dataLoaderCourses = async () => {
   //const params = new URLSearchParams({ 'teacher': loggedInUid() });
-  return fetchData(`courses`);
+
+  const courses =  await fetchData(`courses`);
+  const projects = await fetchProjectsCourse(courses);
+  for( const c of courses){
+    const teacher = await fetchData(`users/${c.teacher}`)
+    c.teacher = teacher.display_name
+  }
+  return {courses, projects}
 };
+
+/**
+ * Fetch the projects for the Course component
+ * @param courses - All the courses
+ * @returns the projects
+ */
+export async function  fetchProjectsCourse (courses:Course[]) {
+  const projectPromises = courses.map((course) =>
+    authenticatedFetch(
+      `${apiHost}/projects?course_id=${getIdFromLink(course.course_id)}`
+    ).then((response) => response.json())
+  );
+
+  const projectResults = await Promise.all(projectPromises);
+  const projectsMap: { [courseId: string]: ProjectDetail[] } = {};
+  for await (const [index, result] of projectResults.entries()) {
+    projectsMap[getIdFromLink(courses[index].course_id)]  = await Promise.all(result.data.map(async (item: Project) => {
+      const projectRes = await authenticatedFetch(item.project_id);
+      if (projectRes.status !== 200) {
+        throw new Response("Failed to fetch project data", {
+          status: projectRes.status,
+        });
+      }
+      const projectJson = await projectRes.json();
+      const projectData = projectJson.data;
+      let projectDeadlines = [];
+      if (projectData.deadlines) {
+        projectDeadlines = projectData.deadlines.map(
+          ([description, dateString]: [string, string]) => ({
+            description,
+            date: new Date(dateString),
+          })
+        );
+      }
+      const project: ProjectDetail = {
+        ...item,
+        deadlines: projectDeadlines,
+      };
+      return project;
+    }));
+  }
+  return { ...projectsMap };
+}
 
 const dataLoaderCourse = async (courseId: string) => {
   return fetchData(`courses/${courseId}`);
