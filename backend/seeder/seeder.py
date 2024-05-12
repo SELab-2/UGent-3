@@ -100,14 +100,15 @@ def generate_projects(course_id, num_projects):
         # Generate a random number of deadlines (0-2)
         num_deadlines = random.randint(0, 2)
 
-        for _ in range(num_deadlines):
+        while len(deadlines) < range(num_deadlines):
             if random.random() < 1/3:
                 past_datetime = datetime.now() - timedelta(days=random.randint(1, 30))
                 deadline = (fake.catch_phrase(), past_datetime)
             else:
                 future_datetime = datetime.now() + timedelta(days=random.randint(1, 30))
                 deadline = (fake.catch_phrase(), future_datetime)
-            deadlines.append(deadline)
+            if deadline not in deadlines:
+                deadlines.append(deadline)
         project = Project(
             title=fake.catch_phrase(),
             description=fake.catch_phrase(),
