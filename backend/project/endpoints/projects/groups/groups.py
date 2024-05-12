@@ -10,7 +10,10 @@ from project.models.project import Project
 from project.models.course import Course
 from project.models.group import Group
 from project.utils.query_agent import query_selected_from_model, insert_into_model
-from project.utils.authentication import authorize_teacher_or_student_of_project, authorize_teacher_of_project
+from project.utils.authentication import (
+    authorize_teacher_or_student_of_project,
+    authorize_teacher_of_project
+)
 from project import db
 
 load_dotenv()
