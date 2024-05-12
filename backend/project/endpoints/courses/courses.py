@@ -8,6 +8,7 @@ parameters can be either one of the following: teacher,ufora_id,name.
 from os import getenv
 from urllib.parse import urljoin
 from dotenv import load_dotenv
+from dataclasses import fields
 
 from flask import request
 from flask_restful import Resource
@@ -38,8 +39,14 @@ class CourseForUser(Resource):
         """
 
         try:
-
             filter_params = request.args.to_dict()
+
+            invalid_params = set(filter_params.keys()) - {f.name for f in fields(Course)}
+            if invalid_params:
+                return {
+                    "url": RESPONSE_URL,
+                    "message": f"Invalid query parameters {invalid_params}"
+                }, 400
 
             # Start with a base query
             base_query = select(Course)

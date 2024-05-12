@@ -62,6 +62,7 @@ class TestSubmissionsEndpoint(TestEndpoint):
         super().authorization(auth_test)
 
 
+
     ### DATA FIELD TYPE ###
     # Test a data field by passing a list of values for which it should return bad request
     data_field_type_tests = \
@@ -76,6 +77,7 @@ class TestSubmissionsEndpoint(TestEndpoint):
         super().data_field_type(data_field_type_test)
 
 
+
     ### QUERY PARAMETER ###
     # Test a query parameter, should return [] for wrong values
     query_parameter_tests = \
@@ -85,6 +87,7 @@ class TestSubmissionsEndpoint(TestEndpoint):
     def test_query_parameters(self, query_parameter_test: tuple[str, Any, str, bool]):
         """Test a query parameter"""
         super().query_parameter(query_parameter_test)
+
 
 
     ### SUBMISSIONS ###
@@ -122,7 +125,7 @@ class TestSubmissionsEndpoint(TestEndpoint):
         assert response.status_code == 200
         data = response.json["data"][0]
         assert data["submission_id"] == f"{api_host}/submissions/{submission.submission_id}"
-        assert data["project_id"] == f"{api_host}/project/{project.project_id}"
+        assert data["project_id"] == f"{api_host}/projects/{project.project_id}"
 
     def test_get_submissions_user_project(
             self, client: FlaskClient, api_host: str,
@@ -137,7 +140,7 @@ class TestSubmissionsEndpoint(TestEndpoint):
         data = response.json["data"][0]
         assert data["submission_id"] == f"{api_host}/submissions/{submission.submission_id}"
         assert data["uid"] == f"{api_host}/users/{student.uid}"
-        assert data["project_id"] == f"{api_host}/project/{project.project_id}"
+        assert data["project_id"] == f"{api_host}/projects/{project.project_id}"
 
     def test_post_submissions(self, client: FlaskClient, project: Project, files):
         """Test posting a submission"""
@@ -147,15 +150,6 @@ class TestSubmissionsEndpoint(TestEndpoint):
             data = {"project_id":project.project_id, "files": files}
         )
         assert response.status_code == 201
-
-    def test_get_submission_wrong_parameter(self, client: FlaskClient):
-        """Test a submission filtering on a non existing parameter"""
-        response = client.get(
-            "/submissions?parameter=0",
-            headers = {"X-CSRF-TOKEN":get_csrf_from_login(client, "teacher")}
-        )
-        assert response.status_code == 400
-
 
 
 
@@ -177,7 +171,7 @@ class TestSubmissionsEndpoint(TestEndpoint):
         response = client.patch(
             f"/submissions/{submission.submission_id}",
             headers = {"X-CSRF-TOKEN":get_csrf_from_login(client, "teacher")},
-            json = {"grading":20}
+            data = {"grading":20}
         )
         assert response.status_code == 200
         data = response.json["data"]
@@ -188,11 +182,19 @@ class TestSubmissionsEndpoint(TestEndpoint):
 
     ### SUBMISSION DOWNLOAD ###
     def test_get_submission_download(
-            self, client: FlaskClient, api_host: str, submission: Submission
+            self, client: FlaskClient, project: Project, files
         ):
         """Test downloading a submission"""
+        csrf = get_csrf_from_login(client, "student")
+        response = client.post(
+            "/submissions",
+            headers = {"X-CSRF-TOKEN":csrf},
+            data = {"project_id":project.project_id, "files": files}
+        )
+        assert response.status_code == 201
+        submission_id = response.json["data"]["submission_id"].split("/")[-1]
         response = client.get(
-            f"/submissions/{submission.submission_id}/download",
-            headers = {"X-CSRF-TOKEN":get_csrf_from_login(client, "student")}
+            f"/submissions/{submission_id}/download",
+            headers = {"X-CSRF-TOKEN":csrf}
         )
         assert response.status_code == 200

@@ -69,7 +69,7 @@ def query_parameter_tests(
     new_endpoint = endpoint + "?parameter=0"
     tests.append(param(
         (new_endpoint, method, token, True),
-        id = f"{new_endpoint} {method.upper()} {token} (parameter 0 500)"
+        id = f"{new_endpoint} {method.upper()} {token} (parameter 0 400)"
     ))
 
     for parameter in parameters:
@@ -90,7 +90,7 @@ class TestEndpoint:
         endpoint, method, csrf, allowed, data = auth_test
 
         if csrf:
-            response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf}, json = data)
+            response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf}, data = data)
         else:
             response = method(endpoint, json = data)
         assert allowed == (response.status_code != 401)
@@ -100,7 +100,7 @@ class TestEndpoint:
 
         endpoint, method, csrf, allowed, data = auth_test
 
-        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf}, json = data)
+        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf}, data = data)
         assert allowed == (response.status_code != 403)
 
     def data_field_type(self, test: tuple[str, Any, str, dict[str, Any]]):
@@ -118,7 +118,7 @@ class TestEndpoint:
 
         response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
         if wrong_parameter:
-            assert wrong_parameter == (response.status_code == 200)
+            assert wrong_parameter == (response.status_code != 200)
 
         if not wrong_parameter:
             assert response.json["data"] == []
