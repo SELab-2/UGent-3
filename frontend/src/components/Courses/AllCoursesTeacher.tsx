@@ -19,7 +19,6 @@ export function AllCoursesTeacher(): JSX.Element {
   const courses = loader.courses;
   const projects = loader.projects;
 
-
   const [courseName, setCourseName] = useState('');
   const [error, setError] = useState('');
 
