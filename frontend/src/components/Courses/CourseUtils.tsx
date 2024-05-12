@@ -142,6 +142,7 @@ export const dataLoaderCourses = async () => {
 /**
  * Fetch the projects for the Course component
  * @param courses - All the courses
+ * @returns the projects
  */
 export async function  fetchProjectsCourse (courses:Course[]) {
   const projectPromises = courses.map((course) =>
@@ -152,9 +153,8 @@ export async function  fetchProjectsCourse (courses:Course[]) {
 
   const projectResults = await Promise.all(projectPromises);
   const projectsMap: { [courseId: string]: ProjectDetail[] } = {};
-
-  projectResults.forEach((result, index) => {
-    const detailProjectPromises = result.data.map(async (item: Project) => {
+  for await (const [index, result] of projectResults.entries()) {
+    projectsMap[getIdFromLink(courses[index].course_id)]  = await Promise.all(result.data.map(async (item: Project) => {
       const projectRes = await authenticatedFetch(item.project_id);
       if (projectRes.status !== 200) {
         throw new Response("Failed to fetch project data", {
@@ -177,13 +177,9 @@ export async function  fetchProjectsCourse (courses:Course[]) {
         deadlines: projectDeadlines,
       };
       return project;
-    });
-    Promise.all(detailProjectPromises).then((projects) => {
-      projectsMap[getIdFromLink(courses[index].course_id)] = projects;
-      setProjects({ ...projectsMap });
-    });
-  });
-  setProjects(projectsMap);
+    }));
+  }
+  return { ...projectsMap };
 }
 
 const dataLoaderCourse = async (courseId: string) => {
