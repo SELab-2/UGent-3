@@ -233,7 +233,6 @@ def authorize_project_visible(f):
             ({"message": "You're not authorized to perform this action"}, 403)))
     return wrap
 
-
 def authorize_submissions_request(f):
     """This function will check if the person sending a request to the API is logged in,
     and either the teacher/admin of the course or the student
