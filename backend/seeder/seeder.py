@@ -100,15 +100,14 @@ def generate_projects(course_id, num_projects):
         # Generate a random number of deadlines (0-2)
         num_deadlines = random.randint(0, 2)
 
-        while len(deadlines) < range(num_deadlines):
+        for _ in range(num_deadlines):
             if random.random() < 1/3:
                 past_datetime = datetime.now() - timedelta(days=random.randint(1, 30))
                 deadline = (fake.catch_phrase(), past_datetime)
             else:
                 future_datetime = datetime.now() + timedelta(days=random.randint(1, 30))
                 deadline = (fake.catch_phrase(), future_datetime)
-            if deadline not in deadlines:
-                deadlines.append(deadline)
+            deadlines.append(deadline)
         project = Project(
             title=fake.catch_phrase(),
             description=fake.catch_phrase(),
@@ -128,10 +127,15 @@ def generate_submissions(project_id, student_uid):
     statusses = [SubmissionStatus.SUCCESS, SubmissionStatus.FAIL,
                  SubmissionStatus.LATE, SubmissionStatus.RUNNING]
     num_submissions = random.randint(0, 2)
+    submission_times = []
     for _ in range(num_submissions):
+        past_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
+        while past_datetime in submission_times:
+            past_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
+        submission_times.append(past_datetime)
         submission = Submission(project_id=project_id,
                                 uid=student_uid,
-                                submission_time=datetime.now(),
+                                submission_time=past_datetime,
                                 submission_path="",
                                 submission_status=random.choice(statusses))
         graded = random.choice([True, False])
