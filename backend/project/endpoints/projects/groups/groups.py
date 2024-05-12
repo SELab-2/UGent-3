@@ -10,7 +10,7 @@ from project.models.project import Project
 from project.models.course import Course
 from project.models.group import Group
 from project.utils.query_agent import query_selected_from_model, insert_into_model
-from project.utils.authentication import login_required, authorize_teacher_of_project
+from project.utils.authentication import authorize_teacher_or_student_of_project, authorize_teacher_of_project
 from project import db
 
 load_dotenv()
@@ -24,8 +24,16 @@ class Groups(Resource):
     @authorize_teacher_of_project
     def patch(self, project_id, teacher_id=None):
         """
-        This function will lock all groups of the project
+        This function will set locked state of project groups, 
+        need to pass locked field in the body
         """
+        req = request.json
+        locked = req.get("locked")
+        if locked is None:
+            return {
+                "message": "Bad request: locked field is required",
+                "url": RESPONSE_URL
+            }, 400
 
         try:
             project = db.session.query(Project).filter_by(
@@ -35,7 +43,7 @@ class Groups(Resource):
                     "message": "Project does not exist",
                     "url": RESPONSE_URL
                 }, 404
-            project.groups_locked = True
+            project.groups_locked = locked
             db.session.commit()
 
             return {
@@ -48,7 +56,7 @@ class Groups(Resource):
                 "url": RESPONSE_URL
             }, 500
 
-    @login_required
+    @authorize_teacher_or_student_of_project
     def get(self, project_id):
         """
         Get function for /project/project_id/groups this will be the main endpoint
