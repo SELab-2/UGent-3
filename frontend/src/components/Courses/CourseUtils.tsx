@@ -1,6 +1,7 @@
 import { NavigateFunction, Params } from "react-router-dom";
 import { authenticatedFetch } from "../../utils/authenticated-fetch";
 import { Me } from "../../types/me";
+import { fetchMe } from "../../utils/fetches/FetchMe";
 
 export interface Course {
   course_id: string;
@@ -133,7 +134,7 @@ const fetchData = async (url: string, params?: URLSearchParams) => {
 
 export const dataLoaderCourses = async () => {
   //const params = new URLSearchParams({ 'teacher': loggedInUid() });
-  return fetchData(`courses`);
+  return {'courses': await fetchData(`courses`), 'me': await fetchMe()};
 };
 
 const dataLoaderCourse = async (courseId: string) => {
