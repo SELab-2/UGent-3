@@ -136,6 +136,10 @@ export const dataLoaderCourses = async () => {
 
   const courses =  await fetchData(`courses`);
   const projects = await fetchProjectsCourse(courses);
+  for( const c of courses){
+    const teacher = await fetchData(`users/${c.teacher}`)
+    c.teacher = teacher.display_name
+  }
   return {courses, projects}
 };
 
