@@ -24,7 +24,6 @@ import {
   apiHost,
   getIdFromLink,
   getNearestFutureDate,
-  getUser,
   ProjectDetail,
 } from "./CourseUtils";
 import {
@@ -128,52 +127,17 @@ export function CourseDetailTeacher(): JSX.Element {
   const courseDetail = useLoaderData() as {
     course: Course;
     projects: ProjectDetail[];
-    admins: UserUid[];
-    students: UserUid[];
+    adminMes: Me[];
+    studentMes: Me[];
   };
-
-  const { course, projects, admins, students } = courseDetail;
-  const [adminObjects, setAdminObjects] = useState<Me[]>([]);
-  const [studentObjects, setStudentObjects] = useState<Me[]>([]);
+  const { course, projects, adminMes, studentMes } = courseDetail;
   const { t } = useTranslation("translation", {
     keyPrefix: "courseDetailTeacher",
   });
+
   const { i18n } = useTranslation();
   const lang = i18n.language;
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchAdminData = async () => {
-      setAdminObjects([]);
-      const admins_and_teacher = admins.concat({ uid: course.teacher });
-      const adminObjects: Me[] = [];
-
-      for (const admin of admins_and_teacher) {
-        const user = await getUser(admin.uid);
-        adminObjects.push(user);
-      }
-
-      setAdminObjects(adminObjects);
-    };
-
-    fetchAdminData();
-  }, [admins, course]);
-
-  useEffect(() => {
-    const fetchStudentData = async () => {
-      setStudentObjects([]);
-      const studentObjects: Me[] = [];
-
-      for (const student of students) {
-        const user = await getUser(student.uid);
-        studentObjects.push(user);
-      }
-
-      setStudentObjects(studentObjects);
-    };
-
-    fetchStudentData();
-  }, [students]);
 
   const handleCheckboxChange = (
     event: ChangeEvent<HTMLInputElement>,
@@ -227,7 +191,7 @@ export function CourseDetailTeacher(): JSX.Element {
               >
                 <Typography variant="h5">{t("admins")}:</Typography>
                 <Grid container direction={"column"}>
-                  {adminObjects.map((admin) => (
+                  {adminMes.map((admin: Me) => (
                     <Grid
                       container
                       alignItems="center"
@@ -263,7 +227,7 @@ export function CourseDetailTeacher(): JSX.Element {
               >
                 <Typography variant="h5">{t("students")}:</Typography>
                 <EmptyOrNotStudents
-                  students={studentObjects}
+                  students={studentMes}
                   selectedStudents={selectedStudents}
                   handleCheckboxChange={handleCheckboxChange}
                 />
