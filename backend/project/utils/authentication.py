@@ -183,14 +183,13 @@ def authorize_teacher_or_student_of_project(f):
         project_id = kwargs["project_id"]
         course_id = get_course_of_project(project_id)
 
-        if (is_teacher_of_course(auth_user_id, course_id) or 
+        if (is_teacher_of_course(auth_user_id, course_id) or
             is_student_of_course(auth_user_id, course_id)):
             return f(*args, **kwargs)
 
         abort(make_response(({"message": """You are not authorized to perfom this action,
                             you are not the teacher OR student of this project"""}, 403)))
     return wrap
-
 
 def authorize_teacher_or_project_admin(f):
     """
