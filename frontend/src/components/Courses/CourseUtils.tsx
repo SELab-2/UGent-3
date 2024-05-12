@@ -133,8 +133,58 @@ const fetchData = async (url: string, params?: URLSearchParams) => {
 
 export const dataLoaderCourses = async () => {
   //const params = new URLSearchParams({ 'teacher': loggedInUid() });
-  return fetchData(`courses`);
+
+  const courses =  await fetchData(`courses`);
+  const projects = await fetchProjectsCourse(courses);
+  return {courses, projects}
 };
+
+/**
+ * Fetch the projects for the Course component
+ * @param courses - All the courses
+ */
+export async function  fetchProjectsCourse (courses:Course[]) {
+  const projectPromises = courses.map((course) =>
+    authenticatedFetch(
+      `${apiHost}/projects?course_id=${getIdFromLink(course.course_id)}`
+    ).then((response) => response.json())
+  );
+
+  const projectResults = await Promise.all(projectPromises);
+  const projectsMap: { [courseId: string]: ProjectDetail[] } = {};
+
+  projectResults.forEach((result, index) => {
+    const detailProjectPromises = result.data.map(async (item: Project) => {
+      const projectRes = await authenticatedFetch(item.project_id);
+      if (projectRes.status !== 200) {
+        throw new Response("Failed to fetch project data", {
+          status: projectRes.status,
+        });
+      }
+      const projectJson = await projectRes.json();
+      const projectData = projectJson.data;
+      let projectDeadlines = [];
+      if (projectData.deadlines) {
+        projectDeadlines = projectData.deadlines.map(
+          ([description, dateString]: [string, string]) => ({
+            description,
+            date: new Date(dateString),
+          })
+        );
+      }
+      const project: ProjectDetail = {
+        ...item,
+        deadlines: projectDeadlines,
+      };
+      return project;
+    });
+    Promise.all(detailProjectPromises).then((projects) => {
+      projectsMap[getIdFromLink(courses[index].course_id)] = projects;
+      setProjects({ ...projectsMap });
+    });
+  });
+  setProjects(projectsMap);
+}
 
 const dataLoaderCourse = async (courseId: string) => {
   return fetchData(`courses/${courseId}`);
