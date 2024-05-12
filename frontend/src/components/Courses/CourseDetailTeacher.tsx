@@ -17,7 +17,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Course,
@@ -142,18 +142,19 @@ export function CourseDetailTeacher(): JSX.Element {
   const lang = i18n.language;
   const navigate = useNavigate();
 
-  useEffect(() => {
+  useMemo(() => {
     setAdminObjects([]);
-    admins.forEach((admin) => {
+    const admins_and_teacher = admins.concat({uid: course.teacher});
+    admins_and_teacher.forEach((admin) => {
       getUser(admin.uid).then((user: Me) => {
         setAdminObjects((prev) => {
           return [...prev, user];
         });
       });
     });
-  }, [admins]);
+  }, [admins, course]);
 
-  useEffect(() => {
+  useMemo(() => {
     setStudentObjects([]);
     students.forEach((student) => {
       getUser(student.uid).then((user: Me) => {
