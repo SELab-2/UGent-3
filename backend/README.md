@@ -27,14 +27,20 @@ the regular base application.
 The project requires a couple of environment variables to run, if you want to develop on this codebase.
 Setting values for these variables can be done with a method to your own liking.
 
-| Variable          | Description                                                    |
-|-------------------|----------------------------------------------------------------|
-| DB_HOST           | Url of where the database is located                           |
-| POSTGRES_USER     | Name of the user, needed to login to the postgres database     |
-| POSTGRES_PASSWORD | Password of the user, needed to login to the postgres database |
-| POSTGRES_HOST     | IP adress of the postgres database                             |
-| POSTGRES_DB       | Name of the postgres database                                  |
-| API_HOST          | Location of the API root                                       |
+| Variable                               | Description                                                                         |
+|----------------------------------------|-------------------------------------------------------------------------------------|
+| DB_HOST                                | Url of where the database is located                                                |
+| POSTGRES_USER                          | Name of the user, needed to login to the postgres database                          |
+| POSTGRES_PASSWORD                      | Password of the user, needed to login to the postgres database                      |
+| POSTGRES_HOST                          | IP adress of the postgres database                                                  |
+| POSTGRES_DB                            | Name of the postgres database                                                       |
+| API_HOST                               | Location of the API root                                                            |
+| CLIENT_ID                              | [Client id](https://learn.microsoft.com/nl-nl/entra/identity-platform/v2-protocols) |
+| CLIENT_SECRET                          | Client's secret                                                                     |
+| CODE_VERIFIER                          | Code verifier                                                                       |
+| JWT_SECRET_KEY                         | JWT secret key                                                                      |                       
+| TENANT_ID                              | [Tenant id](https://learn.microsoft.com/nl-nl/entra/fundamentals/whatis)            |                     
+| HOMEPAGE_URL                           | URL of where the website's homepage is located                                      |
 
 All the variables except the last one are for the database setup,
 these are needed to make a connection with the database.
