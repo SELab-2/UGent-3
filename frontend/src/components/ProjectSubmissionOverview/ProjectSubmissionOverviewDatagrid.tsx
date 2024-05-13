@@ -1,4 +1,4 @@
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import {DataGrid, GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
 import { Box, IconButton } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { green, red } from "@mui/material/colors";
@@ -27,9 +27,28 @@ const fetchSubmissionsFromUser = async (submission_id: string) => {
     });
 };
 
+const editGrade = (submission: Submission, oldSubmission: Submission) => {
+  const submission_id = submission.submission_id;
+  const newGrade = submission.grading;
+
+  if (newGrade < 0 || newGrade > 20) {
+    return oldSubmission;
+  }
+
+  const formData = new FormData();
+  formData.append('grading', newGrade.toString());
+
+  authenticatedFetch(`${APIURL}/submissions/${submission_id}`, {
+    method: "PATCH",
+    body: formData
+  })
+
+  return submission
+};
+
 const columns: GridColDef<Submission>[] = [
-  { field: "submission_id", headerName: "Submission ID", flex: 0.4 },
-  { field: "display_name", headerName: "Student", width: 160, flex: 0.4 },
+  { field: "submission_id", headerName: "Submission ID", flex: 0.4, editable: false },
+  { field: "display_name", headerName: "Student", width: 160, flex: 0.4, editable: false },
   {
     field: "grading",
     headerName: "Grading",
@@ -39,6 +58,7 @@ const columns: GridColDef<Submission>[] = [
   {
     field: "submission_status",
     headerName: "Status",
+    editable: false,
     renderCell: (params: GridRenderCellParams<Submission>) => (
       <>
         {params.row.submission_status === "SUCCESS" ? (
@@ -63,7 +83,7 @@ const columns: GridColDef<Submission>[] = [
 ];
 
 /**
- * @returns the datagrid for displaying submissiosn
+ * @returns the datagrid for displaying submissions
  */
 export default function ProjectSubmissionsOverviewDatagrid({
   submissions,
@@ -78,6 +98,9 @@ export default function ProjectSubmissionsOverviewDatagrid({
         columns={columns}
         pageSizeOptions={[20]}
         disableRowSelectionOnClick
+        processRowUpdate={(updatedRow, oldRow) =>
+          editGrade(updatedRow, oldRow)
+        }
       />
     </Box>
   );
