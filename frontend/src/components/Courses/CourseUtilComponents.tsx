@@ -12,9 +12,7 @@ import {
 } from "@mui/material";
 import {
   Course,
-  Project,
   ProjectDetail,
-  apiHost,
   getIdFromLink,
   getNearestFutureDate,
 } from "./CourseUtils";
@@ -22,7 +20,6 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import debounce from "debounce";
-import { authenticatedFetch } from "../../utils/authenticated-fetch";
 
 /**
  * @param text - The text to be displayed
@@ -79,9 +76,10 @@ export function SearchBox({
  * @returns A component to display courses in horizontal scroller where each course is a card containing its name.
  */
 export function SideScrollableCourses({
-  courses,
+  courses,projects
 }: {
   courses: Course[];
+  projects: {[courseId: string]: ProjectDetail[];};
 }): JSX.Element {
   //const navigate = useNavigate();
   const location = useLocation();
@@ -100,9 +98,6 @@ export function SideScrollableCourses({
   const [uforaIdFilter, setUforaIdFilter] = useState(initialUforaIdFilter);
   const [teacherNameFilter, setTeacherNameFilter] = useState(
     initialTeacherNameFilter
-  );
-  const [projects, setProjects] = useState<{ [courseId: string]: ProjectDetail[] }>(
-    {}
   );
 
   const debouncedHandleSearchChange = useMemo(
@@ -149,51 +144,6 @@ export function SideScrollableCourses({
     const newTeacherNameFilter = event.target.value;
     setTeacherNameFilter(newTeacherNameFilter);
   };
-
-  useEffect(() => {
-    // Fetch projects for each course
-    const fetchProjects = async () => {
-      const projectPromises = courses.map((course) =>
-        authenticatedFetch(
-          `${apiHost}/projects?course_id=${getIdFromLink(course.course_id)}`
-        ).then((response) => response.json())
-      );
-
-      const projectResults = await Promise.all(projectPromises);
-      const projectsMap: { [courseId: string]: ProjectDetail[] } = {};
-
-      projectResults.forEach((result, index) => {
-        const detailProjectPromises = result.data.map(async (item: Project) => {
-          const projectRes = await authenticatedFetch(item.project_id);
-          if (projectRes.status !== 200) {
-            throw new Response("Failed to fetch project data", {
-              status: projectRes.status,
-            });
-          }
-          const projectJson = await projectRes.json();
-          const projectData = projectJson.data;
-          const project: ProjectDetail = {
-            ...item,
-            deadlines: projectData.deadlines.map(
-              ([description, dateString]: [string, string]) => ({
-                description,
-                date: new Date(dateString),
-              })
-            ),
-          };
-          return project;
-        });
-        Promise.all(detailProjectPromises).then((projects) => {
-          projectsMap[getIdFromLink(courses[index].course_id)] = projects;
-          setProjects({ ...projectsMap });
-        });
-      });
-
-      setProjects(projectsMap);
-    };
-
-    fetchProjects();
-  }, [courses]);
 
   const filteredCourses = courses.filter(
     (course) =>
@@ -313,6 +263,8 @@ function EmptyOrNotProjects({
   projects: ProjectDetail[];
   noProjectsText: string;
 }): JSX.Element {
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
   if (projects === undefined || projects.length === 0) {
     return (
       <Typography
@@ -328,21 +280,22 @@ function EmptyOrNotProjects({
       <>
         {projects.slice(0, 3).map((project) => {
           let timeLeft = "";
-          if (project.deadlines != undefined) {
+          if (project.deadlines.length > 0) {
             const deadline = getNearestFutureDate(project.deadlines);
-            if(deadline !== null){
+            if (deadline !== null) {
               const deadlineDate = deadline.date;
               const diffTime = Math.abs(deadlineDate.getTime() - now.getTime());
               const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
               const diffDays = Math.ceil(diffHours * 24);
 
-              timeLeft = diffDays > 1 ? `${diffDays} days` : `${diffHours} hours`;
+              timeLeft =
+                diffDays > 1 ? `${diffDays} days` : `${diffHours} hours`;
             }
           }
           return (
             <Grid item key={project.project_id}>
-              <Link
-                to={`/projects/${getIdFromLink(project.project_id)}`}
+              <Link 
+                to={`/${lang}/projects/${getIdFromLink(project.project_id)}`}
                 style={{ textDecoration: "none", color: "inherit" }}
               >
                 <EpsilonTypography
