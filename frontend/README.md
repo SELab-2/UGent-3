@@ -31,14 +31,15 @@ You can choose your own preferred webserver like for example `nginx`, `serve` or
 The project requires a couple of environment variables to run, if you want to develop on this codebase.
 Setting values for these variables can be done with a method to your own liking.
 
-| Variable          | Description                                                    |
-|-------------------|----------------------------------------------------------------|
-| VITE_API_HOST           | Url of where the database is located                           |
-| POSTGRES_USER     | Name of the user, needed to login to the postgres database     |
-| POSTGRES_PASSWORD | Password of the user, needed to login to the postgres database |
-| POSTGRES_HOST     | IP adress of the postgres database                             |
-| POSTGRES_DB       | Name of the postgres database                                  |
-| API_HOST          | Location of the API root                                       |
+| Variable          | Description                                                              |
+|-------------------|--------------------------------------------------------------------------|
+| VITE_API_HOST           | Url where the api is located                                             |
+| VITE_APP_TENANT_ID    | [Tenant id](https://learn.microsoft.com/nl-nl/entra/fundamentals/whatis) |
+| VITE_APP_CLIENT_ID | [Client id](https://learn.microsoft.com/nl-nl/entra/identity-platform/v2-protocols)                                                            |
+| VITE_APP_CODE_VERIFIER     | Verifier code                                                            | |
+
+If you want more information regarding the .env variables please refer to the
+[Microsoft docs](https://learn.microsoft.com/en-us/entra/)
 
 ## Maintaining the codebase
 ### Writing tests
