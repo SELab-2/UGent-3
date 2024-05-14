@@ -68,7 +68,9 @@ class SubmissionsEndpoint(Resource):
             # Filter the courses based on the query parameters
             conditions = []
             for key, value in filters.items():
-                conditions.append(getattr(Submission, key) == value)
+                attribute = getattr(Submission, key)
+                if attribute:
+                    conditions.append(getattr(Submission, key) == value)
 
             # Get the submissions
             submissions = Submission.query

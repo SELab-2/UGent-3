@@ -51,7 +51,7 @@ class TestSubmissionsEndpoint:
             "/submissions?parameter=0",
             headers = {"X-CSRF-TOKEN":get_csrf_from_login(client, "teacher")}
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
 
 
 
