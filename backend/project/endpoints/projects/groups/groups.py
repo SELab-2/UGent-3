@@ -25,7 +25,7 @@ class Groups(Resource):
     """Api endpoint for the /project/project_id/groups link"""
 
     @authorize_teacher_of_project
-    def patch(self, project_id, teacher_id=None):
+    def patch(self, project_id):
         """
         This function will set locked state of project groups, 
         need to pass locked field in the body
@@ -46,8 +46,10 @@ class Groups(Resource):
                     "message": "Project does not exist",
                     "url": RESPONSE_URL
                 }, 404
+            print("LOCKING GROUP\n\n", locked)
             project.groups_locked = locked
             db.session.commit()
+            print(project.groups_locked)
 
             return {
                 "message": "Groups are locked",
@@ -73,7 +75,7 @@ class Groups(Resource):
         )
 
     @authorize_teacher_of_project
-    def post(self, project_id, teacher_id=None):
+    def post(self, project_id):
         """
         This function will create a new group for a project
         if the body of the post contains a group_size and project_id exists
@@ -90,7 +92,7 @@ class Groups(Resource):
         )
 
     @authorize_teacher_of_project
-    def delete(self, project_id, teacher_id=None):
+    def delete(self, project_id):
         """
         This function will delete a group
         if group_id is provided and request is from teacher
@@ -98,7 +100,6 @@ class Groups(Resource):
 
         req = request.json
         group_id = req.get("group_id")
-
         if group_id is None:
             return {
                 "message": "Bad request: group_id is required",
@@ -113,18 +114,7 @@ class Groups(Resource):
                     "message": "Project associated with group does not exist",
                     "url": RESPONSE_URL
                 }, 404
-            course = db.session.query(Course).filter_by(
-                course_id=project.course_id).first()
-            if course is None:
-                return {
-                    "message": "Course associated with project does not exist",
-                    "url": RESPONSE_URL
-                }, 404
-            if course.teacher != teacher_id:
-                return {
-                    "message": "Unauthorized",
-                    "url": RESPONSE_URL
-                }, 401
+
             group = db.session.query(Group).filter_by(
                 project_id=project_id, group_id=group_id).first()
             db.session.delete(group)
