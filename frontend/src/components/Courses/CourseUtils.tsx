@@ -74,17 +74,6 @@ export function callToApiToCreateCourse(
   })
     .then((response) => response.json())
     .then((data) => {
-      //But first also make sure that teacher is in the course admins list
-      authenticatedFetch(
-        `${apiHost}/courses/${getIdFromLink(data.url)}/admins`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ admin_uid: loggedInUid() }),
-        }
-      );
       navigate(getIdFromLink(data.url)); // navigate to data.url
     });
 }
