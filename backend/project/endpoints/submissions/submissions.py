@@ -44,11 +44,6 @@ class SubmissionsEndpoint(Resource):
         }
         filters = dict(request.args)
         try:
-            invalid_parameters = set(filters.keys()) - {"uid", "project_id"}
-            if invalid_parameters:
-                data["message"] = f"Invalid query parameter(s) {invalid_parameters}"
-                return data, 400
-
             # Check the uid query parameter
             user_id = filters.get("uid")
             if user_id and not isinstance(user_id, str):
