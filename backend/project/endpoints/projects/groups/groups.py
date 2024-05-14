@@ -7,7 +7,6 @@ from flask_restful import Resource
 from sqlalchemy.exc import SQLAlchemyError
 
 from project.models.project import Project
-from project.models.course import Course
 from project.models.group import Group
 from project.utils.query_agent import query_selected_from_model, insert_into_model
 from project.utils.authentication import (
