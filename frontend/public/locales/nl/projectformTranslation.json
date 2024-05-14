@@ -4,6 +4,8 @@
     "startsWith": "Bestandnaam start met",
     "endsWith": "Bestandnaam eindigt met",
     "contains": "Bestandnaam bevat",
+    "addRestriction": "Voeg een bestand restrictie toe",
+    "fileExtension": "Bestandsextensie",
     "helperRegexText": "De gegeven regex mag niet leeg of al toegevoegd zijn"
   },
   "advancedRegex": {
@@ -17,5 +19,9 @@
     "clearSelected": "Deselecteer keuze",
     "tooltipRunner": "Als je moeilijkheden ondervindt om de runner te gebruiken, gebruik volgende documentatie",
     "userDocs": "runner user docs"
+  },
+  "dragAndDrop": {
+    "dragDropHere" :"Sleep & Los een bestand hier",
+    "orSelectFile": "Of klik om een bestand te selecteren"
   }
 }
