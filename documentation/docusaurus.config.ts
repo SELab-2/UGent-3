@@ -11,7 +11,7 @@ const config: Config = {
   url: 'https://sel2-3.ugent.be/',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/docs/',
+  baseUrl: '/user-guide/',
   trailingSlash: false,
 
   // GitHub pages deployment config.
