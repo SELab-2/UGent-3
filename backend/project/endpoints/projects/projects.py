@@ -54,7 +54,9 @@ class ProjectsEndpoint(Resource):
             filters = dict(request.args)
             conditions = []
             for key, value in filters.items():
-                conditions.append(getattr(Project, key) == value)
+                attribute = getattr(Project, key, None)
+                if attribute:
+                    conditions.append(getattr(Project, key) == value)
 
             # Get the projects
             projects = Project.query
