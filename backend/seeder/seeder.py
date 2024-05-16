@@ -127,10 +127,15 @@ def generate_submissions(project_id, student_uid):
     statusses = [SubmissionStatus.SUCCESS, SubmissionStatus.FAIL,
                  SubmissionStatus.LATE, SubmissionStatus.RUNNING]
     num_submissions = random.randint(0, 2)
+    submission_times = []
     for _ in range(num_submissions):
+        past_datetime = datetime.now() - timedelta(days=random.randint(0, 10))
+        while past_datetime in submission_times:
+            past_datetime = datetime.now() - timedelta(days=random.randint(0, 10))
+        submission_times.append(past_datetime)
         submission = Submission(project_id=project_id,
                                 uid=student_uid,
-                                submission_time=datetime.now(),
+                                submission_time=past_datetime,
                                 submission_path="",
                                 submission_status=random.choice(statusses))
         graded = random.choice([True, False])
