@@ -2,6 +2,7 @@ import { Button, Grid, Paper, Typography, styled } from "@mui/material";
 import { verifyZipContents, getFileExtension } from "../../utils/file-utils";
 import JSZip from "jszip";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface FolderDragDropProps {
   onFileDrop?: (file: File) => void;
@@ -16,6 +17,8 @@ const FolderDragDrop: React.FC<FolderDragDropProps> = ({
   regexRequirements,
   onWrongInput,
 }) => {
+  const { t } = useTranslation('projectformTranslation', { keyPrefix: 'dragAndDrop' });
+
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
   const VisuallyHiddenInput = styled("input")({
@@ -113,13 +116,13 @@ const FolderDragDrop: React.FC<FolderDragDropProps> = ({
             textAlign: "center"
           }}
         >
-          <Typography variant="h5">Drag & Drop a File Here</Typography>
+          <Typography variant="h5">{t('dragDropHere')}</Typography>
           <Button
             component="label"
             role={undefined}
             tabIndex={-1}
           >
-            <Typography>Or Click To Select a File</Typography>
+            <Typography>{t('orSelectFile')}</Typography>
             <VisuallyHiddenInput type="file" onChange={handleFileUpload} />
           </Button>
         </Paper>

@@ -4,6 +4,8 @@
     "startsWith": "Filename starts with",
     "endsWith": "Filename ends with",
     "contains": "Filename contains string",
+    "addRestriction": "Add file restriction",
+    "fileExtension": "File extension",
     "helperRegexText": "Regex can't be empty or already added"
   },
   "advancedRegex": {
@@ -17,5 +19,9 @@
     "clearSelected": "Clear Selection",
     "tooltipRunner": "If you're having trouble figuring out the runner please refer to the docs",
     "userDocs": "runner user docs"
+  },
+  "dragAndDrop": {
+    "dragDropHere" :"Drag & Drop a File Here",
+    "orSelectFile": "Or click to select a file"
   }
 }
