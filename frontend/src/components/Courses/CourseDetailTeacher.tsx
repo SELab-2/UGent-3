@@ -151,7 +151,7 @@ export function CourseDetailTeacher(): JSX.Element {
       );
     }
   };
-
+  
   return (
     <>
       <Title title={course.name}></Title>
