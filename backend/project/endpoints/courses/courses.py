@@ -47,8 +47,8 @@ class CourseForUser(Resource):
             # Apply filters dynamically if they are provided
             for param, value in filter_params.items():
                 if value:
-                    attribute = getattr(Course, param, None)
-                    if attribute:
+                    if param in Course.__table__.columns:
+                        attribute = getattr(Course, param)
                         base_query = base_query.filter(attribute == value)
 
             # Define the role-specific queries
