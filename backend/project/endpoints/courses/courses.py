@@ -7,8 +7,8 @@ parameters can be either one of the following: teacher,ufora_id,name.
 
 from os import getenv
 from urllib.parse import urljoin
-from dotenv import load_dotenv
 from dataclasses import fields
+from dotenv import load_dotenv
 
 from flask import request
 from flask_restful import Resource

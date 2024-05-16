@@ -38,7 +38,7 @@ def auth_test(
         endpoint = endpoint.replace(key, str(value))
     csrf = get_csrf_from_login(client, token) if token else None
     data = {k.strip("@"):v for k, v in data_map.items()}
- 
+
     return endpoint, getattr(client, method), csrf, allowed, data
 
 
