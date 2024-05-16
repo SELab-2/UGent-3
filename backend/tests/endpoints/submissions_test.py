@@ -63,21 +63,6 @@ class TestSubmissionsEndpoint(TestEndpoint):
 
 
 
-    ### DATA FIELD TYPE ###
-    # Test a data field by passing a list of values for which it should return bad request
-    data_field_type_tests = \
-        data_field_type_tests("/submissions", "post", "student",
-            {"project_id": "@project_id"}, {"project_id": ["zero"]}) + \
-        data_field_type_tests("/submissions/@submission_id", "patch", "teacher",
-            {}, {"grading": ["zero"]})
-
-    @mark.parametrize("data_field_type_test", data_field_type_tests, indirect=True)
-    def test_data_field_types(self, data_field_type_test: tuple[str, Any, str, dict[str, Any]]):
-        """Test a data field type"""
-        super().data_field_type(data_field_type_test)
-
-
-
     ### QUERY PARAMETER ###
     # Test a query parameter, should return [] for wrong values
     query_parameter_tests = \
@@ -144,12 +129,37 @@ class TestSubmissionsEndpoint(TestEndpoint):
 
     def test_post_submissions(self, client: FlaskClient, project: Project, files):
         """Test posting a submission"""
+        csrf = get_csrf_from_login(client, "student")
         response = client.post(
             "/submissions",
-            headers = {"X-CSRF-TOKEN":get_csrf_from_login(client, "student")},
+            headers = {"X-CSRF-TOKEN":csrf},
             data = {"project_id":project.project_id, "files": files}
         )
         assert response.status_code == 201
+        submission_id = response.json["data"]["submission_id"].split("/")[-1]
+        response = client.get(
+            f"/submissions/{submission_id}",
+            headers = {"X-CSRF-TOKEN":csrf}
+        )
+        assert response.status_code == 200
+
+    def test_post_submissions_invalid_project_id(self, client: FlaskClient, files):
+        """Test posting a submission when given an invalid project"""
+        response = client.post(
+            "/submissions",
+            headers = {"X-CSRF-TOKEN":get_csrf_from_login(client, "student")},
+            data = {"project_id":"zero", "files": files}
+        )
+        assert response.status_code == 400
+
+    def test_post_submissions_invalid_file(self, client: FlaskClient, file_no_name):
+        """Test posting a submission when given a file with no name"""
+        response = client.post(
+            "/submissions",
+            headers = {"X-CSRF-TOKEN":get_csrf_from_login(client, "student")},
+            data = {"project_id":"zero", "files": file_no_name}
+        )
+        assert response.status_code == 400
 
 
 
@@ -177,6 +187,15 @@ class TestSubmissionsEndpoint(TestEndpoint):
         data = response.json["data"]
         assert data["submission_id"] == f"{api_host}/submissions/{submission.submission_id}"
         assert data["grading"] == 20.0
+
+    def test_patch_submission_invalid_grading(self, client: FlaskClient, submission: Submission):
+        """Test posting a submission when given an invalid project"""
+        response = client.patch(
+            f"/submissions/{submission.submission_id}",
+            headers = {"X-CSRF-TOKEN":get_csrf_from_login(client, "teacher")},
+            data = {"grading":"zero"}
+        )
+        assert response.status_code == 400
 
 
 
