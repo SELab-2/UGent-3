@@ -56,7 +56,7 @@ export default function ProjectView() {
     });
 
     authenticatedFetch(
-      `${API_URL}/projects/${projectId}/assignment?lang=${i18next.language}`
+      `${API_URL}/projects/${projectId}/assignment?lang=${i18next.resolvedLanguage}`
     ).then((response) => {
       if (response.ok) {
         response.text().then((data) => setAssignmentRawText(data));
