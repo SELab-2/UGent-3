@@ -45,10 +45,8 @@ class Groups(Resource):
                     "message": "Project does not exist",
                     "url": RESPONSE_URL
                 }, 404
-            print("LOCKING GROUP\n\n", locked)
             project.groups_locked = locked
             db.session.commit()
-            print(project.groups_locked)
 
             return {
                 "message": "Groups are locked",
