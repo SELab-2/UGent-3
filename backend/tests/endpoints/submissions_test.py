@@ -14,7 +14,6 @@ from tests.endpoints.endpoint import (
     TestEndpoint,
     authentication_tests,
     authorization_tests,
-    data_field_type_tests,
     query_parameter_tests
 )
 
