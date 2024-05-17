@@ -138,8 +138,7 @@ export function CourseDetailTeacher(): JSX.Element {
   const { t } = useTranslation("translation", {
     keyPrefix: "courseDetailTeacher",
   });
-  const { i18n } = useTranslation();
-  const lang = i18n.language;
+  const lang = i18next.resolvedLanguage;
   const navigate = useNavigate();
 
   useEffect(() => {
