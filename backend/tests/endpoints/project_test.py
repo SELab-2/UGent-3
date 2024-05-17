@@ -1,8 +1,68 @@
 """Tests for project endpoints."""
 
 import json
+from typing import Any
+
+from pytest import mark
 
 from tests.utils.auth_login import get_csrf_from_login
+from tests.endpoints.endpoint import (
+    TestEndpoint,
+    authentication_tests,
+    authorization_tests
+)
+
+class TestProjectsEndpoint(TestEndpoint):
+    """Class to test the projects API endpoint"""
+
+    ### AUTHENTICATION ###
+    # Where is login required
+    authentication_tests = \
+        authentication_tests("/projects", ["get", "post"]) + \
+        authentication_tests("/projects/@project_id", ["get", "patch", "delete"]) + \
+        authentication_tests("/projects/@project_id/assignment", ["get"]) + \
+        authentication_tests("/projects/@project_id/submissions-download", ["get"]) + \
+        authentication_tests("/projects/@project_id/latest-per-user", ["get"])
+
+    @mark.parametrize("auth_test", authentication_tests, indirect=True)
+    def test_authentication(self, auth_test: tuple[str, Any, str, bool]):
+        """Test the authentication"""
+        super().authentication(auth_test)
+
+
+
+    ### AUTHORIZATION ###
+    # Who can access what
+    authorization_tests = \
+        authorization_tests("/projects", "get",
+            ["student", "student_other", "teacher", "teacher_other", "admin", "admin_other"],
+            []) + \
+        authorization_tests("/projects", "post",
+            ["teacher"],
+            ["student", "student_other", "teacher_other", "admin", "admin_other"]) + \
+        authorization_tests("/projects/@project_id", "get",
+            ["student", "teacher", "admin"],
+            ["student_other", "teacher_other", "admin_other"]) + \
+        authorization_tests("/projects/@project_id", "patch",
+            ["teacher", "admin"],
+            ["student", "student_other", "teacher_other", "admin_other"]) + \
+        authorization_tests("/projects/@project_id", "delete",
+            ["teacher"],
+            ["student", "student_other", "teacher_other", "admin", "admin_other"]) + \
+        authorization_tests("/projects/@project_id/assignment", "get",
+            ["student", "teacher", "admin"],
+            ["student_other", "teacher_other", "admin_other"]) + \
+        authorization_tests("/projects/@project_id/submissions-download", "get",
+            ["teacher", "admin"],
+            ["student", "student_other", "teacher_other", "admin_other"]) + \
+        authorization_tests("/projects/@project_id/latest-per-user", "get",
+            ["student", "teacher", "admin"],
+            ["student_other", "teacher_other", "admin_other"])
+
+    @mark.parametrize("auth_test", authorization_tests, indirect=True)
+    def test_authorization(self, auth_test: tuple[str, Any, str, bool]):
+        """Test the authorization"""
+        super().authorization(auth_test)
 
 def test_assignment_download(client, valid_project):
     """
