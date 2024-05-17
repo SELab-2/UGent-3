@@ -24,7 +24,7 @@ def get_last_submissions_per_user(project_id):
     Get the last submissions per user for a given project
     """
     try:
-        project = Project.query.get(project_id)
+        project = db.session.get(Project, project_id)
     except SQLAlchemyError:
         return {"message": "Internal server error"}, 500
 
