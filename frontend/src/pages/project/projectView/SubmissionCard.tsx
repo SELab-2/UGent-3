@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import SubmissionsGrid from "./SubmissionsGrid";
 import { Submission } from "../../../types/submission";
 import { authenticatedFetch } from "../../../utils/authenticated-fetch";
+import { getCSRFCookie } from "../../../utils/csrf";
 
 interface SubmissionCardProps {
   regexRequirements?: string[];
@@ -69,12 +70,12 @@ export default function SubmissionCard({
     }
     form.append("files", selectedFile);
     form.append("project_id", projectId);
-    form.append("uid", "teacher");
     try {
       const response = await axios.post(submissionUrl, form, {
+        withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: "teacher",
+          "X-CSRF-TOKEN": getCSRFCookie()
         },
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
