@@ -1,4 +1,4 @@
-import {DataGrid, GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
+import {DataGrid, GridRenderCellParams} from "@mui/x-data-grid";
 import { Box, IconButton } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { green, red } from "@mui/material/colors";
@@ -7,6 +7,8 @@ import DownloadIcon from "@mui/icons-material/Download";
 import download from "downloadjs";
 import { authenticatedFetch } from "../../utils/authenticated-fetch";
 import { Submission } from "../../types/submission";
+import {useTranslation} from "react-i18next";
+import {TFunction} from "i18next";
 
 const APIURL = import.meta.env.VITE_APP_API_HOST;
 
@@ -27,11 +29,12 @@ const fetchSubmissionsFromUser = async (submission_id: string) => {
     });
 };
 
-const editGrade = (submission: Submission, oldSubmission: Submission) => {
+const editGrade = (submission: Submission, oldSubmission: Submission, errorMessage: string) => {
   const submission_id = submission.submission_id;
   const newGrade = submission.grading;
 
   if (newGrade < 0 || newGrade > 20) {
+    alert(errorMessage);
     return oldSubmission;
   }
 
@@ -46,41 +49,43 @@ const editGrade = (submission: Submission, oldSubmission: Submission) => {
   return submission
 };
 
-const columns: GridColDef<Submission>[] = [
-  { field: "submission_id", headerName: "Submission ID", flex: 0.4, editable: false },
-  { field: "display_name", headerName: "Student", width: 160, flex: 0.4, editable: false },
-  {
-    field: "grading",
-    headerName: "Grading",
-    editable: true,
-    flex: 0.2,
-  },
-  {
-    field: "submission_status",
-    headerName: "Status",
-    editable: false,
-    renderCell: (params: GridRenderCellParams<Submission>) => (
-      <>
-        {params.row.submission_status === "SUCCESS" ? (
-          <CheckCircleIcon sx={{ color: green[500] }} />
-        ) : (
-          <CancelIcon sx={{ color: red[500] }} />
-        )}
-      </>
-    ),
-  },
-  {
-    field: "submission_path",
-    headerName: "Download",
-    renderCell: (params: GridRenderCellParams<Submission>) => (
-      <IconButton
-        onClick={() => fetchSubmissionsFromUser(params.row.submission_id)}
-      >
-        <DownloadIcon />
-      </IconButton>
-    ),
-  },
-];
+const getTranslatedRows = (t: TFunction<string, string>) => {
+  return [
+    { field: "submission_id", headerName: t("submissionID"), flex: 0.4, editable: false },
+    { field: "display_name", headerName: t("student"), width: 160, flex: 0.4, editable: false },
+    {
+      field: "grading",
+      headerName: t("grading"),
+      editable: true,
+      flex: 0.2,
+    },
+    {
+      field: "submission_status",
+      headerName: t("status"),
+      editable: false,
+      renderCell: (params: GridRenderCellParams<Submission>) => (
+        <>
+          {params.row.submission_status === "SUCCESS" ? (
+            <CheckCircleIcon sx={{ color: green[500] }} />
+          ) : (
+            <CancelIcon sx={{ color: red[500] }} />
+          )}
+        </>
+      ),
+    },
+    {
+      field: "submission_path",
+      headerName: t("download"),
+      renderCell: (params: GridRenderCellParams<Submission>) => (
+        <IconButton
+          onClick={() => fetchSubmissionsFromUser(params.row.submission_id)}
+        >
+          <DownloadIcon />
+        </IconButton>
+      ),
+    },
+  ];
+}
 
 /**
  * @returns the datagrid for displaying submissions
@@ -90,16 +95,21 @@ export default function ProjectSubmissionsOverviewDatagrid({
 }: {
   submissions: Submission[];
 }) {
+
+  const { t } = useTranslation('submissionOverview', { keyPrefix: 'submissionOverview' });
+
+  const errorMsg = t("scoreError");
+
   return (
     <Box my={4}>
       <DataGrid
         getRowId={getRowId}
         rows={submissions}
-        columns={columns}
+        columns={getTranslatedRows(t)}
         pageSizeOptions={[20]}
         disableRowSelectionOnClick
         processRowUpdate={(updatedRow, oldRow) =>
-          editGrade(updatedRow, oldRow)
+          editGrade(updatedRow, oldRow, errorMsg)
         }
       />
     </Box>
