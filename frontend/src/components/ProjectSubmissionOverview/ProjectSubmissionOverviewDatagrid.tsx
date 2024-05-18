@@ -1,5 +1,11 @@
-import {DataGrid, GridRenderCellParams} from "@mui/x-data-grid";
-import { Box, IconButton } from "@mui/material";
+import {
+  DataGrid,
+  GridEditInputCell,
+  GridPreProcessEditCellProps,
+  GridRenderCellParams,
+  GridRenderEditCellParams
+} from "@mui/x-data-grid";
+import {Box, IconButton, styled, Tooltip, tooltipClasses, TooltipProps} from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { green, red } from "@mui/material/colors";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -9,7 +15,6 @@ import { authenticatedFetch } from "../../utils/authenticated-fetch";
 import { Submission } from "../../types/submission";
 import {useTranslation} from "react-i18next";
 import {TFunction} from "i18next";
-
 const APIURL = import.meta.env.VITE_APP_API_HOST;
 
 /**
@@ -29,13 +34,12 @@ const fetchSubmissionsFromUser = async (submission_id: string) => {
     });
 };
 
-const editGrade = (submission: Submission, oldSubmission: Submission, errorMessage: string) => {
+const editGrade = (submission: Submission, errorMessage: string) => {
   const submission_id = submission.submission_id;
   const newGrade = submission.grading;
 
   if (newGrade < 0 || newGrade > 20) {
-    alert(errorMessage);
-    return oldSubmission;
+    throw new Error(errorMessage);
   }
 
   const formData = new FormData();
@@ -49,6 +53,35 @@ const editGrade = (submission: Submission, oldSubmission: Submission, errorMessa
   return submission
 };
 
+const StyledTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.error.contrastText,
+  },
+}));
+
+/**
+ *
+ */
+function NameEditInputCell(props: GridRenderEditCellParams) {
+  const { error, msg } = props;
+
+  return (
+    <StyledTooltip open={!!error} title={msg}>
+      <GridEditInputCell {...props} />
+    </StyledTooltip>
+  );
+}
+
+/**
+ *
+ */
+function renderEditScore(params: GridRenderEditCellParams) {
+  return <NameEditInputCell {...params} />;
+}
+
 const getTranslatedRows = (t: TFunction<string, string>) => {
   return [
     { field: "submission_id", headerName: t("submissionID"), flex: 0.4, editable: false },
@@ -58,6 +91,11 @@ const getTranslatedRows = (t: TFunction<string, string>) => {
       headerName: t("grading"),
       editable: true,
       flex: 0.2,
+      preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
+        const hasError = params.props.value > 20 || params.props.value < 0;
+        return { ...params.props, error: hasError, msg: t("scoreError") };
+      },
+      renderEditCell: renderEditScore
     },
     {
       field: "submission_status",
@@ -108,8 +146,8 @@ export default function ProjectSubmissionsOverviewDatagrid({
         columns={getTranslatedRows(t)}
         pageSizeOptions={[20]}
         disableRowSelectionOnClick
-        processRowUpdate={(updatedRow, oldRow) =>
-          editGrade(updatedRow, oldRow, errorMsg)
+        processRowUpdate={(updatedRow) =>
+          editGrade(updatedRow, errorMsg)
         }
       />
     </Box>
