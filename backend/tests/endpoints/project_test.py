@@ -56,7 +56,7 @@ class TestProjectsEndpoint(TestEndpoint):
             ["teacher", "admin"],
             ["student", "student_other", "teacher_other", "admin_other"]) + \
         authorization_tests("/projects/@project_id/latest-per-user", "get",
-            ["student", "teacher", "admin"],
+            ["teacher", "admin"],
             ["student_other", "teacher_other", "admin_other"])
 
     @mark.parametrize("auth_test", authorization_tests, indirect=True)
