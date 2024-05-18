@@ -224,6 +224,10 @@ const dataLoaderStudents = async (courseId: string) => {
   return fetchData(`courses/${courseId}/students`);
 };
 
+const fetchMes = async (uids: string[]) => {
+  return Promise.all(uids.map((uid) => getUser(uid)));
+}
+
 export const dataLoaderCourseDetail = async ({
   params,
 }: {
@@ -237,5 +241,9 @@ export const dataLoaderCourseDetail = async ({
   const projects = await dataLoaderProjects(courseId);
   const admins = await dataLoaderAdmins(courseId);
   const students = await dataLoaderStudents(courseId);
-  return { course, projects, admins, students };
+  const admin_uids = admins.map((admin: {uid: string}) => getIdFromLink(admin.uid));
+  const student_uids = students.map((student: {uid: string}) => getIdFromLink(student.uid));
+  const adminMes = await fetchMes([course.teacher, ...admin_uids]);
+  const studentMes = await fetchMes(student_uids);
+  return { course, projects, adminMes, studentMes };
 };
