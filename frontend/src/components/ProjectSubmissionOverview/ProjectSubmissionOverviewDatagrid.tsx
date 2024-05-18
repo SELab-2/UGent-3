@@ -63,7 +63,7 @@ const StyledTooltip = styled(({ className, ...props }: TooltipProps) => (
 }));
 
 /**
- *
+ * @returns Component for input edit cell
  */
 function NameEditInputCell(props: GridRenderEditCellParams) {
   const { error, msg } = props;
@@ -76,7 +76,7 @@ function NameEditInputCell(props: GridRenderEditCellParams) {
 }
 
 /**
- *
+ * @returns component for passing params
  */
 function renderEditScore(params: GridRenderEditCellParams) {
   return <NameEditInputCell {...params} />;
