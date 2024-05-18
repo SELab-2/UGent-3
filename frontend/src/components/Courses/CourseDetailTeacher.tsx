@@ -24,7 +24,6 @@ import {
   apiHost,
   getIdFromLink,
   getNearestFutureDate,
-  getUser,
   ProjectDetail,
 } from "./CourseUtils";
 import {
@@ -128,40 +127,15 @@ export function CourseDetailTeacher(): JSX.Element {
   const courseDetail = useLoaderData() as {
     course: Course;
     projects: ProjectDetail[];
-    admins: UserUid[];
-    students: UserUid[];
+    adminMes: Me[];
+    studentMes: Me[];
   };
-
-  const { course, projects, admins, students } = courseDetail;
-  const [adminObjects, setAdminObjects] = useState<Me[]>([]);
-  const [studentObjects, setStudentObjects] = useState<Me[]>([]);
+  const { course, projects, adminMes, studentMes } = courseDetail;
   const { t } = useTranslation("translation", {
     keyPrefix: "courseDetailTeacher",
   });
   const lang = i18next.resolvedLanguage;
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setAdminObjects([]);
-    admins.forEach((admin) => {
-      getUser(admin.uid).then((user: Me) => {
-        setAdminObjects((prev) => {
-          return [...prev, user];
-        });
-      });
-    });
-  }, [admins]);
-
-  useEffect(() => {
-    setStudentObjects([]);
-    students.forEach((student) => {
-      getUser(student.uid).then((user: Me) => {
-        setStudentObjects((prev) => {
-          return [...prev, user];
-        });
-      });
-    });
-  }, [students]);
 
   const handleCheckboxChange = (
     event: ChangeEvent<HTMLInputElement>,
@@ -175,7 +149,7 @@ export function CourseDetailTeacher(): JSX.Element {
       );
     }
   };
-
+  
   return (
     <>
       <Title title={course.name}></Title>
@@ -215,7 +189,7 @@ export function CourseDetailTeacher(): JSX.Element {
               >
                 <Typography variant="h5">{t("admins")}:</Typography>
                 <Grid container direction={"column"}>
-                  {adminObjects.map((admin) => (
+                  {adminMes.map((admin: Me) => (
                     <Grid
                       container
                       alignItems="center"
@@ -251,7 +225,7 @@ export function CourseDetailTeacher(): JSX.Element {
               >
                 <Typography variant="h5">{t("students")}:</Typography>
                 <EmptyOrNotStudents
-                  students={studentObjects}
+                  students={studentMes}
                   selectedStudents={selectedStudents}
                   handleCheckboxChange={handleCheckboxChange}
                 />
