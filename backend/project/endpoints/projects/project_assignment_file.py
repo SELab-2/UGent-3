@@ -13,7 +13,7 @@ from project.utils.authentication import authorize_project_visible
 
 API_URL = os.getenv('API_HOST')
 RESPONSE_URL = urljoin(API_URL, "projects")
-UPLOAD_FOLDER = os.getenv('UPLOAD_URL')
+UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER')
 
 ASSIGNMENT_FILE_NAME = "assignment.md"
 

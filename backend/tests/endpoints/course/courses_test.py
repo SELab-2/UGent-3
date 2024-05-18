@@ -28,7 +28,7 @@ class TestCourseEndpoint(TestEndpoint):
         authentication_tests("/courses/", [])
 
     @mark.parametrize("auth_test", authentication_tests, indirect=True)
-    def test_authentication(self, auth_test: tuple[str, Any, str, bool]):
+    def test_authentication(self, auth_test: tuple[str, Any, str, bool, dict[str, Any]]):
         """Test the authentication"""
         super().authentication(auth_test)
 
@@ -69,7 +69,7 @@ class TestCourseEndpoint(TestEndpoint):
             ["student", "student_other", "teacher_other", "admin", "admin_other"])
 
     @mark.parametrize("auth_test", authorization_tests, indirect=True)
-    def test_authorization(self, auth_test: tuple[str, Any, str, bool]):
+    def test_authorization(self, auth_test: tuple[str, Any, str, bool, dict[str, Any]]):
         """Test the authorization"""
         super().authorization(auth_test)
 
