@@ -14,6 +14,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from project.models.project import Project
 from project.models.submission import Submission
 from project.db_in import db
+from project.utils.authentication import authorize_teacher_or_project_admin
 
 API_HOST = getenv("API_HOST")
 UPLOAD_FOLDER = getenv("UPLOAD_FOLDER")
@@ -57,6 +58,8 @@ class SubmissionDownload(Resource):
     """
     Resource to download all submissions for a project.
     """
+
+    @authorize_teacher_or_project_admin
     def get(self, project_id: int):
         """
         Download all submissions for a project as a zip file.
