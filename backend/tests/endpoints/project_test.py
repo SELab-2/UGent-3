@@ -5,11 +5,14 @@ from typing import Any
 
 from pytest import mark
 
+from project.models.project import Runner
 from tests.utils.auth_login import get_csrf_from_login
 from tests.endpoints.endpoint import (
     TestEndpoint,
     authentication_tests,
-    authorization_tests
+    authorization_tests,
+    data_field_type_tests,
+    query_parameter_tests
 )
 
 class TestProjectsEndpoint(TestEndpoint):
@@ -63,6 +66,52 @@ class TestProjectsEndpoint(TestEndpoint):
     def test_authorization(self, auth_test: tuple[str, Any, str, bool]):
         """Test the authorization"""
         super().authorization(auth_test)
+
+    ### DATA FIELD TYPE ###
+    # Test a data field by passing a list of values for which it should return a bad request
+    # project_data_minimal = {
+    #     "title": "A title",
+    #     "description": "A description",
+    #     "deadlines": [],
+    #     "course_id": "@course_id",
+    #     "visible_for_students": True,
+    #     "archived": False,
+    #     "runner": Runner.GENERAL,
+    #     "regex_expressions": [],
+    #     "assignment_file": "@assignment_file"
+    # }
+    # project_data_test = {
+    #     "title": [None],
+    #     "description": [None],
+    #     "deadlines": [None, {"description": "deadline 1", "deadline": None}],
+    #     "course_id": [None, "zero", 0],
+    #     "visible_for_students": [None],
+    #     "runner": [None, "general"],
+    #     "regex_expressions": [None],
+    #     "assignment_file": [None]
+    # }
+    # data_field_type_tests = \
+    #     data_field_type_tests("/projects", "post", "teacher",
+    #         project_data_minimal, project_data_test) + \
+    #     data_field_type_tests("/projects/@project_id", "patch", "teacher",
+    #         project_data_minimal, project_data_test)
+
+    # @mark.parametrize("data_field_type_test", data_field_type_tests, indirect=True)
+    # def test_data_fields(self, data_field_type_test: tuple[str, Any, str, dict[str, Any]]):
+    #     """Test a data field typing"""
+    #     super().data_field_type(data_field_type_test)
+
+    ### QUERY PARAMETER ###
+    # Test a query parameter, should return [] for wrong values
+    query_parameter_tests = \
+        query_parameter_tests("/projects", "get", "student", ["project_id", "title", "course_id"])
+
+    @mark.parametrize("query_parameter_test", query_parameter_tests, indirect=True)
+    def test_query_parameters(self, query_parameter_test: tuple[str, Any, str, bool]):
+        """Test a query parameter"""
+        super().query_parameter(query_parameter_test)
+
+
 
 def test_assignment_download(client, valid_project):
     """
