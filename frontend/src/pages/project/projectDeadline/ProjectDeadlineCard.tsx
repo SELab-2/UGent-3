@@ -1,5 +1,4 @@
-import {CardActionArea, Card, CardContent, Typography, Box, Button} from '@mui/material';
-import {Link } from "react-router-dom";
+import {CardActionArea, Card, CardContent, Link, Typography, Box, Button} from '@mui/material';
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import {ProjectDeadline} from "./ProjectDeadline.tsx";
@@ -28,7 +27,7 @@ export const ProjectDeadlineCard: React.FC<ProjectCardProps> = ({  deadlines, sh
       {deadlines.map((project, index) => (
        
         <Card key={index} style={{margin: '10px 0'}}>
-          <CardActionArea component={Link} to={`/${i18next.resolvedLanguage}/projects/${project.project_id}`}>
+          <CardActionArea LinkComponent={Link} href={`/${i18next.resolvedLanguage}/projects/${project.project_id}`}>
             <CardContent>
               <Typography variant="h6" style={{color: project.short_submission ?
                 (project.short_submission.submission_status === 'SUCCESS' ? 'green' : 
