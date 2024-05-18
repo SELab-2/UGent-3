@@ -177,6 +177,8 @@ def into_the_db(my_uid):
             course_id = insert_course_into_db_get_id(session, teacher_uid)
             subscribed_students = populate_course_students(
                 session, course_id, students)
+            session.add(CourseStudent(course_id=course_id, uid=my_uid))
+            session.commit()
             subscribed_students.append(my_uid)  # my_uid is also a student
             populate_course_projects(
                 session, course_id, subscribed_students, teacher_uid)
