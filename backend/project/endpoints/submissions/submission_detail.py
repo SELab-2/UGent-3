@@ -37,14 +37,19 @@ class SubmissionEndpoint(Resource):
             "url": urljoin(f"{BASE_URL}/", str(submission_id))
         }
         try:
-            with db.session() as session:
+            with (db.session() as session):
                 submission = session.get(Submission, submission_id)
                 if submission is None:
                     data["url"] = urljoin(f"{API_HOST}/", "/submissions")
                     data["message"] = f"Submission (submission_id={submission_id}) not found"
                     return data, 404
 
-                if set(request.form.keys()) - {"grading", "submission_id", "uid", "project_id", "submission_time"}:
+                if set(request.form.keys()) - {
+                    "grading",
+                    "submission_id",
+                    "uid",
+                    "project_id",
+                    "submission_time"}:
                     data["message"] = "Invalid data field given."
                     return data, 400
 

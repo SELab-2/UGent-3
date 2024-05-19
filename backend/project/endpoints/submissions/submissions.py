@@ -59,7 +59,12 @@ class SubmissionsEndpoint(Resource):
                     return data, 400
                 filters["project_id"] = int(project_id)
 
-            if set(filters.keys()) - {"grading", "submission_id", "uid", "project_id", "submission_time"}:
+            if set(filters.keys()) - {
+                "grading",
+                "submission_id",
+                "uid",
+                "project_id",
+                "submission_time"}:
                 data["message"] = "Invalid data field given."
                 return data, 400
 
