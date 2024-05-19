@@ -134,9 +134,7 @@ export function CourseDetailTeacher(): JSX.Element {
   const { t } = useTranslation("translation", {
     keyPrefix: "courseDetailTeacher",
   });
-
-  const { i18n } = useTranslation();
-  const lang = i18n.language;
+  const lang = i18next.resolvedLanguage;
   const navigate = useNavigate();
 
   const handleCheckboxChange = (
@@ -304,7 +302,7 @@ function EmptyOrNotProjects({
           <Grid item sm={6} key={project.project_id}>
             <Card style={{ background: "lightblue" }} key={project.project_id}>
               <Link
-                to={`/${i18next.language}/projects/${getIdFromLink(project.project_id)}`}
+                to={`/${i18next.resolvedLanguage}/projects/${getIdFromLink(project.project_id)}`}
               >
                 <CardHeader title={project.title} />
               </Link>
@@ -317,7 +315,7 @@ function EmptyOrNotProjects({
               </CardContent>
               <CardActions>
                 <Link
-                  to={`/${i18next.language}/projects/${getIdFromLink(project.project_id)}`}
+                  to={`/${i18next.resolvedLanguage}/projects/${getIdFromLink(project.project_id)}`}
                 >
                   <Button>{t("view")}</Button>
                 </Link>
@@ -463,7 +461,7 @@ function JoinCodeMenu({
   const handleCopyToClipboard = (join_code: string) => {
     const host = window.location.host;
     navigator.clipboard.writeText(
-      `${host}/${i18next.language}/courses/join?code=${join_code}`
+      `${host}/${i18next.resolvedLanguage}/courses/join?code=${join_code}`
     );
   };
 
