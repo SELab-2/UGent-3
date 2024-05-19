@@ -86,7 +86,7 @@ class ProjectsEndpoint(Resource):
         using flask_restfull parse lib
         """
         project_json = parse_project_params()
-        print(project_json)
+
         if not is_teacher_of_course(teacher_id, project_json["course_id"]):
             return {"message":"You are not the teacher of this course"}, 403
 
