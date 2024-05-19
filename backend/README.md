@@ -27,20 +27,19 @@ the regular base application.
 The project requires a couple of environment variables to run, if you want to develop on this codebase.
 Setting values for these variables can be done with a method to your own liking.
 
-| Variable                               | Description                                                                            |
-|----------------------------------------|----------------------------------------------------------------------------------------|
-| DB_HOST                                | URL to the database's host                                                             |
-| POSTGRES_USER                          | Name of the user, needed to login to the postgres database                             |
-| POSTGRES_PASSWORD                      | Password of the user, needed to login to the postgres database                         |
-| POSTGRES_HOST                          | IP adress of the postgres database                                                     |
-| POSTGRES_DB                            | Name of the postgres database                                                          |
-| API_HOST                               | Location of the API root                                                               |
-| CLIENT_ID                              | [Client id](https://learn.microsoft.com/nl-nl/entra/identity-platform/v2-protocols)    |
-| CLIENT_SECRET                          | Client's secret                                                                        |
-| CODE_VERIFIER                          | Code verifier                                                                          |
-| JWT_SECRET_KEY                         | JWT secret key                                                                         |                       
-| TENANT_ID                              | [Tenant id](https://learn.microsoft.com/nl-nl/entra/fundamentals/whatis)               |                     
-| HOMEPAGE_URL                           | URL of where the website's homepage is located                                         |
+| Variable                               | Description                                                                                                                               |
+|----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| POSTGRES_USER                          | Name of the user, needed to login to the postgres database                                                                                |
+| POSTGRES_PASSWORD                      | Password of the user, needed to login to the postgres database                                                                            |
+| POSTGRES_HOST                          | IP adress of the postgres database                                                                                                        |
+| POSTGRES_DB                            | Name of the postgres database                                                                                                             |
+| API_HOST                               | Location of the API root                                                                                                                  |
+| CLIENT_ID                              | [Client id](https://learn.microsoft.com/nl-nl/entra/identity-platform/v2-protocols)                                                       |
+| CLIENT_SECRET                          | Client's secret is your personal secret key for authentication                                                                            |
+| CODE_VERIFIER                          | Code verifier used to verify your personal code in the microsoft application                                                              |
+| JWT_SECRET_KEY                         | JWT secret key is used for security reasons for the microsoft application                                                                 |                       
+| TENANT_ID                              | [Tenant id](https://learn.microsoft.com/nl-nl/entra/fundamentals/whatis), an ID that is used to identify yourself to the microsoft servic |                     
+| HOMEPAGE_URL                           | URL of where the website's homepage is located                                                                                            |
 
 All the variables except the last one are for the database setup,
 these are needed to make a connection with the database.
