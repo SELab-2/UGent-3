@@ -7,6 +7,7 @@ from urllib.parse import urljoin
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from shutil import rmtree
+from dataclasses import fields
 from flask import request
 from flask_restful import Resource
 from sqlalchemy import exc, and_
@@ -43,7 +44,7 @@ class SubmissionsEndpoint(Resource):
             "url": BASE_URL
         }
         filters = dict(request.args)
-        print(filters)
+
         try:
             # Check the uid query parameter
             user_id = filters.get("uid")
@@ -59,14 +60,11 @@ class SubmissionsEndpoint(Resource):
                     return data, 400
                 filters["project_id"] = int(project_id)
 
-            if set(filters.keys()) - {
-                "grading",
-                "submission_id",
-                "uid",
-                "project_id",
-                "submission_time"}:
-                data["message"] = "Invalid data field given."
-                return data, 400
+            filters = {
+                key: value for key, value
+                in filters.items()
+                if key in {f.name for f in fields(Submission)}
+            }
 
             # Get the courses
             courses = Course.query.filter_by(teacher=uid).\
