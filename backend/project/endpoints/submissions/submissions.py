@@ -52,8 +52,6 @@ class SubmissionsEndpoint(Resource):
                 return data, 400
 
             # Check the project_id query parameter
-            print("hier tests")
-            print(filters)
             project_id = filters.get("project_id")
             if project_id:
                 if not project_id.isdigit():
