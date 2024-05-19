@@ -43,6 +43,7 @@ class SubmissionsEndpoint(Resource):
             "url": BASE_URL
         }
         filters = dict(request.args)
+        print(filters)
         try:
             # Check the uid query parameter
             user_id = filters.get("uid")
@@ -51,12 +52,18 @@ class SubmissionsEndpoint(Resource):
                 return data, 400
 
             # Check the project_id query parameter
+            print("hier tests")
+            print(filters)
             project_id = filters.get("project_id")
             if project_id:
                 if not project_id.isdigit():
                     data["message"] = f"Invalid project (project_id={project_id})"
                     return data, 400
                 filters["project_id"] = int(project_id)
+
+            if set(filters.keys()) - {"grading", "submission_id", "uid", "project_id", "submission_time"}:
+                data["message"] = "Invalid data field given."
+                return data, 400
 
             # Get the courses
             courses = Course.query.filter_by(teacher=uid).\

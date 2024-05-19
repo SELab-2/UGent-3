@@ -118,7 +118,7 @@ class TestEndpoint:
 
         response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
         if wrong_parameter:
-            assert wrong_parameter == (response.status_code == 200)
+            assert wrong_parameter == (response.status_code != 200)
 
         if not wrong_parameter:
             assert response.json["data"] == []

@@ -44,6 +44,10 @@ class SubmissionEndpoint(Resource):
                     data["message"] = f"Submission (submission_id={submission_id}) not found"
                     return data, 404
 
+                if set(request.form.keys()) - {"grading", "submission_id", "uid", "project_id", "submission_time"}:
+                    data["message"] = "Invalid data field given."
+                    return data, 400
+
                 return {
                     "data": {
                         "submission_id": urljoin(f"{BASE_URL}/",  str(submission.submission_id)),
