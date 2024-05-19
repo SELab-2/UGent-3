@@ -60,6 +60,8 @@ services:
     build: 
       context: ./backend
       dockerfile: Dockerfile
+    volumes:
+      - ./backend/UPLOAD_FOLDER/:/UPLOAD_FOLDER/:rw
     ports:
       - 5000:5000
   database:
