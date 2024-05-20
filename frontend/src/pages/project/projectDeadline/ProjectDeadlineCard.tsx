@@ -1,10 +1,10 @@
-import {CardActionArea, Card, CardContent, Typography, Box, Button} from '@mui/material';
-import {Link } from "react-router-dom";
+import {CardActionArea, Card, CardContent, Link, Typography, Box, Button} from '@mui/material';
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import {ProjectDeadline} from "./ProjectDeadline.tsx";
 import React from "react";
 import { useNavigate } from 'react-router-dom';
+import i18next from 'i18next';
 
 interface ProjectCardProps{
   deadlines:ProjectDeadline[],
@@ -19,7 +19,6 @@ interface ProjectCardProps{
  */
 export const ProjectDeadlineCard: React.FC<ProjectCardProps> = ({  deadlines, showCourse = true }) => {
   const { t } = useTranslation('translation', { keyPrefix: 'student' });
-  const { i18n } = useTranslation();
   const navigate = useNavigate();
 
   //list of the corresponding assignment
@@ -28,10 +27,12 @@ export const ProjectDeadlineCard: React.FC<ProjectCardProps> = ({  deadlines, sh
       {deadlines.map((project, index) => (
        
         <Card key={index} style={{margin: '10px 0'}}>
-          <CardActionArea component={Link} to={`/${i18n.language}/projects/${project.project_id}`}>
+          <CardActionArea LinkComponent={Link} href={`/${i18next.resolvedLanguage}/projects/${project.project_id}`}>
             <CardContent>
               <Typography variant="h6" style={{color: project.short_submission ?
-                (project.short_submission.submission_status === 'SUCCESS' ? 'green' : 'red') : '#686868'}}>
+                (project.short_submission.submission_status === 'SUCCESS' ? 'green' : 
+                  (project.short_submission.submission_status === 'RUNNING' ? '#686868' : 'red')
+                ) : '#686868'}}>
                 {project.title}
               </Typography>
               {showCourse && (
@@ -46,7 +47,7 @@ export const ProjectDeadlineCard: React.FC<ProjectCardProps> = ({  deadlines, sh
                     onClick={(event) => {
                       event.stopPropagation(); // stops the event from reaching CardActionArea
                       event.preventDefault();
-                      navigate(`/${i18n.language}/courses/${project.course.course_id}`)
+                      navigate(`/${i18next.resolvedLanguage}/courses/${project.course.course_id}`)
                     }}
                   >
                     {project.course.name}

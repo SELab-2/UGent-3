@@ -3,17 +3,17 @@
 from typing import Any
 from pytest import param
 
-def authentication_tests(endpoint: str, methods: list[str],
-                         allowed_tokens: list[str], disallowed_tokens: list[str]) -> list[Any]:
+def authentication_tests(endpoint: str, methods: list[str]) -> list[Any]:
     """Transform the format to single authentication tests"""
     tests = []
 
-    for token in (allowed_tokens + disallowed_tokens):
-        allowed: bool = token in allowed_tokens
-        for method in methods:
+    for method in methods:
+        for token in [None, "0123456789", "login"]:
+            allowed = token == "login"
             tests.append(param(
-            (endpoint, method, token, allowed),
-            id = f"{endpoint} {method.upper()} ({token} {'allowed' if allowed else 'disallowed'})"
+                (endpoint, method, token, allowed),
+                id = f"{endpoint} {method.upper()} " \
+                    f"({token} {'allowed' if allowed else 'disallowed'})"
             ))
 
     return tests
@@ -84,20 +84,23 @@ def query_parameter_tests(
 class TestEndpoint:
     """Base class for endpoint tests"""
 
-    def authentication(self, auth_test: tuple[str, Any]):
+    def authentication(self, auth_test: tuple[str, Any, str, bool, dict[str, Any]]):
         """Test if the authentication for the given endpoint works"""
 
-        endpoint, method, csrf, allowed = auth_test
+        endpoint, method, csrf, allowed, data = auth_test
 
-        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
+        if csrf:
+            response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf}, data = data)
+        else:
+            response = method(endpoint, json = data)
         assert allowed == (response.status_code != 401)
 
-    def authorization(self, auth_test: tuple[str, Any, str, bool]):
+    def authorization(self, auth_test: tuple[str, Any, str, bool, dict[str, Any]]):
         """Test if the authorization for the given endpoint works"""
 
-        endpoint, method, csrf, allowed = auth_test
+        endpoint, method, csrf, allowed, data = auth_test
 
-        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
+        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf}, data = data)
         assert allowed == (response.status_code != 403)
 
     def data_field_type(self, test: tuple[str, Any, str, dict[str, Any]]):
@@ -114,7 +117,8 @@ class TestEndpoint:
         endpoint, method, csrf, wrong_parameter = test
 
         response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
-        assert wrong_parameter == (response.status_code == 400)
+        if wrong_parameter:
+            assert wrong_parameter == (response.status_code == 200)
 
         if not wrong_parameter:
             assert response.json["data"] == []

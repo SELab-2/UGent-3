@@ -9,6 +9,8 @@ from urllib.parse import urljoin
 from flask import Response, stream_with_context
 from flask_restful import Resource
 from project.models.submission import Submission
+from project.utils.authentication import authorize_submission_request
+from project.db_in import db
 
 API_HOST = getenv("API_HOST")
 UPLOAD_FOLDER = getenv("UPLOAD_FOLDER")
@@ -18,11 +20,12 @@ class SubmissionDownload(Resource):
     """
     Resource to download a submission.
     """
+    @authorize_submission_request
     def get(self, submission_id: int):
         """
         Download a submission as a zip file.
         """
-        submission = Submission.query.get(submission_id)
+        submission = db.session.get(Submission, submission_id)
         if submission is None:
             return {
                 "message": f"Submission (submission_id={submission_id}) not found",

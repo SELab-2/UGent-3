@@ -21,16 +21,13 @@ class TestCourseEndpoint(TestEndpoint):
     ### AUTHENTICATION ###
     # Where is login required
     authentication_tests = \
-        authentication_tests("/courses", ["get", "post"], ["login"], ["0123456789", ""]) + \
-        authentication_tests("/courses/@course_id", ["get", "patch", "delete"],
-                             ["login"], ["0123456789", ""]) + \
-        authentication_tests("/courses/@course_id/students", ["get", "post", "delete"],
-                             ["login"], ["0123456789", ""]) + \
-        authentication_tests("/courses/@course_id/admins", ["get", "post", "delete"],
-                             ["login"], ["0123456789", ""])
+        authentication_tests("/courses", ["get", "post"]) + \
+        authentication_tests("/courses/@course_id", ["get", "patch", "delete"]) + \
+        authentication_tests("/courses/@course_id/students", ["get", "post", "delete"]) + \
+        authentication_tests("/courses/@course_id/admins", ["get", "post", "delete"])
 
     @mark.parametrize("auth_test", authentication_tests, indirect=True)
-    def test_authentication(self, auth_test: tuple[str, Any]):
+    def test_authentication(self, auth_test: tuple[str, Any, str, bool, dict[str, Any]]):
         """Test the authentication"""
         super().authentication(auth_test)
 
@@ -71,7 +68,7 @@ class TestCourseEndpoint(TestEndpoint):
             ["student", "student_other", "teacher_other", "admin", "admin_other"])
 
     @mark.parametrize("auth_test", authorization_tests, indirect=True)
-    def test_authorization(self, auth_test: tuple[str, Any, str, bool]):
+    def test_authorization(self, auth_test: tuple[str, Any, str, bool, dict[str, Any]]):
         """Test the authorization"""
         super().authorization(auth_test)
 
@@ -115,7 +112,7 @@ class TestCourseEndpoint(TestEndpoint):
     ### QUERY PARAMETER ###
     # Test a query parameter, should return [] for wrong values
     query_parameter_tests = \
-        query_parameter_tests("/courses", "get", "student", [f.name for f in fields(Course)])
+        query_parameter_tests("/courses", "get", "teacher", [f.name for f in fields(Course)])
 
     @mark.parametrize("query_parameter_test", query_parameter_tests, indirect=True)
     def test_query_parameters(self, query_parameter_test: tuple[str, Any, str, bool]):
@@ -127,7 +124,7 @@ class TestCourseEndpoint(TestEndpoint):
     ### COURSES ###
     def test_get_courses(self, client: FlaskClient, courses: list[Course]):
         """Test getting all courses"""
-        csrf = get_csrf_from_login(client, "student")
+        csrf = get_csrf_from_login(client, "teacher")
         response = client.get("/courses", headers = {"X-CSRF-TOKEN":csrf})
         assert response.status_code == 200
         data = [course["name"] for course in response.json["data"]]
@@ -222,7 +219,6 @@ class TestCourseEndpoint(TestEndpoint):
             }
         )
         assert response.status_code == 201
-        csrf = get_csrf_from_login(client, "student")
         response = client.get("/courses?name=test", headers = {"X-CSRF-TOKEN":csrf})
         assert response.status_code == 200
         data = response.json["data"][0]

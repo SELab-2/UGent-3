@@ -15,14 +15,14 @@ import {
   TableBody, Paper,
   Tooltip, IconButton, Tabs, Tab,
 } from "@mui/material";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useTransition} from "react";
 import JSZip from 'jszip';
 import {useTranslation} from "react-i18next";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeadlineCalender from "../Calender/DeadlineCalender.tsx";
 import { Deadline } from "../../types/deadline";
 import {InfoOutlined} from "@mui/icons-material";
-import {Link, useLoaderData, useLocation} from "react-router-dom";
+import {Link, useLoaderData, useLocation, useNavigate} from "react-router-dom";
 import FolderDragDrop from "../FolderUpload/FolderUpload.tsx";
 import TabPanel from "@mui/lab/TabPanel";
 import {TabContext} from "@mui/lab";
@@ -30,6 +30,7 @@ import FileStuctureForm from "./FileStructureForm.tsx";
 import AdvancedRegex from "./AdvancedRegex.tsx";
 import RunnerSelecter from "./RunnerSelecter.tsx";
 import { authenticatedFetch } from "../../utils/authenticated-fetch.ts";
+import i18next from "i18next";
 
 interface Course {
   course_id: string;
@@ -54,6 +55,7 @@ export default function ProjectForm() {
 
   // all the stuff needed for submitting a project
   const [title, setTitle] = useState('');
+  const [, setTransition] = useTransition();
   const [titleError, setTitleError] = useState(false);
 
   const [description, setDescription] = useState('');
@@ -77,12 +79,15 @@ export default function ProjectForm() {
   const [runner, setRunner] = useState<string>('');
   const [validRunner, setValidRunner] = useState(true);
   const [validSubmission, setValidSubmission] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const courses = useLoaderData() as Course[]
 
   const [courseId, setCourseId] = useState<string>('');
   const [courseName, setCourseName] = useState<string>('');
   const location = useLocation();
+
+  const navigate = useNavigate();
 
   useEffect(() =>{
     const urlParams = new URLSearchParams(location.search);
@@ -142,9 +147,18 @@ export default function ProjectForm() {
 
     if (runner === "CUSTOM") {
       setValidRunner(constainsDocker);
+      if (!constainsDocker) {
+        setErrorMessage(t("faultySubmission"));
+      }
       setValidSubmission(constainsDocker);
-    } else {
+    } else if(runner === ''){
+      setValidRunner(true);
+    }
+    else {
       setValidRunner(containsRuntest);
+      if(!containsRuntest) {
+        setErrorMessage(t("faultySubmission"));
+      }
       setValidSubmission(containsRuntest);
     }
   }
@@ -177,6 +191,7 @@ export default function ProjectForm() {
 
     if (!assignmentFile || !validRunner) {
       setValidSubmission(false);
+      setErrorMessage(t("faultySubmission"));
       return;
     }
 
@@ -212,8 +227,20 @@ export default function ProjectForm() {
     })
 
     if (!response.ok) {
-      throw new Error(t("uploadError"));
+      setValidSubmission(false);
+      if (response.status === 403) {
+        setErrorMessage(t("unauthorized"));
+      }
+      else {
+        setErrorMessage(t("submissionError"));
+      }
+      return;
     }
+
+    response.json().then((data) => {
+      const projectData = data.data;
+      navigate(`/${i18next.resolvedLanguage}/projects/${projectData.project_id}`);
+    })
   }
 
   const handleCourseChange = (e: SelectChangeEvent<string>) => {
@@ -257,7 +284,11 @@ export default function ProjectForm() {
               label={t("projectTitle")}
               placeholder={t("projectTitle")}
               error={titleError}
-              onChange={event => setTitle(event.target.value)}
+              onChange={event => {
+                setTransition(() => {
+                  setTitle(event.target.value);
+                })
+              }}
             />
           </Grid>
           <Grid item>
@@ -270,7 +301,11 @@ export default function ProjectForm() {
               multiline
               rows={4}
               error={descriptionError}
-              onChange={event => setDescription(event.target.value)}
+              onChange={event => {
+                setTransition(() => {
+                  setDescription(event.target.value);
+                })
+              }}
             />
           </Grid>
           <Grid item>
@@ -422,7 +457,7 @@ export default function ProjectForm() {
             {
               !validSubmission && (
                 <Typography style={{color: 'red', paddingTop: "20px" }}>
-                  {t("faultySubmission")} ⚠️
+                  {errorMessage} ⚠️
                 </Typography>
               )
             }

@@ -12,8 +12,7 @@ import {
 } from "@mui/material";
 import {
   Course,
-  Project,
-  apiHost,
+  ProjectDetail,
   getIdFromLink,
   getNearestFutureDate,
 } from "./CourseUtils";
@@ -21,7 +20,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import debounce from "debounce";
-import { authenticatedFetch } from "../../utils/authenticated-fetch";
+import i18next from "i18next";
 
 /**
  * @param text - The text to be displayed
@@ -78,9 +77,10 @@ export function SearchBox({
  * @returns A component to display courses in horizontal scroller where each course is a card containing its name.
  */
 export function SideScrollableCourses({
-  courses,
+  courses,projects
 }: {
   courses: Course[];
+  projects: {[courseId: string]: ProjectDetail[];};
 }): JSX.Element {
   //const navigate = useNavigate();
   const location = useLocation();
@@ -99,9 +99,6 @@ export function SideScrollableCourses({
   const [uforaIdFilter, setUforaIdFilter] = useState(initialUforaIdFilter);
   const [teacherNameFilter, setTeacherNameFilter] = useState(
     initialTeacherNameFilter
-  );
-  const [projects, setProjects] = useState<{ [courseId: string]: Project[] }>(
-    {}
   );
 
   const debouncedHandleSearchChange = useMemo(
@@ -149,28 +146,6 @@ export function SideScrollableCourses({
     setTeacherNameFilter(newTeacherNameFilter);
   };
 
-  useEffect(() => {
-    // Fetch projects for each course
-    const fetchProjects = async () => {
-      const projectPromises = courses.map((course) =>
-        authenticatedFetch(
-          `${apiHost}/projects?course_id=${getIdFromLink(course.course_id)}`
-        ).then((response) => response.json())
-      );
-
-      const projectResults = await Promise.all(projectPromises);
-      const projectsMap: { [courseId: string]: Project[] } = {};
-
-      projectResults.forEach((result, index) => {
-        projectsMap[getIdFromLink(courses[index].course_id)] = result.data;
-      });
-
-      setProjects(projectsMap);
-    };
-
-    fetchProjects();
-  }, [courses]);
-
   const filteredCourses = courses.filter(
     (course) =>
       course.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -216,7 +191,7 @@ function EmptyOrNotFilteredCourses({
   projects,
 }: {
   filteredCourses: Course[];
-  projects: { [courseId: string]: Project[] };
+  projects: { [courseId: string]: ProjectDetail[] };
 }): JSX.Element {
   const { t } = useTranslation("translation", {
     keyPrefix: "courseDetailTeacher",
@@ -286,9 +261,10 @@ function EmptyOrNotProjects({
   projects,
   noProjectsText,
 }: {
-  projects: Project[];
+  projects: ProjectDetail[];
   noProjectsText: string;
 }): JSX.Element {
+  const lang = i18next.resolvedLanguage;
   if (projects === undefined || projects.length === 0) {
     return (
       <Typography
@@ -304,21 +280,22 @@ function EmptyOrNotProjects({
       <>
         {projects.slice(0, 3).map((project) => {
           let timeLeft = "";
-          if (project.deadlines != undefined) {
-            const deadlineDate = getNearestFutureDate(project.deadlines);
-            if (deadlineDate == null) {
-              return <></>;
-            }
-            const diffTime = Math.abs(deadlineDate.getTime() - now.getTime());
-            const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-            const diffDays = Math.ceil(diffHours * 24);
+          if (project.deadlines.length > 0) {
+            const deadline = getNearestFutureDate(project.deadlines);
+            if (deadline !== null) {
+              const deadlineDate = deadline.date;
+              const diffTime = Math.abs(deadlineDate.getTime() - now.getTime());
+              const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+              const diffDays = Math.ceil(diffHours * 24);
 
-            timeLeft = diffDays > 1 ? `${diffDays} days` : `${diffHours} hours`;
+              timeLeft =
+                diffDays > 1 ? `${diffDays} days` : `${diffHours} hours`;
+            }
           }
           return (
             <Grid item key={project.project_id}>
-              <Link
-                to={`/projects/${getIdFromLink(project.project_id)}`}
+              <Link 
+                to={`/${lang}/projects/${getIdFromLink(project.project_id)}`}
                 style={{ textDecoration: "none", color: "inherit" }}
               >
                 <EpsilonTypography

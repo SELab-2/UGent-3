@@ -13,13 +13,21 @@ export async function synchronizeJoinCode() {
   const joinCode = queryParams.get("code");
 
   if (joinCode) {
-    const response = await authenticatedFetch(new URL("/courses/join", API_URL));
+    const response = await authenticatedFetch(
+      `${API_URL}/courses/join`,{
+        method: "POST",
+        body: JSON.stringify({ join_code: joinCode }),
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
-    if (response.ok) {
+    if (response.ok || response.status === 409) {
       const responseData = await response.json();
       return redirect(
         `/${i18next.language}/courses/${responseData.data.course_id}`
       );
+    } else {
+      throw new Error("Invalid join code");
     }
   } else {
     throw new Error("No join code provided");
