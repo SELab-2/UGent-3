@@ -33,7 +33,7 @@ Setting values for these variables can be done with a method to your own liking.
 
 | Variable               | Description                                                                         |
 |------------------------|-------------------------------------------------------------------------------------|
-| VITE_API_HOST          | Url where the api is located                                                        |
+| VITE_API_HOST          | URL of the API                                     |
 | VITE_APP_TENANT_ID     | [Tenant id](https://learn.microsoft.com/nl-nl/entra/fundamentals/whatis)            |
 | VITE_APP_CLIENT_ID     | [Client id](https://learn.microsoft.com/nl-nl/entra/identity-platform/v2-protocols) |                                                          |
 | VITE_APP_CODE_VERIFIER | Verifier code                                                                       |
