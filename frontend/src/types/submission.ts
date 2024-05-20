@@ -3,4 +3,5 @@ export interface Submission {
   submission_time: string;
   submission_status: string;
   uid: string;
+  grading: number;
 }
