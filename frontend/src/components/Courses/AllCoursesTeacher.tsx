@@ -14,7 +14,7 @@ export function AllCoursesTeacher(): JSX.Element {
   const [open, setOpen] = useState(false);
   const loader = useLoaderData() as {
     courses: Course[];
-    projects: { [courseId: string]: ProjectDetail[] }
+    projects: { [courseId: string]: ProjectDetail[] };
   };
   const courses = loader.courses;
   const projects = loader.projects;
