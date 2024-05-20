@@ -63,7 +63,7 @@ class SubmissionsEndpoint(Resource):
             filters = {
                 key: value for key, value
                 in filters.items()
-                if key in {f.name for f in fields(Submission)}
+                if key in model.__table__.columns
             }
 
             # Get the courses
