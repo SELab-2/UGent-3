@@ -7,6 +7,7 @@ parameters can be either one of the following: teacher,ufora_id,name.
 
 from os import getenv
 from urllib.parse import urljoin
+from dataclasses import fields
 from dotenv import load_dotenv
 
 from flask import request
@@ -38,8 +39,11 @@ class CourseForUser(Resource):
         """
 
         try:
-
-            filter_params = request.args.to_dict()
+            filter_params = {
+                key: value for key, value
+                in request.args.to_dict().items()
+                if key in {f.name for f in fields(Course)}
+            }
 
             # Start with a base query
             base_query = select(Course)
@@ -47,8 +51,8 @@ class CourseForUser(Resource):
             # Apply filters dynamically if they are provided
             for param, value in filter_params.items():
                 if value:
-                    attribute = getattr(Course, param, None)
-                    if attribute:
+                    if param in Course.__table__.columns:
+                        attribute = getattr(Course, param)
                         base_query = base_query.filter(attribute == value)
 
             # Define the role-specific queries

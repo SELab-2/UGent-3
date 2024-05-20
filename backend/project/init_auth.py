@@ -5,6 +5,8 @@ from datetime import timedelta, timezone, datetime
 
 from flask_jwt_extended import get_jwt, get_jwt_identity,\
       create_access_token, set_access_cookies
+from .utils.models.user_utils import get_user
+from .models.user import Role
 
 def auth_init(jwt, app):
     """
@@ -43,11 +45,13 @@ def auth_init(jwt, app):
             now = datetime.now(timezone.utc)
             target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
             if target_timestamp > exp_timestamp:
+                uid = get_jwt_identity()
+                user = get_user(uid)
                 access_token = create_access_token(
-                    identity=get_jwt_identity(),
+                    identity=uid,
                     additional_claims=
-                        {"is_admin":get_jwt()["is_admin"],
-                        "is_teacher":get_jwt()["is_teacher"]}
+                        {"is_admin":user.role==Role.ADMIN,
+                        "is_teacher":user.role==Role.TEACHER}
                     )
                 set_access_cookies(response, access_token)
             return response

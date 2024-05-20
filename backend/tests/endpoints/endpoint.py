@@ -69,7 +69,7 @@ def query_parameter_tests(
     new_endpoint = endpoint + "?parameter=0"
     tests.append(param(
         (new_endpoint, method, token, True),
-        id = f"{new_endpoint} {method.upper()} {token} (parameter 0 500)"
+        id = f"{new_endpoint} {method.upper()} {token} (parameter 0 400)"
     ))
 
     for parameter in parameters:
@@ -84,23 +84,23 @@ def query_parameter_tests(
 class TestEndpoint:
     """Base class for endpoint tests"""
 
-    def authentication(self, auth_test: tuple[str, Any, str, bool]):
+    def authentication(self, auth_test: tuple[str, Any, str, bool, dict[str, Any]]):
         """Test if the authentication for the given endpoint works"""
 
-        endpoint, method, csrf, allowed = auth_test
+        endpoint, method, csrf, allowed, data = auth_test
 
         if csrf:
-            response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
+            response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf}, data = data)
         else:
-            response = method(endpoint)
+            response = method(endpoint, json = data)
         assert allowed == (response.status_code != 401)
 
-    def authorization(self, auth_test: tuple[str, Any, str, bool]):
+    def authorization(self, auth_test: tuple[str, Any, str, bool, dict[str, Any]]):
         """Test if the authorization for the given endpoint works"""
 
-        endpoint, method, csrf, allowed = auth_test
+        endpoint, method, csrf, allowed, data = auth_test
 
-        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf})
+        response = method(endpoint, headers = {"X-CSRF-TOKEN":csrf}, data = data)
         assert allowed == (response.status_code != 403)
 
     def data_field_type(self, test: tuple[str, Any, str, dict[str, Any]]):
