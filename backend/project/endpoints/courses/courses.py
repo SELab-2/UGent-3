@@ -39,14 +39,11 @@ class CourseForUser(Resource):
         """
 
         try:
-            filter_params = request.args.to_dict()
-
-            invalid_params = set(filter_params.keys()) - {f.name for f in fields(Course)}
-            if invalid_params:
-                return {
-                    "url": RESPONSE_URL,
-                    "message": f"Invalid query parameters {invalid_params}"
-                }, 400
+            filter_params = {
+                key: value for key, value
+                in request.args.to_dict().items()
+                if key in {f.name for f in fields(Course)}
+            }
 
             # Start with a base query
             base_query = select(Course)

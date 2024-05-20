@@ -158,7 +158,7 @@ class TestSubmissionsEndpoint(TestEndpoint):
             headers = {"X-CSRF-TOKEN":get_csrf_from_login(client, "student")},
             data = {"project_id":"zero", "files": file_no_name}
         )
-        assert response.status_code == 200
+        assert response.status_code == 400
 
 
 
