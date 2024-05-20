@@ -28,7 +28,7 @@ parser.add_argument(
     help='Projects visibility for students',
     location="form"
 )
-parser.add_argument("archived", type=bool, help='Projects', location="form")
+parser.add_argument("archived", type=str, help='Projects', location="form")
 parser.add_argument(
     "regex_expressions",
     type=str,
@@ -61,6 +61,8 @@ def parse_project_params():
                         )
                     )
                 result_dict[key] = new_deadlines
+            elif "archived" == key:
+                result_dict[key] = True if value == "true" else False
             else:
                 result_dict[key] = value
 

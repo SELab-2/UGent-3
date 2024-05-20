@@ -23,7 +23,6 @@ import { synchronizeJoinCode } from "./loaders/join-code.ts";
 import { fetchMe } from "./utils/fetches/FetchMe.ts";
 import {fetchProjectForm} from "./components/ProjectForm/project-form.ts";
 import loadSubmissionOverview from "./loaders/submission-overview-loader.ts";
-import ProjectAdminView from "./pages/project/projectAdminView/projectAdminView.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -52,7 +51,6 @@ const router = createBrowserRouter(
             path=":projectId/overview"
             element={<SubmissionsOverview />}
           />
-          <Route element={<ProjectAdminView />} path=":projectId/admin"></Route>
           <Route path=":projectId" element={<ProjectView />}></Route>
           <Route path="create" element={<ProjectCreateHome />} loader={fetchProjectForm}/>
         </Route>
