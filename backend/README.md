@@ -36,7 +36,6 @@ Setting values for these variables can be done with a method to your own liking.
 | API_HOST                               | Location of the API root                                                                                                                  |
 | CLIENT_ID                              | [Client id](https://learn.microsoft.com/nl-nl/entra/identity-platform/v2-protocols)                                                       |
 | CLIENT_SECRET                          | Client's secret is your personal secret key for authentication                                                                            |
-| CODE_VERIFIER                          | Code verifier used to verify your personal code in the microsoft application                                                              |
 | JWT_SECRET_KEY                         | JWT secret key is used for security reasons for the microsoft application                                                                 |                       
 | TENANT_ID                              | [Tenant id](https://learn.microsoft.com/nl-nl/entra/fundamentals/whatis), an ID that is used to identify yourself to the microsoft servic |                     
 | HOMEPAGE_URL                           | URL of where the website's homepage is located                                                                                            |
