@@ -18,7 +18,9 @@ i18n
     detection: detectionOptions,
     interpolation: {
       escapeValue: false,
-    }
+    },
+    supportedLngs: ['en', 'nl'],
+    nonExplicitSupportedLngs: true
   });
 
 export default i18n;
