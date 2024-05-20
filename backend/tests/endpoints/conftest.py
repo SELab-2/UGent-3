@@ -15,28 +15,31 @@ from project.models.course import Course
 from project.models.course_relation import CourseStudent, CourseAdmin
 from project.models.course_share_code import CourseShareCode
 from project.models.submission import Submission, SubmissionStatus
-from project.models.project import Project
+from project.models.project import Project, Runner
 
 ### AUTHENTICATION & AUTHORIZATION ###
 @fixture
-def data_map(course: Course) -> dict[str, Any]:
+def data_map(course: Course, project: Project, submission: Submission) -> dict[str, Any]:
     """Map an id to data"""
     return {
-        "@course_id": course.course_id
+        "@course_id": course.course_id,
+        "@project_id": project.project_id,
+        "@submission_id": submission.submission_id
     }
 
 @fixture
 def auth_test(
         request: FixtureRequest, client: FlaskClient, data_map: dict[str, Any]
-    ) -> tuple[str, Any, str, bool]:
+    ) -> tuple[str, Any, str, bool, dict[str, Any]]:
     """Add concrete test data to auth"""
     endpoint, method, token, allowed = request.param
 
-    for k, v in data_map.items():
-        endpoint = endpoint.replace(k, str(v))
+    for key, value in data_map.items():
+        endpoint = endpoint.replace(key, str(value))
     csrf = get_csrf_from_login(client, token) if token else None
+    data = {k.strip("@"):v for k, v in data_map.items()}
 
-    return endpoint, getattr(client, method), csrf, allowed
+    return endpoint, getattr(client, method), csrf, allowed, data
 
 
 
@@ -122,6 +125,68 @@ def course(session: Session, student: User, teacher: User, admin: User) -> Cours
     return course
 
 
+### PROJECTS ###
+@fixture
+def project(session: Session, course: Course):
+    """Return a project entry"""
+    project = Project(
+        title="Test project",
+        description="Test project",
+        deadlines=[{"deadline":"2024-05-23T21:59:59", "description":"Final deadline"}],
+        course_id=course.course_id,
+        visible_for_students=True,
+        archived=False,
+        runner=Runner.GENERAL,
+        regex_expressions=[".*.pdf"]
+    )
+    session.add(project)
+    session.commit()
+    return project
+
+
+
+### SUBMISSIONS ###
+@fixture
+def submission(session: Session, student: User, project: Project):
+    """Return a submission entry"""
+    submission = Submission(
+        uid=student.uid,
+        project_id=project.project_id,
+        submission_time=datetime(2024,5,23,22,00,00,tzinfo=ZoneInfo("GMT")),
+        submission_path="/1",
+        submission_status= SubmissionStatus.SUCCESS
+    )
+    session.add(submission)
+    session.commit()
+    return submission
+
+### FILES ###
+@fixture
+def file_empty():
+    """Return an empty file"""
+    descriptor, name = tempfile.mkstemp()
+    with open(descriptor, "rb") as temp:
+        yield temp, name
+
+@fixture
+def file_no_name():
+    """Return a file with no name"""
+    descriptor, name = tempfile.mkstemp()
+    with open(descriptor, "w", encoding="UTF-8") as temp:
+        temp.write("This is a test file.")
+    with open(name, "rb") as temp:
+        yield temp, ""
+
+@fixture
+def files():
+    """Return a temporary file"""
+    name = "/tmp/test.pdf"
+    with open(name, "w", encoding="UTF-8") as file:
+        file.write("This is a test file.")
+    with open(name, "rb") as file:
+        yield [(file, name)]
+
+
 
 ### OTHER ###
 @pytest.fixture
@@ -192,35 +257,6 @@ def valid_user_entries(session):
     session.commit()
 
     return users
-
-@pytest.fixture
-def file_empty():
-    """Return an empty file"""
-    descriptor, name = tempfile.mkstemp()
-    with open(descriptor, "rb") as temp:
-        yield temp, name
-
-@pytest.fixture
-def file_no_name():
-    """Return a file with no name"""
-    descriptor, name = tempfile.mkstemp()
-    with open(descriptor, "w", encoding="UTF-8") as temp:
-        temp.write("This is a test file.")
-    with open(name, "rb") as temp:
-        yield temp, ""
-
-@pytest.fixture
-def files():
-    """Return a temporary file"""
-    descriptor01, name01 = tempfile.mkstemp()
-    with open(descriptor01, "w", encoding="UTF-8") as temp:
-        temp.write("This is a test file.")
-    descriptor02, name02 = tempfile.mkstemp()
-    with open(descriptor02, "w", encoding="UTF-8") as temp:
-        temp.write("This is a test file.")
-    with open(name01, "rb") as temp01:
-        with open(name02, "rb") as temp02:
-            yield [(temp01, name01), (temp02, name02)]
 
 @pytest.fixture
 def course_teacher_ad():
