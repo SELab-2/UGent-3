@@ -1,21 +1,23 @@
 import {
+  Box,
+  Button,
   Card,
   CardContent,
   CardHeader,
   Container,
   Grid,
-  Link,
   Stack,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
-import { useParams } from "react-router-dom";
+import {useLocation, useParams} from "react-router-dom";
 import SubmissionCard from "./SubmissionCard";
 import { Course } from "../../../types/course";
 import { Title } from "../../../components/Header/Title";
 import { authenticatedFetch } from "../../../utils/authenticated-fetch";
 import i18next from "i18next";
+import {useTranslation} from "react-i18next";
 
 const API_URL = import.meta.env.VITE_APP_API_HOST;
 
@@ -31,6 +33,11 @@ interface Project {
  * and submissions of the current user for that project
  */
 export default function ProjectView() {
+
+  const location = useLocation();
+
+  const { t } = useTranslation('translation', { keyPrefix: 'projectView' });
+
   const { projectId } = useParams<{ projectId: string }>();
   const [projectData, setProjectData] = useState<Project | null>(null);
   const [courseData, setCourseData] = useState<Course | null>(null);
@@ -88,9 +95,9 @@ export default function ProjectView() {
                       <Typography>{projectData.description}</Typography>
                       <Typography flex="1" />
                       {courseData && (
-                        <Link href={`/${i18next.resolvedLanguage}/courses/${courseData.course_id}`}>
-                          <Typography>{courseData.name}</Typography>
-                        </Link>
+                        <Button variant="contained" href={`/${i18next.resolvedLanguage}/courses/${courseData.course_id}`}>
+                          {courseData.name}
+                        </Button>
                       )}
                     </Stack>
                   </>
@@ -110,6 +117,19 @@ export default function ProjectView() {
             submissionUrl={`${API_URL}/submissions`}
             projectId={projectId}
           />
+        </Container>
+      </Grid>
+      <Grid item sm={12}>
+        <Container>
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            p: 1,
+            m: 1,
+            width: '100%'
+          }}>
+            <Button sx={{marginRight: "30px"}} variant="contained" href={location.pathname+"/overview"}>{t("projectOverview")}</Button>
+          </Box>
         </Container>
       </Grid>
     </Grid>

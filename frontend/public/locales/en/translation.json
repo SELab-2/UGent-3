@@ -52,7 +52,7 @@
     "cancel": "Cancel",
     "create": "Create",
     "activeCourses": "Active Courses",
-    "archivedCourses":"Archived Courses"    
+    "archivedCourses": "Archived Courses"
   },
   "courseForm": {
     "courseName": "Course Name",
@@ -72,7 +72,8 @@
       "running": "Running",
       "submitTime": "Time submitted",
       "status": "Status"
-    }
+    },
+    "projectOverview": "Overview"
   },
   "time": {
     "yearsAgo": "years ago",
@@ -127,11 +128,11 @@
     "unauthorized": "You are unauthorized to upload a project for this course",
     "submissionError": "Submission failed, please try again"
   },
-  "student" : {
+  "student": {
     "myProjects": "My Projects",
     "myCourses": "My Courses",
     "deadlines": "Past deadlines",
-    "last_submission" : "Last submission",
+    "last_submission": "Last submission",
     "course": "Course",
     "SUCCESS": "Success",
     "FAIL": "Fail",
@@ -139,7 +140,7 @@
     "LATE": "Late",
     "deadlinesOnDay": "Deadlines on: ",
     "noDeadline": "No deadlines on this day",
-    "no_submission_yet" : "No submission yet",
+    "no_submission_yet": "No submission yet",
     "loading": "Loading...",
     "no_projects": "There are no projects here, sign up for a course to see projects"
   },
