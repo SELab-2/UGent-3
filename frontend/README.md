@@ -50,4 +50,4 @@ If you want to execute the linter on all files in the project it can simply be d
 with the command:
 ```sh
 npm run lint
-``` 
+```
