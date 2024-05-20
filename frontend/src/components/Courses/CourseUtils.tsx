@@ -74,17 +74,6 @@ export function callToApiToCreateCourse(
   })
     .then((response) => response.json())
     .then((data) => {
-      //But first also make sure that teacher is in the course admins list
-      authenticatedFetch(
-        `${apiHost}/courses/${getIdFromLink(data.url)}/admins`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ admin_uid: loggedInUid() }),
-        }
-      );
       navigate(getIdFromLink(data.url)); // navigate to data.url
     });
 }
@@ -235,6 +224,10 @@ const dataLoaderStudents = async (courseId: string) => {
   return fetchData(`courses/${courseId}/students`);
 };
 
+const fetchMes = async (uids: string[]) => {
+  return Promise.all(uids.map((uid) => getUser(uid)));
+}
+
 export const dataLoaderCourseDetail = async ({
   params,
 }: {
@@ -248,5 +241,9 @@ export const dataLoaderCourseDetail = async ({
   const projects = await dataLoaderProjects(courseId);
   const admins = await dataLoaderAdmins(courseId);
   const students = await dataLoaderStudents(courseId);
-  return { course, projects, admins, students };
+  const admin_uids = admins.map((admin: {uid: string}) => getIdFromLink(admin.uid));
+  const student_uids = students.map((student: {uid: string}) => getIdFromLink(student.uid));
+  const adminMes = await fetchMes([course.teacher, ...admin_uids]);
+  const studentMes = await fetchMes(student_uids);
+  return { course, projects, adminMes, studentMes };
 };

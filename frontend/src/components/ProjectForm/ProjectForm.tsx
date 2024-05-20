@@ -239,7 +239,7 @@ export default function ProjectForm() {
 
     response.json().then((data) => {
       const projectData = data.data;
-      navigate(`/${i18next.language}/projects/${projectData.project_id}`);
+      navigate(`/${i18next.resolvedLanguage}/projects/${projectData.project_id}`);
     })
   }
 

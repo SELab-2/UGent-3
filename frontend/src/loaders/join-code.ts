@@ -14,8 +14,7 @@ export async function synchronizeJoinCode() {
 
   if (joinCode) {
     const response = await authenticatedFetch(
-      new URL("/courses/join", API_URL),
-      {
+      `${API_URL}/courses/join`,{
         method: "POST",
         body: JSON.stringify({ join_code: joinCode }),
         headers: { "Content-Type": "application/json" },
