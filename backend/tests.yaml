@@ -45,7 +45,7 @@ services:
       TEST_AUTHENTICATION_URL: http://auth-server:5001 # Use the service name defined in Docker Compose
       AUTH_METHOD: test
       JWT_SECRET_KEY: Test123
-      UPLOAD_URL: /data/assignments
+      UPLOAD_FOLDER: /data/assignments
       DOCS_JSON_PATH: static/OpenAPI_Object.yaml
       DOCS_URL: /docs
     volumes:
