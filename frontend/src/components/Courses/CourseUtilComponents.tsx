@@ -20,6 +20,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import debounce from "debounce";
+import i18next from "i18next";
 
 /**
  * @param text - The text to be displayed
@@ -263,8 +264,7 @@ function EmptyOrNotProjects({
   projects: ProjectDetail[];
   noProjectsText: string;
 }): JSX.Element {
-  const { i18n } = useTranslation();
-  const lang = i18n.language;
+  const lang = i18next.resolvedLanguage;
   if (projects === undefined || projects.length === 0) {
     return (
       <Typography

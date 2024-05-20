@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { Outlet, useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 
 const SUPPORTED_LANGUAGES = ["en", "nl"];
 
@@ -15,11 +16,11 @@ export default function LanguagePath() {
   const navigate = useNavigate();
   const curPath = location.pathname;
   useEffect(() => {
-    if (lang && i18n.resolvedLanguage !== lang) {
+    if (lang && i18next.resolvedLanguage !== lang) {
       if (SUPPORTED_LANGUAGES.includes(lang)) {
-        i18n.changeLanguage(lang);
+        i18next.changeLanguage(lang);
       } else {
-        navigate("/" + i18n.resolvedLanguage + curPath, { replace: true });
+        navigate("/" + i18next.resolvedLanguage + curPath, { replace: true });
       }
     }
   }, [lang, curPath, i18n, navigate]);

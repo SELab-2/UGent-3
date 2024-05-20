@@ -43,12 +43,8 @@ class SubmissionsEndpoint(Resource):
             "url": BASE_URL
         }
         filters = dict(request.args)
-        try:
-            invalid_parameters = set(filters.keys()) - {"uid", "project_id"}
-            if invalid_parameters:
-                data["message"] = f"Invalid query parameter(s) {invalid_parameters}"
-                return data, 400
 
+        try:
             # Check the uid query parameter
             user_id = filters.get("uid")
             if user_id and not isinstance(user_id, str):
@@ -63,6 +59,12 @@ class SubmissionsEndpoint(Resource):
                     return data, 400
                 filters["project_id"] = int(project_id)
 
+            filters = {
+                key: value for key, value
+                in filters.items()
+                if key in Submission.__table__.columns
+            }
+
             # Get the courses
             courses = Course.query.filter_by(teacher=uid).\
                 with_entities(Course.course_id).all()
@@ -73,7 +75,8 @@ class SubmissionsEndpoint(Resource):
             # Filter the courses based on the query parameters
             conditions = []
             for key, value in filters.items():
-                conditions.append(getattr(Submission, key) == value)
+                if key in Submission.__table__.columns:
+                    conditions.append(getattr(Submission, key) == value)
 
             # Get the submissions
             submissions = Submission.query
@@ -87,7 +90,7 @@ class SubmissionsEndpoint(Resource):
             # Return the submissions
             data["message"] = "Successfully fetched the submissions"
             data["data"] = [{
-                "submission_id": urljoin(BASE_URL, str(s.submission_id)),
+                "submission_id": urljoin(f"{API_HOST}/", f"/submissions/{s.submission_id}"),
                 "uid": urljoin(f"{API_HOST}/", f"users/{s.uid}"),
                 "project_id": urljoin(f"{API_HOST}/", f"projects/{s.project_id}"),
                 "grading": s.grading,
@@ -188,7 +191,7 @@ class SubmissionsEndpoint(Resource):
                 data["message"] = "Successfully fetched the submissions"
                 data["url"] = urljoin(f"{API_HOST}/", f"/submissions/{submission.submission_id}")
                 data["data"] = submission_response(submission, API_HOST)
-                return data, 200
+                return data, 201
 
         except exc.SQLAlchemyError:
             session.rollback()

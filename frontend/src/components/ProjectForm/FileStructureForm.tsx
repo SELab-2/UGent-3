@@ -77,8 +77,8 @@ export default function FileStuctureForm({ handleSubmit, regexError } : Props) {
       <TextField
         sx={{minWidth: 650}}
         id="contains"
-        label="contains"
-        placeholder="contains"
+        label={t("contains")}
+        placeholder={t("contains")}
         error={regexError}
         value={contains}
         onChange={e => setContains(e.target.value)}
@@ -88,11 +88,11 @@ export default function FileStuctureForm({ handleSubmit, regexError } : Props) {
         freeSolo
         value={extension}
         onChange={(_event, value) => handleExtensionChange(value)}
-        renderInput={(params) => <TextField {...params} label="file extension" error={regexError} helperText={regexError ? t("helperRegexText") : ''} />}
+        renderInput={(params) => <TextField {...params} label={t('fileExtension')} error={regexError} helperText={regexError ? t("helperRegexText") : ''} />}
         options={extensions.map((t) => t)}
       />
       <Button variant="contained" onClick={() => handleRegexSubmit()}>
-        Add file restriction
+        {t('addRestriction')}
       </Button>
     </Stack>
   )
