@@ -26,21 +26,6 @@ You can choose your own preferred webserver like for example `nginx`, `serve` or
    npm run dev
    ```
 
-## Setting up the environment variables
-
-The project requires a couple of environment variables to run, if you want to develop on this codebase.
-Setting values for these variables can be done with a method to your own liking.
-
-| Variable          | Description                                                              |
-|-------------------|--------------------------------------------------------------------------|
-| VITE_API_HOST           | Url where the api is located                                             |
-| VITE_APP_TENANT_ID    | [Tenant id](https://learn.microsoft.com/nl-nl/entra/fundamentals/whatis) |
-| VITE_APP_CLIENT_ID | [Client id](https://learn.microsoft.com/nl-nl/entra/identity-platform/v2-protocols)                                                            |
-| VITE_APP_CODE_VERIFIER     | Verifier code                                                            | |
-
-If you want more information regarding the .env variables please refer to the
-[Microsoft docs](https://learn.microsoft.com/en-us/entra/)
-
 ## Maintaining the codebase
 ### Writing tests
 When writing new code it is important to maintain the right functionality so 
