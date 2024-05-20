@@ -7,7 +7,6 @@ from urllib.parse import urljoin
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from shutil import rmtree
-from dataclasses import fields
 from flask import request
 from flask_restful import Resource
 from sqlalchemy import exc, and_
@@ -63,7 +62,7 @@ class SubmissionsEndpoint(Resource):
             filters = {
                 key: value for key, value
                 in filters.items()
-                if key in model.__table__.columns
+                if key in Submission.__table__.columns
             }
 
             # Get the courses
