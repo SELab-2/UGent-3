@@ -1,6 +1,5 @@
-import { assertType, describe, expectTypeOf, test } from 'vitest';
-import {Me} from '../../../src/types/me.ts';
+import { describe, test } from "vitest";
 
-describe('Me is properly defined', () => {
-    test.todo('Me.role is string')
-  })
+describe("Me is properly defined", () => {
+  test.todo("Me.role is string");
+});

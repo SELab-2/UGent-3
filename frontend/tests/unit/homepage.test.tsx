@@ -1,7 +1,7 @@
-import {expect, vitest, test} from 'vitest';
+import { vitest, test } from "vitest";
 
-vitest.mock('react-i18next', () => ({
-    useTranslation: () => ({t: (key: any) => key})
+vitest.mock("react-i18next", () => ({
+  useTranslation: () => ({ t: (key: any) => key }),
 }));
 
-test.todo("Homepage test")
+test.todo("Homepage test");

@@ -1,8 +1,7 @@
-import {expect, vitest, test} from 'vitest';
-import {Me} from '../../src/types/me.ts';
+import { vitest, test } from "vitest";
 
-vitest.mock('react-i18next', () => ({
-    useTranslation: () => ({t: (key: any) => key})
+vitest.mock("react-i18next", () => ({
+  useTranslation: () => ({ t: (key: any) => key }),
 }));
 
-test.todo("Header test")
+test.todo("Header test");
