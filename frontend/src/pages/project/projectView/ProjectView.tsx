@@ -6,8 +6,9 @@ import {
   CardHeader,
   Container,
   Fade,
-  Grid,
+  Grid, IconButton,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -23,6 +24,9 @@ import {Me} from "../../../types/me.ts";
 import {fetchMe} from "../../../utils/fetches/FetchMe.ts";
 import DeadlineGrid from "../../../components/DeadlineView/DeadlineGrid.tsx";
 import {Deadline} from "../../../types/deadline.ts";
+import EditIcon from '@mui/icons-material/Edit';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 
 const API_URL = import.meta.env.VITE_APP_API_HOST;
 
@@ -51,6 +55,9 @@ export default function ProjectView() {
   const [assignmentRawText, setAssignmentRawText] = useState<string>("");
   const [deadlines, setDeadlines] = useState<Deadline[]>([]);
   const [alertVisibility, setAlertVisibility] = useState(false)
+  const [edit, setEdit] = useState(false);
+  let [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
   const navigate = useNavigate()
   const deleteProject = () => {
@@ -60,12 +67,43 @@ export default function ProjectView() {
     navigate('/projects');
   }
 
+  const patchTitleAndDescription = async () => {
+    setEdit(false);
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+
+    const response = await authenticatedFetch(`${API_URL}/projects/${projectId}`, {
+      method: "PATCH",
+      body: formData
+    });
+
+    // Check if the response is ok (status code 2xx)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    updateProject();
+  }
+
+  const discardEditTitle = () => {
+    const title = projectData?.title;
+    setEdit(false);
+    if (title)
+      setTitle(title);
+
+    if (projectData?.description)
+      setDescription(projectData?.description);
+  }
+
   const updateProject = async () => {
     authenticatedFetch(`${API_URL}/projects/${projectId}`).then((response) => {
       if (response.ok) {
         response.json().then((data) => {
           const projectData = data["data"];
           setProjectData(projectData);
+          setTitle(projectData.title);
+          setDescription(projectData.description);
 
           const transformedDeadlines = projectData.deadlines.map((deadlineArray: string[]): Deadline => ({
             description: deadlineArray[0],
@@ -75,7 +113,7 @@ export default function ProjectView() {
           setDeadlines(transformedDeadlines);
 
           authenticatedFetch(
-              `${API_URL}/courses/${projectData.course_id}`
+            `${API_URL}/courses/${projectData.course_id}`
           ).then((response) => {
             if (response.ok) {
               response.json().then((data) => {
@@ -89,7 +127,7 @@ export default function ProjectView() {
   }
 
   const archiveProject = async () => {
-    const newArchived = !projectData.archived;
+    const newArchived = !projectData?.archived;
     const formData = new FormData();
     formData.append('archived', newArchived.toString());
 
@@ -134,23 +172,66 @@ export default function ProjectView() {
               <Title title={projectData.title} />
               <CardHeader
                 color="secondary"
-                title={projectData.title}
+                title={
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    {
+                      !edit && <>{projectData.title}</>
+                    }
+                    {
+                      edit && <><TextField id="edit-title" label="title" variant="outlined" size="small" defaultValue={title} onChange={(event) => setTitle(event.target.value)}/></>
+                    }
+                    {courseData && (
+                      <Button variant="outlined" type="link" href={`/${i18next.resolvedLanguage}/courses/${courseData.course_id}`}>
+                        {courseData.name}
+                      </Button>
+                    )}
+                  </Box>
+                }
                 subheader={
-                  <>
+                  <Box position="relative" height="100%" sx={{marginTop: "10px"}}>
                     <Stack direction="row" spacing={2}>
-                      <Typography>{projectData.description}</Typography>
+                      {
+                        !edit && <><Typography>{projectData.description}</Typography></>
+                      }
+                      {
+                        edit && <><TextField id="edit-description" label="description" variant="outlined" size="small" defaultValue={description} onChange={(event) => setDescription(event.target.value)}/></>
+                      }
                       <Typography flex="1" />
-                      {courseData && (
-                        <Button variant="outlined" type="link" href={`/${i18next.resolvedLanguage}/courses/${courseData.course_id}`}>
-                          {courseData.name}
-                        </Button>
-                      )}
                     </Stack>
-                  </>
+                  </Box>
                 }
               />
               <CardContent>
                 <Markdown>{assignmentRawText}</Markdown>
+                <Box
+                  display="flex"
+                  alignItems="flex-end"
+                  justifyContent="end"
+                >
+                  {
+                    edit && (
+                      <>
+                        <IconButton onClick={patchTitleAndDescription}>
+                          <CheckIcon />
+                        </IconButton>
+                        <IconButton onClick={discardEditTitle}>
+                          <CloseIcon />
+                        </IconButton>
+                      </>
+                    )
+                  }
+                  {
+                    !edit && (
+                      <IconButton onClick={() => setEdit(true)}>
+                        <EditIcon />
+                      </IconButton>
+                    )
+                  }
+                </Box>
               </CardContent>
             </Card>
           )}
