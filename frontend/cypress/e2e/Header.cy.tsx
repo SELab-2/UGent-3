@@ -1,7 +1,22 @@
 // e2e needs to check that you can actually go from certain page to other pages using navbar/header
 // also logout and maybe changing language? (how to test language stuff?)
 // component tests that everything is present that has to be present
-describe("Header functionality", () => {
+describe("Header look not logged in", () => {
+  it("App name in header", () => {
+    cy.visit("/");
+    cy.get("header").contains("Peristerónas");
+  });
+  it("Login in header", () => {
+    cy.visit("/");
+    cy.get("header").contains("Login");
+  });
+  it("Language in header", () => {
+    cy.visit("/");
+    cy.get("header").contains("en");
+  });
+});
+
+describe("Header functionality not logged in", () => {
   it("Header Login", () => {
     cy.visit("/");
     cy.contains("Login")
