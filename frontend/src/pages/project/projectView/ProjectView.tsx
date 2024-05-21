@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import {useCallback, useEffect, useState} from "react";
 import Markdown from "react-markdown";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import SubmissionCard from "./SubmissionCard";
@@ -96,7 +96,7 @@ export default function ProjectView() {
       setDescription(projectData?.description);
   }
 
-  const updateProject = async () => {
+  const updateProject = useCallback(async () => {
     authenticatedFetch(`${API_URL}/projects/${projectId}`).then((response) => {
       if (response.ok) {
         response.json().then((data) => {
@@ -124,7 +124,7 @@ export default function ProjectView() {
         });
       }
     });
-  }
+  }, [projectId]);
 
   const archiveProject = async () => {
     const newArchived = !projectData?.archived;
@@ -154,7 +154,7 @@ export default function ProjectView() {
       setMe(data);
     });
 
-  }, [projectId]);
+  }, [projectId, updateProject]);
 
   if (!projectId) return null;
 

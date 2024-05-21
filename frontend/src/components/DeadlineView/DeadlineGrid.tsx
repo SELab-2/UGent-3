@@ -8,7 +8,7 @@ interface Props {
 }
 
 /**
- *
+ * @returns grid that displays deadlines in a grid
  */
 export default function DeadlineGrid({deadlines, minWidth}: Props) {
 
