@@ -155,7 +155,7 @@ def projects(session):
             deadlines=[("Deadline 1",datetime(2024,3,15,13,0,0))],
             course_id=course_id_ad3,
             visible_for_students=True,
-            archived=False,
+            archived=True,
             regex_expressions=["solution"]
         ),
         Project(

@@ -42,7 +42,7 @@ parser.add_argument("runner", type=str, help='Projects runner', location="form")
 
 def parse_project_params():
     """
-    Return a dict of every non None value in the param
+    Return a dictionary of every non None value in the param
     """
     args = parser.parse_args()
 
