@@ -56,7 +56,7 @@ export default function ProjectView() {
   const [deadlines, setDeadlines] = useState<Deadline[]>([]);
   const [alertVisibility, setAlertVisibility] = useState(false)
   const [edit, setEdit] = useState(false);
-  let [title, setTitle] = useState("");
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
   const navigate = useNavigate()
