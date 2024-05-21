@@ -3,7 +3,7 @@
 // component tests that everything is present that has to be present
 describe("Header functionality", () => {
   it("Header Login", () => {
-    cy.visit("http://localhost:5173");
+    cy.visit("/");
     cy.contains("Login")
       .should("be.visible")
       .should("have.attr", "href")
