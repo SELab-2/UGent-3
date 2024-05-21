@@ -26,6 +26,17 @@ You can choose your own preferred webserver like for example `nginx`, `serve` or
    npm run dev
    ```
 
+## Setting up the environment variables
+
+This application requires a couple of environment variables to run.
+Setting values for these variables can be done with a method to your own liking.
+
+| Variable               | Description                                                                        |
+|------------------------|------------------------------------------------------------------------------------|
+| VITE_API_HOST          | URL of the API                                                                     |
+| VITE_APP_TENANT_ID     | [Tenant id](https://learn.microsoft.com/nl-nl/entra/fundamentals/whatis)           |
+| VITE_APP_CLIENT_ID     | [Client id](https://learn.microsoft.com/nl-nl/entra/identity-platform/v2-protocols) |
+
 ## Maintaining the codebase
 ### Writing tests
 When writing new code it is important to maintain the right functionality so 
@@ -50,5 +61,4 @@ If you want to execute the linter on all files in the project it can simply be d
 with the command:
 ```sh
 npm run lint
-``` 
-
+```

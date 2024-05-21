@@ -1,6 +1,12 @@
 {
   "submissionOverview": {
     "submissionOverviewHeader": "Project status overview",
-    "downloadButton": "DOWNLOAD ALL PROJECTS"
+    "downloadButton": "DOWNLOAD ALL PROJECTS",
+    "scoreError": "Grade must be between 0 and 20",
+    "submissionID": "Submission ID",
+    "student": "Student",
+    "grading": "Grading",
+    "status": "Status",
+    "download": "Download"
   }
 }
