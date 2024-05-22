@@ -1,4 +1,4 @@
-describe("Homepage not logged in functionality", () => {
+describe("Homepage functionality not logged in ", () => {
   it("Header Visible", () => {
     cy.visit("/");
     cy.contains("Peristerónas");
@@ -9,9 +9,8 @@ describe("Homepage not logged in functionality", () => {
     cy.visit("/");
     cy.contains("Peristerónas");
     cy.get(
-      "a.MuiButtonBase-root.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary.MuiButton-sizeMedium.MuiButton-containedSizeMedium.MuiButton-colorPrimary.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary.MuiButton-sizeMedium.MuiButton-containedSizeMedium.MuiButton-colorPrimary.css-sghohy-MuiButtonBase-root-MuiButton-root"
+      "div.MuiContainer-root.MuiContainer-maxWidthSm.css-cuefkz-MuiContainer-root"
     )
-      .eq(1)
       .contains("Login")
       .should("be.visible")
       .should("have.attr", "href")
