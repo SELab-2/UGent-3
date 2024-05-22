@@ -8,9 +8,10 @@ describe("Homepage functionality not logged in ", () => {
   it("Center button Login", () => {
     cy.visit("/");
     cy.contains("Peristerónas");
-    cy.get(
-      "div.MuiContainer-root.MuiContainer-maxWidthSm.css-cuefkz-MuiContainer-root"
+    cy.contains(
+      "Welcome to Peristerónas, the online submission platform of UGent"
     )
+      .parent()
       .contains("Login")
       .should("be.visible")
       .should("have.attr", "href")
