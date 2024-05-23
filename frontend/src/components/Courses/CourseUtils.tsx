@@ -75,17 +75,6 @@ export function callToApiToCreateCourse(
   })
     .then((response) => response.json())
     .then((data) => {
-      //But first also make sure that teacher is in the course admins list
-      authenticatedFetch(
-        `${apiHost}/courses/${getIdFromLink(data.url)}/admins`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ admin_uid: loggedInUid() }),
-        }
-      );
       navigate(getIdFromLink(data.url)); // navigate to data.url
     });
 }
@@ -134,8 +123,59 @@ const fetchData = async (url: string, params?: URLSearchParams) => {
 
 export const dataLoaderCourses = async () => {
   //const params = new URLSearchParams({ 'teacher': loggedInUid() });
-  return {'courses': await fetchData(`courses`), 'me': await fetchMe()};
+
+  const courses =  await fetchData(`courses`);
+  const projects = await fetchProjectsCourse(courses);
+  const me = await fetchMe();
+  for( const c of courses){
+    const teacher = await fetchData(`users/${c.teacher}`)
+    c.teacher = teacher.display_name
+  }
+  return {courses, projects, me}
 };
+
+/**
+ * Fetch the projects for the Course component
+ * @param courses - All the courses
+ * @returns the projects
+ */
+export async function  fetchProjectsCourse (courses:Course[]) {
+  const projectPromises = courses.map((course) =>
+    authenticatedFetch(
+      `${apiHost}/projects?course_id=${getIdFromLink(course.course_id)}`
+    ).then((response) => response.json())
+  );
+
+  const projectResults = await Promise.all(projectPromises);
+  const projectsMap: { [courseId: string]: ProjectDetail[] } = {};
+  for await (const [index, result] of projectResults.entries()) {
+    projectsMap[getIdFromLink(courses[index].course_id)]  = await Promise.all(result.data.map(async (item: Project) => {
+      const projectRes = await authenticatedFetch(item.project_id);
+      if (projectRes.status !== 200) {
+        throw new Response("Failed to fetch project data", {
+          status: projectRes.status,
+        });
+      }
+      const projectJson = await projectRes.json();
+      const projectData = projectJson.data;
+      let projectDeadlines = [];
+      if (projectData.deadlines) {
+        projectDeadlines = projectData.deadlines.map(
+          ([description, dateString]: [string, string]) => ({
+            description,
+            date: new Date(dateString),
+          })
+        );
+      }
+      const project: ProjectDetail = {
+        ...item,
+        deadlines: projectDeadlines,
+      };
+      return project;
+    }));
+  }
+  return { ...projectsMap };
+}
 
 const dataLoaderCourse = async (courseId: string) => {
   return fetchData(`courses/${courseId}`);
@@ -186,6 +226,10 @@ const dataLoaderStudents = async (courseId: string) => {
   return fetchData(`courses/${courseId}/students`);
 };
 
+const fetchMes = async (uids: string[]) => {
+  return Promise.all(uids.map((uid) => getUser(uid)));
+}
+
 export const dataLoaderCourseDetail = async ({
   params,
 }: {
@@ -199,5 +243,9 @@ export const dataLoaderCourseDetail = async ({
   const projects = await dataLoaderProjects(courseId);
   const admins = await dataLoaderAdmins(courseId);
   const students = await dataLoaderStudents(courseId);
-  return { course, projects, admins, students };
+  const admin_uids = admins.map((admin: {uid: string}) => getIdFromLink(admin.uid));
+  const student_uids = students.map((student: {uid: string}) => getIdFromLink(student.uid));
+  const adminMes = await fetchMes([course.teacher, ...admin_uids]);
+  const studentMes = await fetchMes(student_uids);
+  return { course, projects, adminMes, studentMes };
 };

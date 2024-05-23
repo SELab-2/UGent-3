@@ -56,7 +56,7 @@ export default function ProjectView() {
     });
 
     authenticatedFetch(
-      `${API_URL}/projects/${projectId}/assignment?lang=${i18next.language}`
+      `${API_URL}/projects/${projectId}/assignment?lang=${i18next.resolvedLanguage}`
     ).then((response) => {
       if (response.ok) {
         response.text().then((data) => setAssignmentRawText(data));
@@ -88,7 +88,7 @@ export default function ProjectView() {
                       <Typography>{projectData.description}</Typography>
                       <Typography flex="1" />
                       {courseData && (
-                        <Link href={`/${i18next.language}/courses/${courseData.course_id}`}>
+                        <Link href={`/${i18next.resolvedLanguage}/courses/${courseData.course_id}`}>
                           <Typography>{courseData.name}</Typography>
                         </Link>
                       )}

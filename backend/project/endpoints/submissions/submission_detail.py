@@ -107,7 +107,6 @@ class SubmissionEndpoint(Resource):
 
                 # Save the submission
                 session.commit()
-
                 data["message"] = f"Submission (submission_id={submission_id}) patched"
                 data["url"] = urljoin(f"{BASE_URL}/", str(submission.submission_id))
                 data["data"] = submission_response(submission, API_HOST)

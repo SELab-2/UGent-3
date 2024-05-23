@@ -5,13 +5,13 @@ import { useTranslation } from "react-i18next";
 import {Title} from "../../components/Header/Title.tsx";
 import {useLoaderData, Link as RouterLink} from "react-router-dom";
 import dayjs from "dayjs";
+import i18next from "i18next";
 
 /**
  * Displays all the projects
  * @returns the project page
  */
 export default function ProjectOverView() {
-  const {i18n} = useTranslation()
   const { t } = useTranslation('translation', { keyPrefix: 'projectsOverview' });
   const loader = useLoaderData() as {
     projects: ProjectDeadline[],
@@ -39,7 +39,7 @@ export default function ProjectOverView() {
     return (
       <Grid container spacing={2} key={index}>
         <Grid item xs={12}>
-          <Link href={`/${i18n.language}/courses/${courseProjects[0].course.course_id}`} style={{color: 'inherit'}}
+          <Link href={`/${i18next.resolvedLanguage}/courses/${courseProjects[0].course.course_id}`} style={{color: 'inherit'}}
             underline={'none'}>
             <Typography variant="h6">{courseProjects[0].course.name} {courseProjects[0].course.ufora_id}</Typography>
           </Link>
@@ -56,7 +56,7 @@ export default function ProjectOverView() {
       <Grid container spacing={2}>
         <Grid item xs={2}>
           {me === 'TEACHER' && (
-            <Button component={RouterLink} to={`/${i18n.language}/projects/create`}>{t('new_project')}</Button>
+            <Button component={RouterLink} to={`/${i18next.resolvedLanguage}/projects/create`}>{t('new_project')}</Button>
           )}
         </Grid>
         <Grid item xs={5}>

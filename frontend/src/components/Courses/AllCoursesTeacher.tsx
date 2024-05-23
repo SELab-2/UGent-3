@@ -13,7 +13,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { SideScrollableCourses } from "./CourseUtilComponents";
-import { Course, callToApiToCreateCourse } from "./CourseUtils";
+import { Course, callToApiToCreateCourse, ProjectDetail } from "./CourseUtils";
 import { Title } from "../Header/Title";
 import { useLoaderData } from "react-router-dom";
 import { Me } from "../../types/me";
@@ -23,7 +23,11 @@ import { Me } from "../../types/me";
  */
 export function AllCoursesTeacher(): JSX.Element {
   const [open, setOpen] = useState(false);
-  const { courses, me } = useLoaderData() as { courses: Course[]; me: Me };
+  const { courses, projects, me } = useLoaderData() as {
+    courses: Course[];
+    me: Me;
+    projects: { [courseId: string]: ProjectDetail[] };
+  };
 
   const [courseName, setCourseName] = useState("");
   const [error, setError] = useState("");
@@ -66,7 +70,10 @@ export function AllCoursesTeacher(): JSX.Element {
         direction={"column"}
         style={{ marginTop: "1rem", width: "100vw", height: "80vh" }}
       >
-        <SideScrollableCourses courses={courses}></SideScrollableCourses>
+        <SideScrollableCourses
+          courses={courses}
+          projects={projects}
+        ></SideScrollableCourses>
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>{t("courseForm")}</DialogTitle>
           <form style={{ margin: "2rem" }} onSubmit={handleSubmit}>
