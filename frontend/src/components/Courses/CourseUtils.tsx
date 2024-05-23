@@ -1,6 +1,7 @@
 import { NavigateFunction, Params } from "react-router-dom";
 import { authenticatedFetch } from "../../utils/authenticated-fetch";
 import { Me } from "../../types/me";
+import { fetchMe } from "../../utils/fetches/FetchMe";
 
 export interface Course {
   course_id: string;
@@ -125,11 +126,12 @@ export const dataLoaderCourses = async () => {
 
   const courses =  await fetchData(`courses`);
   const projects = await fetchProjectsCourse(courses);
+  const me = await fetchMe();
   for( const c of courses){
     const teacher = await fetchData(`users/${c.teacher}`)
     c.teacher = teacher.display_name
   }
-  return {courses, projects}
+  return {courses, projects, me}
 };
 
 /**
@@ -224,6 +226,10 @@ const dataLoaderStudents = async (courseId: string) => {
   return fetchData(`courses/${courseId}/students`);
 };
 
+const fetchMes = async (uids: string[]) => {
+  return Promise.all(uids.map((uid) => getUser(uid)));
+}
+
 export const dataLoaderCourseDetail = async ({
   params,
 }: {
@@ -237,5 +243,9 @@ export const dataLoaderCourseDetail = async ({
   const projects = await dataLoaderProjects(courseId);
   const admins = await dataLoaderAdmins(courseId);
   const students = await dataLoaderStudents(courseId);
-  return { course, projects, admins, students };
+  const admin_uids = admins.map((admin: {uid: string}) => getIdFromLink(admin.uid));
+  const student_uids = students.map((student: {uid: string}) => getIdFromLink(student.uid));
+  const adminMes = await fetchMes([course.teacher, ...admin_uids]);
+  const studentMes = await fetchMes(student_uids);
+  return { course, projects, adminMes, studentMes };
 };

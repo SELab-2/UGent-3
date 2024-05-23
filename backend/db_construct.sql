@@ -20,8 +20,8 @@ CREATE TABLE courses (
 );
 
 CREATE TABLE course_join_codes (
-    join_code UUID DEFAULT gen_random_uuid() NOT NULL,
-    course_id INT NOT NULL,
+	join_code UUID DEFAULT gen_random_uuid() NOT NULL,
+	course_id INT NOT NULL,
 	expiry_time DATE,
 	for_admins BOOLEAN NOT NULL,
 	CONSTRAINT fk_course_join_link FOREIGN KEY(course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
@@ -53,10 +53,26 @@ CREATE TABLE projects (
 	course_id INT NOT NULL,
 	visible_for_students BOOLEAN NOT NULL,
 	archived BOOLEAN NOT NULL,
+	groups_locked BOOLEAN DEFAULT FALSE,
 	regex_expressions VARCHAR(50)[],
 	runner runner,
 	PRIMARY KEY(project_id),
 	CONSTRAINT fk_course FOREIGN KEY(course_id) REFERENCES courses(course_id) ON DELETE CASCADE
+);
+
+CREATE TABLE groups (
+	group_id INT GENERATED ALWAYS AS IDENTITY,
+	project_id INT NOT NULL REFERENCES projects(project_id) ON DELETE CASCADE,
+	group_size INT NOT NULL,
+	PRIMARY KEY(project_id, group_id)
+);
+
+CREATE TABLE group_students (
+    uid VARCHAR(255) NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
+    group_id INT NOT NULL,
+    project_id INT NOT NULL,
+    PRIMARY KEY(uid, group_id, project_id),
+    CONSTRAINT fk_group_reference FOREIGN KEY (group_id, project_id) REFERENCES groups(group_id, project_id) ON DELETE CASCADE
 );
 
 CREATE TABLE submissions (

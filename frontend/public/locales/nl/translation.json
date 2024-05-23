@@ -109,7 +109,9 @@
       "running": "Aan het uitvoeren",
       "submitTime": "Indientijd",
       "status": "Status"
-    }
+    },
+    "projectOverview": "Overzicht",
+    "archive": "Archiveer"
   },
   "time": {
     "yearsAgo": "jaren geleden",
