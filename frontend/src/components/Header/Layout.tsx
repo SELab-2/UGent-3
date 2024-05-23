@@ -29,7 +29,7 @@ export default function Layout(): JSX.Element {
     ) {
       navigate("/");
     }
-  }, []);
+  }, [meData.loggedIn, location.pathname, navigate]);
 
   return (
     <>
@@ -38,7 +38,6 @@ export default function Layout(): JSX.Element {
     </>
   );
 }
-
 
 const useEnsureLangCodeInPath = () => {
   const location = useLocation();
@@ -54,5 +53,5 @@ const useEnsureLangCodeInPath = () => {
       const newPath = `/${langCode}/${pathParts.join("/")}`;
       navigate(newPath);
     }
-  }, [location, history, i18next.resolvedLanguage]);
+  }, [location, navigate]);
 };
