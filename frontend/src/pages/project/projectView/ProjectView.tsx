@@ -156,7 +156,6 @@ export default function ProjectView() {
 
   }, [projectId, updateProject]);
 
-
   if (!projectId) return null;
 
   return (

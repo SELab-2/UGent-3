@@ -64,14 +64,6 @@ const ErrorBoundaryPage = () => {
           message={t("serverErrorMessage")}
         />
       );
-    } else {
-      return (
-          <ErrorPage
-              statusCode={error.statusText}
-              statusTitle={t("serverError")}
-              message={t("serverErrorMessage")}
-          />
-      );
     }
   }
 };
