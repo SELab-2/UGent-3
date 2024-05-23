@@ -25,4 +25,11 @@ describe("Header functionality not logged in", () => {
       .and("include", "login.microsoftonline.com");
     // good enough test, will need to test validity of url some other way because can't really login if we can't make our own account for testing
   });
+
+  it("Header change language en -> nl", () => {
+    cy.visit("/");
+    cy.contains("en").should("be.visible").click()
+    cy.contains("Nederlands").should("be.visible").click()
+    cy.contains("nl").should("be.visible")
+  })
 });
