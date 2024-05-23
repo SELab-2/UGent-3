@@ -17,7 +17,7 @@
   "runnerComponent": {
     "testWarning": "No appropriate test file found, can't upload project",
     "clearSelected": "Clear Selection",
-    "tooltipRunner": "If you're having trouble figuring out the runner please refer to the docs",
+    "tooltipRunner": "If you're having trouble figuring out the runner please refer to the ",
     "userDocs": "runner user docs"
   },
   "dragAndDrop": {
