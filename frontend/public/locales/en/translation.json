@@ -52,7 +52,7 @@
     "cancel": "Cancel",
     "create": "Create",
     "activeCourses": "Active Courses",
-    "archivedCourses":"Archived Courses"    
+    "archivedCourses":"Archived Courses"
   },
   "courseForm": {
     "courseName": "Course Name",
@@ -72,7 +72,9 @@
       "running": "Running",
       "submitTime": "Time submitted",
       "status": "Status"
-    }
+    },
+    "projectOverview": "Overview",
+    "archive": "Archive"
   },
   "time": {
     "yearsAgo": "years ago",
