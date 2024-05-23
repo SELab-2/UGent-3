@@ -102,6 +102,9 @@
     "submit": "Indienen",
     "previousSubmissions": "Vorige indieningen",
     "noFileSelected": "Er is geen bestand geselecteerd",
+    "delete": "Verwijder",
+    "deleteProjectWarning": "Bent u zeker dat u dit project wilt verwijderen?",
+    "imSure": "Ja, ik ben zeker",
     "submissionGrid": {
       "late": "Te laat",
       "fail": "Gefaald",

@@ -263,7 +263,7 @@ export default function ProjectView() {
                     color="error"
                     onClick={() => setAlertVisibility(true)}
                   >
-                    Delete
+                    {t("delete")}
                   </Button>
                 </Box>
               </Box>
@@ -281,7 +281,7 @@ export default function ProjectView() {
                 >
                   <Box sx={{ border: 1, p: 1, bgcolor: "background.paper" }}>
                     <Typography>
-                      Are you sure you want to delete this project
+                      {t("deleteProjectWarning")}
                     </Typography>
                     <Box
                       display="flex"
@@ -293,7 +293,7 @@ export default function ProjectView() {
                       width="100%"
                     >
                       <Button variant="contained" onClick={deleteProject}>
-                        Yes I'm Sure
+                        {t("imSure")}
                       </Button>
                     </Box>
                   </Box>
