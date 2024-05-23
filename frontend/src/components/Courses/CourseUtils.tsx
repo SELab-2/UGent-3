@@ -1,6 +1,7 @@
 import { NavigateFunction, Params } from "react-router-dom";
 import { authenticatedFetch } from "../../utils/authenticated-fetch";
 import { Me } from "../../types/me";
+import { fetchMe } from "../../utils/fetches/FetchMe";
 
 export interface Course {
   course_id: string;
@@ -125,11 +126,12 @@ export const dataLoaderCourses = async () => {
 
   const courses =  await fetchData(`courses`);
   const projects = await fetchProjectsCourse(courses);
+  const me = await fetchMe();
   for( const c of courses){
     const teacher = await fetchData(`users/${c.teacher}`)
     c.teacher = teacher.display_name
   }
-  return {courses, projects}
+  return {courses, projects, me}
 };
 
 /**
