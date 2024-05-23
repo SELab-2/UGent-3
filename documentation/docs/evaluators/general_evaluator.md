@@ -1,5 +1,5 @@
 # General evaluator
-The general runner is capable of running the standard language of the following languages
+The general runner is capable of running the standard library of the following languages
 - Javascript
 - Python
 - Ruby
