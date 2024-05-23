@@ -1,5 +1,5 @@
 # General evaluator
-De algemene runner is in staat om de volgende talen uit te voeren met enkel de standaardbibliotheek
+De algemene runner is in staat om de volgende talen uit te voeren met enkel de standaardbibliotheken inbegrepen
 - Javascript
 - Python
 - Ruby
