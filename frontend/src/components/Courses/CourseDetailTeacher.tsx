@@ -461,7 +461,7 @@ function JoinCodeMenu({
   const handleCopyToClipboard = (join_code: string) => {
     const host = window.location.host;
     navigator.clipboard.writeText(
-      `${host}/${i18next.resolvedLanguage}/courses/join?code=${join_code}`
+      `${window.location.protocol}://${host}/${i18next.resolvedLanguage}/courses/join?code=${join_code}`
     );
   };
 
