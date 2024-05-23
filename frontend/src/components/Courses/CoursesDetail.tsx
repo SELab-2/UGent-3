@@ -16,7 +16,7 @@ export default function CoursesDetail() :JSX.Element {
     studentMes: Me[];
     me:Me;
   };
-  if (loader.me.role == "TEACHER") {
+  if (loader.course.teacher === loader.me.uid) {
     return <CourseDetailTeacher/>;
   } else {
     return <CourseDetailStudent/>;
