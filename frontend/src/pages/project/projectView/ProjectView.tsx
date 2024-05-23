@@ -51,7 +51,7 @@ interface Project {
 export default function ProjectView() {
   const location = useLocation();
 
-  const { me, projectData, courseData, assignmentText, isAdmin } =
+  const { projectData, courseData, assignmentText, isAdmin } =
     useLoaderData() as {
       me: Me;
       projectData: Project;

@@ -6,6 +6,15 @@ import i18next from "i18next";
 
 const API_URL = import.meta.env.VITE_APP_API_HOST;
 
+/**
+ * 
+ * @param param0 - params: Params<string>
+ * @returns - projectData: projectData,
+ *           courseData: courseData,
+ *          me: me,
+ *         assignmentText: assignmentText,
+ *        isAdmin: isAdmin
+ */
 export default async function loadProjectViewData({
   params,
 }: {
@@ -61,8 +70,6 @@ export default async function loadProjectViewData({
 
     const isAdmin =
       me.uid === courseData["teacher"] || courseData["admins"].includes(me.uid);
-
-    console.log(courseData);
 
     return {
       projectData: projectData,
