@@ -289,7 +289,7 @@ function EmptyOrNotProjects({
               const diffDays = Math.floor(diffHours / 24);
 
               timeLeft =
-                diffDays > 1 ? `${diffDays} days` : `${diffHours} hours`;
+                diffDays >= 1 ? `${diffDays} days` : `${diffHours} hours`;
             }
           }
           return (
