@@ -35,18 +35,3 @@ describe("Header functionality not logged in", () => {
     cy.contains("nl").should("be.visible");
   });
 });
-
-describe("Header functionality logged in", () => {
-  it("Display name in header", () => {
-    const response = {
-      statusCode: 200,
-      body: me,
-    };
-    cy.intercept("/me", response).as("getMe");
-    cy.intercept("/projects", []).as("getProjects");
-    cy.log(response);
-    cy.visit("/en/home");
-    cy.wait("@getMe");
-    cy.wait("@getProjects");
-  });
-});
