@@ -113,7 +113,7 @@ function handleDeleteCourse(
  *
  * @returns A jsx component representing the course detail page for a teacher
  */
-export function CourseDetailTeacher(): JSX.Element {
+export  default function CourseDetailTeacher() {
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [anchorEl, setAnchorElStudent] = useState<null | HTMLElement>(null);
   const openCodes = Boolean(anchorEl);
@@ -129,6 +129,7 @@ export function CourseDetailTeacher(): JSX.Element {
     projects: ProjectDetail[];
     adminMes: Me[];
     studentMes: Me[];
+    me:Me;
   };
   const { course, projects, adminMes, studentMes } = courseDetail;
   const { t } = useTranslation("translation", {
@@ -276,7 +277,7 @@ export function CourseDetailTeacher(): JSX.Element {
  * @param projects - The array of projects.
  * @returns Either a place holder for no projects or a grid of cards describing the projects.
  */
-function EmptyOrNotProjects({
+export function EmptyOrNotProjects({
   projects,
 }: {
   projects: ProjectDetail[];
