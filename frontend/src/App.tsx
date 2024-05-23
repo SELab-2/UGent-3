@@ -35,6 +35,7 @@ const router = createBrowserRouter(
     >
       <Route index element={<HomePages />} loader={fetchProjectPage} />
       <Route path=":lang" element={<LanguagePath />}>
+        <Route index element={<HomePages />} loader={fetchProjectPage} />
         <Route path="home" element={<HomePages />} loader={fetchProjectPage} />
         <Route path="courses">
           <Route
