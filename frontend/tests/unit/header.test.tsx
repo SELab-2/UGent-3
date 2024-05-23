@@ -1,3 +1,6 @@
-import { test } from "vitest";
+import { describe, test } from "vitest";
+//import { render } from "@testing-library/react";
 
-test.todo("Header test");
+describe("Header", () => {
+  test.todo("Header test");
+});
