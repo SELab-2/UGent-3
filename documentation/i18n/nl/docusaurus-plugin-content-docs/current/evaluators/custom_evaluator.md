@@ -1,0 +1,2 @@
+# Custom evaluator
+Bij het selecteren van de aangepaste runner moet de gebruiker zijn eigen Dockerfile aanleveren. Dit geeft de vrijheid om alles te doen wat je wilt, en het is volledig aan te passen aan je eigen behoeften.

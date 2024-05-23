@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: test_database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d test_database"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - ./db_construct.sql:/docker-entrypoint-initdb.d/init.sql
+  auth-server:
+    build:
+      context: .
+      dockerfile: Dockerfile_auth_test
+    environment:
+      API_HOST: http://auth-server
+    volumes:
+      - .:/auth-app
+    command: ["test_auth_server"]
+
+
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-server:
+        condition: service_started
+    privileged: true
+    environment:
+      POSTGRES_HOST: postgres  # Use the service name defined in Docker Compose
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: test_database
+      API_HOST: http://api_is_here
+      TEST_AUTHENTICATION_URL: http://auth-server:5001 # Use the service name defined in Docker Compose
+      AUTH_METHOD: test
+      JWT_SECRET_KEY: Test123
+      UPLOAD_FOLDER: /data/assignments
+      DOCS_JSON_PATH: static/OpenAPI_Object.yaml
+      DOCS_URL: /docs
+    volumes:
+      - .:/app
+    command: ["pytest"]

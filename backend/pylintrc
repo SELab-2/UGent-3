@@ -1,0 +1,19 @@
+[MASTER]
+init-hook='import sys; sys.path.append(".")'
+ignore-paths=tests/utils/submission_evaluators/resources/.*
+
+[MESSAGES CONTROL]
+disable=W0621, # Redefining name %r from outer scope (line %s)
+        W0613 # unused-argument
+
+
+[test-files:*_test.py]
+disable=
+    W0613, # Unused argument (pytest uses it)
+    W0621, # Redefining name %r from outer scope (line %s)
+    R0904, # Too many public methods (too many unit tests essentially)
+    R0913, # Too many arguments (too many fixtures essentially)
+
+[modules:project/modules/*]
+disable=
+    R0903 # Too few public methods (modules don't require us to have public methods)

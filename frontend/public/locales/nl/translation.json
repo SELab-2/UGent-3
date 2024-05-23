@@ -1,0 +1,148 @@
+{
+  "header": {
+    "myProjects": "Mijn Projecten",
+    "myCourses": "Mijn Vakken",
+    "login": "Aanmelden",
+    "home": "Home",
+    "tag": "nl",
+    "homepage": "Homepage",
+    "projectUploadForm": "Project uploaden",
+    "logout": "Afmelden"
+  },
+  "home": {
+    "home": "Home",
+    "tag": "nl",
+    "homepage": "Homepagina",
+    "welcomeDescription": "Welkom bij Peristerónas, het online indieningsplatform van UGent",
+    "login": "Aanmelden"
+  },
+  "courseDetailTeacher": {
+    "title": "Vak Details",
+    "noCoursesFound": "Geen vakken gevonden",
+    "unauthorizedDelete": "U heeft niet de juiste rechten om dit vak te verwijderen",
+    "noProjects": "Geen projecten",
+    "noStudents": "Geen studenten voor dit vak",
+    "deleteCourse": "Verwijder vak",
+    "joinCodes": "Join Codes",
+    "forAdmins": "Voor Admins",
+    "forStudents": "Voor Studenten",
+    "noExpiryDate": "Geen vervaldatum",
+    "expiryDate": "Vervaldatum",
+    "newJoinCode": "Nieuwe Join Code",
+    "deleteSelected": "Verwijder geselecteerde studenten",
+    "projects": "Projecten",
+    "newProject": "Nieuw Project",
+    "assistantList": "Lijst co-leerkrachten/assistenten",
+    "newTeacher": "Nieuwe leerkracht",
+    "studentList": "Lijst studenten",
+    "newStudent": "Nieuwe student(en)",
+    "deadline": "Deadline",
+    "teacher": "Leerkracht",
+    "view": "Bekijk",
+    "admins": "Admins",
+    "students": "Studenten"
+  },
+  "allCoursesTeacher": {
+    "title": "Alle Vakken",
+    "courseForm": "Vak Form",
+    "courseName": "Vak Naam",
+    "submit": "Opslaan",
+    "emptyCourseNameError": "Vak naam mag niet leeg zijn",
+    "cancel": "Annuleer",
+    "create": "Nieuw Vak",
+    "activeCourses": "Actieve Vakken",
+    "archivedCourses":"Gearchiveerde Vakken"
+  },
+  "courseForm": {
+    "courseName": "Vak Naam",
+    "submit": "Opslaan",
+    "emptyCourseNameError": "Vak naam mag niet leeg zijn"
+  },
+  "student": {
+    "myProjects": "Mijn Projecten",
+    "myCourses": "Mijn Vakken",
+    "deadlines": "Verlopen Deadlines",
+    "course": "Vak",
+    "last_submission": "Laatste indiening",
+    "SUCCESS": "Geslaagd",
+    "FAIL": "Gefaald",
+    "RUNNING": "Aan het lopen",
+    "LATE": "Te laat",
+    "deadlinesOnDay": "Deadlines op: ",
+    "noDeadline": "Geen deadlines op deze dag",
+    "no_submission_yet" : "Nog geen indiening",
+    "loading": "Laden...",
+    "no_projects": "Er zijn hier geen projecten, meld je aan voor een vak om projecten te zien"
+
+  },
+  "projectForm": {
+    "projectTitle": "Titel",
+    "projectDescription": "Beschrijving",
+    "projectCourse": "Vak",
+    "projectDeadline": "Project deadline",
+    "visibleForStudents": "Zichtbaar voor studenten",
+    "uploadFile": "Upload bestand",
+    "regex": "Voeg Regex toe",
+    "selectCourseText": "Selecteer een vak",
+    "testWarning": "Opgelet: Deze opgave bevat geen tests",
+    "helperText": "Selecteer een geldige deadline voor het project",
+    "uploadProject": "Upload project",
+    "regexStructure": "Regex structuur",
+    "uploadError": "Project is niet goed geformatteerd",
+    "noDeadlinesPlaceholder": "Nog geen opgegeven deadlines",
+    "noFilesPlaceholder": "Nog geen opgave bestanden geupload",
+    "noRegexPlaceholder": "Nog geen regex toegevoegd",
+    "unauthorized": "U heeft niet de juiste rechten om een project aan te maken voor dit vak",
+    "submissionError": "Er is een fout opgetreden bij het indienen van uw project, probeer het later opnieuw.",
+    "clearSelected": "Deselecteer keuze"
+  },
+  "projectView": {
+    "submitNetworkError": "Er is iets mislopen bij het opslaan van uw indiening. Probeer het later opnieuw.",
+    "selected": "Geselecteerd",
+    "submit": "Indienen",
+    "previousSubmissions": "Vorige indieningen",
+    "noFileSelected": "Er is geen bestand geselecteerd",
+    "delete": "Verwijder",
+    "deleteProjectWarning": "Bent u zeker dat u dit project wilt verwijderen?",
+    "imSure": "Ja, ik ben zeker",
+    "submissionGrid": {
+      "late": "Te laat",
+      "fail": "Gefaald",
+      "success": "Succesvol",
+      "running": "Aan het uitvoeren",
+      "submitTime": "Indientijd",
+      "status": "Status"
+    },
+    "projectOverview": "Overzicht",
+    "archive": "Archiveer"
+  },
+  "time": {
+    "yearsAgo": "jaren geleden",
+    "monthsAgo": "maanden geleden",
+    "daysAgo": "dagen geleden",
+    "hoursAgo": "uur geleden",
+    "minutesAgo": "minuten geleden",
+    "justNow": "Zonet",
+    "yearsLater": "jaren later",
+    "monthsLater": "maanden later",
+    "daysLater": "dagen later",
+    "hoursLater": "uur later",
+    "minutesLater": "minuten later"
+  },
+  "projectsOverview": {
+    "past_deadline": "Verlopen Projecten",
+    "future_deadline": "Opkomende Deadlines",
+    "no_projects": "Er zijn hier geen projecten.",
+    "new_project": "Nieuw Project"
+  },
+  "error": {
+    "pageNotFound": "Pagina Niet Gevonden",
+    "pageNotFoundMessage": "De opgevraagde pagina werd niet gevonden.",
+    "forbidden": "Verboden",
+    "forbiddenMessage": "Je hebt geen toegang tot deze bron.",
+    "clientError": "Client Fout",
+    "clientErrorMessage": "Er is een client fout opgetreden.",
+    "serverError": "Server Fout",
+    "serverErrorMessage": "Er is een server fout opgetreden."
+  }
+}
