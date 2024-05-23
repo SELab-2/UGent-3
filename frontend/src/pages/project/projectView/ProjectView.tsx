@@ -195,10 +195,9 @@ export default function ProjectView() {
                   <Box position="relative" height="100%" sx={{marginTop: "10px"}}>
                     <Stack direction="row" spacing={2}>
                       {
-                        !edit && <><Typography>{projectData.description}</Typography></>
-                      }
-                      {
-                        edit && <><TextField id="edit-description" label="description" variant="outlined" size="small" defaultValue={description} onChange={(event) => setDescription(event.target.value)}/></>
+                        !edit
+                          ? <><Typography>{projectData.description}</Typography></>
+                          : edit && <><TextField id="edit-description" label="description" variant="outlined" size="small" defaultValue={description} onChange={(event) => setDescription(event.target.value)}/></>
                       }
                       <Typography flex="1" />
                     </Stack>
@@ -212,25 +211,23 @@ export default function ProjectView() {
                   alignItems="flex-end"
                   justifyContent="end"
                 >
-                  {
-                    edit && (
-                      <>
-                        <IconButton onClick={patchTitleAndDescription}>
-                          <CheckIcon />
+                  { me && me.role === "TEACHER" && (
+                    edit
+                      ? (
+                        <>
+                          <IconButton onClick={patchTitleAndDescription}>
+                            <CheckIcon />
+                          </IconButton>
+                          <IconButton onClick={discardEditTitle}>
+                            <CloseIcon />
+                          </IconButton>
+                        </>)
+                      : (
+                        <IconButton onClick={() => setEdit(true)}>
+                          <EditIcon />
                         </IconButton>
-                        <IconButton onClick={discardEditTitle}>
-                          <CloseIcon />
-                        </IconButton>
-                      </>
-                    )
-                  }
-                  {
-                    !edit && (
-                      <IconButton onClick={() => setEdit(true)}>
-                        <EditIcon />
-                      </IconButton>
-                    )
-                  }
+                      )
+                  )}
                 </Box>
               </CardContent>
             </Card>
@@ -242,7 +239,7 @@ export default function ProjectView() {
               projectId={projectId}
             />
           </Box>
-          {me && me.role == "TEACHER" && (
+          {me && me.role === "TEACHER" && (
             <Box
               width="100%">
               <Box display="flex"
