@@ -131,7 +131,7 @@ export  default function CourseDetailTeacher() {
     studentMes: Me[];
     me:Me;
   };
-  const { course, projects, adminMes, studentMes,me } = courseDetail;
+  const { course, projects, adminMes, studentMes } = courseDetail;
   const { t } = useTranslation("translation", {
     keyPrefix: "courseDetailTeacher",
   });
