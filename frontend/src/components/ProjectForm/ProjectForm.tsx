@@ -372,7 +372,7 @@ export default function ProjectForm() {
           <Grid item>
             <Stack direction="row" style={{display: "flex", alignItems:"center", paddingBottom: "40px"}}>
               <FolderDragDrop onFileDrop={file => handleFileUpload2(file)} regexRequirements={[]} />
-              <Tooltip style={{ height: "40%" }} title={<Typography variant="h6">{t("fileInfo")}: <Link to="/">{t("userDocs")}</Link></Typography>}>
+              <Tooltip style={{ height: "40%" }} title={<Typography variant="h6">{t("fileInfo")}: <Link to="/user-guide">{t("userDocs")}</Link></Typography>}>
                 <IconButton>
                   <InfoOutlined/>
                 </IconButton>
