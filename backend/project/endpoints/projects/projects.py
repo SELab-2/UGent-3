@@ -52,10 +52,6 @@ class ProjectsEndpoint(Resource):
             courses_student = [c[0] for c in courses_student]
             # Filter the projects based on the query parameters
             filters = dict(request.args)
-            invalid_filters = set(filters.keys()) - {"project_id", "title", "course_id"}
-            if invalid_filters:
-                data["message"] = f"Invalid query parameters {invalid_filters}"
-                return data, 400
             conditions = []
             for key, value in filters.items():
                 if key in Project.__table__.columns:

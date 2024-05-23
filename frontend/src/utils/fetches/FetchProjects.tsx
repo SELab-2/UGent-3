@@ -5,15 +5,16 @@ import {
   ProjectDeadline,
   ShortSubmission,
 } from "../../pages/project/projectDeadline/ProjectDeadline.tsx";
+import { Me } from "../../types/me.ts";
 const API_URL = import.meta.env.VITE_APP_API_HOST;
 
 export const fetchProjectPage = async () => {
-  const projects = await fetchProjects();
   const me = await fetchMe();
+  const projects = await fetchProjects(me);
   return { projects, me };
 };
 
-export const fetchProjects = async () => {
+export const fetchProjects = async (me: Me) => {
   try {
     const response = await authenticatedFetch(`${API_URL}/projects`);
     const jsonData = await response.json();
@@ -24,7 +25,7 @@ export const fetchProjects = async () => {
           const project_id = url_split[url_split.length - 1];
           const response_submissions = await (
             await authenticatedFetch(
-              encodeURI(`${API_URL}/submissions?project_id=${project_id}`)
+              encodeURI(`${API_URL}/submissions?project_id=${project_id}&uid=${me.uid}`)
             )
           ).json();
 
