@@ -21,8 +21,9 @@ import HomePages from "./pages/home/HomePages.tsx";
 import ProjectOverView from "./pages/project/projectOverview.tsx";
 import { synchronizeJoinCode } from "./loaders/join-code.ts";
 import { fetchMe } from "./utils/fetches/FetchMe.ts";
-import {fetchProjectForm} from "./components/ProjectForm/project-form.ts";
+import { fetchProjectForm } from "./components/ProjectForm/project-form.ts";
 import loadSubmissionOverview from "./loaders/submission-overview-loader.ts";
+import loadProjectViewData from "./loaders/project-view-loader.ts";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -36,9 +37,17 @@ const router = createBrowserRouter(
       <Route path=":lang" element={<LanguagePath />}>
         <Route path="home" element={<HomePages />} loader={fetchProjectPage} />
         <Route path="courses">
-          <Route index element={<AllCoursesTeacher />} loader={dataLoaderCourses}/>
+          <Route
+            index
+            element={<AllCoursesTeacher />}
+            loader={dataLoaderCourses}
+          />
           <Route path="join" loader={synchronizeJoinCode} />
-          <Route path=":courseId" element={<CourseDetailTeacher />} loader={dataLoaderCourseDetail} />
+          <Route
+            path=":courseId"
+            element={<CourseDetailTeacher />}
+            loader={dataLoaderCourseDetail}
+          />
         </Route>
         <Route path="projects">
           <Route
@@ -51,12 +60,20 @@ const router = createBrowserRouter(
             path=":projectId/overview"
             element={<SubmissionsOverview />}
           />
-          <Route path=":projectId" element={<ProjectView />}></Route>
-          <Route path="create" element={<ProjectCreateHome />} loader={fetchProjectForm}/>
+          <Route
+            path=":projectId"
+            element={<ProjectView />}
+            loader={loadProjectViewData}
+          ></Route>
+          <Route
+            path="create"
+            element={<ProjectCreateHome />}
+            loader={fetchProjectForm}
+          />
         </Route>
       </Route>
-    </Route>,
-  ),
+    </Route>
+  )
 );
 
 /**
