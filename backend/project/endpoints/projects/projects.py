@@ -63,6 +63,7 @@ class ProjectsEndpoint(Resource):
             projects = projects.all()
             projects = [p for p in projects if get_course_of_project(p.project_id) in courses]
             projects_student = Project.query.filter(Project.course_id.in_(courses_student)).all()
+            projects_student = projects_student.filter(and_(*conditions)) if conditions else projects_student
             projects_student = [p for p in projects_student if p.visible_for_students]
             projects += projects_student
 
