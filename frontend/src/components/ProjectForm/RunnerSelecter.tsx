@@ -66,7 +66,7 @@ export default function RunnerSelecter({ handleSubmit, runner, containsDocker, c
             <MenuItem value={t("clearSelected")}>{t("clearSelected")}</MenuItem>
           </Select>
         </FormControl>
-        <Tooltip title={<Typography variant="h6">{t("tooltipRunner")}: <Link to="/user-guide">{t("userDocs")}</Link></Typography>}>
+        <Tooltip title={<Typography variant="h6">{t("tooltipRunner")}: <Link to="/user-guide/docs/category/evaluators">{t("userDocs")}</Link></Typography>}>
           <IconButton>
             <InfoOutlined/>
           </IconButton>
