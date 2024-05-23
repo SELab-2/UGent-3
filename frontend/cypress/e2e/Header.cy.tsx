@@ -1,6 +1,8 @@
 // e2e needs to check that you can actually go from certain page to other pages using navbar/header
 // also logout and maybe changing language? (how to test language stuff?)
 // component tests that everything is present that has to be present
+import me from "../../tests/utils/me-fixture.ts";
+
 describe("Header look not logged in", () => {
   it("App name in header", () => {
     cy.visit("/");
@@ -28,8 +30,26 @@ describe("Header functionality not logged in", () => {
 
   it("Header change language en -> nl", () => {
     cy.visit("/");
-    cy.contains("en").should("be.visible").click()
-    cy.contains("Nederlands").should("be.visible").click()
-    cy.contains("nl").should("be.visible")
-  })
+    cy.contains("en").should("be.visible").click();
+    cy.contains("Nederlands").should("be.visible").click();
+    cy.contains("nl").should("be.visible");
+  });
+});
+
+describe("Header functionality logged in", () => {
+  it("Display name in header", () => {
+    const response = {
+      statusCode: 200,
+      body: me,
+    };
+    cy.intercept(
+      '/me',
+      response
+    ).as("getMe");
+    cy.intercept('/projects', []).as("getProjects");
+    cy.log(response);
+    cy.visit("/en/home");
+    cy.wait("@getMe");
+    cy.wait("@getProjects");
+  });
 });
