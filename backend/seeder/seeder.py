@@ -170,16 +170,18 @@ def into_the_db(my_uid):
             subscribed_students = populate_course_students(
                 session, course_id, students)
             populate_course_projects(
-                session, course_id, subscribed_students, my_uid)
+                session, course_id, subscribed_students)
 
         for _ in range(5):  # 5 courses where my_uid is a student
             teacher_uid = teachers[random.randint(0, len(teachers)-1)].uid
             course_id = insert_course_into_db_get_id(session, teacher_uid)
             subscribed_students = populate_course_students(
                 session, course_id, students)
+            session.add(CourseStudent(course_id=course_id, uid=my_uid))
+            session.commit()
             subscribed_students.append(my_uid)  # my_uid is also a student
             populate_course_projects(
-                session, course_id, subscribed_students, teacher_uid)
+                session, course_id, subscribed_students)
     except SQLAlchemyError as e:
         if session:  # possibly error resulted in session being null
             session.rollback()
@@ -209,12 +211,8 @@ def populate_course_students(session, course_id, students):
     return [student.uid for student in subscribed_students]
 
 
-def populate_course_projects(session, course_id, students, teacher_uid):
+def populate_course_projects(session, course_id, students):
     """Populates the course with projects and submissions, also creates the files"""
-    teacher_relation = course_admin_generator(course_id, teacher_uid)
-    session.add(teacher_relation)
-    session.commit()
-
     num_projects = random.randint(1, 3)
     projects = generate_projects(course_id, num_projects)
     session.add_all(projects)

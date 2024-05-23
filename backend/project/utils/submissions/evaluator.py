@@ -82,15 +82,18 @@ def run_evaluator(submission: Submission, project_path: str, evaluator: str, is_
     Returns:
         int: The exit code of the evaluator.
     """
-    status_code = evaluate(submission, project_path, evaluator, is_late)
-
-    if not is_late:
-        if status_code == 0:
-            submission.submission_status = 'SUCCESS'
+    try:
+        status_code = evaluate(submission, project_path, evaluator, is_late)
+        if not is_late:
+            if status_code == 0:
+                submission.submission_status = 'SUCCESS'
+            else:
+                submission.submission_status = 'FAIL'
         else:
-            submission.submission_status = 'FAIL'
-    else:
-        submission.submission_status = 'LATE'
+            submission.submission_status = 'LATE'
+    except: # pylint: disable=bare-except
+        submission.submission_status = 'FAIL'
+
 
     try:
         db.session.merge(submission)

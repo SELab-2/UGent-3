@@ -37,4 +37,4 @@ fi
 
 echo "Running tests..."
 ls /submission
-bash /tests/run_test.sh
+bash /tests/run_tests.sh

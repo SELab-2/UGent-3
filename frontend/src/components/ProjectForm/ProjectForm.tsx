@@ -31,6 +31,7 @@ import AdvancedRegex from "./AdvancedRegex.tsx";
 import RunnerSelecter from "./RunnerSelecter.tsx";
 import { authenticatedFetch } from "../../utils/authenticated-fetch.ts";
 import i18next from "i18next";
+import DeadlineGrid from "../DeadlineView/DeadlineGrid.tsx";
 
 interface Course {
   course_id: string;
@@ -239,7 +240,7 @@ export default function ProjectForm() {
 
     response.json().then((data) => {
       const projectData = data.data;
-      navigate(`/${i18next.language}/projects/${projectData.project_id}`);
+      navigate(`/${i18next.resolvedLanguage}/projects/${projectData.project_id}`);
     })
   }
 
@@ -332,30 +333,7 @@ export default function ProjectForm() {
               deadlines={[]}
               onChange={(deadlines: Deadline[]) => handleDeadlineChange(deadlines)}
               editable={true} />
-            <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 650 }}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold' }}>{t("deadline")}</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }} align="right">{t("description")}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {deadlines.length === 0 ? ( // Check if deadlines is empty
-                    <TableRow>
-                      <TableCell colSpan={2} align="center">{t("noDeadlinesPlaceholder")}</TableCell>
-                    </TableRow>
-                  ) : (
-                    deadlines.map((deadline, index) => (
-                      <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                        <TableCell component="th" scope="row">{deadline.deadline}</TableCell>
-                        <TableCell align="right">{deadline.description}</TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <DeadlineGrid deadlines={deadlines} minWidth={650} />
           </Grid>
           <Grid item>
             <Stack direction="row" style={{display: "flex", alignItems:"center"}}>
@@ -372,7 +350,7 @@ export default function ProjectForm() {
           <Grid item>
             <Stack direction="row" style={{display: "flex", alignItems:"center", paddingBottom: "40px"}}>
               <FolderDragDrop onFileDrop={file => handleFileUpload2(file)} regexRequirements={[]} />
-              <Tooltip style={{ height: "40%" }} title={<Typography variant="h6">{t("fileInfo")}: <Link to="/">{t("userDocs")}</Link></Typography>}>
+              <Tooltip style={{ height: "40%" }} title={<Typography variant="h6">{t("fileInfo")}: <Link to="/user-guide">{t("userDocs")}</Link></Typography>}>
                 <IconButton>
                   <InfoOutlined/>
                 </IconButton>

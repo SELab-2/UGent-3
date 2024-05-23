@@ -20,6 +20,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import debounce from "debounce";
+import i18next from "i18next";
 
 /**
  * @param text - The text to be displayed
@@ -263,8 +264,7 @@ function EmptyOrNotProjects({
   projects: ProjectDetail[];
   noProjectsText: string;
 }): JSX.Element {
-  const { i18n } = useTranslation();
-  const lang = i18n.language;
+  const lang = i18next.resolvedLanguage;
   if (projects === undefined || projects.length === 0) {
     return (
       <Typography
@@ -286,10 +286,10 @@ function EmptyOrNotProjects({
               const deadlineDate = deadline.date;
               const diffTime = Math.abs(deadlineDate.getTime() - now.getTime());
               const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-              const diffDays = Math.ceil(diffHours * 24);
+              const diffDays = Math.floor(diffHours / 24);
 
               timeLeft =
-                diffDays > 1 ? `${diffDays} days` : `${diffHours} hours`;
+                diffDays >= 1 ? `${diffDays} days` : `${diffHours} hours`;
             }
           }
           return (
