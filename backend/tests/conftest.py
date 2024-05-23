@@ -17,7 +17,7 @@ from project.models.user import User,Role
 from project.models.project import Project
 from project.models.course_relation import CourseStudent,CourseAdmin
 from project.models.submission import Submission, SubmissionStatus
-
+from project.models.group import Group
 
 
 ### CLIENT & SESSION ###
@@ -52,6 +52,8 @@ def session() -> Generator[Session, any, None]:
         session.add_all(projects(session))
         session.commit()
         session.add_all(submissions(session))
+        session.commit()
+        session.add(group(session))
         session.commit()
 
         yield session
@@ -199,3 +201,8 @@ def submissions(session):
             submission_status= SubmissionStatus.SUCCESS
         )
     ]
+
+def group(session):
+    """Return a group to populate the database"""
+    project_id = session.query(Project).filter_by(title="B+ Trees").first().project_id
+    return Group(project_id=project_id, group_size=4)

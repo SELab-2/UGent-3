@@ -41,13 +41,15 @@ export function loggedInToken() {
  * @returns The username.
  */
 export async function getUser(uid: string): Promise<Me> {
-  return authenticatedFetch(`${apiHost}/users/${getIdFromLink(uid)}`).then((response) => {
-    if (response.ok) {
-      return response.json().then((data) => {
-        return data.data;
-      });
+  return authenticatedFetch(`${apiHost}/users/${getIdFromLink(uid)}`).then(
+    (response) => {
+      if (response.ok) {
+        return response.json().then((data) => {
+          return data.data;
+        });
+      }
     }
-  })
+  );
 }
 
 /**
@@ -124,14 +126,14 @@ const fetchData = async (url: string, params?: URLSearchParams) => {
 export const dataLoaderCourses = async () => {
   //const params = new URLSearchParams({ 'teacher': loggedInUid() });
 
-  const courses =  await fetchData(`courses`);
+  const courses = await fetchData(`courses`);
   const projects = await fetchProjectsCourse(courses);
   const me = await fetchMe();
-  for( const c of courses){
-    const teacher = await fetchData(`users/${c.teacher}`)
-    c.teacher = teacher.display_name
+  for (const c of courses) {
+    const teacher = await fetchData(`users/${c.teacher}`);
+    c.teacher = teacher.display_name;
   }
-  return {courses, projects, me}
+  return { courses, projects, me };
 };
 
 /**
@@ -139,7 +141,7 @@ export const dataLoaderCourses = async () => {
  * @param courses - All the courses
  * @returns the projects
  */
-export async function  fetchProjectsCourse (courses:Course[]) {
+export async function fetchProjectsCourse(courses: Course[]) {
   const projectPromises = courses.map((course) =>
     authenticatedFetch(
       `${apiHost}/projects?course_id=${getIdFromLink(course.course_id)}`
@@ -149,30 +151,32 @@ export async function  fetchProjectsCourse (courses:Course[]) {
   const projectResults = await Promise.all(projectPromises);
   const projectsMap: { [courseId: string]: ProjectDetail[] } = {};
   for await (const [index, result] of projectResults.entries()) {
-    projectsMap[getIdFromLink(courses[index].course_id)]  = await Promise.all(result.data.map(async (item: Project) => {
-      const projectRes = await authenticatedFetch(item.project_id);
-      if (projectRes.status !== 200) {
-        throw new Response("Failed to fetch project data", {
-          status: projectRes.status,
-        });
-      }
-      const projectJson = await projectRes.json();
-      const projectData = projectJson.data;
-      let projectDeadlines = [];
-      if (projectData.deadlines) {
-        projectDeadlines = projectData.deadlines.map(
-          ([description, dateString]: [string, string]) => ({
-            description,
-            date: new Date(dateString),
-          })
-        );
-      }
-      const project: ProjectDetail = {
-        ...item,
-        deadlines: projectDeadlines,
-      };
-      return project;
-    }));
+    projectsMap[getIdFromLink(courses[index].course_id)] = await Promise.all(
+      result.data.map(async (item: Project) => {
+        const projectRes = await authenticatedFetch(item.project_id);
+        if (projectRes.status !== 200) {
+          throw new Response("Failed to fetch project data", {
+            status: projectRes.status,
+          });
+        }
+        const projectJson = await projectRes.json();
+        const projectData = projectJson.data;
+        let projectDeadlines = [];
+        if (projectData.deadlines) {
+          projectDeadlines = projectData.deadlines.map(
+            ([description, dateString]: [string, string]) => ({
+              description,
+              date: new Date(dateString),
+            })
+          );
+        }
+        const project: ProjectDetail = {
+          ...item,
+          deadlines: projectDeadlines,
+        };
+        return project;
+      })
+    );
   }
   return { ...projectsMap };
 }
@@ -228,7 +232,7 @@ const dataLoaderStudents = async (courseId: string) => {
 
 const fetchMes = async (uids: string[]) => {
   return Promise.all(uids.map((uid) => getUser(uid)));
-}
+};
 
 export const dataLoaderCourseDetail = async ({
   params,
@@ -239,13 +243,28 @@ export const dataLoaderCourseDetail = async ({
   if (!courseId) {
     throw new Error("Course ID is undefined.");
   }
+  const me = await fetchMe();
+
   const course = await dataLoaderCourse(courseId);
+
+  const courseAdminuids = course["admins"].map((admin: string) => {
+    const urlSplit = admin.split("/");
+    return urlSplit[urlSplit.length - 1];
+  });
+
   const projects = await dataLoaderProjects(courseId);
-  const admins = await dataLoaderAdmins(courseId);
+  let adminMes: Me[] = [];
+  if (me.uid === course.teacher || courseAdminuids.includes(me.uid)) {
+    const admins = await dataLoaderAdmins(courseId);
+    const adminUids = admins.map((admin: { uid: string }) =>
+      getIdFromLink(admin.uid)
+    );
+    adminMes = await fetchMes([course.teacher, ...adminUids]);
+  }
   const students = await dataLoaderStudents(courseId);
-  const admin_uids = admins.map((admin: {uid: string}) => getIdFromLink(admin.uid));
-  const student_uids = students.map((student: {uid: string}) => getIdFromLink(student.uid));
-  const adminMes = await fetchMes([course.teacher, ...admin_uids]);
+  const student_uids = students.map((student: { uid: string }) =>
+    getIdFromLink(student.uid)
+  );
   const studentMes = await fetchMes(student_uids);
-  return { course, projects, adminMes, studentMes };
+  return { course, projects, adminMes, studentMes, me };
 };

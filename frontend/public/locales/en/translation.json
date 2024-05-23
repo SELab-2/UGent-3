@@ -65,6 +65,9 @@
     "submit": "Submit",
     "previousSubmissions": "Previous Submissions",
     "noFileSelected": "No file selected",
+    "delete": "Delete",
+    "deleteProjectWarning": "Are you sure you want to delete this project?",
+    "imSure": "Yes, I'm sure",
     "submissionGrid": {
       "late": "Late",
       "fail": "Fail",

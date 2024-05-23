@@ -50,6 +50,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return wrap
 
+
 def login_required_return_uid(f):
     """
     This function will check if the person sending a request to the API is logged in
@@ -61,6 +62,7 @@ def login_required_return_uid(f):
         kwargs["uid"] = uid
         return f(*args, **kwargs)
     return wrap
+
 
 def authorize_admin(f):
     """
@@ -168,6 +170,26 @@ def authorize_teacher_of_project(f):
                             you are not the teacher of this project"""}, 403)))
     return wrap
 
+
+def authorize_teacher_or_student_of_project(f):
+    """
+    This function will check if the person sending a request to the API is logged in, 
+    and the teacher or student of the course which the project in the request belongs to.
+    Returns 403: Not Authorized if either condition is false
+    """
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        auth_user_id = return_authenticated_user_id()
+        project_id = kwargs["project_id"]
+        course_id = get_course_of_project(project_id)
+
+        if (is_teacher_of_course(auth_user_id, course_id) or
+            is_student_of_course(auth_user_id, course_id)):
+            return f(*args, **kwargs)
+
+        abort(make_response(({"message": """You are not authorized to perfom this action,
+                            you are not the teacher OR student of this project"""}, 403)))
+    return wrap
 
 def authorize_teacher_or_project_admin(f):
     """
