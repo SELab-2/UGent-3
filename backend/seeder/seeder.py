@@ -222,7 +222,7 @@ def populate_course_projects(session, course_id, students):
         # Write assignment.md file
         assignment_content = fake.text()
         assignment_file_path = os.path.join(
-            UPLOAD_URL, "projects", str(project_id), "assignment.md")
+            UPLOAD_URL, str(project_id), "assignment.md")
         os.makedirs(os.path.dirname(assignment_file_path), exist_ok=True)
         with open(assignment_file_path, "w", encoding="utf-8") as assignment_file:
             assignment_file.write(assignment_content)
@@ -236,7 +236,7 @@ def populate_project_submissions(session, students, project_id):
         session.add_all(submissions)
         session.commit()
         for submission in submissions:
-            submission_directory = os.path.join(UPLOAD_URL, "projects", str(
+            submission_directory = os.path.join(UPLOAD_URL, str(
                 project_id), "submissions", str(submission.submission_id), "submission")
             os.makedirs(submission_directory, exist_ok=True)
             submission_file_path = os.path.join(
