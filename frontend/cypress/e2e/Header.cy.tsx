@@ -42,11 +42,8 @@ describe("Header functionality logged in", () => {
       statusCode: 200,
       body: me,
     };
-    cy.intercept(
-      '/me',
-      response
-    ).as("getMe");
-    cy.intercept('/projects', []).as("getProjects");
+    cy.intercept("/me", response).as("getMe");
+    cy.intercept("/projects", []).as("getProjects");
     cy.log(response);
     cy.visit("/en/home");
     cy.wait("@getMe");
