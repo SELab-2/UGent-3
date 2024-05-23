@@ -43,13 +43,13 @@ class ProjectsEndpoint(Resource):
         }
         try:
             # Get all the courses a user is part of
-            courses = CourseStudent.query.filter_by(uid=uid).\
+            coursesStudent = CourseStudent.query.filter_by(uid=uid).\
                 with_entities(CourseStudent.course_id).all()
-            courses += CourseAdmin.query.filter_by(uid=uid).\
+            courses = CourseAdmin.query.filter_by(uid=uid).\
                 with_entities(CourseAdmin.course_id).all()
             courses += Course.query.filter_by(teacher=uid).with_entities(Course.course_id).all()
             courses = [c[0] for c in courses] # Remove the tuple wrapping the course_id
-
+            coursesStudent = [c[0] for c in coursesStudent]
             # Filter the projects based on the query parameters
             filters = dict(request.args)
             conditions = []
@@ -62,6 +62,9 @@ class ProjectsEndpoint(Resource):
             projects = projects.filter(and_(*conditions)) if conditions else projects
             projects = projects.all()
             projects = [p for p in projects if get_course_of_project(p.project_id) in courses]
+            projects_student = Project.query.filter(Project.course_id.in_(coursesStudent)).all()
+            projects_student = [p for p in projects_student if p.visible_for_students]
+            projects += projects_student
 
             # Return the projects
             data["message"] = "Successfully fetched the projects"
