@@ -6,7 +6,6 @@ import {
 } from "react-router-dom";
 import Layout from "./components/Header/Layout";
 import { AllCoursesTeacher } from "./components/Courses/AllCoursesTeacher";
-import { CourseDetailTeacher } from "./components/Courses/CourseDetailTeacher";
 import {
   dataLoaderCourseDetail,
   dataLoaderCourses,
@@ -23,6 +22,7 @@ import { synchronizeJoinCode } from "./loaders/join-code.ts";
 import { fetchMe } from "./utils/fetches/FetchMe.ts";
 import {fetchProjectForm} from "./components/ProjectForm/project-form.ts";
 import loadSubmissionOverview from "./loaders/submission-overview-loader.ts";
+import CoursesDetail from "./components/Courses/CoursesDetail.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -38,7 +38,7 @@ const router = createBrowserRouter(
         <Route path="courses">
           <Route index element={<AllCoursesTeacher />} loader={dataLoaderCourses}/>
           <Route path="join" loader={synchronizeJoinCode} />
-          <Route path=":courseId" element={<CourseDetailTeacher />} loader={dataLoaderCourseDetail} />
+          <Route path=":courseId" element={<CoursesDetail />} loader={dataLoaderCourseDetail} />
         </Route>
         <Route path="projects">
           <Route

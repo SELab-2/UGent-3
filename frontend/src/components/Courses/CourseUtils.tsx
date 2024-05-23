@@ -247,5 +247,6 @@ export const dataLoaderCourseDetail = async ({
   const student_uids = students.map((student: {uid: string}) => getIdFromLink(student.uid));
   const adminMes = await fetchMes([course.teacher, ...admin_uids]);
   const studentMes = await fetchMes(student_uids);
-  return { course, projects, adminMes, studentMes };
+  const me = await fetchMe();
+  return { course, projects, adminMes, studentMes, me};
 };
