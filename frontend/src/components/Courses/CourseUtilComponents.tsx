@@ -286,7 +286,7 @@ function EmptyOrNotProjects({
               const deadlineDate = deadline.date;
               const diffTime = Math.abs(deadlineDate.getTime() - now.getTime());
               const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-              const diffDays = Math.ceil(diffHours * 24);
+              const diffDays = Math.floor(diffHours / 24);
 
               timeLeft =
                 diffDays > 1 ? `${diffDays} days` : `${diffHours} hours`;
