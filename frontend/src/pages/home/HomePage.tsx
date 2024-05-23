@@ -11,14 +11,13 @@ import {
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { DayCalendarSkeleton, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { PickersDay, PickersDayProps } from "@mui/x-date-pickers/PickersDay";
 import { ProjectDeadlineCard } from "../project/projectDeadline/ProjectDeadlineCard.tsx";
 import { ProjectDeadline } from "../project/projectDeadline/ProjectDeadline.tsx";
 import { useLoaderData } from "react-router-dom";
 import { Me } from "../../types/me.ts";
-
 interface DeadlineInfoProps {
   selectedDay: Dayjs;
   deadlines: ProjectDeadline[];
@@ -144,6 +143,11 @@ export default function HomePage() {
     .sort((a, b) => dayjs(b.deadline).diff(dayjs(a.deadline)))
     .slice(0, 3); // only show the first 3
   const noDeadlineProject = projects.filter((p) => p.deadline === undefined);
+
+  useEffect(() => {
+    handleMonthChange(selectedDay, projects, setHighlightedDays);
+  }, [projects, selectedDay]);
+
   return (
     <Container style={{ paddingTop: "50px" }}>
       <Grid container spacing={2} wrap="nowrap">
