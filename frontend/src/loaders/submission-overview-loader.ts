@@ -30,7 +30,7 @@ export default async function loadSubmissionOverview({
 
   const projectId = params.projectId;
   const projectResponse = await authenticatedFetch(
-      `${APIURL}/projects/${projectId}`
+    `${APIURL}/projects/${projectId}`
   );
 
   if (!projectResponse.ok) {
