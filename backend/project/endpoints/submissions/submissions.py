@@ -7,6 +7,7 @@ from urllib.parse import urljoin
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from shutil import rmtree
+import zipfile
 from flask import request
 from flask_restful import Resource
 from sqlalchemy import exc, and_
@@ -104,7 +105,7 @@ class SubmissionsEndpoint(Resource):
             return data, 500
 
     @authorize_student_submission
-    def post(self, uid=None) -> dict[str, any]:
+    def post(self, uid=None) -> dict[str, any]: # pylint: disable=too-many-locals, too-many-branches, too-many-statements
         """Post a new submission to a project
 
         Returns:
@@ -174,7 +175,13 @@ class SubmissionsEndpoint(Resource):
                     input_folder = path.join(submission.submission_path, "submission")
                     makedirs(input_folder, exist_ok=True)
                     for file in files:
-                        file.save(path.join(input_folder, file.filename))
+                        file_path = path.join(input_folder, file.filename)
+                        file.save(file_path)
+                        if file.filename.endswith(".zip"):
+                            with zipfile.ZipFile(file_path) as upload_zip:
+                                upload_zip.extractall(input_folder)
+
+
                 except OSError:
                     rmtree(submission.submission_path)
                     session.rollback()
