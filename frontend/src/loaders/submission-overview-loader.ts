@@ -30,11 +30,15 @@ export default async function loadSubmissionOverview({
 
   const projectId = params.projectId;
   const projectResponse = await authenticatedFetch(
-    `${APIURL}/projects/${projectId}`
+      `${APIURL}/projects/${projectId}`
   );
 
-  if(projectResponse.status != 200) {
-    throw new Response("Not authenticated", {status: 403});
+  if (!projectResponse.ok) {
+    if (projectResponse.status == 403) {
+      throw new Response("Not authenticated", {status: 403});
+    } else if (projectResponse.status == 404) {
+      throw new Response("Not found", {status: 404});
+    }
   }
 
   const projectData = (await projectResponse.json())["data"];
