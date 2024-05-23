@@ -1,20 +1,24 @@
-FROM docker:dind as builder
+FROM docker:dind
 
-FROM python:3.9
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    tzdata
 
-COPY --from=builder /usr/local/bin/docker /usr/local/bin/docker
+ENV TZ=UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+    
 
-RUN mkdir /app
-WORKDIR /app
 
-ADD ./project /app/
-
-COPY requirements.txt /app/requirements.txt
-
-RUN pip3 install -r requirements.txt
+RUN python3 -m venv /venv
+ENV PATH="/venv/bin:$PATH"
 
 COPY . /app
 
-CMD ["/app/entry-point.sh"]
-#ENTRYPOINT ["python"]
-#CMD ["__main__.py"]
+WORKDIR /app
+
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+RUN chmod +x /app/entry-point.sh
+ENTRYPOINT ["/app/entry-point.sh"]
+

@@ -54,7 +54,8 @@ services:
   backend:
     <<: *common-keys-selab
     container_name: backend
-    command: ["python", "__main__.py"]
+    privileged: true
+    command: ["python", "-m", "project"]
     depends_on:
       - database
     build: 
@@ -62,7 +63,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend/UPLOAD_FOLDER/:/UPLOAD_FOLDER/:rw
-      - /var/run/docker.sock:/var/run/docker.sock 
+        #- /var/run/docker.sock:/var/run/docker.sock 
     ports:
       - 5000:5000
   database:
