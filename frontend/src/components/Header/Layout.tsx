@@ -24,10 +24,11 @@ export default function Layout(): JSX.Element {
       !meData.loggedIn &&
       !(
         location.pathname === "/" ||
-        /\/([a-z]{2})?\/home/.test(location.pathname)
+        /\/([a-z]{2})\/home/.test(location.pathname) ||
+        location.pathname === `/${i18next.resolvedLanguage}`
       )
     ) {
-      navigate("/");
+      navigate(`${i18next.resolvedLanguage}/home`);
     }
   }, [meData.loggedIn, location.pathname, navigate]);
 
