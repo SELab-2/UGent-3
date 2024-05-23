@@ -4,6 +4,9 @@ import tempfile
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from typing import Any
+from zipfile import ZipFile
+import os
+
 import pytest
 from pytest import fixture, FixtureRequest
 from flask.testing import FlaskClient
@@ -125,12 +128,13 @@ def course(session: Session, student: User, teacher: User, admin: User) -> Cours
     return course
 
 
+
 ### PROJECTS ###
 @fixture
 def project(session: Session, course: Course):
     """Return a project entry"""
     project = Project(
-        title="Test project",
+        title="project",
         description="Test project",
         deadlines=[{"deadline":"2024-05-23T21:59:59", "description":"Final deadline"}],
         course_id=course.course_id,
@@ -142,6 +146,45 @@ def project(session: Session, course: Course):
     session.add(project)
     session.commit()
     return project
+
+@fixture
+def project_invisible(session: Session, course: Course):
+    """Return a project entry that is not visible for the student"""
+    project = Project(
+        title="invisible project",
+        description="Test project",
+        deadlines=[{"deadline":"2024-05-23T21:59:59", "description":"Final deadline"}],
+        course_id=course.course_id,
+        visible_for_students=False,
+        archived=False,
+        runner=Runner.GENERAL,
+        regex_expressions=[".*.pdf"]
+    )
+    session.add(project)
+    session.commit()
+    return project
+
+@fixture
+def project_archived(session: Session, course: Course):
+    """Return a project entry that is not visible for the student"""
+    project = Project(
+        title="archived project",
+        description="Test project",
+        deadlines=[{"deadline":"2024-05-23T21:59:59", "description":"Final deadline"}],
+        course_id=course.course_id,
+        visible_for_students=True,
+        archived=True,
+        runner=Runner.GENERAL,
+        regex_expressions=[".*.pdf"]
+    )
+    session.add(project)
+    session.commit()
+    return project
+
+@fixture
+def projects(project: Project, project_invisible: Project, project_archived: Project):
+    """Return a list of project entries"""
+    return [project, project_invisible, project_archived]
 
 
 
@@ -162,13 +205,6 @@ def submission(session: Session, student: User, project: Project):
 
 ### FILES ###
 @fixture
-def file_empty():
-    """Return an empty file"""
-    descriptor, name = tempfile.mkstemp()
-    with open(descriptor, "rb") as temp:
-        yield temp, name
-
-@fixture
 def file_no_name():
     """Return a file with no name"""
     descriptor, name = tempfile.mkstemp()
@@ -176,15 +212,34 @@ def file_no_name():
         temp.write("This is a test file.")
     with open(name, "rb") as temp:
         yield temp, ""
+    os.remove(name)
 
 @fixture
 def files():
     """Return a temporary file"""
-    name = "/tmp/test.pdf"
+    name = "test.pdf"
     with open(name, "w", encoding="UTF-8") as file:
         file.write("This is a test file.")
     with open(name, "rb") as file:
         yield [(file, name)]
+    os.remove(name)
+
+@fixture
+def file_assignment():
+    """Return an assignment file for a project"""
+    assignment_file = "assignment.md"
+    assignment_content = "# Assignment"
+    with open(assignment_file, "w", encoding="UTF-8") as file:
+        file.write(assignment_content)
+
+    zip_file = "project.zip"
+    with ZipFile(zip_file, "w") as zipf:
+        zipf.write(assignment_file)
+
+        yield (zipf, zip_file)
+
+    os.remove(assignment_file)
+    os.remove(zip_file)
 
 
 
